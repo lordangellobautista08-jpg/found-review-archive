@@ -77,43 +77,58 @@ footer{border-top:1px solid var(--bd);padding:22px 0;color:var(--mu);font-size:.
 <header><div class="w hi"><button class="btn" id="bg" onclick="dr(1)" aria-label="Menu">☰</button><a class="brand" onclick="go('home')">Found <i>/</i> CE Review Archive</a><div id="tb"></div></div></header>
 <div id="ov" onclick="dr(0)"></div><aside id="dr"></aside>
 <main id="app"></main>
-<footer class="art"><div class="w">Found / CE Review Archive · Prototype: your progress and your own content are saved in this browser only</div></footer>
+<footer class="art"><div class="w">Found / CE Review Archive · Your progress and your own content are saved to your account</div></footer>
 <div id="toast"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.109.0"></script>
 <script>
 /* ===== BASICS ===== */
-const L=(()=>{try{localStorage.getItem('x');return localStorage}catch(e){return{}}})();
+/* These two values are public. Your data is protected by the database rules (RLS), not by hiding them. */
+const SB_URL='https://ixwfnogcxcctkpnnlqaw.supabase.co',SB_KEY='sb_publishable_Kn0-quPSdHj7a8WwsJ8nmA_yXFJdf3N';
+const sb=supabase.createClient(SB_URL,SB_KEY);
 const $=s=>document.querySelector(s),v=id=>$('#'+id).value,U=()=>Math.random().toString(36).slice(2,8),C=['MSTC','HPGE','PSAD'],
 E=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),
 sh=a=>[...a].sort(()=>Math.random()-.5),mmss=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0'),
 go=h=>{if(location.hash=='#/'+h)route();else location.hash='#/'+h},
-CD={MSTC:'Mathematics, Surveying and Transportation Engineering.',HPGE:'Hydraulics and Geotechnical Engineering.',PSAD:'Structural Analysis and Design.'},
-FOL=['Lecture Notes','Questionnaires','Solutions'],J=(k,d)=>{try{return JSON.parse(L[k])||d}catch(e){return d}};
-let D=J('fra2',null)||{FO:C.flatMap(c=>FOL.map(n=>({id:U(),c,name:n,def:1}))),M:[],F:[],MQ:[],U:[['Student One','student@example.com','student'],['Admin One','admin@example.com','admin']]},
-P=J('fra2p',null)||{h:[],q:{},fc:{},bm:[]},role=L.fra_role||'student',nv=0,tk,QL=0,OQ=[];
-const save=()=>{try{L.fra2=JSON.stringify(D);L.fra2p=JSON.stringify(P)}catch(e){toast('Storage is full. Remove some images.')}};save();
-function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',2600)}
+CD={MSTC:'Mathematics, Surveying and Transportation Engineering.',HPGE:'Hydraulics and Geotechnical Engineering.',PSAD:'Structural Analysis and Design.'};
+let D={FO:[],M:[],F:[],MQ:[],U:[]},P={h:[],q:{},fc:{},bm:[]},role='student',nv=0,tk,QL=0,OQ=[],ME=null,PR=null,CU=null,AU={mode:'in',msg:''};
+const save=()=>{};
+function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',3200)}
 function dr(x){$('#dr').classList.toggle('on',!!x);$('#ov').classList.toggle('on',!!x)}
 const tag=x=>`<span class="tag">${E(x)}</span>`,hd=(t,p)=>`<div class="ph art"><div class="w"><h1>${t}</h1><p class="mu">${p}</p></div></div>`,
 empty=t=>`<div class="card empty art"><p class="mu">${t}</p></div>`;
-function del(k,id){if(confirm('Delete this?')){D[k]=D[k].filter(x=>x.id!=id);save();route()}}
-function bm(id){const i=P.bm.indexOf(id);i<0?P.bm.push(id):P.bm.splice(i,1);save();route()}
+const TB={M:'materials',F:'flashcards',MQ:'questions'};
+async function del(k,id){if(!confirm('Delete this?'))return;const r=await sb.from(TB[k]).delete().eq('id',id);if(r.error)return toast(r.error.message);D[k]=D[k].filter(x=>x.id!=id);route()}
+async function bm(id){const i=P.bm.indexOf(id),r=i<0?await sb.from('bookmarks').insert({user_id:ME.id,material_id:id}):await sb.from('bookmarks').delete().eq('material_id',id).eq('user_id',ME.id);if(r.error)return toast(r.error.message);i<0?P.bm.push(id):P.bm.splice(i,1);route()}
 
-/* ===== QUESTIONS: loaded from questions.csv (official) + your own ===== */
+/* ===== QUESTIONS + DATA LOADING (from Supabase) ===== */
 const csv=tx=>{const R=[];let r=[],f='',q=0;for(let i=0;i<tx.length;i++){const c=tx[i];if(q){if(c=='"'){if(tx[i+1]=='"'){f+='"';i++}else q=0}else f+=c}else if(c=='"')q=1;else if(c==','){r.push(f);f=''}else if(c=='\n'||c=='\r'){if(c=='\r'&&tx[i+1]=='\n')i++;r.push(f);f='';R.push(r);r=[]}else f+=c}if(f||r.length){r.push(f);R.push(r)}return R};
-const toQ=R=>R.slice(1).filter(f=>f.length>=14).map(f=>{const x=f.length-14,g=i=>(f[i<9?i:i+x]||'').trim(),a='ABCD'.indexOf(g(9).toUpperCase());/* rows with 2 extra columns are auto-repaired */return a<0?0:{id:'o'+g(0),c:g(1).toUpperCase(),s:g(2),t:g(3),q:g(4),o:[g(5),g(6),g(7),g(8)],a,e:g(10),d:g(11),st:g(13)}}).filter(x=>x&&C.includes(x.c));
-const imp=t=>{OQ=toQ(csv(t.replace(/^\uFEFF/,'')))};
-fetch('questions.csv').then(r=>r.ok?r.text():Promise.reject()).then(imp).catch(()=>{if(L.fra_csv)imp(L.fra_csv)}).finally(()=>{QL=1;route()});
-function impCsv(el){const f=el.files[0];if(!f)return;f.text().then(t=>{imp(t);if(!OQ.length)return toast('No valid questions found. Check the columns.');try{L.fra_csv=t}catch(e){}toast('Loaded '+OQ.length+' questions');route()})}
+const dbq=x=>({id:x.id,c:x.component,s:x.subject,t:x.topic,q:x.question,o:[x.choice_a,x.choice_b,x.choice_c,x.choice_d],a:'ABCD'.indexOf(x.correct_answer),e:x.explanation||'',d:x.difficulty||'',st:x.verification_status||'',own:x.owner_id?1:0});
 const allQ=()=>[...OQ,...D.MQ],subs=c=>[...new Set(allQ().filter(x=>x.c==c).map(x=>x.s))],tops=(c,s)=>[...new Set(allQ().filter(x=>x.c==c&&x.s==s).map(x=>x.t))];
 const stat=f=>{const q=allQ().filter(f);let ok=0,n=0,m=0,at=0;q.forEach(x=>{const s=P.q[x.id];if(s){at++;ok+=s[0];n+=s[1];m+=s[2]}});return{n:q.length,at,acc:n?Math.round(100*ok/n):0,ms:q.length?Math.round(100*m/q.length):0}};
 const bars=s=>`<p class="sm" style="margin-top:10px">Accuracy ${s.acc}%</p><div class="pb"><b style="width:${s.acc}%"></b></div><p class="sm">Mastery ${s.ms}%</p><div class="pb"><b style="width:${s.ms}%"></b></div><p class="mu sm">${s.at} of ${s.n} questions attempted</p>`;
+async function pg(t,f){let a=[],i=0;for(;;){const r=await f(sb.from(t).select('*')).range(i,i+999);if(r.error)return{data:a,error:r.error};a=a.concat(r.data);if(r.data.length<1000)return{data:a};i+=1000}}
+async function load(){
+const r=await Promise.all([sb.from('profiles').select('*').eq('id',ME.id).maybeSingle(),pg('questions',q=>q.order('id')),sb.from('folders').select('*').order('created_at'),sb.from('materials').select('*').order('created_at'),sb.from('flashcards').select('*').order('created_at'),sb.from('flashcard_marks').select('*'),sb.from('bookmarks').select('*'),pg('question_stats',q=>q.order('question_id')),sb.from('quiz_attempts').select('*').order('created_at',{ascending:false}).limit(30)]);
+const er=r.find(x=>x.error);if(er)toast(er.error.message);const g=i=>r[i].data||[];
+PR=r[0].data||{display_name:'',role:'student'};role=PR.role||'student';
+const Q=g(1).map(dbq);OQ=Q.filter(x=>!x.own);D.MQ=Q.filter(x=>x.own);
+D.FO=g(2).map(x=>({id:x.id,c:x.component,name:x.name,def:x.is_default,own:x.owner_id?1:0}));
+D.M=g(3).map(x=>({id:x.id,fo:x.folder_id,title:x.title,desc:x.description||'',type:x.file_type||''}));
+const F=g(4),paths=F.filter(x=>x.image_path).map(x=>x.image_path),su={};
+if(paths.length){const s=await sb.storage.from('flashcard-images').createSignedUrls(paths,3600);(s.data||[]).forEach(x=>su[x.path]=x.signedUrl)}
+D.F=F.map(x=>({id:x.id,c:x.component,f:x.front,b:x.back||'',img:su[x.image_path]||'',ip:x.image_path||'',pub:x.published,own:x.owner_id?1:0}));
+P.fc={};g(5).forEach(x=>P.fc[x.flashcard_id]=x.status);P.bm=g(6).map(x=>x.material_id);
+P.q={};g(7).forEach(x=>P.q[x.question_id]=[x.correct_count,x.total_count,+x.last_correct]);
+const at=g(8),an=at.length?(await pg('quiz_answers',q=>q.in('attempt_id',at.map(x=>x.id)).order('id'))).data:[];
+P.h=at.map(a=>({id:a.id,ts:new Date(a.created_at).getTime(),sc:a.scope||'',n:a.total,k:a.correct,secs:a.seconds||0,it:an.filter(x=>x.attempt_id==a.id).sort((x,y)=>x.position-y.position).map(x=>({id:x.question_id,ch:x.chosen,ok:+x.is_correct}))}));
+D.U=[];if(role=='admin'){const u=await sb.from('profiles').select('*').order('created_at');D.U=u.data||[]}}
 
 /* ===== VIEWS ===== */
 const V={};
-V.home=()=>`<section class="hero art"><div class="w"><p class="eyebrow">Civil Engineering Board Exam</p><h1>Your CE review archive: notes, questions and quizzes in one place.</h1><p class="lead">Lecture notes, questionnaires and solutions, plus quizzes, flashcards and progress tracking for MSTC, HPGE and PSAD.</p><button class="btn p" onclick="go('dash')">Get started</button></div></section>
-<div class="w sec"><h2>Exam Components</h2><div class="g">${C.map(c=>`<div class="card art" onclick="go('c/${c}')"><h3>${c}</h3><p class="mu">${CD[c]}</p><p class="mu sm">${allQ().filter(x=>x.c==c).length} questions</p></div>`).join('')}</div></div>`;
+V.home=()=>`<section class="hero art"><div class="w"><p class="eyebrow">Civil Engineering Board Exam</p><h1>Your CE review archive: notes, questions and quizzes in one place.</h1><p class="lead">Lecture notes, questionnaires and solutions, plus quizzes, flashcards and progress tracking for MSTC, HPGE and PSAD.</p><button class="btn p" onclick="go(ME?'dash':'auth')">Get started</button></div></section>
+<div class="w sec"><h2>Exam Components</h2><div class="g">${C.map(c=>`<div class="card art" onclick="go('c/${c}')"><h3>${c}</h3><p class="mu">${CD[c]}</p><p class="mu sm">${ME?allQ().filter(x=>x.c==c).length+' questions':'Log in to start'}</p></div>`).join('')}</div></div>`;
 
-V.dash=()=>{const a=stat(()=>1),h=P.h.slice(0,4);return hd('Welcome, Student','Your progress across all components.')+`<div class="w sec stack">
+V.dash=()=>{const a=stat(()=>1),h=P.h.slice(0,4);return hd('Welcome, '+E(PR&&PR.display_name||'Student'),'Your progress across all components.')+`<div class="w sec stack">
 <div class="card art stack"><h3>Quiz</h3><p class="mu">Draws from all ${a.n} questions across MSTC, HPGE and PSAD. You can also start a quiz inside each component.</p><button class="btn p" onclick="go('quiz')">Start a quiz</button></div>
 <div class="g">${C.map(c=>`<div class="card art" onclick="go('c/${c}')"><h3>${c}</h3>${bars(stat(x=>x.c==c))}</div>`).join('')}</div>
 <p class="mu sm">Accuracy = correct answers ÷ answers given. Mastery = questions you last answered correctly ÷ all questions.</p>
@@ -124,9 +139,9 @@ V.c=c=>{if(!C.includes(c))return V.dash();const s=stat(x=>x.c==c),fo=D.FO.filter
 return hd(c,CD[c])+`<div class="w sec stack"><div class="card art"><h3>Quiz</h3><p class="mu">${s.n} questions available in ${c}. Pick one subject, several topics, or everything.</p><button class="btn p" onclick="go('quiz/${c}')">Take a ${c} quiz</button>${bars(s)}</div>
 <div><h2>Folders</h2><div class="g">${fo.map(f=>`<div class="card" onclick="go('f/${f.id}')"><h3>📁 ${E(f.name)}</h3><p class="mu sm">${D.M.filter(m=>m.fo==f.id).length} items</p></div>`).join('')}<div class="card" style="border-style:dashed" onclick="newFo('${c}')"><h3>＋ New folder</h3><p class="mu sm">Create your own</p></div></div></div>
 <div><h2>Subject statistics</h2><div class="card" style="overflow-x:auto"><table style="margin:0"><tr><th>Subject / topic</th><th>Questions</th><th>Accuracy</th><th>Mastery</th></tr>${subs(c).map(sb=>{const t=stat(x=>x.c==c&&x.s==sb);return `<tr><td><b>${E(sb)}</b></td><td>${t.n}</td><td>${t.acc}%</td><td>${t.ms}%</td></tr>`+tops(c,sb).map(p=>{const u=stat(x=>x.c==c&&x.s==sb&&x.t==p);return `<tr class="mu sm"><td>&nbsp;&nbsp;${E(p)}</td><td>${u.n}</td><td>${u.acc}%</td><td>${u.ms}%</td></tr>`}).join('')}).join('')||'<tr><td class="mu">No questions yet for this component.</td></tr>'}</table></div></div></div>`};
-function newFo(c){const n=(prompt('Folder name:')||'').trim();if(n){D.FO.push({id:U(),c,name:n});save();route()}}
-function delFo(id){const f=D.FO.find(x=>x.id==id);if(confirm('Delete this folder?')){D.FO=D.FO.filter(x=>x.id!=id);save();go('c/'+f.c)}}
-function addM(fo){const t=v('mn').trim();if(!t)return toast('Title required');D.M.push({id:U(),fo,title:t,desc:v('md'),type:v('my')});save();route()}
+async function newFo(c){const n=(prompt('Folder name:')||'').trim();if(!n)return;const r=await sb.from('folders').insert({component:c,name:n,owner_id:role=='admin'?null:ME.id}).select().single();if(r.error)return toast(r.error.message);D.FO.push({id:r.data.id,c,name:n,def:false,own:r.data.owner_id?1:0});route()}
+async function delFo(id){const f=D.FO.find(x=>x.id==id);if(!confirm('Delete this folder?'))return;const r=await sb.from('folders').delete().eq('id',id);if(r.error)return toast(r.error.message);D.FO=D.FO.filter(x=>x.id!=id);go('c/'+f.c)}
+async function addM(fo){const t=v('mn').trim();if(!t)return toast('Title required');const r=await sb.from('materials').insert({folder_id:fo,title:t,description:v('md'),file_type:v('my')}).select().single();if(r.error)return toast(r.error.message);D.M.push({id:r.data.id,fo,title:t,desc:v('md'),type:v('my')});route()}
 V.f=id=>{const f=D.FO.find(x=>x.id==id);if(!f)return V.dash();const it=D.M.filter(m=>m.fo==id),ad=role=='admin';
 return hd('📁 '+E(f.name),`<a class="lk" onclick="go('c/${f.c}')">← ${f.c}</a>`)+`<div class="w sec stack">${ad?`<div class="card stack"><h3>Add item (admin)</h3><input id="mn" placeholder="Title" style="width:100%"><textarea id="md" placeholder="Description"></textarea><div class="row"><select id="my">${['PDF','PPTX','DOCX','XLSX','IMG'].map(x=>`<option>${x}</option>`).join('')}</select><button class="btn p" onclick="addM('${id}')">Add</button></div><p class="mu sm">Real file upload arrives with Supabase Storage.</p></div>`:''}
 <div class="g">${it.map(m=>`<div class="card"><div class="row" style="margin:0">${tag(m.type)}<a class="star" onclick="bm('${m.id}')">${P.bm.includes(m.id)?'★':'☆'}</a></div><h3 style="margin-top:8px">${E(m.title)}</h3><p class="mu">${E(m.desc)}</p><div class="row"><button class="btn" onclick="toast('Files open here once Supabase Storage is connected')">Open</button>${ad?`<a class="lk" onclick="del('M','${m.id}')">Delete</a>`:''}</div></div>`).join('')||empty('This folder is empty.')}</div>
@@ -152,10 +167,11 @@ function tick(){const e=$('#tm');if(!QZ||QZ.done||!e)return;const s=Math.max(0,M
 function cnt(){const e=$('#ans');if(e&&QZ)e.textContent=Object.keys(QZ.sel).length+' / '+QZ.qs.length+' answered'}
 function submitQ(auto){const z=QZ,un=z.qs.length-Object.keys(z.sel).length;if(!auto&&un&&!confirm(un+' unanswered. Submit anyway?'))return;z.done=1;let sc=0;
 const it=z.qs.map((q,i)=>{const ok=+(z.sel[i]===q.a);sc+=ok;const s=P.q[q.id]||[0,0,0];P.q[q.id]=[s[0]+ok,s[1]+1,ok];return{id:q.id,ch:z.sel[i]==null?null:q.o[z.sel[i]],ok}});
-z.sc=sc;z.it=it;z.secs=Math.round((Date.now()-z.t0)/1000);P.h.unshift({id:U(),ts:Date.now(),sc:z.scope,n:z.qs.length,k:sc,secs:z.secs,it});save();route();scrollTo(0,0)}
+z.sc=sc;z.it=it;z.secs=Math.round((Date.now()-z.t0)/1000);P.h.unshift({id:U(),ts:Date.now(),sc:z.scope,n:z.qs.length,k:sc,secs:z.secs,it});route();scrollTo(0,0);
+sb.from('quiz_attempts').insert({user_id:ME.id,scope:z.scope,total:z.qs.length,correct:sc,seconds:z.secs}).select().single().then(async r=>{if(r.error)return toast('Could not save history: '+r.error.message);P.h[0].id=r.data.id;const a=await sb.from('quiz_answers').insert(it.map((i,n)=>({attempt_id:r.data.id,user_id:ME.id,question_id:i.id,chosen:i.ch,is_correct:!!i.ok,position:n})));if(a.error)toast('Could not save answers: '+a.error.message)})}
 const run=()=>`<div class="qbar"><b id="tm">${QZ.end?'⏱':'No timer'}</b><span id="ans" class="mu sm"></span><span><a class="lk sm" onclick="if(confirm('Quit this quiz? Your answers will be lost.')){QZ=null;route()}">Quit</a> <button class="btn p" onclick="submitQ()">Submit quiz</button></span></div><div class="stack">`+QZ.qs.map((q,i)=>`<div class="card"><p class="mu sm">Q${i+1} · ${E(q.s)} › ${E(q.t)}</p><p class="qt">${E(q.q)}</p>${q.o.map((o,j)=>`<label class="opt"><input type="radio" name="q${i}" ${QZ.sel[i]===j?'checked':''} onchange="QZ.sel[${i}]=${j};cnt()">${E(o)}</label>`).join('')}</div>`).join('')+`<button class="btn p" onclick="submitQ()">Submit quiz</button></div>`;
 const res=()=>{const z=QZ;return `<div class="card art stack"><h3>Score: ${z.sc} / ${z.qs.length} (${Math.round(100*z.sc/z.qs.length)}%)</h3><p class="mu">Time: ${mmss(z.secs)} · ${E(z.scope)}</p><div class="strip">${z.it.map(i=>`<i class="${i.ok?'g':''}"></i>`).join('')}</div><div class="row"><button class="btn p" onclick="QZ=null;route()">New quiz</button><button class="btn" onclick="go('hist')">History</button></div></div><div class="stack" style="margin-top:16px">`+z.qs.map((q,i)=>`<div class="card"><p class="mu sm">Q${i+1} · ${z.sel[i]==null?'— Not answered':z.it[i].ok?'✓ Correct':'✗ Wrong'} · ${E(q.s)} › ${E(q.t)}</p><p class="qt">${E(q.q)}</p>${q.o.map((o,j)=>`<div class="opt ${j==q.a?'ok':j==z.sel[i]?'no':''}">${E(o)}</div>`).join('')}<div class="exp">${E(q.e)}</div></div>`).join('')+'</div>'};
-V.quiz=a=>{const c=C.includes(a)?a:'';return hd(c?c+' Quiz':'Quiz',c?'Questions from '+c+' only.':'Questions from every component.')+`<div class="w sec">${QZ?(QZ.done?res():run()):!QL?empty('Loading questions…'):allQ().length?setup(c):`<div class="card art stack"><h3>No questions loaded yet</h3><p class="mu">Put <b>questions.csv</b> in the same folder as this page (works when hosted or with Live Server), or import it here:</p><input type="file" accept=".csv" onchange="impCsv(this)"></div>`}</div>`};
+V.quiz=a=>{const c=C.includes(a)?a:'';return hd(c?c+' Quiz':'Quiz',c?'Questions from '+c+' only.':'Questions from every component.')+`<div class="w sec">${QZ?(QZ.done?res():run()):!QL?empty('Loading questions…'):allQ().length?setup(c):`<div class="card art stack"><h3>No questions yet</h3><p class="mu">An admin can add questions under Admin → Questions.</p></div>`}</div>`};
 
 /* ===== HISTORY ===== */
 let HV=null,HI=0,HW=0;
@@ -170,9 +186,17 @@ V.hist=()=>{const h=P.h.find(x=>x.id==HV);return hd('Quiz History','Every quiz y
 let FT='s',FC={i:0,o:null},ED=null,FF={c:'',k:''};
 const deck=()=>{const d=D.F.filter(x=>(x.pub||x.own)&&(!FF.c||x.c==FF.c)&&(!FF.k||(FF.k=='img'?x.img:FF.k=='own'?x.own:!x.own)));return FC.o?d.sort((a,b)=>FC.o.indexOf(a.id)-FC.o.indexOf(b.id)):d};
 function nav2(n){const l=deck().length;FC.i=(FC.i+n+l)%l;route()}
-function mark(id,s){P.fc[id]=s;save();nav2(1)}
-function readImg(id,cb){const f=$('#'+id).files[0];if(!f)return cb();const r=new FileReader();r.onload=()=>{const i=new Image();i.onload=()=>{const k=Math.min(1,900/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(i,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',.8))};i.onerror=()=>toast('Could not read that image');i.src=r.result};r.readAsDataURL(f)}
-function saveF(own){const f=v('ff').trim(),b=v('fb').trim();if(!f)return toast('Add a title for the front');readImg('fi',img=>{const e=own&&D.F.find(x=>x.id==ED);if(!b&&!img&&!(e&&e.img))return toast('Add back text or an image');const o={c:v('fk'),f,b};if(img)o.img=img;if(e)Object.assign(e,o);else D.F.push({id:U(),pub:1,own:own?1:0,...o});ED=null;save();route()})}
+function mark(id,s){P.fc[id]=s;sb.from('flashcard_marks').upsert({user_id:ME.id,flashcard_id:id,status:s}).then(r=>r.error&&toast(r.error.message));nav2(1)}
+function readImg(id,cb){const f=$('#'+id).files[0];if(!f)return cb();const r=new FileReader();r.onload=()=>{const i=new Image();i.onload=()=>{const k=Math.min(1,900/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(i,0,0,c.width,c.height);c.toBlob(cb,'image/jpeg',.8)};i.onerror=()=>toast('Could not read that image');i.src=r.result};r.readAsDataURL(f)}
+function saveF(own){const f=v('ff').trim(),b=v('fb').trim();if(!f)return toast('Add a title for the front');
+readImg('fi',async blob=>{const e=own&&D.F.find(x=>x.id==ED);if(!b&&!blob&&!(e&&e.img))return toast('Add back text or an image');
+const oid=own?ME.id:null;let ip=e?e.ip:'';
+if(blob){ip=(oid||'official')+'/'+crypto.randomUUID()+'.jpg';const u=await sb.storage.from('flashcard-images').upload(ip,blob,{contentType:'image/jpeg'});if(u.error)return toast(u.error.message)}
+const row={component:v('fk'),front:f,back:b,image_path:ip||null};
+const r=e?await sb.from('flashcards').update(row).eq('id',e.id).select().single():await sb.from('flashcards').insert({...row,owner_id:oid}).select().single();
+if(r.error)return toast(r.error.message);
+let img=e?e.img:'';if(blob){const s=await sb.storage.from('flashcard-images').createSignedUrl(ip,3600);img=s.data?s.data.signedUrl:''}
+const x={id:r.data.id,c:row.component,f,b,img,ip:ip||'',pub:r.data.published,own:own?1:0};if(e)Object.assign(e,x);else D.F.push(x);ED=null;route()})}
 const fform=(e,own)=>`<select id="fk">${C.map(c=>`<option ${e.c==c?'selected':''}>${c}</option>`).join('')}</select><input id="ff" placeholder="Front / title" value="${E(e.f||'')}" style="width:100%"><textarea id="fb" placeholder="Back / answer (optional if you add an image)">${E(e.b||'')}</textarea><div><p class="lb">Formula image (optional)</p><input type="file" id="fi" accept="image/*">${e.img?'<p class="mu sm">Current image is kept unless you choose a new one.</p>':''}</div><div class="row"><button class="btn p" onclick="saveF(${own})">Save</button>${ED&&own?'<button class="btn" onclick="ED=null;route()">Cancel</button>':''}</div>`;
 function study(){const d=deck(),bar=`<div class="bar"><select onchange="FF.c=this.value;FC.i=0;route()"><option value="">All components</option>${C.map(c=>`<option ${FF.c==c?'selected':''}>${c}</option>`).join('')}</select><select onchange="FF.k=this.value;FC.i=0;route()">${[['','All cards'],['img','Formula cards (images)'],['own','My cards'],['off','Official cards']].map(([k,t])=>`<option value="${k}" ${FF.k==k?'selected':''}>${t}</option>`).join('')}</select></div>`;
 if(!d.length)return bar+empty('No cards here yet. Add formula cards under My Cards.');FC.i=Math.min(FC.i,d.length-1);const c=d[FC.i],s=P.fc[c.id];
@@ -181,28 +205,60 @@ function mine(){const e=D.F.find(x=>x.id==ED)||{};return `<div class="card stack
 V.cards=()=>hd('Flashcards','Official cards, formula cards (images) and your private cards.')+`<div class="w sec"><div class="tabs">${[['s','Study'],['m','My Cards']].map(([k,n])=>`<a class="${FT==k?'on':''}" onclick="FT='${k}';route()">${n}</a>`).join('')}</div>${FT=='s'?study():mine()}</div>`;
 
 /* ===== MY QUESTIONS ===== */
-function addQ(){const o=[0,1,2,3].map(i=>v('o'+i).trim()),q=v('mq').trim(),s=v('ms').trim(),t=v('mt').trim();if(!q||!s||!t||o.some(x=>!x))return toast('Fill in subject, topic, question and all 4 choices');D.MQ.push({id:'m'+U(),c:v('mc'),s,t,q,o,a:+v('ma'),e:v('me').trim(),d:'',st:''});save();route()}
-V.myq=()=>hd('My Questions','Add your own questions. They are private and appear in your quizzes.')+`<div class="w sec stack"><div class="card stack"><select id="mc">${C.map(c=>`<option>${c}</option>`).join('')}</select><div class="row"><input id="ms" placeholder="Subject" list="sl"><input id="mt" placeholder="Topic"></div><datalist id="sl">${[...new Set(allQ().map(x=>x.s))].map(s=>`<option value="${E(s)}">`).join('')}</datalist><textarea id="mq" placeholder="Question"></textarea>${[0,1,2,3].map(i=>`<input id="o${i}" placeholder="Choice ${'ABCD'[i]}" style="width:100%">`).join('')}<div class="row"><select id="ma">${[0,1,2,3].map(i=>`<option value="${i}">Correct: ${'ABCD'[i]}</option>`).join('')}</select></div><textarea id="me" placeholder="Explanation / solution"></textarea><button class="btn p" onclick="addQ()">Add question</button></div>${D.MQ.map(x=>`<div class="card"><p class="mu sm">${x.c} › ${E(x.s)} › ${E(x.t)}</p><p>${E(x.q)}</p><a class="lk" onclick="del('MQ','${x.id}')">Delete</a></div>`).join('')}</div>`;
+async function addQ(off){const o=[0,1,2,3].map(i=>v('o'+i).trim()),q=v('mq').trim(),s=v('ms').trim(),t=v('mt').trim();if(!q||!s||!t||o.some(x=>!x))return toast('Fill in subject, topic, question and all 4 choices');
+const r=await sb.from('questions').insert({component:v('mc'),subject:s,topic:t,question:q,choice_a:o[0],choice_b:o[1],choice_c:o[2],choice_d:o[3],correct_answer:'ABCD'[+v('ma')],explanation:v('me').trim(),owner_id:off?null:ME.id}).select().single();
+if(r.error)return toast(r.error.message);const x=dbq(r.data);off?OQ.push(x):D.MQ.push(x);toast('Question added');route()}
+const qform=off=>`<div class="card stack"><select id="mc">${C.map(c=>`<option>${c}</option>`).join('')}</select><div class="row"><input id="ms" placeholder="Subject" list="sl"><input id="mt" placeholder="Topic"></div><datalist id="sl">${[...new Set(allQ().map(x=>x.s))].map(s=>`<option value="${E(s)}">`).join('')}</datalist><textarea id="mq" placeholder="Question"></textarea>${[0,1,2,3].map(i=>`<input id="o${i}" placeholder="Choice ${'ABCD'[i]}" style="width:100%">`).join('')}<div class="row"><select id="ma">${[0,1,2,3].map(i=>`<option value="${i}">Correct: ${'ABCD'[i]}</option>`).join('')}</select></div><textarea id="me" placeholder="Explanation / solution"></textarea><button class="btn p" onclick="addQ(${off})">Add question</button></div>`;
+V.myq=()=>hd('My Questions','Add your own questions. They are private and appear in your quizzes.')+`<div class="w sec stack">${qform(0)}${D.MQ.map(x=>`<div class="card"><p class="mu sm">${x.c} › ${E(x.s)} › ${E(x.t)}</p><p>${E(x.q)}</p><a class="lk" onclick="del('MQ','${x.id}')">Delete</a></div>`).join('')}</div>`;
 
 /* ===== ADMIN ===== */
 let AT='o';
-function pub(id){const x=D.F.find(x=>x.id==id);x.pub=x.pub?0:1;save();route()}
+async function pub(id){const x=D.F.find(x=>x.id==id),r=await sb.from('flashcards').update({published:!x.pub}).eq('id',id);if(r.error)return toast(r.error.message);x.pub=!x.pub;route()}
+async function impCsv(el){const f=el.files[0];if(!f)return;const rows=[];
+csv((await f.text()).replace(/^\uFEFF/,'')).slice(1).filter(r=>r.length>=14).forEach(r=>{const x=r.length-14,g=i=>(r[i<9?i:i+x]||'').trim(),a=g(9).toUpperCase();/* rows with 2 extra columns are auto-repaired */
+if(a.length!=1||!'ABCD'.includes(a))return;rows.push({question_number:+g(0)||null,component:g(1).toUpperCase(),subject:g(2),topic:g(3),question:g(4),choice_a:g(5),choice_b:g(6),choice_c:g(7),choice_d:g(8),correct_answer:a,explanation:g(10),difficulty:g(11),source:g(12),verification_status:g(13),owner_id:null})});
+if(!rows.length)return toast('No valid rows found. Check the columns.');if(!confirm('Add '+rows.length+' official questions?'))return;
+for(let i=0;i<rows.length;i+=100){const r=await sb.from('questions').insert(rows.slice(i,i+100));if(r.error)return toast(r.error.message)}
+toast('Added '+rows.length+' questions');await load();route()}
 const AD={
-o:()=>`<div class="g">${[['Users (sample)',D.U.length],['Official questions',OQ.length],['Folders',D.FO.length],['Folder items',D.M.length],['Official flashcards',D.F.filter(x=>!x.own).length]].map(([n,x])=>`<div class="card art stat"><b>${x}</b><span class="mu sm">${n}</span></div>`).join('')}</div>`,
-u:()=>`<table>${D.U.map((u,i)=>`<tr><td>${u[0]}</td><td class="mu">${u[1]}</td><td><select onchange="D.U[${i}][2]=this.value;save()">${['student','admin'].map(r=>`<option ${u[2]==r?'selected':''}>${r}</option>`).join('')}</select></td></tr>`).join('')}</table><p class="mu sm">Sample users. Real accounts come from Supabase Auth.</p>`,
+o:()=>`<div class="g">${[['Users',D.U.length],['Official questions',OQ.length],['Folders',D.FO.length],['Folder items',D.M.length],['Official flashcards',D.F.filter(x=>!x.own).length]].map(([n,x])=>`<div class="card art stat"><b>${x}</b><span class="mu sm">${n}</span></div>`).join('')}</div>`,
+u:()=>`<table><tr><th>Name</th><th>Role</th><th>Joined</th></tr>${D.U.map(u=>`<tr><td>${E(u.display_name||'')}</td><td>${u.role}</td><td class="mu sm">${new Date(u.created_at).toLocaleDateString()}</td></tr>`).join('')}</table><p class="mu sm">To change someone's role, edit the profiles table in Supabase (Table Editor).</p>`,
 f:()=>`<div class="card stack"><h3>New official card</h3>${fform({},0)}</div><table>${D.F.filter(x=>!x.own).map(x=>`<tr><td>${E(x.f)} ${x.img?'🖼':''}</td><td class="mu sm">${x.c}</td><td><a class="lk" onclick="pub('${x.id}')">${x.pub?'Published':'Hidden'}</a></td><td><a class="lk" onclick="del('F','${x.id}')">Delete</a></td></tr>`).join('')}</table>`,
-q:()=>{const m={};OQ.forEach(x=>{const k=x.c+' › '+x.s+' › '+x.t;m[k]=(m[k]||0)+1});const fl=OQ.filter(x=>/need/i.test(x.st)).length;return `<div class="card stack"><h3>Official questions: ${OQ.length}</h3><p class="mu sm">The hosted site reads <b>questions.csv</b> from your GitHub repo automatically. For testing from a double-clicked file, import it here (saved in this browser only).</p><input type="file" accept=".csv" onchange="impCsv(this)">${fl?`<p class="sm">${fl} question(s) are marked "Needs Review" in the CSV.</p>`:''}</div><table>${Object.entries(m).map(([k,n])=>`<tr><td>${E(k)}</td><td>${n}</td></tr>`).join('')}</table>`}};
-V.admin=()=>hd('Admin Dashboard','Manage content. (Prototype only: real protection comes from Supabase RLS.)')+`<div class="w sec"><div class="tabs">${[['o','Overview'],['u','Users'],['f','Official cards'],['q','Questions']].map(([k,n])=>`<a class="${AT==k?'on':''}" onclick="AT='${k}';route()">${n}</a>`).join('')}</div>${AD[AT]()}</div>`;
+q:()=>{const m={};OQ.forEach(x=>{const k=x.c+' › '+x.s+' › '+x.t;m[k]=(m[k]||0)+1});const fl=OQ.filter(x=>/need/i.test(x.st)).length;
+return `<div class="card stack"><h3>Official questions: ${OQ.length}</h3><p class="mu sm">Add one below, or import a CSV with the same columns as before. New questions show up for everyone right away.</p><div><p class="lb">Import CSV</p><input type="file" accept=".csv" onchange="impCsv(this)"></div>${fl?`<p class="sm">${fl} question(s) are marked "Needs Review".</p>`:''}</div><h3 style="margin-top:18px">Add one official question</h3>${qform(1)}<table>${Object.entries(m).map(([k,n])=>`<tr><td>${E(k)}</td><td>${n}</td></tr>`).join('')}</table>`}};
+V.admin=()=>hd('Admin Dashboard','Manage official content. Security is enforced by the database rules (RLS).')+`<div class="w sec"><div class="tabs">${[['o','Overview'],['u','Users'],['f','Official cards'],['q','Questions']].map(([k,n])=>`<a class="${AT==k?'on':''}" onclick="AT='${k}';route()">${n}</a>`).join('')}</div>${AD[AT]()}</div>`;
 
-/* ===== MENU, TOP BAR, ROUTER ===== */
-const drawer=()=>{const a=(h,t)=>`<a onclick="dr(0);${h}">${t}</a>`;return a("go('dash')",'Dashboard')+a("go('quiz')",'Quiz')+a("go('hist')",'Quiz History')+`<p class="dl">Components</p>`+C.map(c=>a(`go('c/${c}')`,c)).join('')+`<p class="dl">Study</p>`+a("FF={c:'',k:''};go('cards')",'Flashcards')+a("FF={c:'',k:'img'};go('cards')",'Formula Cards')+a("go('myq')",'My Questions')+(role=='admin'?`<p class="dl">Admin</p>`+a("go('admin')",'Admin Dashboard'):'')+`<p class="dl"></p>`+a("go('home')",'Log out')};
-const tbar=n=>n=='home'?`<button class="btn" onclick="go('dash')">Log in</button> <button class="btn p" onclick="go('dash')">Sign up</button>`:`<div class="seg">${['student','admin'].map(r=>`<button class="${role==r?'on':''}" onclick="setR('${r}')">${r=='admin'?'Admin':'Student'}</button>`).join('')}</div>`;
-function setR(r){role=r;L.fra_role=r;go(r=='admin'?'admin':'dash')}
-function route(){clearTimeout(tk);const[n0,a]=(location.hash.slice(2)||'home').split('/');let n=V[n0]?n0:'home';if(n=='admin'&&role!='admin'){toast('Switch to Admin view first');n='dash'}
+/* ===== MENU, TOP BAR, LOGIN, ROUTER ===== */
+const drawer=()=>{const a=(h,t)=>`<a onclick="dr(0);${h}">${t}</a>`;return a("go('dash')",'Dashboard')+a("go('quiz')",'Quiz')+a("go('hist')",'Quiz History')+`<p class="dl">Components</p>`+C.map(c=>a(`go('c/${c}')`,c)).join('')+`<p class="dl">Study</p>`+a("FF={c:'',k:''};go('cards')",'Flashcards')+a("FF={c:'',k:'img'};go('cards')",'Formula Cards')+a("go('myq')",'My Questions')+(role=='admin'?`<p class="dl">Admin</p>`+a("go('admin')",'Admin Dashboard'):'')+`<p class="dl"></p>`+a("out()",'Log out')};
+const tbar=()=>ME?`<span class="sm mu" style="white-space:nowrap">${E(PR&&PR.display_name||'')} <span class="tag">${role}</span></span>`:`<button class="btn" onclick="AU.mode='in';AU.msg='';go('auth')">Log in</button> <button class="btn p" onclick="AU.mode='up';AU.msg='';go('auth')">Sign up</button>`;
+function out(){sb.auth.signOut()}
+V.auth=()=>{const m=AU.mode,T={in:'Log in',up:'Create account',reset:'Reset password',newpw:'Set a new password'};
+return hd(T[m],m=='newpw'?'Choose a new password for your account.':'Sign in to save your progress and keep it on every device.')+`<div class="w sec"><div class="card art stack" style="max-width:440px;margin:auto">${AU.msg?`<div class="exp">${E(AU.msg)}</div>`:''}${m=='up'?'<input id="an" placeholder="Display name" style="width:100%">':''}${m=='newpw'?'':'<input id="ae" type="email" placeholder="Email" autocomplete="email" style="width:100%">'}${m=='reset'?'':`<input id="ap" type="password" placeholder="${m=='newpw'?'New password':'Password'}" autocomplete="${m=='in'?'current-password':'new-password'}" style="width:100%">`}<button class="btn p" onclick="doAuth()">${T[m]}</button><p class="sm">${m=='in'?`<a class="lk" onclick="AU.mode='up';AU.msg='';route()">Create an account</a> · <a class="lk" onclick="AU.mode='reset';AU.msg='';route()">Forgot password?</a>`:m=='newpw'?'':`<a class="lk" onclick="AU.mode='in';AU.msg='';route()">Back to log in</a>`}</p></div></div>`};
+async function doAuth(){const m=AU.mode,e=m=='newpw'?'':v('ae').trim(),p=m=='reset'?'':v('ap');let r;
+if(m=='up'){if(p.length<6)return toast('Password needs at least 6 characters');r=await sb.auth.signUp({email:e,password:p,options:{data:{display_name:v('an').trim()||e.split('@')[0]}}})}
+else if(m=='in')r=await sb.auth.signInWithPassword({email:e,password:p});
+else if(m=='reset'){r=await sb.auth.resetPasswordForEmail(e,{redirectTo:location.origin+location.pathname});if(!r.error){AU.msg='Check your email for the reset link.';return route()}}
+else{r=await sb.auth.updateUser({password:p});if(!r.error){AU.mode='in';toast('Password updated');return go('dash')}}
+if(r.error)return toast(r.error.message);
+if(m=='up'&&!r.data.session){AU.msg='Account created. Check your email to confirm it, then log in.';route()}}
+function route(){clearTimeout(tk);const[n0,a]=(location.hash.slice(2)||'home').split('/');let n=V[n0]?n0:'home';
+if(!QL){$('#app').innerHTML='<div class="w sec">'+empty('Loading…')+'</div>';$('#tb').innerHTML='';$('#bg').style.display='none';return}
+if(!ME&&!['home','auth'].includes(n))n='auth';
+if(ME&&n=='auth'&&AU.mode!='newpw')n='dash';
+if(n=='admin'&&role!='admin'){toast('Admins only');n='dash'}
 const ap=$('#app');ap.innerHTML=V[n](a);if(nv){ap.className='';void ap.offsetWidth;ap.className='in';nv=0}
-$('#tb').innerHTML=tbar(n);$('#dr').innerHTML=drawer();$('#bg').style.display=n=='home'?'none':'';
+$('#tb').innerHTML=tbar();$('#dr').innerHTML=ME?drawer():'';$('#bg').style.display=ME?'':'none';
 if(n=='quiz'&&QZ&&!QZ.done){cnt();if(QZ.end)tick()}else smry()}
-addEventListener('hashchange',()=>{nv=1;scrollTo(0,0);route()});route();
+addEventListener('hashchange',()=>{nv=1;scrollTo(0,0);route()});
+addEventListener('keydown',e=>{if(e.key=='Enter'&&location.hash=='#/auth'&&e.target.tagName=='INPUT')doAuth()});
+/* session: runs on page load, login, logout and password-reset links */
+sb.auth.onAuthStateChange((ev,s)=>setTimeout(async()=>{
+if(ev=='PASSWORD_RECOVERY')AU.mode='newpw';
+ME=s&&s.user||null;
+if(!ME){CU=null;D={FO:[],M:[],F:[],MQ:[],U:[]};P={h:[],q:{},fc:{},bm:[]};OQ=[];PR=null;role='student';QZ=null;QL=1;if(ev=='SIGNED_OUT')go('home');else route();return}
+if(ME.id!=CU){CU=ME.id;QL=0;route();await load();QL=1}
+if(AU.mode=='newpw')go('auth');else if(location.hash=='#/auth')go('dash');else route()},0));
+route();
 </script>
 </body>
 </html>
