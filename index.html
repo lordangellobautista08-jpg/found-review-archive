@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Found / CE Review Archive</title>
+<style>
+/* ===== COLOR SYSTEM: change colors here only ===== */
+:root{
+--aq:#9FD3D0;      /* Pantone 13-5410 TPG Iced Aqua (approximate hex) */
+--aq2:#8CC6C3;--soft:#E8F5F4;--teal:#2F7F80;--ink:#0E3B3C;
+--bg:#fff;--bg2:#F7FAFA;--tx:#171717;--mu:#737373;--bd:#E5E7EB;--r:6px;
+/* ===== ABSTRACT MOTIF: one design reused everywhere ===== */
+--art:url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' fill='none' stroke='%239FD3D0' stroke-width='1.5'><circle cx='200' cy='200' r='30'/><circle cx='200' cy='200' r='60'/><circle cx='200' cy='200' r='90'/><circle cx='200' cy='200' r='120'/><circle cx='60' cy='50' r='14' fill='%23D9EEED' stroke='none'/><path d='M0 120L120 0M0 160L160 0M0 80L80 0'/><circle cx='100' cy='100' r='3' fill='%239FD3D0'/></svg>")}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--tx);background:var(--bg)}
+a,.lk{cursor:pointer;text-decoration:none;color:inherit}
+.w{max-width:1100px;margin:0 auto;padding:0 20px}
+.art{background-image:var(--art);background-repeat:no-repeat;background-position:right -30px top -30px;background-size:240px}
+header{border-bottom:1px solid var(--bd);position:sticky;top:0;background:#fffffff2;z-index:5}
+.hi{display:flex;align-items:center;gap:10px;height:56px}
+.brand{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700}.brand i{color:var(--teal);font-style:normal}
+.seg{display:flex;border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
+.seg button{border:0;background:#fff;padding:6px 12px;font-size:.85rem;cursor:pointer}.seg .on{background:var(--aq);color:var(--ink);font-weight:600}
+#dr{position:fixed;top:0;left:0;bottom:0;width:250px;background:#fff;border-right:1px solid var(--bd);transform:translateX(-100%);transition:transform .2s;z-index:20;padding:14px;overflow:auto}
+#dr.on{transform:none}#dr a{display:block;padding:8px 10px;border-radius:var(--r)}#dr a:hover{background:var(--soft)}
+.dl{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin:14px 10px 4px}
+#ov{display:none;position:fixed;inset:0;background:#0005;z-index:19}#ov.on{display:block}
+.btn{display:inline-block;padding:8px 16px;border:1px solid var(--bd);border-radius:var(--r);background:#fff;font-size:.95rem;font-weight:500;cursor:pointer;color:var(--tx);transition:transform .12s,border-color .12s}
+.btn:hover{border-color:var(--teal)}.btn:active{transform:scale(.97)}
+.btn.p{background:var(--aq);border-color:var(--teal);color:var(--ink)}.btn.p:hover{background:var(--aq2)}
+.hero{background-color:var(--bg2);border-bottom:1px solid var(--bd);padding:72px 0;background-size:460px;background-position:right -60px center}
+.hero h1{font-size:2.2rem;line-height:1.2;max-width:600px;margin:8px 0 14px}
+.eyebrow{color:var(--teal);font-weight:600;font-size:.8rem;text-transform:uppercase;letter-spacing:.06em}
+.lead{color:var(--mu);max-width:540px;margin-bottom:22px}
+.ph{background-color:var(--bg2);border-bottom:1px solid var(--bd);padding:30px 0}.ph h1{font-size:1.8rem}
+.sec{padding:28px 0 48px}.sec h2{margin-bottom:12px}
+.g{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
+.card{background-color:#fff;border:1px solid var(--bd);border-radius:var(--r);padding:20px;transition:transform .12s,border-color .12s}
+.card.art{background-size:130px;background-position:right -35px bottom -35px}
+.card[onclick]:hover{transform:translateY(-2px);border-color:var(--aq)}
+.card h3{margin-bottom:6px;color:var(--ink)}
+.empty{grid-column:1/-1}.stack>*+*{margin-top:16px}
+.stat b{display:block;font-size:1.6rem;color:var(--ink)}
+.mu{color:var(--mu)}.sm{font-size:.85rem}.lb{font-weight:600;color:var(--ink)}
+.tag{display:inline-block;font-size:.75rem;padding:1px 8px;border-radius:99px;background:var(--soft);color:var(--ink);border:1px solid var(--aq)}
+.star{margin-left:auto;font-size:1.2rem;color:var(--teal)}.lk{color:var(--teal)}
+.pb{height:6px;background:var(--soft);border-radius:3px;overflow:hidden;margin:4px 0}.pb b{display:block;height:100%;background:var(--teal);animation:gr .6s ease-out}
+@keyframes gr{from{width:0}}@keyframes in{from{opacity:0;transform:translateY(6px)}}#app.in{animation:in .25s ease-out}
+input,select,textarea{font:inherit;padding:8px 10px;border:1px solid var(--bd);border-radius:var(--r);background:#fff;max-width:100%}textarea{width:100%;min-height:70px}
+.bar{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 16px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--bd);margin-bottom:18px;flex-wrap:wrap}
+.tabs a{padding:8px 14px;border-bottom:2px solid transparent}.tabs a.on{border-color:var(--teal);font-weight:600;color:var(--ink)}
+.qt{margin:10px 0;font-weight:500}
+.opt{display:flex;gap:10px;padding:10px 12px;border:1px solid var(--bd);border-radius:var(--r);margin:8px 0;cursor:pointer}
+.opt.ok{border-color:#2e9e6b;background:#eaf7f0}.opt.no{border-color:#d9534f;background:#fdeeee}
+.exp{background:var(--soft);padding:10px 12px;border-radius:var(--r);font-size:.95rem}
+.qbar{position:sticky;top:56px;z-index:4;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:#fff;border:1px solid var(--teal);border-radius:var(--r);padding:8px 12px;margin-bottom:14px}
+.qbar b{font-size:1.2rem;color:var(--ink)}.qbar b.low{color:#d9534f}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.chip{border:1px solid var(--bd);border-radius:99px;padding:3px 10px;font-size:.85rem;cursor:pointer;display:flex;gap:6px;align-items:center}.chip:has(input:checked){background:var(--soft);border-color:var(--aq)}
+.fc{perspective:900px;cursor:pointer}.fi{position:relative;min-height:270px;transition:transform .35s;transform-style:preserve-3d}.fc.on .fi{transform:rotateY(180deg)}
+.ff,.fb{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;text-align:center;padding:24px;border:1px solid var(--bd);border-radius:var(--r);background-color:#fff;overflow:auto;font-size:1.1rem}
+.ff>*,.fb>*{margin:auto}
+.ff{background-image:var(--art);background-repeat:no-repeat;background-position:right -30px bottom -30px;background-size:150px}
+.fb{transform:rotateY(180deg);background:var(--soft)}.fb img{max-width:100%;max-height:220px;object-fit:contain}
+.strip{display:flex;flex-wrap:wrap;gap:3px;margin:8px 0}.strip i{width:12px;height:12px;border-radius:2px;background:#d9534f}.strip i.g{background:#2e9e6b}
+table{width:100%;border-collapse:collapse;font-size:.9rem;margin-top:12px}td,th{padding:7px 8px;border-bottom:1px solid var(--bd);text-align:left;vertical-align:top}
+footer{border-top:1px solid var(--bd);padding:22px 0;color:var(--mu);font-size:.9rem;background-size:150px;background-position:right -40px center}
+#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:var(--r);font-size:.9rem;display:none;z-index:30}
+@media(max-width:600px){.hero{padding:44px 0;background-size:300px}.hero h1{font-size:1.7rem}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header><div class="w hi"><button class="btn" id="bg" onclick="dr(1)" aria-label="Menu">☰</button><a class="brand" onclick="go('home')">Found <i>/</i> CE Review Archive</a><div id="tb"></div></div></header>
+<div id="ov" onclick="dr(0)"></div><aside id="dr"></aside>
+<main id="app"></main>
+<footer class="art"><div class="w">Found / CE Review Archive · Prototype: your progress and your own content are saved in this browser only</div></footer>
+<div id="toast"></div>
+<script>
+/* ===== BASICS ===== */
+const L=(()=>{try{localStorage.getItem('x');return localStorage}catch(e){return{}}})();
+const $=s=>document.querySelector(s),v=id=>$('#'+id).value,U=()=>Math.random().toString(36).slice(2,8),C=['MSTC','HPGE','PSAD'],
+E=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),
+sh=a=>[...a].sort(()=>Math.random()-.5),mmss=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0'),
+go=h=>{if(location.hash=='#/'+h)route();else location.hash='#/'+h},
+CD={MSTC:'Mathematics, Surveying and Transportation Engineering.',HPGE:'Hydraulics and Geotechnical Engineering.',PSAD:'Structural Analysis and Design.'},
+FOL=['Lecture Notes','Questionnaires','Solutions'],J=(k,d)=>{try{return JSON.parse(L[k])||d}catch(e){return d}};
+let D=J('fra2',null)||{FO:C.flatMap(c=>FOL.map(n=>({id:U(),c,name:n,def:1}))),M:[],F:[],MQ:[],U:[['Student One','student@example.com','student'],['Admin One','admin@example.com','admin']]},
+P=J('fra2p',null)||{h:[],q:{},fc:{},bm:[]},role=L.fra_role||'student',nv=0,tk,QL=0,OQ=[];
+const save=()=>{try{L.fra2=JSON.stringify(D);L.fra2p=JSON.stringify(P)}catch(e){toast('Storage is full. Remove some images.')}};save();
+function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',2600)}
+function dr(x){$('#dr').classList.toggle('on',!!x);$('#ov').classList.toggle('on',!!x)}
+const tag=x=>`<span class="tag">${E(x)}</span>`,hd=(t,p)=>`<div class="ph art"><div class="w"><h1>${t}</h1><p class="mu">${p}</p></div></div>`,
+empty=t=>`<div class="card empty art"><p class="mu">${t}</p></div>`;
+function del(k,id){if(confirm('Delete this?')){D[k]=D[k].filter(x=>x.id!=id);save();route()}}
+function bm(id){const i=P.bm.indexOf(id);i<0?P.bm.push(id):P.bm.splice(i,1);save();route()}
+
+/* ===== QUESTIONS: loaded from questions.csv (official) + your own ===== */
+const csv=tx=>{const R=[];let r=[],f='',q=0;for(let i=0;i<tx.length;i++){const c=tx[i];if(q){if(c=='"'){if(tx[i+1]=='"'){f+='"';i++}else q=0}else f+=c}else if(c=='"')q=1;else if(c==','){r.push(f);f=''}else if(c=='\n'||c=='\r'){if(c=='\r'&&tx[i+1]=='\n')i++;r.push(f);f='';R.push(r);r=[]}else f+=c}if(f||r.length){r.push(f);R.push(r)}return R};
+const toQ=R=>R.slice(1).filter(f=>f.length>=14).map(f=>{const x=f.length-14,g=i=>(f[i<9?i:i+x]||'').trim(),a='ABCD'.indexOf(g(9).toUpperCase());/* rows with 2 extra columns are auto-repaired */return a<0?0:{id:'o'+g(0),c:g(1).toUpperCase(),s:g(2),t:g(3),q:g(4),o:[g(5),g(6),g(7),g(8)],a,e:g(10),d:g(11),st:g(13)}}).filter(x=>x&&C.includes(x.c));
+const imp=t=>{OQ=toQ(csv(t.replace(/^\uFEFF/,'')))};
+fetch('questions.csv').then(r=>r.ok?r.text():Promise.reject()).then(imp).catch(()=>{if(L.fra_csv)imp(L.fra_csv)}).finally(()=>{QL=1;route()});
+function impCsv(el){const f=el.files[0];if(!f)return;f.text().then(t=>{imp(t);if(!OQ.length)return toast('No valid questions found. Check the columns.');try{L.fra_csv=t}catch(e){}toast('Loaded '+OQ.length+' questions');route()})}
+const allQ=()=>[...OQ,...D.MQ],subs=c=>[...new Set(allQ().filter(x=>x.c==c).map(x=>x.s))],tops=(c,s)=>[...new Set(allQ().filter(x=>x.c==c&&x.s==s).map(x=>x.t))];
+const stat=f=>{const q=allQ().filter(f);let ok=0,n=0,m=0,at=0;q.forEach(x=>{const s=P.q[x.id];if(s){at++;ok+=s[0];n+=s[1];m+=s[2]}});return{n:q.length,at,acc:n?Math.round(100*ok/n):0,ms:q.length?Math.round(100*m/q.length):0}};
+const bars=s=>`<p class="sm" style="margin-top:10px">Accuracy ${s.acc}%</p><div class="pb"><b style="width:${s.acc}%"></b></div><p class="sm">Mastery ${s.ms}%</p><div class="pb"><b style="width:${s.ms}%"></b></div><p class="mu sm">${s.at} of ${s.n} questions attempted</p>`;
+
+/* ===== VIEWS ===== */
+const V={};
+V.home=()=>`<section class="hero art"><div class="w"><p class="eyebrow">Civil Engineering Board Exam</p><h1>Your CE review archive: notes, questions and quizzes in one place.</h1><p class="lead">Lecture notes, questionnaires and solutions, plus quizzes, flashcards and progress tracking for MSTC, HPGE and PSAD.</p><button class="btn p" onclick="go('dash')">Get started</button></div></section>
+<div class="w sec"><h2>Exam Components</h2><div class="g">${C.map(c=>`<div class="card art" onclick="go('c/${c}')"><h3>${c}</h3><p class="mu">${CD[c]}</p><p class="mu sm">${allQ().filter(x=>x.c==c).length} questions</p></div>`).join('')}</div></div>`;
+
+V.dash=()=>{const a=stat(()=>1),h=P.h.slice(0,4);return hd('Welcome, Student','Your progress across all components.')+`<div class="w sec stack">
+<div class="card art stack"><h3>Quiz</h3><p class="mu">Draws from all ${a.n} questions across MSTC, HPGE and PSAD. You can also start a quiz inside each component.</p><button class="btn p" onclick="go('quiz')">Start a quiz</button></div>
+<div class="g">${C.map(c=>`<div class="card art" onclick="go('c/${c}')"><h3>${c}</h3>${bars(stat(x=>x.c==c))}</div>`).join('')}</div>
+<p class="mu sm">Accuracy = correct answers ÷ answers given. Mastery = questions you last answered correctly ÷ all questions.</p>
+<div class="g"><div class="card"><h3>Recent quizzes</h3>${h.map(x=>`<p class="sm">${x.k}/${x.n} · ${E(x.sc)}</p>`).join('')||'<p class="mu sm">None yet.</p>'}<div class="row"><button class="btn" onclick="go('hist')">View history</button></div></div>
+<div class="card"><h3>Study</h3><div class="row"><button class="btn" onclick="FF={c:'',k:''};go('cards')">Flashcards</button><button class="btn" onclick="FF={c:'',k:'img'};go('cards')">Formula cards</button></div></div></div></div>`};
+
+V.c=c=>{if(!C.includes(c))return V.dash();const s=stat(x=>x.c==c),fo=D.FO.filter(f=>f.c==c);
+return hd(c,CD[c])+`<div class="w sec stack"><div class="card art"><h3>Quiz</h3><p class="mu">${s.n} questions available in ${c}. Pick one subject, several topics, or everything.</p><button class="btn p" onclick="go('quiz/${c}')">Take a ${c} quiz</button>${bars(s)}</div>
+<div><h2>Folders</h2><div class="g">${fo.map(f=>`<div class="card" onclick="go('f/${f.id}')"><h3>📁 ${E(f.name)}</h3><p class="mu sm">${D.M.filter(m=>m.fo==f.id).length} items</p></div>`).join('')}<div class="card" style="border-style:dashed" onclick="newFo('${c}')"><h3>＋ New folder</h3><p class="mu sm">Create your own</p></div></div></div>
+<div><h2>Subject statistics</h2><div class="card" style="overflow-x:auto"><table style="margin:0"><tr><th>Subject / topic</th><th>Questions</th><th>Accuracy</th><th>Mastery</th></tr>${subs(c).map(sb=>{const t=stat(x=>x.c==c&&x.s==sb);return `<tr><td><b>${E(sb)}</b></td><td>${t.n}</td><td>${t.acc}%</td><td>${t.ms}%</td></tr>`+tops(c,sb).map(p=>{const u=stat(x=>x.c==c&&x.s==sb&&x.t==p);return `<tr class="mu sm"><td>&nbsp;&nbsp;${E(p)}</td><td>${u.n}</td><td>${u.acc}%</td><td>${u.ms}%</td></tr>`}).join('')}).join('')||'<tr><td class="mu">No questions yet for this component.</td></tr>'}</table></div></div></div>`};
+function newFo(c){const n=(prompt('Folder name:')||'').trim();if(n){D.FO.push({id:U(),c,name:n});save();route()}}
+function delFo(id){const f=D.FO.find(x=>x.id==id);if(confirm('Delete this folder?')){D.FO=D.FO.filter(x=>x.id!=id);save();go('c/'+f.c)}}
+function addM(fo){const t=v('mn').trim();if(!t)return toast('Title required');D.M.push({id:U(),fo,title:t,desc:v('md'),type:v('my')});save();route()}
+V.f=id=>{const f=D.FO.find(x=>x.id==id);if(!f)return V.dash();const it=D.M.filter(m=>m.fo==id),ad=role=='admin';
+return hd('📁 '+E(f.name),`<a class="lk" onclick="go('c/${f.c}')">← ${f.c}</a>`)+`<div class="w sec stack">${ad?`<div class="card stack"><h3>Add item (admin)</h3><input id="mn" placeholder="Title" style="width:100%"><textarea id="md" placeholder="Description"></textarea><div class="row"><select id="my">${['PDF','PPTX','DOCX','XLSX','IMG'].map(x=>`<option>${x}</option>`).join('')}</select><button class="btn p" onclick="addM('${id}')">Add</button></div><p class="mu sm">Real file upload arrives with Supabase Storage.</p></div>`:''}
+<div class="g">${it.map(m=>`<div class="card"><div class="row" style="margin:0">${tag(m.type)}<a class="star" onclick="bm('${m.id}')">${P.bm.includes(m.id)?'★':'☆'}</a></div><h3 style="margin-top:8px">${E(m.title)}</h3><p class="mu">${E(m.desc)}</p><div class="row"><button class="btn" onclick="toast('Files open here once Supabase Storage is connected')">Open</button>${ad?`<a class="lk" onclick="del('M','${m.id}')">Delete</a>`:''}</div></div>`).join('')||empty('This folder is empty.')}</div>
+${!f.def&&!it.length?`<button class="btn" onclick="delFo('${id}')">Delete this folder</button>`:''}</div>`};
+
+/* ===== QUIZ ===== */
+let QZ=null;const QS={n:10,t:0,c:null,sel:new Set()};
+const keys=c=>[...new Set(allQ().filter(x=>!c||x.c==c).map(x=>x.c+'|'+x.s+'|'+x.t))],pool=()=>allQ().filter(x=>QS.sel.has(x.c+'|'+x.s+'|'+x.t));
+function tog(el){el.checked?QS.sel.add(el.dataset.k):QS.sel.delete(el.dataset.k);smry()}
+function selK(el,on){const p=el.dataset.p+'|';keys(QS.c).forEach(k=>{if((k+'|').startsWith(p))on?QS.sel.add(k):QS.sel.delete(k)});route()}
+function smry(){const e=$('#sum');if(!e)return;const p=pool().length,n=Math.min(Math.max(10,QS.n|0),p);e.innerHTML=`<b>Your quiz:</b> ${p>=10?n:0} questions (from ${p} available in your selection) · Timer: ${QS.t>0?QS.t+' min':'off'} · Shuffled`+(p<10?'<br>Select more topics: at least 10 questions are needed.':'')}
+function setup(c){if(QS.c!==c){QS.c=c;QS.sel=new Set(keys(c))}
+return `<div class="card stack"><h3>Quiz settings</h3>
+<div><p class="lb">1 · Choose what to include</p>${(c?[c]:C).map(k=>subs(k).length?`<p style="margin-top:8px"><b>${k}</b> <a class="lk sm" data-p="${k}" onclick="selK(this,1)">select all</a> · <a class="lk sm" data-p="${k}" onclick="selK(this,0)">clear</a></p>`+subs(k).map(s=>`<p class="sm" style="margin-top:6px"><b>${E(s)}</b> <a class="lk" data-p="${E(k+'|'+s)}" onclick="selK(this,1)">all</a> · <a class="lk" data-p="${E(k+'|'+s)}" onclick="selK(this,0)">none</a></p><div class="chips">${tops(k,s).map(t=>`<label class="chip"><input type="checkbox" data-k="${E(k+'|'+s+'|'+t)}" ${QS.sel.has(k+'|'+s+'|'+t)?'checked':''} onchange="tog(this)">${E(t)}</label>`).join('')}</div>`).join(''):'').join('')}</div>
+<div><p class="lb">2 · Number of questions (minimum 10)</p><input type="number" min="10" value="${QS.n}" onchange="QS.n=+this.value;smry()"></div>
+<div><p class="lb">3 · Timer in minutes (0 = no timer)</p><input type="number" min="0" value="${QS.t}" onchange="QS.t=+this.value;smry()"></div>
+<p class="mu sm">Question order and answer choices are always shuffled. You submit once, at the end.</p>
+<div class="exp" id="sum"></div><button class="btn p" onclick="startQ()">Start quiz</button></div>`}
+function startQ(){const p=pool();if(p.length<10)return toast('At least 10 questions are needed. Select more topics.');const n=Math.min(Math.max(10,QS.n|0),p.length),
+all=keys(QS.c).every(k=>QS.sel.has(k)),qs=sh(p).slice(0,n).map(x=>{const o=sh(x.o.map((t,i)=>[t,i]));return{...x,o:o.map(a=>a[0]),a:o.findIndex(a=>a[1]==x.a)}});
+QZ={qs,sel:{},t0:Date.now(),end:QS.t>0?Date.now()+QS.t*60000:0,scope:(QS.c||'All components')+' · '+(all?'all subjects':QS.sel.size+' topics'),done:0};route();scrollTo(0,0)}
+function tick(){const e=$('#tm');if(!QZ||QZ.done||!e)return;const s=Math.max(0,Math.round((QZ.end-Date.now())/1000));e.textContent='⏱ '+mmss(s);e.classList.toggle('low',s<60);if(!s)return submitQ(1);tk=setTimeout(tick,500)}
+function cnt(){const e=$('#ans');if(e&&QZ)e.textContent=Object.keys(QZ.sel).length+' / '+QZ.qs.length+' answered'}
+function submitQ(auto){const z=QZ,un=z.qs.length-Object.keys(z.sel).length;if(!auto&&un&&!confirm(un+' unanswered. Submit anyway?'))return;z.done=1;let sc=0;
+const it=z.qs.map((q,i)=>{const ok=+(z.sel[i]===q.a);sc+=ok;const s=P.q[q.id]||[0,0,0];P.q[q.id]=[s[0]+ok,s[1]+1,ok];return{id:q.id,ch:z.sel[i]==null?null:q.o[z.sel[i]],ok}});
+z.sc=sc;z.it=it;z.secs=Math.round((Date.now()-z.t0)/1000);P.h.unshift({id:U(),ts:Date.now(),sc:z.scope,n:z.qs.length,k:sc,secs:z.secs,it});save();route();scrollTo(0,0)}
+const run=()=>`<div class="qbar"><b id="tm">${QZ.end?'⏱':'No timer'}</b><span id="ans" class="mu sm"></span><span><a class="lk sm" onclick="if(confirm('Quit this quiz? Your answers will be lost.')){QZ=null;route()}">Quit</a> <button class="btn p" onclick="submitQ()">Submit quiz</button></span></div><div class="stack">`+QZ.qs.map((q,i)=>`<div class="card"><p class="mu sm">Q${i+1} · ${E(q.s)} › ${E(q.t)}</p><p class="qt">${E(q.q)}</p>${q.o.map((o,j)=>`<label class="opt"><input type="radio" name="q${i}" ${QZ.sel[i]===j?'checked':''} onchange="QZ.sel[${i}]=${j};cnt()">${E(o)}</label>`).join('')}</div>`).join('')+`<button class="btn p" onclick="submitQ()">Submit quiz</button></div>`;
+const res=()=>{const z=QZ;return `<div class="card art stack"><h3>Score: ${z.sc} / ${z.qs.length} (${Math.round(100*z.sc/z.qs.length)}%)</h3><p class="mu">Time: ${mmss(z.secs)} · ${E(z.scope)}</p><div class="strip">${z.it.map(i=>`<i class="${i.ok?'g':''}"></i>`).join('')}</div><div class="row"><button class="btn p" onclick="QZ=null;route()">New quiz</button><button class="btn" onclick="go('hist')">History</button></div></div><div class="stack" style="margin-top:16px">`+z.qs.map((q,i)=>`<div class="card"><p class="mu sm">Q${i+1} · ${z.sel[i]==null?'— Not answered':z.it[i].ok?'✓ Correct':'✗ Wrong'} · ${E(q.s)} › ${E(q.t)}</p><p class="qt">${E(q.q)}</p>${q.o.map((o,j)=>`<div class="opt ${j==q.a?'ok':j==z.sel[i]?'no':''}">${E(o)}</div>`).join('')}<div class="exp">${E(q.e)}</div></div>`).join('')+'</div>'};
+V.quiz=a=>{const c=C.includes(a)?a:'';return hd(c?c+' Quiz':'Quiz',c?'Questions from '+c+' only.':'Questions from every component.')+`<div class="w sec">${QZ?(QZ.done?res():run()):!QL?empty('Loading questions…'):allQ().length?setup(c):`<div class="card art stack"><h3>No questions loaded yet</h3><p class="mu">Put <b>questions.csv</b> in the same folder as this page (works when hosted or with Live Server), or import it here:</p><input type="file" accept=".csv" onchange="impCsv(this)"></div>`}</div>`};
+
+/* ===== HISTORY ===== */
+let HV=null,HI=0,HW=0;
+const flip=(f,b)=>`<div class="fc" onclick="this.classList.toggle('on')"><div class="fi"><div class="ff">${f}</div><div class="fb">${b}</div></div></div>`;
+function replay(h){const l=h.it.map(i=>({i,q:allQ().find(x=>x.id==i.id)})).filter(x=>x.q&&(!HW||!x.i.ok)),
+bk=`<div class="row" style="margin:0 0 12px"><button class="btn" onclick="HV=null;route()">← History</button><label class="sm"><input type="checkbox" ${HW?'checked':''} onchange="HW=this.checked?1:0;HI=0;route()"> Wrong answers only</label></div>`;
+if(!l.length)return bk+empty('Nothing to show.');HI=Math.min(HI,l.length-1);const{i,q}=l[HI],n=l.length;
+return bk+flip(`<div>${E(q.q)}<div class="sm mu" style="margin-top:10px">${q.o.map((o,j)=>'ABCD'[j]+'. '+E(o)).join('<br>')}</div></div>`,`<div><b>${i.ok?'✓ You were correct':'✗ You were wrong'}</b><p>Your answer: ${i.ch==null?'(none)':E(i.ch)}</p><p>Correct: ${E(q.o[q.a])}</p><p class="sm mu">${E(q.e)}</p></div>`)+`<p class="mu sm" style="text-align:center">Question ${HI+1} of ${n} · click the card to flip</p><div class="row" style="justify-content:center"><button class="btn" onclick="HI=(HI+${n-1})%${n};route()">←</button><button class="btn" onclick="HI=(HI+1)%${n};route()">→</button></div>`}
+V.hist=()=>{const h=P.h.find(x=>x.id==HV);return hd('Quiz History','Every quiz you finish is saved here. Green = correct, red = wrong.')+`<div class="w sec">${h?replay(h):`<div class="stack">${P.h.map(x=>`<div class="card"><div class="row" style="margin:0"><b>${x.k} / ${x.n}</b><span class="mu sm">${Math.round(100*x.k/x.n)}% · ${new Date(x.ts).toLocaleDateString()} · ${mmss(x.secs)}</span></div><p class="sm">${E(x.sc)}</p><div class="strip">${x.it.map(i=>`<i class="${i.ok?'g':''}"></i>`).join('')}</div><button class="btn" onclick="HV='${x.id}';HI=0;HW=0;route()">Review as flashcards</button></div>`).join('')||empty('No quizzes taken yet.')}</div>`}</div>`};
+
+/* ===== FLASHCARDS ===== */
+let FT='s',FC={i:0,o:null},ED=null,FF={c:'',k:''};
+const deck=()=>{const d=D.F.filter(x=>(x.pub||x.own)&&(!FF.c||x.c==FF.c)&&(!FF.k||(FF.k=='img'?x.img:FF.k=='own'?x.own:!x.own)));return FC.o?d.sort((a,b)=>FC.o.indexOf(a.id)-FC.o.indexOf(b.id)):d};
+function nav2(n){const l=deck().length;FC.i=(FC.i+n+l)%l;route()}
+function mark(id,s){P.fc[id]=s;save();nav2(1)}
+function readImg(id,cb){const f=$('#'+id).files[0];if(!f)return cb();const r=new FileReader();r.onload=()=>{const i=new Image();i.onload=()=>{const k=Math.min(1,900/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(i,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',.8))};i.onerror=()=>toast('Could not read that image');i.src=r.result};r.readAsDataURL(f)}
+function saveF(own){const f=v('ff').trim(),b=v('fb').trim();if(!f)return toast('Add a title for the front');readImg('fi',img=>{const e=own&&D.F.find(x=>x.id==ED);if(!b&&!img&&!(e&&e.img))return toast('Add back text or an image');const o={c:v('fk'),f,b};if(img)o.img=img;if(e)Object.assign(e,o);else D.F.push({id:U(),pub:1,own:own?1:0,...o});ED=null;save();route()})}
+const fform=(e,own)=>`<select id="fk">${C.map(c=>`<option ${e.c==c?'selected':''}>${c}</option>`).join('')}</select><input id="ff" placeholder="Front / title" value="${E(e.f||'')}" style="width:100%"><textarea id="fb" placeholder="Back / answer (optional if you add an image)">${E(e.b||'')}</textarea><div><p class="lb">Formula image (optional)</p><input type="file" id="fi" accept="image/*">${e.img?'<p class="mu sm">Current image is kept unless you choose a new one.</p>':''}</div><div class="row"><button class="btn p" onclick="saveF(${own})">Save</button>${ED&&own?'<button class="btn" onclick="ED=null;route()">Cancel</button>':''}</div>`;
+function study(){const d=deck(),bar=`<div class="bar"><select onchange="FF.c=this.value;FC.i=0;route()"><option value="">All components</option>${C.map(c=>`<option ${FF.c==c?'selected':''}>${c}</option>`).join('')}</select><select onchange="FF.k=this.value;FC.i=0;route()">${[['','All cards'],['img','Formula cards (images)'],['own','My cards'],['off','Official cards']].map(([k,t])=>`<option value="${k}" ${FF.k==k?'selected':''}>${t}</option>`).join('')}</select></div>`;
+if(!d.length)return bar+empty('No cards here yet. Add formula cards under My Cards.');FC.i=Math.min(FC.i,d.length-1);const c=d[FC.i],s=P.fc[c.id];
+return bar+flip(`<div>${E(c.f)}</div>`,`<div>${c.b?E(c.b):''}${c.img?`<img src="${c.img}" alt="">`:''}</div>`)+`<p class="mu sm" style="text-align:center">Card ${FC.i+1} of ${d.length} · ${c.c} · ${c.own?'Personal':'Official'} · ${s=='known'?'Known':s=='review'?'Need review':'Unmarked'} · click the card to flip</p><div class="row" style="justify-content:center"><button class="btn" onclick="nav2(-1)">←</button><button class="btn" onclick="mark('${c.id}','review')">Need Review</button><button class="btn p" onclick="mark('${c.id}','known')">Known</button><button class="btn" onclick="nav2(1)">→</button><button class="btn" onclick="FC.o=sh(D.F.map(x=>x.id));FC.i=0;route()">Shuffle</button></div>`}
+function mine(){const e=D.F.find(x=>x.id==ED)||{};return `<div class="card stack"><h3>${ED?'Edit card':'New card'} <span class="mu sm">(private to you)</span></h3>${fform(e,1)}</div><div class="g" style="margin-top:16px">${D.F.filter(x=>x.own).map(x=>`<div class="card"><b>${E(x.f)}</b> ${x.img?'<span class="tag">image</span>':''}<p class="mu sm">${x.c}</p><div class="row"><button class="btn" onclick="ED='${x.id}';route()">Edit</button><button class="btn" onclick="del('F','${x.id}')">Delete</button></div></div>`).join('')||empty('You have no personal cards yet.')}</div>`}
+V.cards=()=>hd('Flashcards','Official cards, formula cards (images) and your private cards.')+`<div class="w sec"><div class="tabs">${[['s','Study'],['m','My Cards']].map(([k,n])=>`<a class="${FT==k?'on':''}" onclick="FT='${k}';route()">${n}</a>`).join('')}</div>${FT=='s'?study():mine()}</div>`;
+
+/* ===== MY QUESTIONS ===== */
+function addQ(){const o=[0,1,2,3].map(i=>v('o'+i).trim()),q=v('mq').trim(),s=v('ms').trim(),t=v('mt').trim();if(!q||!s||!t||o.some(x=>!x))return toast('Fill in subject, topic, question and all 4 choices');D.MQ.push({id:'m'+U(),c:v('mc'),s,t,q,o,a:+v('ma'),e:v('me').trim(),d:'',st:''});save();route()}
+V.myq=()=>hd('My Questions','Add your own questions. They are private and appear in your quizzes.')+`<div class="w sec stack"><div class="card stack"><select id="mc">${C.map(c=>`<option>${c}</option>`).join('')}</select><div class="row"><input id="ms" placeholder="Subject" list="sl"><input id="mt" placeholder="Topic"></div><datalist id="sl">${[...new Set(allQ().map(x=>x.s))].map(s=>`<option value="${E(s)}">`).join('')}</datalist><textarea id="mq" placeholder="Question"></textarea>${[0,1,2,3].map(i=>`<input id="o${i}" placeholder="Choice ${'ABCD'[i]}" style="width:100%">`).join('')}<div class="row"><select id="ma">${[0,1,2,3].map(i=>`<option value="${i}">Correct: ${'ABCD'[i]}</option>`).join('')}</select></div><textarea id="me" placeholder="Explanation / solution"></textarea><button class="btn p" onclick="addQ()">Add question</button></div>${D.MQ.map(x=>`<div class="card"><p class="mu sm">${x.c} › ${E(x.s)} › ${E(x.t)}</p><p>${E(x.q)}</p><a class="lk" onclick="del('MQ','${x.id}')">Delete</a></div>`).join('')}</div>`;
+
+/* ===== ADMIN ===== */
+let AT='o';
+function pub(id){const x=D.F.find(x=>x.id==id);x.pub=x.pub?0:1;save();route()}
+const AD={
+o:()=>`<div class="g">${[['Users (sample)',D.U.length],['Official questions',OQ.length],['Folders',D.FO.length],['Folder items',D.M.length],['Official flashcards',D.F.filter(x=>!x.own).length]].map(([n,x])=>`<div class="card art stat"><b>${x}</b><span class="mu sm">${n}</span></div>`).join('')}</div>`,
+u:()=>`<table>${D.U.map((u,i)=>`<tr><td>${u[0]}</td><td class="mu">${u[1]}</td><td><select onchange="D.U[${i}][2]=this.value;save()">${['student','admin'].map(r=>`<option ${u[2]==r?'selected':''}>${r}</option>`).join('')}</select></td></tr>`).join('')}</table><p class="mu sm">Sample users. Real accounts come from Supabase Auth.</p>`,
+f:()=>`<div class="card stack"><h3>New official card</h3>${fform({},0)}</div><table>${D.F.filter(x=>!x.own).map(x=>`<tr><td>${E(x.f)} ${x.img?'🖼':''}</td><td class="mu sm">${x.c}</td><td><a class="lk" onclick="pub('${x.id}')">${x.pub?'Published':'Hidden'}</a></td><td><a class="lk" onclick="del('F','${x.id}')">Delete</a></td></tr>`).join('')}</table>`,
+q:()=>{const m={};OQ.forEach(x=>{const k=x.c+' › '+x.s+' › '+x.t;m[k]=(m[k]||0)+1});const fl=OQ.filter(x=>/need/i.test(x.st)).length;return `<div class="card stack"><h3>Official questions: ${OQ.length}</h3><p class="mu sm">The hosted site reads <b>questions.csv</b> from your GitHub repo automatically. For testing from a double-clicked file, import it here (saved in this browser only).</p><input type="file" accept=".csv" onchange="impCsv(this)">${fl?`<p class="sm">${fl} question(s) are marked "Needs Review" in the CSV.</p>`:''}</div><table>${Object.entries(m).map(([k,n])=>`<tr><td>${E(k)}</td><td>${n}</td></tr>`).join('')}</table>`}};
+V.admin=()=>hd('Admin Dashboard','Manage content. (Prototype only: real protection comes from Supabase RLS.)')+`<div class="w sec"><div class="tabs">${[['o','Overview'],['u','Users'],['f','Official cards'],['q','Questions']].map(([k,n])=>`<a class="${AT==k?'on':''}" onclick="AT='${k}';route()">${n}</a>`).join('')}</div>${AD[AT]()}</div>`;
+
+/* ===== MENU, TOP BAR, ROUTER ===== */
+const drawer=()=>{const a=(h,t)=>`<a onclick="dr(0);${h}">${t}</a>`;return a("go('dash')",'Dashboard')+a("go('quiz')",'Quiz')+a("go('hist')",'Quiz History')+`<p class="dl">Components</p>`+C.map(c=>a(`go('c/${c}')`,c)).join('')+`<p class="dl">Study</p>`+a("FF={c:'',k:''};go('cards')",'Flashcards')+a("FF={c:'',k:'img'};go('cards')",'Formula Cards')+a("go('myq')",'My Questions')+(role=='admin'?`<p class="dl">Admin</p>`+a("go('admin')",'Admin Dashboard'):'')+`<p class="dl"></p>`+a("go('home')",'Log out')};
+const tbar=n=>n=='home'?`<button class="btn" onclick="go('dash')">Log in</button> <button class="btn p" onclick="go('dash')">Sign up</button>`:`<div class="seg">${['student','admin'].map(r=>`<button class="${role==r?'on':''}" onclick="setR('${r}')">${r=='admin'?'Admin':'Student'}</button>`).join('')}</div>`;
+function setR(r){role=r;L.fra_role=r;go(r=='admin'?'admin':'dash')}
+function route(){clearTimeout(tk);const[n0,a]=(location.hash.slice(2)||'home').split('/');let n=V[n0]?n0:'home';if(n=='admin'&&role!='admin'){toast('Switch to Admin view first');n='dash'}
+const ap=$('#app');ap.innerHTML=V[n](a);if(nv){ap.className='';void ap.offsetWidth;ap.className='in';nv=0}
+$('#tb').innerHTML=tbar(n);$('#dr').innerHTML=drawer();$('#bg').style.display=n=='home'?'none':'';
+if(n=='quiz'&&QZ&&!QZ.done){cnt();if(QZ.end)tick()}else smry()}
+addEventListener('hashchange',()=>{nv=1;scrollTo(0,0);route()});route();
+</script>
+</body>
+</html>
