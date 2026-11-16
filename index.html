@@ -316,16 +316,15 @@ function closeFab(){
 function fabFolders(){
   const list=D.FO.filter(f=>
     f.c===fabComponent &&
-    (fabMode==='folder'||f.own||role==='admin')
+    (fabMode==='folder'||f.own||f.def||role==='admin')
   );
 
   return list.map(f=>`
     <option value="${f.id}" ${fabDestination===f.id?'selected':''}>
-      ${'— '.repeat(folderDepth(f))}${E(f.name)}
+      ${f.def ? '📁 [Default] ' : '— '.repeat(folderDepth(f))}${E(f.name)}
     </option>
   `).join('');
 }
-
 function folderDepth(f){
   let depth=0,p=f.parent;
   while(p){
@@ -661,12 +660,15 @@ V.c = c => {
             <span class="tag">${count} items</span>
             <button class="btn" style="padding:4px 8px; border:none; background:transparent; font-size:1.2rem; cursor:pointer;" onclick="toggleMenu('fo_${f.id}', event)">⋮</button>
           </div>
-          ${activeMenu === 'fo_' + f.id ? `
-            <div style="position:absolute; right:16px; top:45px; background:#fff; border:1px solid var(--bd); box-shadow:0 4px 16px #0002; border-radius:var(--r); z-index:20; padding:6px 0; min-width:140px" onclick="event.stopPropagation()">
-              <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="renameFolder('${f.id}')">✏️ Rename</a>
-              <a style="display:block; padding:8px 14px; font-size:.9rem; color:#d9534f; cursor:pointer;" onclick="showConfirm('Delete Folder', 'Are you sure you want to delete this folder?', () => delFo('${f.id}'))">🗑️ Delete</a>
-            </div>
-          ` : ''}
+          ${activeMenu === 'm_' + m.id ? `
+  <div style="position:absolute; right:16px; top:45px; background:#fff; border:1px solid var(--bd); box-shadow:0 4px 16px #0002; border-radius:var(--r); z-index:20; padding:6px 0; min-width:140px" onclick="event.stopPropagation()">
+    <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="openM('${m.id}')">👁️ Open File</a>
+    ${canManage ? `
+      <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="renameMaterial('${m.id}')">✏️ Rename</a>
+      <a style="display:block; padding:8px 14px; font-size:.9rem; color:#d9534f; cursor:pointer;" onclick="showConfirm('Delete Material', 'Delete this file permanently?', () => delM('${m.id}'))">🗑️ Delete</a>
+    ` : ''}
+  </div>
+` : ''}
         </div>
       `;
     } else {
@@ -693,17 +695,82 @@ V.c = c => {
 
 async function delFo(id){const f=D.FO.find(x=>x.id==id);if(!confirm('Delete this folder?'))return;const r=await sb.from('folders').delete().eq('id',id);if(r.error)return toast(r.error.message);D.FO=D.FO.filter(x=>x.id!=id);go('c/'+f.c)}
 
-async function openM(id){
-  const m=D.M.find(x=>x.id==id);
-  if(!m||!m.path)return toast('File not found');
+async function openM(id) {
+  const m = D.M.find(x => x.id == id);
+  if (!m || !m.path) return toast('File not found');
 
-  const r=await sb.storage
-    .from('review-materials')
-    .createSignedUrl(m.path,3600);
+  const r = await sb.storage.from('review-materials').createSignedUrl(m.path, 3600);
+  if (r.error) return toast(r.error.message);
 
-  if(r.error)return toast(r.error.message);
+  const url = r.data.signedUrl;
+  const ext = m.type.toLowerCase();
 
-  window.open(r.data.signedUrl,'_blank','noopener');
+  // Open natively in-site if PDF or image, otherwise open in new tab
+  if (['pdf', 'jpg', 'jpeg', 'png', 'webp'].includes(ext)) {
+    viewerFile = { title: m.title, url, type: ext };
+    route();
+  } else {
+    window.open(url, '_blank', 'noopener');
+  }
+}
+
+let viewerFile = null;
+
+function closeViewer() {
+  viewerFile = null;
+  route();
+}
+
+function renderFileViewer() {
+  let root = $('#fileViewerRoot');
+  if (!root) {
+    const div = document.createElement('div');
+    div.id = 'fileViewerRoot';
+    document.body.appendChild(div);
+    root = div;
+  }
+  if (!viewerFile) {
+    root.innerHTML = '';
+    return;
+  }
+  const isPdf = viewerFile.type === 'pdf';
+  root.innerHTML = `
+    <div class="fm-backdrop" onclick="closeViewer()" style="padding:20px;">
+      <div class="fm-card" onclick="event.stopPropagation()" style="max-width:1000px; width:100%; height:90vh; display:flex; flex-direction:column; padding:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--bd); padding-bottom:10px; margin-bottom:10px;">
+          <h2 style="font-size:1.1rem; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:70%;">${E(viewerFile.title)}</h2>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <a href="${viewerFile.url}" target="_blank" class="btn sm">Download File</a>
+            <button class="btn" onclick="closeViewer()">✕ Close</button>
+          </div>
+        </div>
+        <div style="flex:1; width:100%; height:100%; overflow:auto; background:#f7fafa; border-radius:var(--r); display:flex; align-items:center; justify-content:center;">
+          ${isPdf 
+            ? `<object data="${viewerFile.url}" type="application/pdf" style="width:100%; height:100%;">
+                 <div style="padding:30px; text-align:center;">
+                   <p style="margin-bottom:12px;">Unable to display PDF directly in this browser frame.</p>
+                   <a href="${viewerFile.url}" target="_blank" class="btn p">Open PDF in New Tab</a>
+                 </div>
+               </object>`
+            : `<img src="${viewerFile.url}" style="max-width:100%; max-height:100%; object-fit:contain;" alt="">`
+          }
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renameMaterial(id) {
+  const m = D.M.find(x => x.id == id);
+  if (!m) return;
+  const newTitle = prompt('Enter new file name:', m.title);
+  if (!newTitle || !newTitle.trim()) return;
+  sb.from('materials').update({ title: newTitle.trim() }).eq('id', id).then(r => {
+    if (r.error) return toast(r.error.message);
+    m.title = newTitle.trim();
+    toast('File renamed');
+    route();
+  });
 }
 
 async function delM(id){
@@ -802,8 +869,8 @@ V.f = id => {
               </div>
               ${activeMenu === 'm_' + m.id ? `
                 <div style="position:absolute; right:16px; top:45px; background:#fff; border:1px solid var(--bd); box-shadow:0 4px 16px #0002; border-radius:var(--r); z-index:20; padding:6px 0; min-width:140px" onclick="event.stopPropagation()">
-                  <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="openM('${m.id}')">👁️ Open File</a>
-                  ${canManage ? `<a style="display:block; padding:8px 14px; font-size:.9rem; color:#d9534f; cursor:pointer;" onclick="showConfirm('Delete Material', 'Delete this file permanently?', () => delM('${m.id}'))">🗑️ Delete</a>` : ''}
+                  <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="openM('${m.id}')">Open File</a>
+                  ${canManage ? `<a style="display:block; padding:8px 14px; font-size:.9rem; color:#d9534f; cursor:pointer;" onclick="showConfirm('Delete Material', 'Delete this file permanently?', () => delM('${m.id}'))">Delete</a>` : ''}
                 </div>
               ` : ''}
             </div>
