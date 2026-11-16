@@ -660,15 +660,12 @@ V.c = c => {
             <span class="tag">${count} items</span>
             <button class="btn" style="padding:4px 8px; border:none; background:transparent; font-size:1.2rem; cursor:pointer;" onclick="toggleMenu('fo_${f.id}', event)">⋮</button>
           </div>
-          ${activeMenu === 'm_' + m.id ? `
-  <div style="position:absolute; right:16px; top:45px; background:#fff; border:1px solid var(--bd); box-shadow:0 4px 16px #0002; border-radius:var(--r); z-index:20; padding:6px 0; min-width:140px" onclick="event.stopPropagation()">
-    <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="openM('${m.id}')">👁️ Open File</a>
-    ${canManage ? `
-      <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="renameMaterial('${m.id}')">✏️ Rename</a>
-      <a style="display:block; padding:8px 14px; font-size:.9rem; color:#d9534f; cursor:pointer;" onclick="showConfirm('Delete Material', 'Delete this file permanently?', () => delM('${m.id}'))">🗑️ Delete</a>
-    ` : ''}
-  </div>
-` : ''}
+           ${activeMenu === 'fo_' + f.id ? `
+          <div style="position:absolute; right:16px; top:45px; background:#fff; border:1px solid var(--bd); box-shadow:0 4px 16px #0002; border-radius:var(--r); z-index:20; padding:6px 0; min-width:140px" onclick="event.stopPropagation()">
+            <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="renameFolder('${f.id}')">Rename</a>
+            <a style="display:block; padding:8px 14px; font-size:.9rem; color:#d9534f; cursor:pointer;" onclick="showConfirm('Delete Folder', 'Are you sure?', () => delFo('${f.id}'))">Delete</a>
+          </div>
+        ` : ''}
         </div>
       `;
     } else {
@@ -868,11 +865,14 @@ V.f = id => {
                 <button class="btn" style="padding:4px 8px; border:none; background:transparent; font-size:1.2rem; cursor:pointer;" onclick="toggleMenu('m_${m.id}', event)">⋮</button>
               </div>
               ${activeMenu === 'm_' + m.id ? `
-                <div style="position:absolute; right:16px; top:45px; background:#fff; border:1px solid var(--bd); box-shadow:0 4px 16px #0002; border-radius:var(--r); z-index:20; padding:6px 0; min-width:140px" onclick="event.stopPropagation()">
-                  <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="openM('${m.id}')">Open File</a>
-                  ${canManage ? `<a style="display:block; padding:8px 14px; font-size:.9rem; color:#d9534f; cursor:pointer;" onclick="showConfirm('Delete Material', 'Delete this file permanently?', () => delM('${m.id}'))">Delete</a>` : ''}
-                </div>
-              ` : ''}
+              <div style="position:absolute; right:16px; top:45px; background:#fff; border:1px solid var(--bd); box-shadow:0 4px 16px #0002; border-radius:var(--r); z-index:20; padding:6px 0; min-width:140px" onclick="event.stopPropagation()">
+                <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="openM('${m.id}')">👁️ Open File</a>
+                ${canManage ? `
+                  <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="renameMaterial('${m.id}')">✏️ Rename</a>
+                  <a style="display:block; padding:8px 14px; font-size:.9rem; color:#d9534f; cursor:pointer;" onclick="showConfirm('Delete Material', 'Delete this file permanently?', () => delM('${m.id}'))">🗑️ Delete</a>
+                ` : ''}
+              </div>
+            ` : ''}
             </div>
           `;
         } else {
