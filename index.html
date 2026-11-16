@@ -71,6 +71,28 @@ footer{border-top:1px solid var(--bd);padding:22px 0;color:var(--mu);font-size:.
 #toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 16px;border-radius:var(--r);font-size:.9rem;display:none;z-index:30}
 @media(max-width:600px){.hero{padding:44px 0;background-size:300px}.hero h1{font-size:1.7rem}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+.g.list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.g.list>.card{
+  width:100%;
+  display:flex;
+  flex-direction:row;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+}
+
+.g.list>.card h3{
+  margin:0;
+}
+
+.g.list>.card p{
+  margin:4px 0;
+}
 </style>
 </head>
 <body>
@@ -91,6 +113,12 @@ sh=a=>[...a].sort(()=>Math.random()-.5),mmss=s=>Math.floor(s/60)+':'+String(s%60
 go=h=>{if(location.hash=='#/'+h)route();else location.hash='#/'+h},
 CD={MSTC:'Mathematics, Surveying and Transportation Engineering.',HPGE:'Hydraulics and Geotechnical Engineering.',PSAD:'Structural Analysis and Design.'};
 let D={FO:[],M:[],F:[],MQ:[],U:[]},P={h:[],q:{},fc:{},bm:[]},role='student',nv=0,tk,QL=0,OQ=[],ME=null,PR=null,CU=null,AU={mode:'in',msg:''};
+let folderView='grid';
+
+function toggleFolderView(){
+  folderView=folderView==='grid'?'list':'grid';
+  route();
+}
 const save=()=>{};
 function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',3200)}
 function dr(x){$('#dr').classList.toggle('on',!!x);$('#ov').classList.toggle('on',!!x)}
@@ -146,7 +174,14 @@ V.dash=()=>{const a=stat(()=>1),h=P.h.slice(0,4);return hd('Welcome, '+E(PR&&PR.
 
 V.c=c=>{if(!C.includes(c))return V.dash();const s=stat(x=>x.c==c),fo=D.FO.filter(f=>f.c==c);
 return hd(c,CD[c])+`<div class="w sec stack"><div class="card art"><h3>Quiz</h3><p class="mu">${s.n} questions available in ${c}. Pick one subject, several topics, or everything.</p><button class="btn p" onclick="go('quiz/${c}')">Take a ${c} quiz</button>${bars(s)}</div>
-<div><h2>Folders</h2><div class="g">${fo.map(f=>`<div class="card" onclick="go('f/${f.id}')"><h3>📁 ${E(f.name)}</h3><p class="mu sm">${D.M.filter(m=>m.fo==f.id).length} items</p></div>`).join('')}<div class="card" style="border-style:dashed" onclick="newFo('${c}')"><h3>＋ New folder</h3><p class="mu sm">Create your own</p></div></div></div>
+<div>
+  <div class="row" style="justify-content:space-between">
+    <h2>Folders</h2>
+    <button class="btn" onclick="toggleFolderView()">
+      ${folderView==='grid'?'List view ☰':'Grid view ▦'}
+    </button>
+  </div>
+  <div class="g ${folderView}">${fo.map(f=>`<div class="card" onclick="go('f/${f.id}')"><h3>📁 ${E(f.name)}</h3><p class="mu sm">${D.M.filter(m=>m.fo==f.id).length} items</p></div>`).join('')}<div class="card" style="border-style:dashed" onclick="newFo('${c}')"><h3>＋ New folder</h3><p class="mu sm">Create your own</p></div></div></div>
 <div><h2>Subject statistics</h2><div class="card" style="overflow-x:auto"><table style="margin:0"><tr><th>Subject / topic</th><th>Questions</th><th>Accuracy</th><th>Mastery</th></tr>${subs(c).map(sb=>{const t=stat(x=>x.c==c&&x.s==sb);return `<tr><td><b>${E(sb)}</b></td><td>${t.n}</td><td>${t.acc}%</td><td>${t.ms}%</td></tr>`+tops(c,sb).map(p=>{const u=stat(x=>x.c==c&&x.s==sb&&x.t==p);return `<tr class="mu sm"><td>&nbsp;&nbsp;${E(p)}</td><td>${u.n}</td><td>${u.acc}%</td><td>${u.ms}%</td></tr>`}).join('')}).join('')||'<tr><td class="mu">No questions yet for this component.</td></tr>'}</table></div></div></div>`};
 async function newFo(c){const n=(prompt('Folder name:')||'').trim();if(!n)return;const r=await sb.from('folders').insert({component:c,name:n,owner_id:role=='admin'?null:ME.id}).select().single();if(r.error)return toast(r.error.message);D.FO.push({id:r.data.id,c,name:n,def:false,own:r.data.owner_id?1:0});route()}
 async function delFo(id){const f=D.FO.find(x=>x.id==id);if(!confirm('Delete this folder?'))return;const r=await sb.from('folders').delete().eq('id',id);if(r.error)return toast(r.error.message);D.FO=D.FO.filter(x=>x.id!=id);go('c/'+f.c)}
@@ -258,8 +293,14 @@ async function delM(id){
       <button class="btn p" onclick="addM('${id}')">Upload file</button>
     </div>`:''}
 
-    <div class="g">
-      ${it.map(m=>`
+    <div class="row" style="justify-content:flex-end">
+  <button class="btn" onclick="toggleFolderView()">
+    ${folderView==='grid'?'List view ☰':'Grid view ▦'}
+  </button>
+</div>
+
+<div class="g ${folderView}">
+  ${it.map(m=>`
         <div class="card">
           <div class="row" style="margin:0">
             ${tag(m.type)}
