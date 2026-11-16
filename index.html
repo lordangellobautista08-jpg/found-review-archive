@@ -1069,7 +1069,7 @@ function study() {
         <option value="">Official cards</option>
         <option value="img" ${FF.k == 'img' ? 'selected' : ''}>Formula cards (images)</option>
         <option value="own" ${FF.k == 'own' ? 'selected' : ''}>My cards</option>
-        <option value="questions" ${FF.k == 'questions' ? 'selected' : ''}>📚 Question Bank Cards</option>
+        <option value="questions" ${FF.k == 'questions' ? 'selected' : ''}>Question Bank Cards</option>
       </select>
 
       ${FF.k === 'questions' && FF.c ? `
@@ -1087,7 +1087,7 @@ function study() {
       ` : ''}
     </div>`;
 
-  if (!d.length) return bar + empty('No questions found. Make sure you select a specific component (MSTC, HPGE, or PSAD) when viewing Question Bank cards.');
+  if (!d.length) return bar + empty('No questions found for this selection. Make sure questions are loaded and a component is selected.');
   FC.i = Math.min(FC.i, d.length - 1);
   const c = d[FC.i], s = P.fc[c.id];
 
