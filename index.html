@@ -592,36 +592,89 @@ const stat=f=>{const q=allQ().filter(f);let ok=0,n=0,m=0,at=0;q.forEach(x=>{cons
 const bars=s=>`<p class="sm" style="margin-top:10px">Accuracy ${s.acc}%</p><div class="pb"><b style="width:${s.acc}%"></b></div><p class="sm">Mastery ${s.ms}%</p><div class="pb"><b style="width:${s.ms}%"></b></div><p class="mu sm">${s.at} of ${s.n} questions attempted</p>`;
 async function pg(t,f){let a=[],i=0;for(;;){const r=await f(sb.from(t).select('*')).range(i,i+999);if(r.error)return{data:a,error:r.error};a=a.concat(r.data);if(r.data.length<1000)return{data:a};i+=1000}}
 async function load(){
-const r=await Promise.all([sb.from('profiles').select('*').eq('id',ME.id).maybeSingle(),pg('questions',q=>q.order('id')),sb.from('folders').select('*').order('created_at'),sb.from('materials').select('*').order('created_at'),sb.from('flashcards').select('*').order('created_at'),sb.from('flashcard_marks').select('*'),sb.from('bookmarks').select('*'),pg('question_stats',q=>q.order('question_id')),sb.from('quiz_attempts').select('*').order('created_at',{ascending:false}).limit(30)]);
-const er=r.find(x=>x.error);if(er)toast(er.error.message);const g=i=>r[i].data||[];
-PR=r[0].data||{display_name:'',role:'student'};role=PR.role||'student';
-const Q=g(1).map(dbq);OQ=Q.filter(x=>!x.own);D.MQ=Q.filter(x=>x.own);
-D.FO=g(2).map(x=>({
-  id:x.id,
-  c:x.component,
-  name:x.name,
-  parent:x.parent_id||null,
-  def:x.is_default,
-  own:x.owner_id?1:0
-}));
-D.M=g(3).map(x=>({
-  id:x.id,
-  fo:x.folder_id,
-  title:x.title,
-  desc:x.description||'',
-  type:x.file_type||'',
-  path:x.file_path||'',
-  pub:x.published,
-  own:x.owner_id?1:0
-}));
-const F=g(4),paths=F.filter(x=>x.image_path).map(x=>x.image_path),su={};
-if(paths.length){const s=await sb.storage.from('flashcard-images').createSignedUrls(paths,3600);(s.data||[]).forEach(x=>su[x.path]=x.signedUrl)}
-D.F=F.map(x=>({id:x.id,c:x.component,f:x.front,b:x.back||'',img:su[x.image_path]||'',ip:x.image_path||'',pub:x.published,own:x.owner_id?1:0}));
-P.fc={};g(5).forEach(x=>P.fc[x.flashcard_id]=x.status);P.bm=g(6).map(x=>x.material_id);
-P.q={};g(7).forEach(x=>P.q[x.question_id]=[x.correct_count,x.total_count,+x.last_correct]);
-const at=g(8),an=at.length?(await pg('quiz_answers',q=>q.in('attempt_id',at.map(x=>x.id)).order('id'))).data:[];
-P.h=at.map(a=>({id:a.id,ts:new Date(a.created_at).getTime(),sc:a.scope||'',n:a.total,k:a.correct,secs:a.seconds||0,it:an.filter(x=>x.attempt_id==a.id).sort((x,y)=>x.position-y.position).map(x=>({id:x.question_id,ch:x.chosen,ok:+x.is_correct}))}));
-D.U=[];if(role=='admin'){const u=await sb.from('profiles').select('*').order('created_at');D.U=u.data||[]}}
+  try {
+    const r = await Promise.all([
+      sb.from('profiles').select('*').eq('id', ME.id).maybeSingle(),
+      pg('questions', q => q.order('id')),
+      sb.from('folders').select('*').order('created_at'),
+      sb.from('materials').select('*').order('created_at'),
+      sb.from('flashcards').select('*').order('created_at'),
+      sb.from('flashcard_marks').select('*'),
+      sb.from('bookmarks').select('*'),
+      pg('question_stats', q => q.order('question_id')),
+      sb.from('quiz_attempts').select('*').order('created_at', { ascending: false }).limit(30)
+    ]);
+
+    const er = r.find(x => x && x.error);
+    if (er) console.warn('Supabase warning:', er.error.message);
+
+    const g = i => (r[i] && r[i].data) ? r[i].data : [];
+    
+    PR = (r[0] && r[0].data) ? r[0].data : { display_name: '', role: 'student' };
+    role = PR.role || 'student';
+
+    const Q = g(1).map(dbq);
+    OQ = Q.filter(x => !x.own);
+    D.MQ = Q.filter(x => x.own);
+
+    D.FO = g(2).map(x => ({
+      id: x.id,
+      c: x.component,
+      name: x.name,
+      parent: x.parent_id || null,
+      def: x.is_default,
+      own: x.owner_id ? 1 : 0
+    }));
+
+    D.M = g(3).map(x => ({
+      id: x.id,
+      fo: x.folder_id,
+      title: x.title,
+      desc: x.description || '',
+      type: x.file_type || '',
+      path: x.file_path || '',
+      pub: x.published,
+      own: x.owner_id ? 1 : 0
+    }));
+
+    const F = g(4), paths = F.filter(x => x.image_path).map(x => x.image_path), su = {};
+    if (paths.length) {
+      const s = await sb.storage.from('flashcard-images').createSignedUrls(paths, 3600);
+      (s.data || []).forEach(x => su[x.path] = x.signedUrl);
+    }
+    D.F = F.map(x => ({
+      id: x.id, c: x.component, f: x.front, b: x.back || '', img: su[x.image_path] || '', ip: x.image_path || '', pub: x.published, own: x.owner_id ? 1 : 0
+    }));
+
+    P.fc = {}; 
+    g(5).forEach(x => P.fc[x.flashcard_id] = x.status);
+    
+    P.bm = g(6).map(x => x.material_id);
+    
+    P.q = {}; 
+    g(7).forEach(x => P.q[x.question_id] = [x.correct_count, x.total_count, +x.last_correct]);
+
+    const at = g(8), an = at.length ? (await pg('quiz_answers', q => q.in('attempt_id', at.map(x => x.id)).order('id'))).data : [];
+    P.h = at.map(a => ({
+      id: a.id,
+      ts: new Date(a.created_at).getTime(),
+      sc: a.scope || '',
+      n: a.total,
+      k: a.correct,
+      secs: a.seconds || 0,
+      it: an.filter(x => x.attempt_id == a.id).sort((x, y) => x.position - y.position).map(x => ({ id: x.question_id, ch: x.chosen, ok: +x.is_correct }))
+    }));
+
+    D.U = [];
+    if (role == 'admin') {
+      const u = await sb.from('profiles').select('*').order('created_at');
+      D.U = u.data || [];
+    }
+  } catch (err) {
+    console.error('Fatal load exception:', err);
+    toast('Database connection error. Check console (F12).');
+  }
+}
 
 /* ===== VIEWS ===== */
 const V={};
