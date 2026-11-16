@@ -113,7 +113,16 @@ const er=r.find(x=>x.error);if(er)toast(er.error.message);const g=i=>r[i].data||
 PR=r[0].data||{display_name:'',role:'student'};role=PR.role||'student';
 const Q=g(1).map(dbq);OQ=Q.filter(x=>!x.own);D.MQ=Q.filter(x=>x.own);
 D.FO=g(2).map(x=>({id:x.id,c:x.component,name:x.name,def:x.is_default,own:x.owner_id?1:0}));
-D.M=g(3).map(x=>({id:x.id,fo:x.folder_id,title:x.title,desc:x.description||'',type:x.file_type||''}));
+D.M=g(3).map(x=>({
+  id:x.id,
+  fo:x.folder_id,
+  title:x.title,
+  desc:x.description||'',
+  type:x.file_type||'',
+  path:x.file_path||'',
+  pub:x.published,
+  own:x.owner_id?1:0
+}));
 const F=g(4),paths=F.filter(x=>x.image_path).map(x=>x.image_path),su={};
 if(paths.length){const s=await sb.storage.from('flashcard-images').createSignedUrls(paths,3600);(s.data||[]).forEach(x=>su[x.path]=x.signedUrl)}
 D.F=F.map(x=>({id:x.id,c:x.component,f:x.front,b:x.back||'',img:su[x.image_path]||'',ip:x.image_path||'',pub:x.published,own:x.owner_id?1:0}));
@@ -141,11 +150,141 @@ return hd(c,CD[c])+`<div class="w sec stack"><div class="card art"><h3>Quiz</h3>
 <div><h2>Subject statistics</h2><div class="card" style="overflow-x:auto"><table style="margin:0"><tr><th>Subject / topic</th><th>Questions</th><th>Accuracy</th><th>Mastery</th></tr>${subs(c).map(sb=>{const t=stat(x=>x.c==c&&x.s==sb);return `<tr><td><b>${E(sb)}</b></td><td>${t.n}</td><td>${t.acc}%</td><td>${t.ms}%</td></tr>`+tops(c,sb).map(p=>{const u=stat(x=>x.c==c&&x.s==sb&&x.t==p);return `<tr class="mu sm"><td>&nbsp;&nbsp;${E(p)}</td><td>${u.n}</td><td>${u.acc}%</td><td>${u.ms}%</td></tr>`}).join('')}).join('')||'<tr><td class="mu">No questions yet for this component.</td></tr>'}</table></div></div></div>`};
 async function newFo(c){const n=(prompt('Folder name:')||'').trim();if(!n)return;const r=await sb.from('folders').insert({component:c,name:n,owner_id:role=='admin'?null:ME.id}).select().single();if(r.error)return toast(r.error.message);D.FO.push({id:r.data.id,c,name:n,def:false,own:r.data.owner_id?1:0});route()}
 async function delFo(id){const f=D.FO.find(x=>x.id==id);if(!confirm('Delete this folder?'))return;const r=await sb.from('folders').delete().eq('id',id);if(r.error)return toast(r.error.message);D.FO=D.FO.filter(x=>x.id!=id);go('c/'+f.c)}
-async function addM(fo){const t=v('mn').trim();if(!t)return toast('Title required');const r=await sb.from('materials').insert({folder_id:fo,title:t,description:v('md'),file_type:v('my')}).select().single();if(r.error)return toast(r.error.message);D.M.push({id:r.data.id,fo,title:t,desc:v('md'),type:v('my')});route()}
-V.f=id=>{const f=D.FO.find(x=>x.id==id);if(!f)return V.dash();const it=D.M.filter(m=>m.fo==id),ad=role=='admin';
-return hd('📁 '+E(f.name),`<a class="lk" onclick="go('c/${f.c}')">← ${f.c}</a>`)+`<div class="w sec stack">${ad?`<div class="card stack"><h3>Add item (admin)</h3><input id="mn" placeholder="Title" style="width:100%"><textarea id="md" placeholder="Description"></textarea><div class="row"><select id="my">${['PDF','PPTX','DOCX','XLSX','IMG'].map(x=>`<option>${x}</option>`).join('')}</select><button class="btn p" onclick="addM('${id}')">Add</button></div><p class="mu sm">Real file upload arrives with Supabase Storage.</p></div>`:''}
-<div class="g">${it.map(m=>`<div class="card"><div class="row" style="margin:0">${tag(m.type)}<a class="star" onclick="bm('${m.id}')">${P.bm.includes(m.id)?'★':'☆'}</a></div><h3 style="margin-top:8px">${E(m.title)}</h3><p class="mu">${E(m.desc)}</p><div class="row"><button class="btn" onclick="toast('Files open here once Supabase Storage is connected')">Open</button>${ad?`<a class="lk" onclick="del('M','${m.id}')">Delete</a>`:''}</div></div>`).join('')||empty('This folder is empty.')}</div>
-${!f.def&&!it.length?`<button class="btn" onclick="delFo('${id}')">Delete this folder</button>`:''}</div>`};
+async function addM(fo){
+  const title=v('mn').trim();
+  const desc=v('md').trim();
+  const file=$('#mf').files[0];
+
+  if(!title)return toast('Title required');
+  if(!file)return toast('Please choose a file');
+  if(file.size>25*1024*1024)return toast('File exceeds the 25 MB limit');
+
+  const ext=file.name.split('.').pop().toLowerCase();
+  const allowed=['pdf','doc','docx','ppt','pptx','xls','xlsx','jpg','jpeg','png','webp'];
+  if(!allowed.includes(ext))return toast('File type not supported');
+
+  const folder=D.FO.find(x=>x.id==fo);
+  if(!folder)return toast('Folder not found');
+
+  const owner=folder.own?ME.id:'official';
+  const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
+  const path=`${owner}/${fo}/${Date.now()}_${safeName}`;
+  const type=ext.toUpperCase();
+
+  const upload=await sb.storage.from('review-materials').upload(path,file,{
+    cacheControl:'3600',
+    upsert:false
+  });
+
+  if(upload.error)return toast(upload.error.message);
+
+  const result=await sb.from('materials').insert({
+    folder_id:fo,
+    title,
+    description:desc,
+    file_type:type,
+    file_path:path,
+    published:folder.own?true:role==='admin',
+    owner_id:folder.own?ME.id:null
+  }).select().single();
+
+  if(result.error){
+    await sb.storage.from('review-materials').remove([path]);
+    return toast(result.error.message);
+  }
+
+  D.M.push({
+    id:result.data.id,
+    fo,
+    title,
+    desc,
+    type,
+    path,
+    pub:result.data.published,
+    own:result.data.owner_id?1:0
+  });
+
+  toast('File uploaded successfully');
+  route();
+}
+async function openM(id){
+  const m=D.M.find(x=>x.id==id);
+  if(!m||!m.path)return toast('File not found');
+
+  const r=await sb.storage
+    .from('review-materials')
+    .createSignedUrl(m.path,3600);
+
+  if(r.error)return toast(r.error.message);
+
+  window.open(r.data.signedUrl,'_blank','noopener');
+}
+
+async function delM(id){
+  const m=D.M.find(x=>x.id==id);
+  if(!m)return;
+
+  if(!confirm('Delete this material and its uploaded file?'))return;
+
+  const r=await sb.from('materials').delete().eq('id',id);
+  if(r.error)return toast(r.error.message);
+
+  if(m.path){
+    const s=await sb.storage.from('review-materials').remove([m.path]);
+    if(s.error)toast('Material deleted, but its stored file could not be removed.');
+  }
+
+  D.M=D.M.filter(x=>x.id!=id);
+  P.bm=P.bm.filter(x=>x!==id);
+  route();
+}V.f=id=>{
+  const f=D.FO.find(x=>x.id==id);
+  if(!f)return V.dash();
+
+  const it=D.M.filter(m=>m.fo==id);
+  const canManage=f.own||role==='admin';
+
+  return hd('📁 '+E(f.name),
+    `<a class="lk" onclick="go('c/${f.c}')">← ${f.c}</a>`
+  )+`<div class="w sec stack">
+
+    ${canManage?`
+    <div class="card stack">
+      <h3>Upload a material</h3>
+      <input id="mn" placeholder="Material title" style="width:100%">
+      <textarea id="md" placeholder="Description (optional)"></textarea>
+      <input id="mf" type="file" accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.webp">
+      <p class="mu sm">PDF, Word, PowerPoint, Excel or image. Maximum 25 MB.</p>
+      <button class="btn p" onclick="addM('${id}')">Upload file</button>
+    </div>`:''}
+
+    <div class="g">
+      ${it.map(m=>`
+        <div class="card">
+          <div class="row" style="margin:0">
+            ${tag(m.type)}
+            <a class="star" onclick="bm('${m.id}')">
+              ${P.bm.includes(m.id)?'★':'☆'}
+            </a>
+          </div>
+
+          <h3 style="margin-top:8px">${E(m.title)}</h3>
+          <p class="mu">${E(m.desc)}</p>
+
+          <div class="row">
+            <button class="btn" onclick="openM('${m.id}')">Open</button>
+            ${canManage?`<a class="lk" onclick="delM('${m.id}')">Delete</a>`:''}
+          </div>
+        </div>
+      `).join('')||empty('This folder is empty.')}
+    </div>
+
+    ${(f.own||role==='admin')&&!it.length?`
+      <button class="btn" onclick="delFo('${id}')">Delete folder</button>
+    `:''}
+
+  </div>`;
+};
 
 /* ===== QUIZ ===== */
 let QZ=null;const QS={n:10,t:0,c:null,sel:new Set()};
