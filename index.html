@@ -649,6 +649,7 @@ V.c = c => {
   <div class="g ${folderView}">
   ${fo.map(f => {
     const count = D.M.filter(m => m.fo == f.id).length + D.FO.filter(x => x.parent == f.id).length;
+    const canManageFolder = f.own || role === 'admin';
     if (folderView === 'list') {
       return `
         <div class="card" style="display:flex; align-items:center; justify-content:space-between; padding:12px 18px; position:relative;">
@@ -660,12 +661,12 @@ V.c = c => {
             <span class="tag">${count} items</span>
             <button class="btn" style="padding:4px 8px; border:none; background:transparent; font-size:1.2rem; cursor:pointer;" onclick="toggleMenu('fo_${f.id}', event)">⋮</button>
           </div>
-           ${activeMenu === 'fo_' + f.id ? `
-          <div style="position:absolute; right:16px; top:45px; background:#fff; border:1px solid var(--bd); box-shadow:0 4px 16px #0002; border-radius:var(--r); z-index:20; padding:6px 0; min-width:140px" onclick="event.stopPropagation()">
-            <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="renameFolder('${f.id}')">Rename</a>
-            <a style="display:block; padding:8px 14px; font-size:.9rem; color:#d9534f; cursor:pointer;" onclick="showConfirm('Delete Folder', 'Are you sure?', () => delFo('${f.id}'))">Delete</a>
-          </div>
-        ` : ''}
+          ${activeMenu === 'fo_' + f.id ? `
+            <div style="position:absolute; right:16px; top:45px; background:#fff; border:1px solid var(--bd); box-shadow:0 4px 16px #0002; border-radius:var(--r); z-index:20; padding:6px 0; min-width:140px" onclick="event.stopPropagation()">
+              <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="renameFolder('${f.id}')">✏️ Rename</a>
+              ${canManageFolder ? `<a style="display:block; padding:8px 14px; font-size:.9rem; color:#d9534f; cursor:pointer;" onclick="showConfirm('Delete Folder', 'Are you sure?', () => delFo('${f.id}'))">🗑️ Delete</a>` : ''}
+            </div>
+          ` : ''}
         </div>
       `;
     } else {
@@ -679,7 +680,7 @@ V.c = c => {
           ${activeMenu === 'fo_' + f.id ? `
             <div style="position:absolute; right:16px; top:40px; background:#fff; border:1px solid var(--bd); box-shadow:0 4px 16px #0002; border-radius:var(--r); z-index:20; padding:6px 0; min-width:140px" onclick="event.stopPropagation()">
               <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="renameFolder('${f.id}')">✏️ Rename</a>
-              <a style="display:block; padding:8px 14px; font-size:.9rem; color:#d9534f; cursor:pointer;" onclick="showConfirm('Delete Folder', 'Are you sure?', () => delFo('${f.id}'))">🗑️ Delete</a>
+              ${canManageFolder ? `<a style="display:block; padding:8px 14px; font-size:.9rem; color:#d9534f; cursor:pointer;" onclick="showConfirm('Delete Folder', 'Are you sure?', () => delFo('${f.id}'))">🗑️ Delete</a>` : ''}
             </div>
           ` : ''}
         </div>
