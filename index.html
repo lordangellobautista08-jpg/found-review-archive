@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Found / CE Review Archive</title>
+<script>try{if(localStorage.getItem("theme")=="dark")document.documentElement.dataset.theme="dark"}catch(e){}</script>
 <style>
 /* ===== COLOR SYSTEM: change colors here only ===== */
 :root{
@@ -17,16 +18,16 @@ body{font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:va
 a,.lk{cursor:pointer;text-decoration:none;color:inherit}
 .w{max-width:1100px;margin:0 auto;padding:0 20px}
 .art{background-image:var(--art);background-repeat:no-repeat;background-position:right -30px top -30px;background-size:240px}
-header{border-bottom:1px solid var(--bd);position:sticky;top:0;background:#fffffff2;z-index:5}
+header{border-bottom:1px solid var(--bd);position:sticky;top:0;background:var(--hdr);z-index:5}
 .hi{display:flex;align-items:center;gap:10px;height:56px}
 .brand{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:700}.brand i{color:var(--teal);font-style:normal}
 .seg{display:flex;border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
-.seg button{border:0;background:#fff;padding:6px 12px;font-size:.85rem;cursor:pointer}.seg .on{background:var(--aq);color:var(--ink);font-weight:600}
-#dr{position:fixed;top:0;left:0;bottom:0;width:250px;background:#fff;border-right:1px solid var(--bd);transform:translateX(-100%);transition:transform .2s;z-index:20;padding:14px;overflow:auto}
+.seg button{border:0;background:var(--card);padding:6px 12px;font-size:.85rem;cursor:pointer}.seg .on{background:var(--aq);color:var(--ink);font-weight:600}
+#dr{position:fixed;top:0;left:0;bottom:0;width:250px;background:var(--card);border-right:1px solid var(--bd);transform:translateX(-100%);transition:transform .2s;z-index:20;padding:14px;overflow:auto}
 #dr.on{transform:none}#dr a{display:block;padding:8px 10px;border-radius:var(--r)}#dr a:hover{background:var(--soft)}
 .dl{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin:14px 10px 4px}
 #ov{display:none;position:fixed;inset:0;background:#0005;z-index:19}#ov.on{display:block}
-.btn{display:inline-block;padding:8px 16px;border:1px solid var(--bd);border-radius:var(--r);background:#fff;font-size:.95rem;font-weight:500;cursor:pointer;color:var(--tx);transition:transform .12s,border-color .12s}
+.btn{display:inline-block;padding:8px 16px;border:1px solid var(--bd);border-radius:var(--r);background:var(--card);font-size:.95rem;font-weight:500;cursor:pointer;color:var(--tx);transition:transform .12s,border-color .12s}
 .btn:hover{border-color:var(--teal)}.btn:active{transform:scale(.97)}
 .btn.p{background:var(--aq);border-color:var(--teal);color:var(--ink)}.btn.p:hover{background:var(--aq2)}
 .hero{background-color:var(--bg2);border-bottom:1px solid var(--bd);padding:72px 0;background-size:460px;background-position:right -60px center}
@@ -36,7 +37,7 @@ header{border-bottom:1px solid var(--bd);position:sticky;top:0;background:#fffff
 .ph{background-color:var(--bg2);border-bottom:1px solid var(--bd);padding:30px 0}.ph h1{font-size:1.8rem}
 .sec{padding:28px 0 48px}.sec h2{margin-bottom:12px}
 .g{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:16px}
-.card{background-color:#fff;border:1px solid var(--bd);border-radius:var(--r);padding:20px;transition:transform .12s,border-color .12s}
+.card{background-color:var(--card);border:1px solid var(--bd);border-radius:var(--r);padding:20px;transition:transform .12s,border-color .12s}
 .card.art{background-size:130px;background-position:right -35px bottom -35px}
 .card[onclick]:hover{transform:translateY(-2px);border-color:var(--aq)}
 .card h3{margin-bottom:6px;color:var(--ink)}
@@ -47,7 +48,7 @@ header{border-bottom:1px solid var(--bd);position:sticky;top:0;background:#fffff
 .star{margin-left:auto;font-size:1.2rem;color:var(--teal)}.lk{color:var(--teal)}
 .pb{height:6px;background:var(--soft);border-radius:3px;overflow:hidden;margin:4px 0}.pb b{display:block;height:100%;background:var(--teal);animation:gr .6s ease-out}
 @keyframes gr{from{width:0}}@keyframes in{from{opacity:0;transform:translateY(6px)}}#app.in{animation:in .25s ease-out}
-input,select,textarea{font:inherit;padding:8px 10px;border:1px solid var(--bd);border-radius:var(--r);background:#fff;max-width:100%}textarea{width:100%;min-height:70px}
+input,select,textarea{font:inherit;padding:8px 10px;border:1px solid var(--bd);border-radius:var(--r);background:var(--card);max-width:100%}textarea{width:100%;min-height:70px}
 .bar{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 16px}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
 .tabs{display:flex;gap:4px;border-bottom:1px solid var(--bd);margin-bottom:18px;flex-wrap:wrap}
@@ -56,12 +57,12 @@ input,select,textarea{font:inherit;padding:8px 10px;border:1px solid var(--bd);b
 .opt{display:flex;gap:10px;padding:10px 12px;border:1px solid var(--bd);border-radius:var(--r);margin:8px 0;cursor:pointer}
 .opt.ok{border-color:#2e9e6b;background:#eaf7f0}.opt.no{border-color:#d9534f;background:#fdeeee}
 .exp{background:var(--soft);padding:10px 12px;border-radius:var(--r);font-size:.95rem}
-.qbar{position:sticky;top:56px;z-index:4;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:#fff;border:1px solid var(--teal);border-radius:var(--r);padding:8px 12px;margin-bottom:14px}
+.qbar{position:sticky;top:56px;z-index:4;display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--card);border:1px solid var(--teal);border-radius:var(--r);padding:8px 12px;margin-bottom:14px}
 .qbar b{font-size:1.2rem;color:var(--ink)}.qbar b.low{color:#d9534f}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
 .chip{border:1px solid var(--bd);border-radius:99px;padding:3px 10px;font-size:.85rem;cursor:pointer;display:flex;gap:6px;align-items:center}.chip:has(input:checked){background:var(--soft);border-color:var(--aq)}
 .fc{perspective:900px;cursor:pointer}.fi{position:relative;min-height:270px;transition:transform .35s;transform-style:preserve-3d}.fc.on .fi{transform:rotateY(180deg)}
-.ff,.fb{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;text-align:center;padding:24px;border:1px solid var(--bd);border-radius:var(--r);background-color:#fff;overflow:auto;font-size:1.1rem}
+.ff,.fb{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;text-align:center;padding:24px;border:1px solid var(--bd);border-radius:var(--r);background-color:var(--card);overflow:auto;font-size:1.1rem}
 .ff>*,.fb>*{margin:auto}
 .ff{background-image:var(--art);background-repeat:no-repeat;background-position:right -30px bottom -30px;background-size:150px}
 .fb{transform:rotateY(180deg);background:var(--soft)}.fb img{max-width:100%;max-height:220px;object-fit:contain}
@@ -109,7 +110,7 @@ footer{border-top:1px solid var(--bd);padding:22px 0;color:var(--mu);font-size:.
 }
 .fm-card{
   width:100%;max-width:440px;max-height:90vh;overflow:auto;
-  background:#fff;border:1px solid var(--bd);border-radius:10px;
+  background:var(--card);border:1px solid var(--bd);border-radius:10px;
   padding:22px;box-shadow:0 12px 40px #0003;
 }
 .fm-card h2{font-size:1.3rem;color:var(--ink);margin-bottom:14px}
@@ -173,7 +174,7 @@ footer{border-top:1px solid var(--bd);padding:22px 0;color:var(--mu);font-size:.
 @property --p{syntax:'<number>';inherits:false;initial-value:0}
 @keyframes ringin{from{--p:0}}
 .ring{--p:0;width:92px;height:92px;flex:none;border-radius:50%;background:conic-gradient(var(--teal) calc(var(--p)*1%),var(--soft) 0);display:grid;place-items:center;animation:ringin .8s ease-out}
-.ring span{width:70px;height:70px;border-radius:50%;background:#fff;display:grid;place-items:center;font-weight:700;font-size:1.15rem;color:var(--ink)}
+.ring span{width:70px;height:70px;border-radius:50%;background:var(--card);display:grid;place-items:center;font-weight:700;font-size:1.15rem;color:var(--ink)}
 .mrow{display:flex;align-items:center;gap:14px}.mrow small{display:block;color:var(--mu);font-size:.85rem}
 /* ===== ADDED: quiz history rows ===== */
 .hrow{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
@@ -186,7 +187,7 @@ footer{border-top:1px solid var(--bd);padding:22px 0;color:var(--mu);font-size:.
 .fx{display:flex;align-items:center;gap:8px}.fx .star{margin-left:0}
 .fd{flex-basis:100%;margin:0}.g.list .fd{display:none}
 .dots{border:0;background:transparent;font-size:1.2rem;cursor:pointer;padding:2px 8px;color:var(--tx)}
-.pop{position:absolute;right:12px;top:42px;background:#fff;border:1px solid var(--bd);box-shadow:0 4px 16px #0002;border-radius:var(--r);z-index:20;padding:6px 0;min-width:150px}
+.pop{position:absolute;right:12px;top:42px;background:var(--card);border:1px solid var(--bd);box-shadow:0 4px 16px #0002;border-radius:var(--r);z-index:20;padding:6px 0;min-width:150px}
 .pop a{display:block;padding:8px 14px;font-size:.9rem;cursor:pointer}.pop a:hover{background:var(--soft)}.pop a.dng{color:#d9534f}
 .fm-card.viewer{max-width:1000px;height:90vh;display:flex;flex-direction:column;padding:16px}
 .vh{display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid var(--bd);padding-bottom:10px;margin-bottom:10px}
@@ -198,20 +199,49 @@ footer{border-top:1px solid var(--bd);padding:22px 0;color:var(--mu);font-size:.
 /* ===== ADDED: mobile only: pinned, smaller footer ===== */
 @media(max-width:600px){
 body{padding-bottom:34px}
-footer{position:fixed;left:0;right:0;bottom:0;z-index:15;padding:7px 0;font-size:.68rem;background-color:#fffffff2;background-size:70px}
+footer{position:fixed;left:0;right:0;bottom:0;z-index:15;padding:7px 0;font-size:.68rem;background-color:var(--hdr);background-size:70px}
 footer .w{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #fabRoot{bottom:50px}
 .hr{align-items:flex-start;text-align:left}
 }
+/* ===== DARK MODE (moon button in the header) ===== */
+:root{--card:#fff;--hdr:#fffffff2;--onaq:#0E3B3C;--onfab:#fff;--toast:#0E3B3C;--okbg:#eaf7f0;--nobg:#fdeeee}
+:root[data-theme="dark"]{--bg:#24003D;--bg2:#2B0A47;--card:#33145A;--soft:#432070;--bd:#54307E;--tx:#F1E9F7;--mu:#B9A3CC;--aq:#5EEAD4;--aq2:#45D5BF;--teal:#5EEAD4;--ink:#F4EEFB;--onaq:#24003D;--onfab:#24003D;--hdr:#24003DEB;--toast:#4A1D78;--okbg:#0E3F36;--nobg:#4A1634;color-scheme:dark}
+.btn.p,.seg .on,#dr a.on{color:var(--onaq)}
+#toast{background:var(--toast)}.fab{color:var(--onfab)}
+.opt.ok{background:var(--okbg)}.opt.no{background:var(--nobg)}
+.thm.on{background:var(--soft);border-color:var(--teal)}
+#dr a.on{background:var(--aq);font-weight:600}
+/* ===== layout helpers ===== */
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.fig{display:block;max-width:100%;max-height:240px;object-fit:contain;margin:10px auto;border-radius:var(--r)}
+.ff img{max-width:100%;max-height:200px;object-fit:contain}
+.qtx{overflow:hidden;text-overflow:ellipsis}
+.pgn{display:flex;gap:12px;align-items:center;justify-content:center;margin-top:14px}
+.custom-select-trigger span:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* ===== selection bar and checkboxes ===== */
+.selbar{position:sticky;top:60px;z-index:6;display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--card);border:1px solid var(--teal);border-radius:var(--r);padding:8px 12px}
+.selbar .sp{flex:1}
+.selbox{width:18px;height:18px;margin-right:6px;accent-color:var(--teal);flex:none}
+.card.selected{border-color:var(--teal);background-color:var(--soft)}
+.fm-card input[type=checkbox]{width:auto}
+.fm-card.wide{max-width:720px}
+/* ===== multi-select dropdown ===== */
+.ms .custom-options{max-height:300px;min-width:240px}
+.mshead{display:flex;gap:10px;align-items:center;padding:8px;position:sticky;top:0;background:var(--card);border-bottom:1px solid var(--bd)}
+.mshead input{flex:1;min-width:0;padding:5px 8px}
+.msi{display:flex;gap:8px;align-items:center;padding:6px 12px;cursor:pointer;font-size:.9rem;margin:0}
+.msi:hover{background:var(--soft)}.msi span{flex:1}
 </style>
 </head>
 <body>
-<header><div class="w hi"><button class="btn" id="bg" onclick="dr(1)" aria-label="Menu">☰</button><a class="brand" onclick="go(ME ? 'dash' : 'home')">Found <i>/</i> CE Review Archive</a><div id="tb"></div></div></header>
+<header><div class="w hi"><button class="btn" id="bg" onclick="dr(1)" aria-label="Menu">☰</button><a class="brand" onclick="go(ME ? 'dash' : 'home')">Found <i>/</i> CE Review Archive</a><button class="btn thm" id="thm" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Dark mode">🌙</button><div id="tb"></div></div></header>
 <div id="ov" onclick="dr(0)"></div><aside id="dr"></aside>
 <main id="app"></main>
 <footer class="art"><div class="w">Found / CE Review Archive · Your progress and your own content are saved to your account</div></footer>
 <div id="toast"></div>
 <div id="fabRoot"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.109.0"></script>
 <script>
 /* ===== BASICS ===== */
@@ -223,24 +253,31 @@ E=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':
 sh=a=>[...a].sort(()=>Math.random()-.5),mmss=s=>Math.floor(s/60)+':'+String(s%60).padStart(2,'0'),
 go=h=>{if(location.hash=='#/'+h)route();else location.hash='#/'+h},
 CD={MSTC:'Mathematics, Surveying and Transportation Engineering.',HPGE:'Hydraulics and Geotechnical Engineering.',PSAD:'Structural Analysis and Design.'};
-let D={FO:[],M:[],F:[],MQ:[],U:[]},P={h:[],q:{},fc:{},bm:[]},role='student',nv=0,tk,QL=0,OQ=[],ME=null,PR=null,CU=null,AU={mode:'in',msg:''};
-/* ===== UI CORE: modals, custom dropdown, menus ===== */
-let folderView='grid',activeMenu=null,viewerFile=null,MD=null,FQ='';
+let D={FO:[],M:[],F:[],MQ:[],U:[]},P={h:[],q:{},fc:{},bm:[],op:{}},role='student',nv=0,tk,QL=0,OQ=[],ME=null,PR=null,CU=null,AU={mode:'in',msg:''};
+/* ===== UI CORE: modals, custom dropdown, menus, dark mode ===== */
+let folderView='grid',FSORT='az',activeMenu=null,viewerFile=null,MD=null,FQ='';
+let selMode=false,SEL=new Set(),VIS=[],selFor='',CB=null;
 let fab={open:false,mode:'upload',c:'',d:'',busy:false};
+const EXT=['pdf','doc','docx','ppt','pptx','xls','xlsx','jpg','jpeg','png','webp'],LIM=30*1024*1024,ex=f=>f.name.split('.').pop().toLowerCase();
 
-/* one reusable modal: confirm, prompt, info and custom bodies */
+function toggleTheme(){const d=document.documentElement,on=d.dataset.theme!='dark';d.dataset.theme=on?'dark':'';try{localStorage.setItem('theme',on?'dark':'')}catch(e){}syncTheme()}
+function syncTheme(){const b=$('#thm');if(b)b.classList.toggle('on',document.documentElement.dataset.theme=='dark')}
+
+/* one reusable modal: confirm, prompt, info, editors. If onOk returns a promise the modal stays open until it finishes. */
 function openMdl(m){MD=m;renderCustomConfirm();setTimeout(()=>{const i=$('#mdlIn');if(i){i.focus();i.select()}},0)}
 function closeMdl(){MD=null;renderCustomConfirm()}
-function mdlOk(){const r=MD&&MD.onOk?MD.onOk():0;if(r===false)return;closeMdl()}
+async function mdlOk(){if(!MD||MD.busy)return;let r;const b=$('#mdlOk');
+try{r=MD.onOk?MD.onOk():0;if(r&&r.then){MD.busy=1;if(b){b.disabled=true;b.textContent='Working…'}r=await r}}catch(e){if(MD)MD.busy=0;if(b){b.disabled=false;b.textContent=MD.okText||'Confirm'}return toast(e.message||String(e))}
+if(r===false){if(MD)MD.busy=0;if(b){b.disabled=false;b.textContent=MD.okText||'Confirm'}return}closeMdl()}
 function renderCustomConfirm(){let r=$('#mdlRoot');if(!r){r=document.createElement('div');r.id='mdlRoot';document.body.appendChild(r)}
-r.innerHTML=MD?`<div class="fm-backdrop" onclick="closeMdl()"><div class="fm-card" onclick="event.stopPropagation();ddc()"><h2>${E(MD.title)}</h2>${MD.body||''}<div class="fm-actions">${MD.noCancel?'':'<button class="btn" onclick="closeMdl()">Cancel</button>'}<button class="btn p" onclick="mdlOk()">${E(MD.okText||'Confirm')}</button></div></div></div>`:''}
+r.innerHTML=MD?`<div class="fm-backdrop" onclick="closeMdl()"><div class="fm-card ${MD.wide?'wide':''}" onclick="event.stopPropagation();ddc()"><h2>${E(MD.title)}</h2>${MD.body||''}<div class="fm-actions">${MD.noCancel?'':'<button class="btn" onclick="closeMdl()">Cancel</button>'}<button class="btn p" id="mdlOk" onclick="mdlOk()">${E(MD.okText||'Confirm')}</button></div></div></div>`:''}
 const showConfirm=(t,m,fn)=>openMdl({title:t,body:`<p class="mu">${E(m)}</p>`,onOk:fn});
 const showInfo=(t,rows)=>openMdl({title:t,noCancel:1,okText:'Close',body:`<table style="margin:0">${rows.map(([a,b])=>`<tr><td class="mu">${a}</td><td>${E(b)}</td></tr>`).join('')}</table>`});
-function showPrompt(t,l,val,fn){openMdl({title:t,okText:'Save',body:`<div class="field"><label>${E(l)}</label><input id="mdlIn" value="${E(val)}"></div>`,onOk:()=>{const n=$('#mdlIn').value.trim();if(!n){toast('Please enter a name');return false}fn(n)}})}
+function showPrompt(t,l,val,fn){openMdl({title:t,okText:'Save',body:`<div class="field"><label>${E(l)}</label><input id="mdlIn" value="${E(val)}"></div>`,onOk:()=>{const n=$('#mdlIn').value.trim();if(!n){toast('Please enter a name');return false}return fn(n)}})}
 
 /* custom dropdown: renders a hidden input with the same id, so v('id') still works */
 const dd=(id,opts,val,cb)=>{const o=opts.map(x=>Array.isArray(x)?x:[x,x]),cur=o.find(x=>String(x[0])==String(val))||o[0]||['',''];
-return `<div class="custom-dropdown" data-cb="${E(cb||'')}"><input type="hidden" id="${id}" value="${E(cur[0])}"><div class="custom-select-trigger" onclick="ddt(event,this)"><span>${E(cur[1])}</span><span>▾</span></div><div class="custom-options">${o.map(x=>`<div class="custom-option" data-v="${E(x[0])}" onclick="ddp(this)">${E(x[1])}</div>`).join('')}</div></div>`};
+return `<div class="custom-dropdown" data-cb="${E(cb||'')}"><input type="hidden" id="${id}" value="${E(cur[0])}"><div class="custom-select-trigger" onclick="ddt(event,this)"><span>${E(cur[1])}</span><span>▾</span></div><div class="custom-options">${o.map(x=>`<div class="custom-option ${String(x[0])==String(cur[0])?'sel':''}" data-v="${E(x[0])}" onclick="ddp(this)">${E(x[1])}</div>`).join('')}</div></div>`};
 const ddc=()=>document.querySelectorAll('.custom-dropdown.open').forEach(x=>x.classList.remove('open'));
 function ddt(e,t){e.stopPropagation();const d=t.parentNode,was=d.classList.contains('open');ddc();if(!was)d.classList.add('open')}
 function ddp(el){const d=el.closest('.custom-dropdown'),val=el.dataset.v;d.querySelector('input').value=val;d.querySelector('.custom-select-trigger span').textContent=el.textContent;d.classList.remove('open');if(d.dataset.cb)new Function('v',d.dataset.cb)(val)}
@@ -255,65 +292,131 @@ function toggleFolderView(){folderView=folderView=='grid'?'list':'grid';route()}
 /* ===== FOLDERS AND FILES ===== */
 const fpath=f=>{const p=[];let x=f;while(x){p.unshift(x.name);x=x.parent?D.FO.find(y=>y.id==x.parent):null}return p.join(' › ')};
 const dsc=id=>{const r=[id];D.FO.filter(x=>x.parent==id).forEach(x=>r.push(...dsc(x.id)));return r};
+const gi=k=>k[0]=='f'?D.FO.find(x=>x.id==k.slice(2)):D.M.find(x=>x.id==k.slice(2));
+const canFo=f=>!f.def&&(f.own||role=='admin'),canMat=m=>m.own||role=='admin';
+const sibNames=(par,kind,comp)=>kind=='f'?D.FO.filter(x=>x.c==comp&&(x.parent||null)==(par||null)).map(x=>x.name):D.M.filter(x=>x.fo==par).map(x=>x.title);
+const uname=(base,taken)=>{if(!taken.includes(base))return base;let n=1,t;do{t=base+' (copy'+(n>1?' '+n:'')+')';n++}while(taken.includes(t));return t};
+const dn=(n,u)=>{if(!u.includes(n))return n;const i=n.lastIndexOf('.'),b=i>0?n.slice(0,i):n,e=i>0?n.slice(i):'';let k=2;while(u.includes(b+' ('+k+')'+e))k++;return b+' ('+k+')'+e};
 function renameFolder(id){const f=D.FO.find(x=>x.id==id);if(!f)return;showPrompt('Rename folder','Folder name',f.name,async n=>{const r=await sb.from('folders').update({name:n}).eq('id',id);if(r.error)return toast(r.error.message);f.name=n;toast('Folder renamed');route()})}
 function renameMaterial(id){const m=D.M.find(x=>x.id==id);if(!m)return;showPrompt('Rename file','File name',m.title,async n=>{const r=await sb.from('materials').update({title:n}).eq('id',id);if(r.error)return toast(r.error.message);m.title=n;toast('File renamed');route()})}
-async function delFo(id){const f=D.FO.find(x=>x.id==id);if(!f)return;const ids=dsc(id),paths=D.M.filter(m=>ids.includes(m.fo)).map(m=>m.path).filter(Boolean);
+async function delFo(id,quiet){const f=D.FO.find(x=>x.id==id);if(!f)return;const ids=dsc(id),paths=D.M.filter(m=>ids.includes(m.fo)).map(m=>m.path).filter(Boolean);
 for(const i of ids.slice().reverse()){const r=await sb.from('folders').delete().eq('id',i);if(r.error)return toast(r.error.message)}
 if(paths.length)await sb.storage.from('review-materials').remove(paths);
-D.FO=D.FO.filter(x=>!ids.includes(x.id));D.M=D.M.filter(m=>!ids.includes(m.fo));P.bm=P.bm.filter(b=>D.M.some(m=>m.id==b));toast('Folder deleted');go(f.parent?'f/'+f.parent:'c/'+f.c)}
-async function delM(id){const m=D.M.find(x=>x.id==id);if(!m)return;const r=await sb.from('materials').delete().eq('id',id);if(r.error)return toast(r.error.message);
-if(m.path){const s=await sb.storage.from('review-materials').remove([m.path]);if(s.error)toast('Deleted, but the stored file could not be removed.')}
-D.M=D.M.filter(x=>x.id!=id);P.bm=P.bm.filter(x=>x!==id);route()}
-function moveMaterial(id){const m=D.M.find(x=>x.id==id),cur=m&&D.FO.find(x=>x.id==m.fo);if(!cur)return;
-const opts=D.FO.filter(f=>f.c==cur.c&&(m.own||!f.own)).map(f=>[f.id,fpath(f)]).sort((a,b)=>a[1].localeCompare(b[1]));
-openMdl({title:'Move file',okText:'Move',body:`<p class="mu sm">${E(m.title)}</p><div class="field"><label>Destination folder (${cur.c})</label>${dd('mvTo',opts,m.fo)}</div>`,onOk:async()=>{const to=v('mvTo');if(to==m.fo)return;const r=await sb.from('materials').update({folder_id:to}).eq('id',id);if(r.error)return toast(r.error.message);m.fo=to;toast('File moved');route()}})}
+D.FO=D.FO.filter(x=>!ids.includes(x.id));D.M=D.M.filter(m=>!ids.includes(m.fo));P.bm=P.bm.filter(b=>D.M.some(m=>m.id==b));
+if(!quiet){toast('Folder deleted');go(f.parent?'f/'+f.parent:'c/'+f.c)}}
+async function delM(id,quiet){const m=D.M.find(x=>x.id==id);if(!m)return;const r=await sb.from('materials').delete().eq('id',id);if(r.error)return toast(r.error.message);
+if(m.path){const s=await sb.storage.from('review-materials').remove([m.path]);if(s.error&&!quiet)toast('Deleted, but the stored file could not be removed.')}
+D.M=D.M.filter(x=>x.id!=id);P.bm=P.bm.filter(x=>x!==id);if(!quiet)route()}
+function moveMaterial(id){moveKeys(['m:'+id])}
+function moveKeys(keys){const its=keys.map(k=>[k,gi(k)]).filter(x=>x[1]&&(x[0][0]=='f'?canFo(x[1]):canMat(x[1])));
+if(!its.length)return toast('You can only move items you own');
+const f0=its[0][0][0]=='f'?its[0][1]:D.FO.find(x=>x.id==its[0][1].fo),comp=f0.c,ban=new Set();
+its.forEach(([k,it])=>{if(k[0]=='f')dsc(it.id).forEach(i=>ban.add(i))});
+const allF=its.every(x=>x[0][0]=='f'),official=its.some(x=>!x[1].own),root=allF&&(role=='admin'||!official);
+const opts=[...(root?[['','Component root']]:[]),...D.FO.filter(f=>f.c==comp&&!ban.has(f.id)&&(!official||!f.own)).map(f=>[f.id,fpath(f)]).sort((a,b)=>cmp(a[1],b[1]))];
+if(!opts.length)return toast('There is nowhere to move these items');
+openMdl({title:'Move '+its.length+' item(s)',okText:'Move',body:`<div class="field"><label>Destination (${comp})</label>${dd('mvTo',opts,opts[0][0])}</div>`,onOk:async()=>{const to=v('mvTo');let n=0;
+for(const[k,it]of its){const r=k[0]=='f'?await sb.from('folders').update({parent_id:to||null}).eq('id',it.id):await sb.from('materials').update({folder_id:to}).eq('id',it.id);if(r.error){toast(r.error.message);continue}k[0]=='f'?it.parent=to||null:it.fo=to;n++}
+toast('Moved '+n+' item(s)');selOff(1);route()}})}
 function folderInfo(id){const f=D.FO.find(x=>x.id==id);if(!f)return;showInfo('Folder information',[['Name',f.name],['Component',f.c],['Type',f.def?'Default folder':f.own?'Personal':'Official'],['Subfolders',D.FO.filter(x=>x.parent==id).length],['Files',D.M.filter(m=>m.fo==id).length]])}
-function fileInfo(id){const m=D.M.find(x=>x.id==id),f=m&&D.FO.find(x=>x.id==m.fo);if(!m)return;showInfo('File information',[['Title',m.title],['Type',m.type],['Folder',f?fpath(f):'None'],['Description',m.desc||'None'],['Access',m.own?'Personal (only you)':'Official']])}
+function fileInfo(id){const m=D.M.find(x=>x.id==id),f=m&&D.FO.find(x=>x.id==m.fo);if(!m)return;showInfo('File information',[['Title',m.title],['Type',m.type],['Folder',f?fpath(f):'None'],['Description',m.desc||'None'],['Access',m.own?'Personal (only you)':'Official'],['Times opened',(P.op||{})[id]||0]])}
 
-/* open a file: PDFs and images show inside the site, other types download in a new tab */
+/* ===== SELECTION ===== */
+function selOn(){selMode=true;SEL.clear();route()}
+function selOff(quiet){selMode=false;SEL.clear();if(!quiet)route()}
+function selTog(k){SEL.has(k)?SEL.delete(k):SEL.add(k);route()}
+function selAll(){VIS.forEach(k=>SEL.add(k));route()}
+const selKeys=()=>[...SEL].filter(k=>gi(k)),none=()=>toast('Select something first');
+const selBar=()=>selMode?`<div class="selbar"><b>${SEL.size} selected</b><a class="lk sm" onclick="selAll()">Select all</a><a class="lk sm" onclick="SEL.clear();route()">Clear</a><span class="sp"></span><button class="btn" onclick="copySel()">Copy</button><button class="btn" onclick="moveSel()">Move to…</button><button class="btn" onclick="dlSel()">Download</button><button class="btn" onclick="delSel()">Delete</button><button class="btn p" onclick="selOff()">Done</button></div>`:'';
+function copySel(){const k=selKeys();if(!k.length)return none();CB={keys:k};toast('Copied '+k.length+' item(s). Open a folder and press Paste.');selOff()}
+function moveSel(){const k=selKeys();if(!k.length)return none();moveKeys(k)}
+function dlSel(){const k=selKeys();if(!k.length)return none();dlKeys(k)}
+function delSel(){const k=selKeys();if(!k.length)return none();showConfirm('Delete selected','Delete '+k.length+' selected item(s)? Folders are deleted with everything inside them.',async()=>{let n=0,s=0;
+for(const x of k){const it=gi(x);if(!it)continue;if(x[0]=='f'){if(canFo(it)){await delFo(it.id,1);n++}else s++}else{if(canMat(it)){await delM(it.id,1);n++}else s++}}
+selOff(1);toast('Deleted '+n+' item(s)'+(s?', '+s+' not allowed':''));route()})}
+
+/* ===== COPY, DUPLICATE, PASTE ===== */
+async function cloneFile(m,dest,title){const off=role=='admin'&&!dest.own,np=`${off?'official':ME.id}/${dest.id}/${Date.now()}_${U()}_${(title+'.'+m.type.toLowerCase()).replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+const c=await sb.storage.from('review-materials').copy(m.path,np);if(c.error)throw c.error;
+const r=await sb.from('materials').insert({folder_id:dest.id,title,description:m.desc,file_type:m.type,file_path:np,published:true,owner_id:off?null:ME.id}).select().single();
+if(r.error){await sb.storage.from('review-materials').remove([np]);throw r.error}D.M.push(mapM(r.data))}
+async function cloneFo(f,par,name,comp){const mine=role!='admin'||(par&&par.own),r=await sb.from('folders').insert({component:comp,name,parent_id:par?par.id:null,owner_id:mine?ME.id:null}).select().single();if(r.error)throw r.error;
+const nf=mapFo(r.data);D.FO.push(nf);const kids=D.FO.filter(x=>x.parent==f.id&&x.id!=nf.id);
+for(const m of D.M.filter(x=>x.fo==f.id&&x.path))await cloneFile(m,nf,m.title);for(const s of kids)await cloneFo(s,nf,s.name,comp);return nf}
+async function pasteHere(destId,comp){if(!CB||!CB.keys.length)return;const dest=destId?D.FO.find(x=>x.id==destId):null,c=dest?dest.c:comp;let ok=0,bad=0;toast('Pasting…');
+for(const k of CB.keys){const it=gi(k);if(!it){bad++;continue}try{
+if(k[0]=='m'){if(!dest){bad++;continue}await cloneFile(it,dest,uname(it.title,sibNames(dest.id,'m')))}
+else{if(dest&&dsc(it.id).includes(dest.id)){bad++;continue}await cloneFo(it,dest,uname(it.name,sibNames(dest?dest.id:null,'f',c)),c)}ok++}catch(e){bad++;toast(e.message||String(e))}}
+toast('Pasted '+ok+' item(s)'+(bad?', '+bad+' skipped (files can only be pasted inside a folder)':''));route()}
+async function dupKey(k){const it=gi(k);if(!it)return;toast('Duplicating…');try{
+if(k[0]=='m'){const fo=D.FO.find(x=>x.id==it.fo);await cloneFile(it,fo,uname(it.title,sibNames(fo.id,'m')))}
+else{const par=it.parent?D.FO.find(x=>x.id==it.parent):null;await cloneFo(it,par,uname(it.name,sibNames(it.parent,'f',it.c)),it.c)}toast('Duplicated')}catch(e){toast(e.message||String(e))}route()}
+const copyKey=k=>{CB={keys:[k]};toast('Copied. Open a folder and press Paste.');route()};
+
+/* ===== DOWNLOAD (one file as is, several items as a zip) ===== */
+const fname=m=>m.title+'.'+m.type.toLowerCase();
+function saveBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000)}
+async function getBlob(m){const r=await sb.storage.from('review-materials').download(m.path);if(r.error)throw r.error;return r.data}
+async function zipFo(z,f){const d=z.folder(f.name.replace(/[\\/]/g,'_')),used=[];
+for(const m of D.M.filter(x=>x.fo==f.id&&x.path)){const nm=dn(fname(m),used);used.push(nm);toast('Adding '+nm);d.file(nm,await getBlob(m))}
+for(const s of D.FO.filter(x=>x.parent==f.id))await zipFo(d,s)}
+async function dlKeys(keys){const its=keys.map(k=>[k,gi(k)]).filter(x=>x[1]);if(!its.length)return;
+try{if(its.length==1&&its[0][0][0]=='m'){toast('Downloading…');saveBlob(await getBlob(its[0][1]),fname(its[0][1]));return}
+if(!window.JSZip)return toast('The zip tool could not load. Check your connection and refresh.');
+const zip=new JSZip(),used=[];toast('Preparing zip…');
+for(const[k,it]of its){if(k[0]=='f')await zipFo(zip,it);else if(it.path){const nm=dn(fname(it),used);used.push(nm);zip.file(nm,await getBlob(it))}}
+const blob=await zip.generateAsync({type:'blob'}),one=its.length==1?its[0][1].name:'Found-Review-Archive';saveBlob(blob,one+'.zip');toast('Download ready')}catch(e){toast(e.message||String(e))}}
+
+/* open a file: PDFs and images show inside the site, other types download in a new tab. Counts toward "most opened". */
 async function openM(id){const m=D.M.find(x=>x.id==id);if(!m||!m.path)return toast('File not found');
 const r=await sb.storage.from('review-materials').createSignedUrl(m.path,3600);if(r.error)return toast(r.error.message);
-const ext=m.type.toLowerCase(),url=r.data.signedUrl;if(['pdf','jpg','jpeg','png','webp'].includes(ext)){viewerFile={title:m.title,url,type:ext};route()}else window.open(url,'_blank','noopener')}
+P.op=P.op||{};P.op[id]=(P.op[id]||0)+1;sb.from('material_opens').upsert({user_id:ME.id,material_id:id,opens:P.op[id],last_opened:new Date().toISOString()}).then(x=>x.error&&console.warn(x.error.message));
+const e=m.type.toLowerCase(),url=r.data.signedUrl;if(['pdf','jpg','jpeg','png','webp'].includes(e)){viewerFile={title:m.title,url,type:e};route()}else window.open(url,'_blank','noopener')}
 function closeViewer(){viewerFile=null;route()}
 function renderFileViewer(){let r=$('#fileViewerRoot');if(!r){r=document.createElement('div');r.id='fileViewerRoot';document.body.appendChild(r)}
 if(!viewerFile){r.innerHTML='';return}const pdf=viewerFile.type==='pdf';
 r.innerHTML=`<div class="fm-backdrop" onclick="closeViewer()"><div class="fm-card viewer" onclick="event.stopPropagation()"><div class="vh"><h2>${E(viewerFile.title)}</h2><div class="row" style="margin:0"><a href="${viewerFile.url}" target="_blank" rel="noopener" class="btn">Download</a><button class="btn" onclick="closeViewer()">✕ Close</button></div></div><div class="vb">${pdf?`<object data="${viewerFile.url}" type="application/pdf" style="width:100%;height:100%"><div style="padding:30px;text-align:center"><p style="margin-bottom:12px">This browser can't show the PDF here.</p><a href="${viewerFile.url}" target="_blank" rel="noopener" class="btn p">Open PDF in a new tab</a></div></object>`:`<img src="${viewerFile.url}" alt="">`}</div></div></div>`}
 
-/* ===== CREATE FOLDER / UPLOAD (the + button, and "Upload here" buttons) ===== */
+/* ===== CREATE FOLDER / UPLOAD FILES / UPLOAD A FOLDER ===== */
 function openFab(mode,dest){activeMenu=null;const p=location.hash.slice(2).split('/'),f=dest?D.FO.find(x=>x.id==dest):(dest===undefined&&p[0]=='f')?D.FO.find(x=>x.id==p[1]):null;
 fab={open:true,mode:mode||'upload',c:f?f.c:C.includes(p[1])?p[1]:'',d:f?f.id:'',busy:false};route()}
 function closeFab(){fab.open=false;renderFab()}
 function setFabMode(m){fab.mode=m;renderFab()}
-const fabOpts=()=>[['',fab.mode=='folder'?'Component root':'Choose a folder'],...D.FO.filter(f=>f.c==fab.c).map(f=>[f.id,fpath(f)]).sort((a,b)=>a[1].localeCompare(b[1]))];
-function renderFab(){const r=$('#fabRoot');if(!r)return;if(!ME){r.innerHTML='';return}const up=fab.mode=='upload';
+const fabOpts=()=>[['',fab.mode=='upload'?'Choose a folder':'Component root'],...D.FO.filter(f=>f.c==fab.c).map(f=>[f.id,fpath(f)]).sort((a,b)=>cmp(a[1],b[1]))];
+function renderFab(){const r=$('#fabRoot');if(!r)return;if(!ME){r.innerHTML='';return}const m=fab.mode,pv=role=='admin'?'Files added to official folders are visible to everyone.':'Files you upload are private to you.';
 r.innerHTML=`<button class="fab" onclick="openFab()" aria-label="Create or upload">+</button>`+(fab.open?`<div class="fm-backdrop" onclick="closeFab()"><div class="fm-card" onclick="event.stopPropagation();ddc()"><div class="row" style="justify-content:space-between;margin:0 0 14px"><h2 style="margin:0">Create or upload</h2><button class="btn" onclick="closeFab()">✕</button></div>
-<div class="fm-modes"><button class="btn ${up?'':'p'}" onclick="setFabMode('folder')">📁 New folder</button><button class="btn ${up?'p':''}" onclick="setFabMode('upload')">↑ Upload files</button></div>
+<div class="fm-modes"><button class="btn ${m=='folder'?'p':''}" onclick="setFabMode('folder')">📁 New folder</button><button class="btn ${m=='upload'?'p':''}" onclick="setFabMode('upload')">↑ Files</button><button class="btn ${m=='dir'?'p':''}" onclick="setFabMode('dir')">📂 Folder</button></div>
 <div class="field"><label>Component</label>${dd('fabC',[['','Choose component'],...C],fab.c,"fab.c=v;fab.d='';renderFab()")}</div>
-<div class="field"><label>${up?'Upload destination':'Parent folder'}</label>${dd('fabF',fabOpts(),fab.d,"fab.d=v")}</div>
-${up?`<div class="field"><label>Select files</label><input id="fabFiles" type="file" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.webp" onchange="$('#fabCount').textContent=this.files.length+' file(s) selected'"><p id="fabCount" class="mu sm">You can select several files.</p></div><div class="field"><label>Description (optional)</label><textarea id="fabDesc" placeholder="Applies to all selected files"></textarea></div><p class="mu sm">PDF, Word, PowerPoint, Excel or image, up to 30 MB each. ${role=='admin'?'Files added to official folders are visible to everyone.':'Files you upload are private to you.'}</p>`:`<div class="field"><label>Folder name</label><input id="fabName" placeholder="Enter folder name"></div>`}
-<div class="fm-actions"><button class="btn" onclick="closeFab()">Cancel</button><button class="btn p" ${fab.busy?'disabled':''} onclick="${up?'uploadFabFiles()':'createFabFolder()'}">${fab.busy?'Working…':up?'Upload files':'Create folder'}</button></div></div></div>`:'')}
+<div class="field"><label>${m=='upload'?'Upload destination':m=='dir'?'Upload the folder into':'Parent folder'}</label>${dd('fabF',fabOpts(),fab.d,"fab.d=v")}</div>
+${m=='upload'?`<div class="field"><label>Select files</label><input id="fabFiles" type="file" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.webp" onchange="$('#fabCount').textContent=this.files.length+' file(s) selected'"><p id="fabCount" class="mu sm">You can select several files.</p></div><div class="field"><label>Description (optional)</label><textarea id="fabDesc" placeholder="Applies to all selected files"></textarea></div><p class="mu sm">PDF, Word, PowerPoint, Excel or image, up to 30 MB each. ${pv}</p>`
+:m=='dir'?`<div class="field"><label>Choose a folder from your device</label><input id="fabDir" type="file" webkitdirectory multiple onchange="$('#fabCount').textContent=this.files.length+' file(s) found'"><p id="fabCount" class="mu sm">Its subfolders are recreated too. Unsupported or oversized files are skipped.</p></div><p class="mu sm">${pv}</p>`
+:`<div class="field"><label>Folder name</label><input id="fabName" placeholder="Enter folder name"></div>`}
+<div class="fm-actions"><button class="btn" onclick="closeFab()">Cancel</button><button class="btn p" ${fab.busy?'disabled':''} onclick="${m=='upload'?'uploadFabFiles()':m=='dir'?'uploadFabDir()':'createFabFolder()'}">${fab.busy?'Working…':m=='upload'?'Upload files':m=='dir'?'Upload folder':'Create folder'}</button></div></div></div>`:'')}
+const fabDone=()=>{fab={open:false,mode:'upload',c:'',d:'',busy:false}};
+const fabFail=e=>{fab.busy=false;renderFab();toast(e.message||String(e))};
 async function createFabFolder(){const name=v('fabName').trim();if(!fab.c)return toast('Choose a component first');if(!name)return toast('Enter a folder name');
-const par=fab.d?D.FO.find(x=>x.id==fab.d):null;if(fab.d&&!par)return toast('Parent folder not found');
-const mine=role!='admin'||(par&&par.own);fab.busy=true;renderFab();
+const par=fab.d?D.FO.find(x=>x.id==fab.d):null,mine=role!='admin'||(par&&par.own);fab.busy=true;renderFab();
 const r=await sb.from('folders').insert({component:fab.c,name,parent_id:par?par.id:null,owner_id:mine?ME.id:null}).select().single();
-if(r.error){fab.busy=false;renderFab();return toast(r.error.message)}
-D.FO.push({id:r.data.id,c:fab.c,name,parent:par?par.id:null,def:false,own:r.data.owner_id?1:0});fab={open:false,mode:'upload',c:'',d:'',busy:false};toast('Folder created');route()}
+if(r.error)return fabFail(r.error);D.FO.push(mapFo(r.data));fabDone();toast('Folder created');route()}
 /* everyone can upload into any folder they can see, including the default ones.
    Students and personal folders: the file is private to the uploader. Admins in official folders: visible to everyone. */
-async function uploadFabFiles(){const fo=fab.d,files=[...(($('#fabFiles')||{}).files||[])],desc=(($('#fabDesc')||{}).value||'').trim();
-if(!fab.c)return toast('Choose a component first');if(!fo)return toast('Choose an upload destination');
-const folder=D.FO.find(x=>x.id==fo);if(!folder)return toast('Folder not found');if(!files.length)return toast('Choose at least one file');
-const ok=['pdf','doc','docx','ppt','pptx','xls','xlsx','jpg','jpeg','png','webp'],ex=f=>f.name.split('.').pop().toLowerCase();
-for(const f of files){if(f.size>30*1024*1024)return toast(f.name+' is over 30 MB');if(!ok.includes(ex(f)))return toast(f.name+' is not a supported file type')}
-const off=role=='admin'&&!folder.own,up=[],rec=[];fab.busy=true;renderFab();
-for(const[i,f]of files.entries()){toast('Uploading '+(i+1)+' of '+files.length+'…');
-const path=`${off?'official':ME.id}/${fo}/${Date.now()}_${i}_${U()}_${f.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`,u=await sb.storage.from('review-materials').upload(path,f,{cacheControl:'3600',upsert:false});
-if(u.error){if(up.length)await sb.storage.from('review-materials').remove(up);fab.busy=false;renderFab();return toast(u.error.message)}
-up.push(path);rec.push({folder_id:fo,title:f.name.replace(/\.[^.]+$/,''),description:desc,file_type:ex(f).toUpperCase(),file_path:path,published:true,owner_id:off?null:ME.id})}
-const r=await sb.from('materials').insert(rec).select();
-if(r.error){await sb.storage.from('review-materials').remove(up);fab.busy=false;renderFab();return toast(r.error.message)}
-r.data.forEach(x=>D.M.push({id:x.id,fo:x.folder_id,title:x.title,desc:x.description||'',type:x.file_type||'',path:x.file_path||'',pub:x.published,own:x.owner_id?1:0}));
-fab={open:false,mode:'upload',c:'',d:'',busy:false};toast(files.length+' file(s) uploaded');route()}
+async function putFile(f,fo,desc,i){const off=role=='admin'&&!fo.own,path=`${off?'official':ME.id}/${fo.id}/${Date.now()}_${i||0}_${U()}_${f.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;
+const u=await sb.storage.from('review-materials').upload(path,f,{cacheControl:'3600',upsert:false});if(u.error)throw u.error;
+const r=await sb.from('materials').insert({folder_id:fo.id,title:f.name.replace(/\.[^.]+$/,''),description:desc||'',file_type:ex(f).toUpperCase(),file_path:path,published:true,owner_id:off?null:ME.id}).select().single();
+if(r.error){await sb.storage.from('review-materials').remove([path]);throw r.error}D.M.push(mapM(r.data))}
+async function uploadFabFiles(){const files=[...(($('#fabFiles')||{}).files||[])],desc=(($('#fabDesc')||{}).value||'').trim();
+if(!fab.c)return toast('Choose a component first');if(!fab.d)return toast('Choose an upload destination');
+const folder=D.FO.find(x=>x.id==fab.d);if(!folder)return toast('Folder not found');if(!files.length)return toast('Choose at least one file');
+for(const f of files){if(f.size>LIM)return toast(f.name+' is over 30 MB');if(!EXT.includes(ex(f)))return toast(f.name+' is not a supported file type')}
+fab.busy=true;renderFab();try{for(const[i,f]of files.entries()){toast('Uploading '+(i+1)+' of '+files.length+'…');await putFile(f,folder,desc,i)}}catch(e){return fabFail(e)}
+fabDone();toast(files.length+' file(s) uploaded');route()}
+async function uploadFabDir(){const all=[...(($('#fabDir')||{}).files||[])];if(!fab.c)return toast('Choose a component first');if(!all.length)return toast('Choose a folder first');
+const keep=all.filter(f=>EXT.includes(ex(f))&&f.size<=LIM),skip=all.length-keep.length;if(!keep.length)return toast('No supported files were found in that folder');
+const par=fab.d?D.FO.find(x=>x.id==fab.d):null,mine=role!='admin'||(par&&par.own),cache={};fab.busy=true;renderFab();
+async function ensure(parts){const k=parts.join('/');if(cache[k])return cache[k];const p=parts.length>1?await ensure(parts.slice(0,-1)):par,
+r=await sb.from('folders').insert({component:fab.c,name:parts[parts.length-1],parent_id:p?p.id:null,owner_id:mine?ME.id:null}).select().single();if(r.error)throw r.error;const nf=mapFo(r.data);D.FO.push(nf);cache[k]=nf;return nf}
+try{for(const[i,f]of keep.entries()){toast('Uploading '+(i+1)+' of '+keep.length+'…');const parts=(f.webkitRelativePath||f.name).split('/').slice(0,-1);const fo=parts.length?await ensure(parts):par;if(!fo)throw new Error('Choose a destination folder');await putFile(f,fo,'',i)}}catch(e){return fabFail(e)}
+fabDone();toast(keep.length+' file(s) uploaded'+(skip?', '+skip+' skipped':''));route()}
 const save=()=>{};
 function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',3200)}
 function dr(x){$('#dr').classList.toggle('on',!!x);$('#ov').classList.toggle('on',!!x)}
@@ -331,151 +434,116 @@ async function del(k, id) {
 async function bm(id){const i=P.bm.indexOf(id),r=i<0?await sb.from('bookmarks').insert({user_id:ME.id,material_id:id}):await sb.from('bookmarks').delete().eq('material_id',id).eq('user_id',ME.id);if(r.error)return toast(r.error.message);i<0?P.bm.push(id):P.bm.splice(i,1);route()}
 
 /* ===== QUESTIONS + DATA LOADING (from Supabase) ===== */
+/* ===== DATA (loaded from Supabase) ===== */
 const csv=tx=>{const R=[];let r=[],f='',q=0;for(let i=0;i<tx.length;i++){const c=tx[i];if(q){if(c=='"'){if(tx[i+1]=='"'){f+='"';i++}else q=0}else f+=c}else if(c=='"')q=1;else if(c==','){r.push(f);f=''}else if(c=='\n'||c=='\r'){if(c=='\r'&&tx[i+1]=='\n')i++;r.push(f);f='';R.push(r);r=[]}else f+=c}if(f||r.length){r.push(f);R.push(r)}return R};
-const dbq=x=>({id:x.id,c:x.component,s:x.subject,t:x.topic,q:x.question,o:[x.choice_a,x.choice_b,x.choice_c,x.choice_d],a:'ABCD'.indexOf(x.correct_answer),e:x.explanation||'',d:x.difficulty||'',st:x.verification_status||'',own:x.owner_id?1:0});
-const allQ=()=>[...OQ,...D.MQ],subs=c=>[...new Set(allQ().filter(x=>x.c==c).map(x=>x.s))],tops=(c,s)=>[...new Set(allQ().filter(x=>x.c==c&&x.s==s).map(x=>x.t))];
+/* alphabetical sorting helpers (numbers sort naturally: "Set 2" before "Set 10") */
+const cmp=(a,b)=>String(a).localeCompare(String(b),undefined,{numeric:true,sensitivity:'base'}),
+SORTS=[['az','Name A → Z'],['za','Name Z → A'],['new','Newest first'],['old','Oldest first']],
+sortBy=(arr,mode,nm,ts)=>[...arr].sort((a,b)=>mode=='za'?cmp(nm(b),nm(a)):mode=='new'?ts(b)-ts(a):mode=='old'?ts(a)-ts(b):cmp(nm(a),nm(b)));
+const T0=x=>new Date(x||0).getTime();
+const dbq=x=>({id:x.id,n:x.question_number,c:x.component,s:x.subject,t:x.topic,q:x.question,o:[x.choice_a,x.choice_b,x.choice_c,x.choice_d],a:'ABCD'.indexOf(x.correct_answer),e:x.explanation||'',d:x.difficulty||'',st:x.verification_status||'',src:x.source||'',pub:x.published,own:x.owner_id?1:0,qp:x.question_image||'',ep:x.explanation_image||'',qi:'',ei:'',ts:T0(x.created_at)});
+const mapFo=x=>({id:x.id,c:x.component,name:x.name,parent:x.parent_id||null,def:x.is_default,own:x.owner_id?1:0,ts:T0(x.created_at)}),
+mapM=x=>({id:x.id,fo:x.folder_id,title:x.title,desc:x.description||'',type:x.file_type||'',path:x.file_path||'',pub:x.published,own:x.owner_id?1:0,ts:T0(x.created_at)}),
+mapF=(x,su)=>({id:x.id,c:x.component,f:x.front,b:x.back||'',img:su[x.image_path]||'',ip:x.image_path||'',fimg:su[x.front_image_path]||'',fip:x.front_image_path||'',pub:x.published,own:x.owner_id?1:0,ts:T0(x.created_at)});
+const allQ=()=>[...OQ,...D.MQ].filter(x=>x.pub),
+subs=c=>[...new Set(allQ().filter(x=>x.c==c).map(x=>x.s))].sort(cmp),
+tops=(c,s)=>[...new Set(allQ().filter(x=>x.c==c&&x.s==s).map(x=>x.t))].sort(cmp);
 const stat=f=>{const q=allQ().filter(f);let ok=0,n=0,m=0,at=0;q.forEach(x=>{const s=P.q[x.id];if(s){at++;ok+=s[0];n+=s[1];m+=s[2]}});return{n:q.length,at,acc:n?Math.round(100*ok/n):0,ms:q.length?Math.round(100*m/q.length):0}};
 const bars=s=>`<div class="mrow" style="margin-top:12px"><div class="ring" style="--p:${s.ms}"><span>${s.ms}%</span></div><div><b>Mastery</b><small>Questions you last answered correctly</small></div></div><p class="sm" style="margin-top:14px">Accuracy ${s.acc}%</p><div class="pb"><b style="width:${s.acc}%"></b></div>`;
 async function pg(t,f){let a=[],i=0;for(;;){const r=await f(sb.from(t).select('*')).range(i,i+999);if(r.error)return{data:a,error:r.error};a=a.concat(r.data);if(r.data.length<1000)return{data:a};i+=1000}}
-async function load(){
-  try {
-    const r = await Promise.all([
-      sb.from('profiles').select('*').eq('id', ME.id).maybeSingle(),
-      pg('questions', q => q.order('id')),
-      sb.from('folders').select('*').order('created_at'),
-      sb.from('materials').select('*').order('created_at'),
-      sb.from('flashcards').select('*').order('created_at'),
-      sb.from('flashcard_marks').select('*'),
-      sb.from('bookmarks').select('*'),
-      pg('question_stats', q => q.order('question_id')),
-      sb.from('quiz_attempts').select('*').order('created_at', { ascending: false }).limit(30)
-    ]);
+async function signed(paths){const m={};paths=[...new Set(paths.filter(Boolean))];for(let i=0;i<paths.length;i+=100){const s=await sb.storage.from('flashcard-images').createSignedUrls(paths.slice(i,i+100),3600);(s.data||[]).forEach(x=>{if(x.signedUrl)m[x.path]=x.signedUrl})}return m}
+async function load(){try{
+const r=await Promise.all([sb.from('profiles').select('*').eq('id',ME.id).maybeSingle(),pg('questions',q=>q.order('id')),sb.from('folders').select('*'),sb.from('materials').select('*'),sb.from('flashcards').select('*'),sb.from('flashcard_marks').select('*'),sb.from('bookmarks').select('*'),pg('question_stats',q=>q.order('question_id')),sb.from('quiz_attempts').select('*').order('created_at',{ascending:false}).limit(30),sb.from('material_opens').select('*')]);
+const er=r.find(x=>x&&x.error);if(er)toast(er.error.message);const g=i=>(r[i]&&r[i].data)||[];
+PR=(r[0]&&r[0].data)||{display_name:'',role:'student'};role=PR.role||'student';
+const Q=g(1).map(dbq),F=g(4),su=await signed([...Q.flatMap(x=>[x.qp,x.ep]),...F.flatMap(x=>[x.image_path,x.front_image_path])]);
+Q.forEach(x=>{x.qi=su[x.qp]||'';x.ei=su[x.ep]||''});OQ=Q.filter(x=>!x.own);D.MQ=Q.filter(x=>x.own);
+D.FO=g(2).map(mapFo);D.M=g(3).map(mapM);D.F=F.map(x=>mapF(x,su));
+P.fc={};g(5).forEach(x=>P.fc[x.flashcard_id]=x.status);P.bm=g(6).map(x=>x.material_id);
+P.q={};g(7).forEach(x=>P.q[x.question_id]=[x.correct_count,x.total_count,+x.last_correct]);
+P.op={};g(9).forEach(x=>P.op[x.material_id]=x.opens);
+const at=g(8),an=at.length?(await pg('quiz_answers',q=>q.in('attempt_id',at.map(x=>x.id)).order('id'))).data:[];
+P.h=at.map(a=>({id:a.id,ts:T0(a.created_at),sc:a.scope||'',n:a.total,k:a.correct,secs:a.seconds||0,it:an.filter(x=>x.attempt_id==a.id).sort((x,y)=>x.position-y.position).map(x=>({id:x.question_id,ch:x.chosen,ok:+x.is_correct}))}));
+D.U=[];if(role=='admin'){const u=await sb.from('profiles').select('*');D.U=u.data||[]}
+}catch(err){console.error(err);toast('Database connection error. Check the console (F12).')}}
 
-    const er = r.find(x => x && x.error);
-    if (er) console.warn('Supabase warning:', er.error.message);
-
-    const g = i => (r[i] && r[i].data) ? r[i].data : [];
-    
-    PR = (r[0] && r[0].data) ? r[0].data : { display_name: '', role: 'student' };
-    role = PR.role || 'student';
-
-    const Q = g(1).map(dbq);
-    OQ = Q.filter(x => !x.own);
-    D.MQ = Q.filter(x => x.own);
-
-    D.FO = g(2).map(x => ({
-      id: x.id,
-      c: x.component,
-      name: x.name,
-      parent: x.parent_id || null,
-      def: x.is_default,
-      own: x.owner_id ? 1 : 0
-    }));
-
-    D.M = g(3).map(x => ({
-      id: x.id,
-      fo: x.folder_id,
-      title: x.title,
-      desc: x.description || '',
-      type: x.file_type || '',
-      path: x.file_path || '',
-      pub: x.published,
-      own: x.owner_id ? 1 : 0
-    }));
-
-    const F = g(4), paths = F.filter(x => x.image_path).map(x => x.image_path), su = {};
-    if (paths.length) {
-      const s = await sb.storage.from('flashcard-images').createSignedUrls(paths, 3600);
-      (s.data || []).forEach(x => su[x.path] = x.signedUrl);
-    }
-    D.F = F.map(x => ({
-      id: x.id, c: x.component, f: x.front, b: x.back || '', img: su[x.image_path] || '', ip: x.image_path || '', pub: x.published, own: x.owner_id ? 1 : 0
-    }));
-
-    P.fc = {}; 
-    g(5).forEach(x => P.fc[x.flashcard_id] = x.status);
-    
-    P.bm = g(6).map(x => x.material_id);
-    
-    P.q = {}; 
-    g(7).forEach(x => P.q[x.question_id] = [x.correct_count, x.total_count, +x.last_correct]);
-
-    const at = g(8), an = at.length ? (await pg('quiz_answers', q => q.in('attempt_id', at.map(x => x.id)).order('id'))).data : [];
-    P.h = at.map(a => ({
-      id: a.id,
-      ts: new Date(a.created_at).getTime(),
-      sc: a.scope || '',
-      n: a.total,
-      k: a.correct,
-      secs: a.seconds || 0,
-      it: an.filter(x => x.attempt_id == a.id).sort((x, y) => x.position - y.position).map(x => ({ id: x.question_id, ch: x.chosen, ok: +x.is_correct }))
-    }));
-
-    D.U = [];
-    if (role == 'admin') {
-      const u = await sb.from('profiles').select('*').order('created_at');
-      D.U = u.data || [];
-    }
-  } catch (err) {
-    console.error('Fatal load exception:', err);
-    toast('Database connection error. Check console (F12).');
-  }
-}
+/* delete helper (confirmation is shown by the caller's popup) */
+async function del(k,id){const r=await sb.from(TB[k]).delete().eq('id',id);if(r.error)return toast(r.error.message);D[k]=D[k].filter(x=>x.id!=id);route()}
 
 /* ===== VIEWS ===== */
 const V={};
 V.home=()=>`<section class="hero art"><div class="w"><p class="eyebrow">Civil Engineering Board Exam</p><h1>Your CE review archive: notes, questions and quizzes in one place.</h1><p class="lead">Lecture notes, questionnaires and solutions, plus quizzes, flashcards and progress tracking for MSTC, HPGE and PSAD.</p><button class="btn p" onclick="go(ME?'dash':'auth')">Get started</button></div></section>
 <div class="w sec"><h2>Exam Components</h2><div class="g">${C.map(c=>`<div class="card art" onclick="go('c/${c}')"><h3>${c}</h3><p class="mu">${CD[c]}</p><p class="mu sm">${ME?allQ().filter(x=>x.c==c).length+' questions':'Log in to start'}</p></div>`).join('')}</div></div>`;
 
-V.dash=()=>{const a=stat(()=>1),h=P.h.slice(0,4);return hd('Welcome, '+E(PR&&PR.display_name||'Student'),'Your progress across all components.')+`<div class="w sec stack">
+V.dash=()=>{const a=stat(()=>1),h=P.h.slice(0,4),op=P.op||{},top5=D.M.filter(m=>op[m.id]).sort((x,y)=>op[y.id]-op[x.id]).slice(0,5);
+return hd('Welcome, '+E(PR&&PR.display_name||'Student'),'Your progress across all components.')+`<div class="w sec stack">
 <div class="card art stack"><h3>Quiz</h3><p class="mu">Draws from all ${a.n} questions across MSTC, HPGE and PSAD. You can also start a quiz inside each component.</p><button class="btn p" onclick="go('quiz')">Start a quiz</button></div>
 <div class="g">${C.map(c=>`<div class="card art" onclick="go('c/${c}')"><h3>${c}</h3>${bars(stat(x=>x.c==c))}</div>`).join('')}</div>
 <p class="mu sm">Accuracy = correct answers ÷ answers given. Mastery = questions you last answered correctly ÷ all questions.</p>
+<div class="card"><h3>Most opened files</h3>${top5.map(m=>`<div class="row" style="justify-content:space-between;margin:8px 0 0"><a class="lk" onclick="openM('${m.id}')">${tag(m.type)} ${E(m.title)}</a><span class="mu sm">${op[m.id]} ${op[m.id]==1?'open':'opens'}</span></div>`).join('')||'<p class="mu sm">Files you open will show up here.</p>'}</div>
 <div class="g"><div class="card"><h3>Recent quizzes</h3>${h.map(x=>`<p class="sm">${x.k}/${x.n} · ${E(x.sc)}</p>`).join('')||'<p class="mu sm">None yet.</p>'}<div class="row"><button class="btn" onclick="go('hist')">View history</button></div></div>
 <div class="card"><h3>Study</h3><div class="row"><button class="btn" onclick="FF={c:'',k:''};go('cards')">Flashcards</button><button class="btn" onclick="FF={c:'',k:'img'};go('cards')">Formula cards</button></div></div></div></div>`};
 
 /* ===== COMPONENT PAGE + FOLDER PAGE ===== */
-const folderCard=f=>{const n=D.M.filter(m=>m.fo==f.id).length+D.FO.filter(x=>x.parent==f.id).length,ed=!f.def&&(f.own||role=='admin');
-return `<div class="card fr"><div class="fl" onclick="go('f/${f.id}')"><span>📁</span><h3>${E(f.name)}</h3></div><div class="fx">${f.own?'<span class="tag">Personal</span>':''}<span class="tag">${n} items</span><button class="dots" onclick="toggleMenu('fo_${f.id}',event)" aria-label="Folder menu">⋮</button></div>${mnu('fo_'+f.id,[['Open',`go('f/${f.id}')`],['Upload here',`openFab('upload','${f.id}')`],['Info',`folderInfo('${f.id}')`],ed&&['Rename',`renameFolder('${f.id}')`],ed&&['Delete',`showConfirm('Delete folder','This also deletes everything inside it.',()=>delFo('${f.id}'))`,1]])}</div>`};
-const fileCard=m=>{const ed=m.own||role=='admin';
-return `<div class="card fr"><div class="fl" onclick="openM('${m.id}')">${tag(m.type)}<h3>${E(m.title)}</h3></div><div class="fx">${m.own?'<span class="tag">Personal</span>':''}<a class="star" onclick="bm('${m.id}')">${P.bm.includes(m.id)?'★':'☆'}</a><button class="dots" onclick="toggleMenu('m_${m.id}',event)" aria-label="File menu">⋮</button></div>${m.desc?`<p class="mu sm fd">${E(m.desc)}</p>`:''}${mnu('m_'+m.id,[['Open',`openM('${m.id}')`],['Info',`fileInfo('${m.id}')`],ed&&['Rename',`renameMaterial('${m.id}')`],ed&&['Move to…',`moveMaterial('${m.id}')`],ed&&['Delete',`showConfirm('Delete file','Delete this file permanently?',()=>delM('${m.id}'))`,1]])}</div>`};
-const viewBtn=()=>`<button class="btn" onclick="toggleFolderView()">${folderView=='grid'?'List ☰':'Grid ▦'}</button>`;
+const folderCard=f=>{const k='f:'+f.id,n=D.M.filter(m=>m.fo==f.id).length+D.FO.filter(x=>x.parent==f.id).length,ed=canFo(f),on=SEL.has(k);
+return `<div class="card fr ${on?'selected':''}"><div class="fl" onclick="${selMode?`selTog('${k}')`:`go('f/${f.id}')`}">${selMode?`<input type="checkbox" class="selbox" ${on?'checked':''} onclick="event.stopPropagation()" onchange="selTog('${k}')">`:''}<span>📁</span><h3>${E(f.name)}</h3></div><div class="fx">${f.own?'<span class="tag">Personal</span>':''}<span class="tag">${n} items</span>${selMode?'':`<button class="dots" onclick="toggleMenu('fo_${f.id}',event)" aria-label="Folder menu">⋮</button>`}</div>${mnu('fo_'+f.id,[['Open',`go('f/${f.id}')`],['Upload here',`openFab('upload','${f.id}')`],['Copy',`copyKey('${k}')`],['Duplicate',`dupKey('${k}')`],['Download (zip)',`dlKeys(['${k}'])`],['Info',`folderInfo('${f.id}')`],ed&&['Rename',`renameFolder('${f.id}')`],ed&&['Move to…',`moveKeys(['${k}'])`],ed&&['Delete',`showConfirm('Delete folder','This also deletes everything inside it.',()=>delFo('${f.id}'))`,1]])}</div>`};
+const fileCard=m=>{const k='m:'+m.id,ed=canMat(m),on=SEL.has(k);
+return `<div class="card fr ${on?'selected':''}"><div class="fl" onclick="${selMode?`selTog('${k}')`:`openM('${m.id}')`}">${selMode?`<input type="checkbox" class="selbox" ${on?'checked':''} onclick="event.stopPropagation()" onchange="selTog('${k}')">`:''}${tag(m.type)}<h3>${E(m.title)}</h3></div><div class="fx">${m.own?'<span class="tag">Personal</span>':''}<a class="star" onclick="bm('${m.id}')">${P.bm.includes(m.id)?'★':'☆'}</a>${selMode?'':`<button class="dots" onclick="toggleMenu('m_${m.id}',event)" aria-label="File menu">⋮</button>`}</div>${m.desc?`<p class="mu sm fd">${E(m.desc)}</p>`:''}${mnu('m_'+m.id,[['Open',`openM('${m.id}')`],['Copy',`copyKey('${k}')`],['Duplicate',`dupKey('${k}')`],['Download',`dlKeys(['${k}'])`],['Info',`fileInfo('${m.id}')`],ed&&['Rename',`renameMaterial('${m.id}')`],ed&&['Move to…',`moveKeys(['${k}'])`],ed&&['Delete',`showConfirm('Delete file','Delete this file permanently?',()=>delM('${m.id}'))`,1]])}</div>`};
+const ftools=(dest,comp)=>`<button class="btn ${selMode?'p':''}" onclick="${selMode?'selOff()':'selOn()'}">☑ ${selMode?'Selecting':'Select'}</button>${CB&&CB.keys.length?`<button class="btn" onclick="pasteHere('${dest}','${comp}')">📋 Paste (${CB.keys.length})</button>`:''}<button class="btn" onclick="openFab('upload','${dest}')">↑ Upload</button><button class="btn" onclick="openFab('folder','${dest}')">＋ Folder</button>${dd('fsort',SORTS,FSORT,"FSORT=v;route()")}<button class="btn" onclick="toggleFolderView()">${folderView=='grid'?'List ☰':'Grid ▦'}</button>`;
+const selReset=()=>{if(selFor!==location.hash){selMode=false;SEL.clear();selFor=location.hash}};
+const listOf=(fo,it)=>{const a=sortBy(fo,FSORT,x=>x.name,x=>x.ts),b=sortBy(it,FSORT,x=>x.title,x=>x.ts);VIS=[...a.map(x=>'f:'+x.id),...b.map(x=>'m:'+x.id)];return a.map(folderCard).join('')+b.map(fileCard).join('')};
 
-V.c=c=>{if(!C.includes(c))return V.dash();const s=stat(x=>x.c==c),fo=D.FO.filter(f=>f.c==c&&!f.parent);
+V.c=c=>{if(!C.includes(c))return V.dash();selReset();const s=stat(x=>x.c==c),fo=D.FO.filter(f=>f.c==c&&!f.parent);
 return hd(c,CD[c])+`<div class="w sec stack"><div class="card art"><h3>Quiz</h3><p class="mu">${s.n} questions available in ${c}. Pick one subject, several topics, or everything.</p><button class="btn p" onclick="go('quiz/${c}')">Take a ${c} quiz</button>${bars(s)}</div>
-<div><div class="row" style="justify-content:space-between;margin:0 0 12px"><h2 style="margin:0">Folders</h2><div class="row" style="margin:0"><button class="btn" onclick="openFab('upload','')">↑ Upload</button><button class="btn" onclick="openFab('folder','')">＋ New folder</button>${viewBtn()}</div></div><div class="g ${folderView}">${fo.map(folderCard).join('')||empty('No folders here yet.')}</div></div>
+<div><div class="row" style="justify-content:space-between;margin:0 0 12px"><h2 style="margin:0">Folders</h2><div class="row" style="margin:0">${ftools('',c)}</div></div>${selBar()}<div class="g ${folderView}" style="margin-top:12px">${listOf(fo,[])||empty('No folders here yet.')}</div></div>
 <div><h2>Subject statistics</h2><div class="card" style="overflow-x:auto"><table style="margin:0"><tr><th>Subject / topic</th><th>Questions</th><th>Accuracy</th><th>Mastery</th></tr>${subs(c).map(su=>{const t=stat(x=>x.c==c&&x.s==su);return `<tr><td><b>${E(su)}</b></td><td>${t.n}</td><td>${t.acc}%</td><td>${t.ms}%</td></tr>`+tops(c,su).map(p=>{const u=stat(x=>x.c==c&&x.s==su&&x.t==p);return `<tr class="mu sm"><td>&nbsp;&nbsp;${E(p)}</td><td>${u.n}</td><td>${u.acc}%</td><td>${u.ms}%</td></tr>`}).join('')}).join('')||'<tr><td class="mu">No questions yet for this component.</td></tr>'}</table></div></div></div>`};
 
-V.f=id=>{const f=D.FO.find(x=>x.id==id);if(!f)return V.dash();const q=FQ.toLowerCase(),par=f.parent?D.FO.find(x=>x.id==f.parent):null,
-sub=D.FO.filter(x=>x.parent==id&&(!q||x.name.toLowerCase().includes(q))),it=D.M.filter(m=>m.fo==id&&(!q||(m.title+' '+m.desc).toLowerCase().includes(q))),all=D.M.some(m=>m.fo==id)||D.FO.some(x=>x.parent==id);
-return hd('📁 '+E(f.name),`<a class="lk" onclick="FQ='';go('${par?'f/'+par.id:'c/'+f.c}')">← ${par?E(par.name):f.c}</a>`)+`<div class="w sec stack"><div class="row" style="justify-content:space-between;margin:0"><input id="fq" placeholder="Search in this folder" value="${E(FQ)}" style="flex:1;min-width:160px;max-width:320px" oninput="FQ=this.value;route();const i=$('#fq');i.focus();i.setSelectionRange(99,99)"><div class="row" style="margin:0"><button class="btn p" onclick="openFab('upload','${id}')">↑ Upload here</button><button class="btn" onclick="openFab('folder','${id}')">＋ New subfolder</button>${viewBtn()}</div></div>
-<div class="g ${folderView}">${sub.map(folderCard).join('')}${it.map(fileCard).join('')}${!sub.length&&!it.length?empty(all?'Nothing matches your search.':'This folder is empty. Use “Upload here” to add files.'):''}</div></div>`};
+V.f=id=>{const f=D.FO.find(x=>x.id==id);if(!f)return V.dash();selReset();const q=FQ.toLowerCase(),par=f.parent?D.FO.find(x=>x.id==f.parent):null,
+sub=D.FO.filter(x=>x.parent==id&&(!q||x.name.toLowerCase().includes(q))),it=D.M.filter(m=>m.fo==id&&(!q||(m.title+' '+m.desc).toLowerCase().includes(q))),all=D.M.some(m=>m.fo==id)||D.FO.some(x=>x.parent==id),html=listOf(sub,it);
+return hd('📁 '+E(f.name),`<a class="lk" onclick="FQ='';go('${par?'f/'+par.id:'c/'+f.c}')">← ${par?E(par.name):f.c}</a>`)+`<div class="w sec stack"><div class="row" style="justify-content:space-between;margin:0"><input id="fq" placeholder="Search in this folder" value="${E(FQ)}" style="flex:1;min-width:160px;max-width:320px" oninput="FQ=this.value;route();const i=$('#fq');i.focus();i.setSelectionRange(99,99)"><div class="row" style="margin:0">${ftools(id,f.c)}</div></div>${selBar()}
+<div class="g ${folderView}">${html||empty(all?'Nothing matches your search.':'This folder is empty. Use “Upload” to add files, or paste copied items.')}</div></div>`};
 
 /* ===== QUIZ ===== */
-let QZ=null;const QS={n:10,t:0,c:null,sel:new Set()};
-const keys=c=>[...new Set(allQ().filter(x=>!c||x.c==c).map(x=>x.c+'|'+x.s+'|'+x.t))],pool=()=>allQ().filter(x=>QS.sel.has(x.c+'|'+x.s+'|'+x.t));
-function tog(el){el.checked?QS.sel.add(el.dataset.k):QS.sel.delete(el.dataset.k);smry()}
-function selK(el,on){const p=el.dataset.p+'|';keys(QS.c).forEach(k=>{if((k+'|').startsWith(p))on?QS.sel.add(k):QS.sel.delete(k)});route()}
-function smry(){const e=$('#sum');if(!e)return;const p=pool().length,n=Math.min(Math.max(10,QS.n|0),p);e.innerHTML=`<b>Your quiz:</b> ${p>=10?n:0} questions (from ${p} available in your selection) · Timer: ${QS.t>0?QS.t+' min':'off'} · Shuffled`+(p<10?'<br>Select more topics: at least 10 questions are needed.':'')}
-function setup(c){if(QS.c!==c){QS.c=c;QS.sel=new Set(keys(c))}
+let QZ=null;const QS={n:10,t:0,c:null,src:'all',dif:'',subj:new Set(),top:new Set(),len:-1};
+const ck=x=>x.c+'|'+x.s,tk2=x=>x.c+'|'+x.s+'|'+x.t,
+base=()=>allQ().filter(x=>!QS.c||x.c==QS.c),
+flt=()=>base().filter(x=>(QS.src=='all'||(QS.src=='own')==!!x.own)&&(!QS.dif||x.d==QS.dif)),
+pool=()=>flt().filter(x=>QS.subj.has(ck(x))&&QS.top.has(tk2(x)));
+function qinit(c){QS.c=c;QS.src='all';QS.dif='';QS.subj=new Set(base().map(ck));QS.top=new Set(base().map(tk2));QS.len=allQ().length}
+/* multi-select dropdown with search (k = 's' subjects, 't' topics) */
+const msItems=k=>{const m=new Map();(k=='s'?base():base().filter(x=>QS.subj.has(ck(x)))).forEach(x=>{const id=k=='s'?ck(x):tk2(x);if(!m.has(id))m.set(id,{k:id,l:(QS.c?'':x.c+' › ')+(k=='s'?x.s:x.s+' › '+x.t),n:0})});
+flt().forEach(x=>{const e=m.get(k=='s'?ck(x):tk2(x));if(e)e.n++});return[...m.values()].sort((a,b)=>cmp(a.l,b.l))};
+const msLabel=k=>{const it=msItems(k),sel=k=='s'?QS.subj:QS.top,n=it.filter(i=>sel.has(i.k)).length,w=k=='s'?'subjects':'topics';return n==it.length?`All ${w} (${n})`:n?`${n} of ${it.length} ${w}`:'None selected'};
+const msList=k=>{const sel=k=='s'?QS.subj:QS.top;return msItems(k).map(i=>`<label class="msi" data-t="${E(i.l.toLowerCase())}"><input type="checkbox" data-k="${E(i.k)}" ${sel.has(i.k)?'checked':''} onchange="msTog(this,'${k}')"><span>${E(i.l)}</span><small class="mu">${i.n}</small></label>`).join('')||'<p class="mu sm" style="padding:8px 12px">Nothing to show.</p>'};
+const ms=k=>`<div class="custom-dropdown ms"><div class="custom-select-trigger" onclick="ddt(event,this)"><span id="msl_${k}">${E(msLabel(k))}</span><span>▾</span></div><div class="custom-options" onclick="event.stopPropagation()"><div class="mshead"><input placeholder="Search…" oninput="msFind(this)"><a class="lk sm" onclick="msAll('${k}',1)">All</a><a class="lk sm" onclick="msAll('${k}',0)">None</a></div><div id="msb_${k}">${msList(k)}</div></div></div>`;
+function msFind(el){const q=el.value.toLowerCase();el.closest('.custom-options').querySelectorAll('.msi').forEach(l=>l.style.display=l.dataset.t.includes(q)?'':'none')}
+function msRefresh(full){['s','t'].forEach(k=>{const b=$('#msb_'+k),l=$('#msl_'+k);if(b&&(full||k=='t'))b.innerHTML=msList(k);if(l)l.textContent=msLabel(k)});smry()}
+function msTog(el,k){const sel=k=='s'?QS.subj:QS.top;el.checked?sel.add(el.dataset.k):sel.delete(el.dataset.k);if(k=='s'){QS.top=new Set(base().filter(x=>QS.subj.has(ck(x))).map(tk2));msRefresh(0)}else{const l=$('#msl_t');if(l)l.textContent=msLabel('t');smry()}}
+function msAll(k,on){const it=msItems(k);if(k=='s'){QS.subj=new Set(on?it.map(i=>i.k):[]);QS.top=new Set(base().filter(x=>QS.subj.has(ck(x))).map(tk2))}else QS.top=new Set(on?it.map(i=>i.k):[]);msRefresh(1)}
+function smry(){const e=$('#sum');if(!e)return;const p=pool().length,n=Math.min(Math.max(10,QS.n|0),p),src={all:'All questions',off:'Official only',own:'My questions only'}[QS.src];
+e.innerHTML=`<b>Your quiz</b><br>Questions: ${p>=10?n:0} of ${p} available<br>Subjects: ${E(msLabel('s'))}<br>Topics: ${E(msLabel('t'))}<br>Source: ${src} · Difficulty: ${QS.dif||'any'}<br>Timer: ${QS.t>0?QS.t+' min':'off'} · Order: shuffled`+(p<10?'<br><b>Select more: at least 10 questions are needed.</b>':'')}
+const ownTools=()=>`<div class="card stack"><h3>Add your own questions</h3><p class="mu sm">Your questions are private. They can be included in quizzes (choose “My questions only” above) and show up in flashcards. You have ${D.MQ.length}.</p><div class="row"><button class="btn" onclick="openQEd(null,0)">＋ Add one question</button><label class="btn">↑ Import CSV<input type="file" accept=".csv" hidden onchange="impCsv(this,1)"></label><a class="lk sm" onclick="dlTemplate()">Download CSV template</a><a class="lk sm" onclick="go('myq')">Manage my questions</a></div></div>`;
+function setup(c){if(QS.c!==c||QS.len!==allQ().length)qinit(c);
 return `<div class="card stack"><h3>Quiz settings</h3>
-<div><p class="lb">1 · Choose what to include</p>${(c?[c]:C).map(k=>subs(k).length?`<p style="margin-top:8px"><b>${k}</b> <a class="lk sm" data-p="${k}" onclick="selK(this,1)">select all</a> · <a class="lk sm" data-p="${k}" onclick="selK(this,0)">clear</a></p>`+subs(k).map(s=>`<p class="sm" style="margin-top:6px"><b>${E(s)}</b> <a class="lk" data-p="${E(k+'|'+s)}" onclick="selK(this,1)">all</a> · <a class="lk" data-p="${E(k+'|'+s)}" onclick="selK(this,0)">none</a></p><div class="chips">${tops(k,s).map(t=>`<label class="chip"><input type="checkbox" data-k="${E(k+'|'+s+'|'+t)}" ${QS.sel.has(k+'|'+s+'|'+t)?'checked':''} onchange="tog(this)">${E(t)}</label>`).join('')}</div>`).join(''):'').join('')}</div>
-<div><p class="lb">2 · Number of questions (minimum 10)</p><input type="number" min="10" value="${QS.n}" onchange="QS.n=+this.value;smry()"></div>
-<div><p class="lb">3 · Timer in minutes (0 = no timer)</p><input type="number" min="0" value="${QS.t}" onchange="QS.t=+this.value;smry()"></div>
+<div class="g2"><div><p class="lb">1 · Source</p>${dd('qsSrc',[['all','All questions'],['off','Official only'],['own','My questions only']],QS.src,"QS.src=v;msRefresh(1)")}</div><div><p class="lb">2 · Difficulty</p>${dd('qsDif',[['','Any difficulty'],'Easy','Medium','Hard'],QS.dif,"QS.dif=v;msRefresh(1)")}</div></div>
+<div class="g2"><div><p class="lb">3 · Subjects</p>${ms('s')}</div><div><p class="lb">4 · Topics</p>${ms('t')}</div></div>
+<div class="g2"><div><p class="lb">5 · Number of questions (minimum 10)</p><input type="number" min="10" value="${QS.n}" onchange="QS.n=+this.value;smry()"></div><div><p class="lb">6 · Timer in minutes (0 = no timer)</p><input type="number" min="0" value="${QS.t}" onchange="QS.t=+this.value;smry()"></div></div>
 <p class="mu sm">Question order and answer choices are always shuffled. You submit once, at the end.</p>
-<div class="exp" id="sum"></div><button class="btn p" onclick="startQ()">Start quiz</button></div>`}
-function startQ(){const p=pool();if(p.length<10)return toast('At least 10 questions are needed. Select more topics.');const n=Math.min(Math.max(10,QS.n|0),p.length),
-all=keys(QS.c).every(k=>QS.sel.has(k)),qs=sh(p).slice(0,n).map(x=>{const o=sh(x.o.map((t,i)=>[t,i]));return{...x,o:o.map(a=>a[0]),a:o.findIndex(a=>a[1]==x.a)}});
-QZ={qs,sel:{},t0:Date.now(),end:QS.t>0?Date.now()+QS.t*60000:0,scope:(QS.c||'All components')+' · '+(all?'all subjects':QS.sel.size+' topics'),done:0};route();scrollTo(0,0)}
+<div class="exp" id="sum"></div><button class="btn p" onclick="startQ()">Start quiz</button></div>`+ownTools()}
+function startQ(){const p=pool();if(p.length<10)return toast('At least 10 questions are needed. Select more subjects or topics.');const n=Math.min(Math.max(10,QS.n|0),p.length),
+allS=msItems('s').every(i=>QS.subj.has(i.k)),allT=msItems('t').every(i=>QS.top.has(i.k)),
+qs=sh(p).slice(0,n).map(x=>{const o=sh(x.o.map((t,i)=>[t,i]));return{...x,o:o.map(a=>a[0]),a:o.findIndex(a=>a[1]==x.a)}});
+QZ={qs,sel:{},t0:Date.now(),end:QS.t>0?Date.now()+QS.t*60000:0,scope:(QS.c||'All components')+' · '+(allS?'all subjects':QS.subj.size+' subjects')+(allT?'':' · '+QS.top.size+' topics')+(QS.src=='own'?' · my questions':QS.src=='off'?' · official':''),done:0};route();scrollTo(0,0)}
 function tick(){const e=$('#tm');if(!QZ||QZ.done||!e)return;const s=Math.max(0,Math.round((QZ.end-Date.now())/1000));e.textContent='⏱ '+mmss(s);e.classList.toggle('low',s<60);if(!s)return submitQ(1);tk=setTimeout(tick,500)}
 function cnt(){const e=$('#ans');if(e&&QZ)e.textContent=Object.keys(QZ.sel).length+' / '+QZ.qs.length+' answered'}
 function submitQ(auto){const z=QZ,un=z.qs.length-Object.keys(z.sel).length;if(!auto&&un&&!confirm(un+' unanswered. Submit anyway?'))return;z.done=1;let sc=0;
 const it=z.qs.map((q,i)=>{const ok=+(z.sel[i]===q.a);sc+=ok;const s=P.q[q.id]||[0,0,0];P.q[q.id]=[s[0]+ok,s[1]+1,ok];return{id:q.id,ch:z.sel[i]==null?null:q.o[z.sel[i]],ok}});
 z.sc=sc;z.it=it;z.secs=Math.round((Date.now()-z.t0)/1000);P.h.unshift({id:U(),ts:Date.now(),sc:z.scope,n:z.qs.length,k:sc,secs:z.secs,it});route();scrollTo(0,0);
 sb.from('quiz_attempts').insert({user_id:ME.id,scope:z.scope,total:z.qs.length,correct:sc,seconds:z.secs}).select().single().then(async r=>{if(r.error)return toast('Could not save history: '+r.error.message);P.h[0].id=r.data.id;const a=await sb.from('quiz_answers').insert(it.map((i,n)=>({attempt_id:r.data.id,user_id:ME.id,question_id:i.id,chosen:i.ch,is_correct:!!i.ok,position:n})));if(a.error)toast('Could not save answers: '+a.error.message)})}
-const run=()=>`<div class="qbar"><b id="tm">${QZ.end?'⏱':'No timer'}</b><span id="ans" class="mu sm"></span><span><a class="lk sm" onclick="if(confirm('Quit this quiz? Your answers will be lost.')){QZ=null;route()}">Quit</a> <button class="btn p" onclick="submitQ()">Submit quiz</button></span></div><div class="stack">`+QZ.qs.map((q,i)=>`<div class="card"><p class="mu sm">Q${i+1} · ${E(q.s)} › ${E(q.t)}</p><p class="qt">${E(q.q)}</p>${q.o.map((o,j)=>`<label class="opt"><input type="radio" name="q${i}" ${QZ.sel[i]===j?'checked':''} onchange="QZ.sel[${i}]=${j};cnt()">${E(o)}</label>`).join('')}</div>`).join('')+`<button class="btn p" onclick="submitQ()">Submit quiz</button></div>`;
-const res=()=>{const z=QZ;return `<div class="card art stack"><h3>Score: ${z.sc} / ${z.qs.length} (${Math.round(100*z.sc/z.qs.length)}%)</h3><p class="mu">Time: ${mmss(z.secs)} · ${E(z.scope)}</p><div class="strip">${z.it.map(i=>`<i class="${i.ok?'g':''}"></i>`).join('')}</div><div class="row"><button class="btn p" onclick="QZ=null;route()">New quiz</button><button class="btn" onclick="go('hist')">History</button></div></div><div class="stack" style="margin-top:16px">`+z.qs.map((q,i)=>`<div class="card"><p class="mu sm">Q${i+1} · ${z.sel[i]==null?'— Not answered':z.it[i].ok?'✓ Correct':'✗ Wrong'} · ${E(q.s)} › ${E(q.t)}</p><p class="qt">${E(q.q)}</p>${q.o.map((o,j)=>`<div class="opt ${j==q.a?'ok':j==z.sel[i]?'no':''}">${E(o)}</div>`).join('')}<div class="exp">${E(q.e)}</div></div>`).join('')+'</div>'};
-V.quiz=a=>{const c=C.includes(a)?a:'';return hd(c?c+' Quiz':'Quiz',c?'Questions from '+c+' only.':'Questions from every component.')+`<div class="w sec">${QZ?(QZ.done?res():run()):!QL?empty('Loading questions…'):allQ().length?setup(c):`<div class="card art stack"><h3>No questions yet</h3><p class="mu">An admin can add questions under Admin → Questions.</p></div>`}</div>`};
+const fig=u=>u?`<img class="fig" src="${u}" alt="">`:'';
+const run=()=>`<div class="qbar"><b id="tm">${QZ.end?'⏱':'No timer'}</b><span id="ans" class="mu sm"></span><span><a class="lk sm" onclick="if(confirm('Quit this quiz? Your answers will be lost.')){QZ=null;route()}">Quit</a> <button class="btn p" onclick="submitQ()">Submit quiz</button></span></div><div class="stack">`+QZ.qs.map((q,i)=>`<div class="card"><p class="mu sm">Q${i+1} · ${E(q.s)} › ${E(q.t)}</p><p class="qt">${E(q.q)}</p>${fig(q.qi)}${q.o.map((o,j)=>`<label class="opt"><input type="radio" name="q${i}" ${QZ.sel[i]===j?'checked':''} onchange="QZ.sel[${i}]=${j};cnt()">${E(o)}</label>`).join('')}</div>`).join('')+`<button class="btn p" onclick="submitQ()">Submit quiz</button></div>`;
+const res=()=>{const z=QZ;return `<div class="card art stack"><h3>Score: ${z.sc} / ${z.qs.length} (${Math.round(100*z.sc/z.qs.length)}%)</h3><p class="mu">Time: ${mmss(z.secs)} · ${E(z.scope)}</p><div class="strip">${z.it.map(i=>`<i class="${i.ok?'g':''}"></i>`).join('')}</div><div class="row"><button class="btn p" onclick="QZ=null;route()">New quiz</button><button class="btn" onclick="go('hist')">History</button></div></div><div class="stack" style="margin-top:16px">`+z.qs.map((q,i)=>`<div class="card"><p class="mu sm">Q${i+1} · ${z.sel[i]==null?'— Not answered':z.it[i].ok?'✓ Correct':'✗ Wrong'} · ${E(q.s)} › ${E(q.t)}</p><p class="qt">${E(q.q)}</p>${fig(q.qi)}${q.o.map((o,j)=>`<div class="opt ${j==q.a?'ok':j==z.sel[i]?'no':''}">${E(o)}</div>`).join('')}<div class="exp">${E(q.e)}${fig(q.ei)}</div></div>`).join('')+'</div>'};
+V.quiz=a=>{const c=C.includes(a)?a:'';return hd(c?c+' Quiz':'Quiz',c?'Questions from '+c+' only.':'Questions from every component.')+`<div class="w sec">${QZ?(QZ.done?res():run()):!QL?empty('Loading questions…'):allQ().length?`<div class="stack">${setup(c)}</div>`:`<div class="stack"><div class="card art stack"><h3>No questions yet</h3><p class="mu">An admin can add official questions, or add your own below.</p></div>${ownTools()}</div>`}</div>`};
 
 /* ===== HISTORY ===== */
 let HV=null,HI=0,HW=0;
@@ -483,64 +551,136 @@ const flip=(f,b)=>`<div class="fc" onclick="this.classList.toggle('on')"><div cl
 function replay(h){const l=h.it.map(i=>({i,q:allQ().find(x=>x.id==i.id)})).filter(x=>x.q&&(!HW||!x.i.ok)),
 bk=`<div class="row" style="margin:0 0 12px"><button class="btn" onclick="HV=null;route()">← History</button><label class="sm"><input type="checkbox" ${HW?'checked':''} onchange="HW=this.checked?1:0;HI=0;route()"> Wrong answers only</label></div>`;
 if(!l.length)return bk+empty('Nothing to show.');HI=Math.min(HI,l.length-1);const{i,q}=l[HI],n=l.length;
-return bk+flip(`<div>${E(q.q)}<div class="sm mu" style="margin-top:10px">${q.o.map((o,j)=>'ABCD'[j]+'. '+E(o)).join('<br>')}</div></div>`,`<div><b>${i.ok?'✓ You were correct':'✗ You were wrong'}</b><p>Your answer: ${i.ch==null?'(none)':E(i.ch)}</p><p>Correct: ${E(q.o[q.a])}</p><p class="sm mu">${E(q.e)}</p></div>`)+`<p class="mu sm" style="text-align:center">Question ${HI+1} of ${n} · click the card to flip</p><div class="row" style="justify-content:center"><button class="btn" onclick="HI=(HI+${n-1})%${n};route()">←</button><button class="btn" onclick="HI=(HI+1)%${n};route()">→</button></div>`}
+return bk+flip(`<div>${E(q.q)}${fig(q.qi)}<div class="sm mu" style="margin-top:10px">${q.o.map((o,j)=>'ABCD'[j]+'. '+E(o)).join('<br>')}</div></div>`,`<div><b>${i.ok?'✓ You were correct':'✗ You were wrong'}</b><p>Your answer: ${i.ch==null?'(none)':E(i.ch)}</p><p>Correct: ${E(q.o[q.a])}</p><p class="sm mu">${E(q.e)}</p>${fig(q.ei)}</div>`)+`<p class="mu sm" style="text-align:center">Question ${HI+1} of ${n} · click the card to flip</p><div class="row" style="justify-content:center"><button class="btn" onclick="HI=(HI+${n-1})%${n};route()">←</button><button class="btn" onclick="HI=(HI+1)%${n};route()">→</button></div>`}
 V.hist=()=>{const h=P.h.find(x=>x.id==HV),dt=t=>new Date(t).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}),tm=t=>new Date(t).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
 return hd('Quiz History','Every quiz you finish is saved here. Green = correct, red = wrong.')+`<div class="w sec">${h?replay(h):`<div class="stack">${P.h.map(x=>`<div class="card"><div class="hrow"><div class="hl"><b>${dt(x.ts)}</b><span class="mu sm">${tm(x.ts)}</span><span class="mu sm">⏱ ${mmss(x.secs)} taken</span></div><div class="hr"><span class="hscore">${x.k} / ${x.n} <small class="mu">${Math.round(100*x.k/x.n)}%</small></span><button class="btn p" onclick="HV='${x.id}';HI=0;HW=0;route()">Review as flashcards</button><span class="tag">${E(x.sc)}</span></div></div><div class="strip">${x.it.map(i=>`<i class="${i.ok?'g':''}"></i>`).join('')}</div></div>`).join('')||empty('No quizzes taken yet.')}</div>`}</div>`};
 
 /* ===== FLASHCARDS: generated from the question bank, plus official, formula and personal cards ===== */
-let FT='s',FC={i:0,o:null},ED=null,FF={c:'',k:'q',s:'',t:'',m:''};
-const qcard=x=>({id:x.id,c:x.c,own:x.own,src:'Question bank',fh:`<div>${E(x.q)}<div class="sm mu" style="margin-top:10px">${x.o.map((o,j)=>'ABCD'[j]+'. '+E(o)).join('<br>')}</div></div>`,bh:`<div><b>${'ABCD'[x.a]}. ${E(x.o[x.a])}</b>${x.e?`<p class="sm mu" style="margin-top:10px">${E(x.e)}</p>`:''}</div>`});
-const fcard=x=>({id:x.id,c:x.c,own:x.own,src:x.own?'Personal':'Official',fh:`<div>${E(x.f)}</div>`,bh:`<div>${x.b?E(x.b):''}${x.img?`<img src="${x.img}" alt="">`:''}</div>`});
-const deck=()=>{const k=FF.k||'q',m=FF.m;let d=k=='q'?allQ().filter(x=>(!FF.c||x.c==FF.c)&&(!FF.s||x.s==FF.s)&&(!FF.t||x.t==FF.t)).map(qcard)
-:D.F.filter(x=>(x.pub||x.own)&&(!FF.c||x.c==FF.c)&&(k=='img'?x.img:k=='own'?x.own:!x.own)).map(fcard);
-if(m)d=d.filter(x=>m=='new'?!P.fc[x.id]:P.fc[x.id]==m);return FC.o?d.sort((a,b)=>FC.o.indexOf(a.id)-FC.o.indexOf(b.id)):d};
+let FT='s',FC={i:0,o:null},FF={c:'',k:'q',s:'',t:'',m:'',so:''};
+const qcard=x=>({id:x.id,c:x.c,own:x.own,src:x.own?'My question':'Question bank',lbl:x.q,fh:`<div>${E(x.q)}${fig(x.qi)}<div class="sm mu" style="margin-top:10px">${x.o.map((o,j)=>'ABCD'[j]+'. '+E(o)).join('<br>')}</div></div>`,bh:`<div><b>${'ABCD'[x.a]}. ${E(x.o[x.a])}</b>${x.e?`<p class="sm mu" style="margin-top:10px">${E(x.e)}</p>`:''}${fig(x.ei)}</div>`});
+const fcard=x=>({id:x.id,c:x.c,own:x.own,src:x.own?'Personal card':'Official card',lbl:x.f,fh:`<div>${E(x.f)}${fig(x.fimg)}</div>`,bh:`<div>${x.b?E(x.b):''}${fig(x.img)}</div>`});
+const deck=()=>{const k=FF.k||'q',m=FF.m;let d=k[0]=='q'?allQ().filter(x=>(k=='q'||(k=='qm')==!!x.own)&&(!FF.c||x.c==FF.c)&&(!FF.s||x.s==FF.s)&&(!FF.t||x.t==FF.t)).map(qcard)
+:D.F.filter(x=>(x.pub||x.own)&&(!FF.c||x.c==FF.c)&&(k=='img'?(x.img||x.fimg):k=='own'?x.own:!x.own)).map(fcard);
+if(m)d=d.filter(x=>m=='new'?!P.fc[x.id]:P.fc[x.id]==m);
+if(FF.so=='az')return d.sort((a,b)=>cmp(a.lbl,b.lbl));return FC.o?d.sort((a,b)=>FC.o.indexOf(a.id)-FC.o.indexOf(b.id)):d};
 function nav2(n){const l=deck().length;if(!l)return route();FC.i=(FC.i+n+l)%l;route()}
 function mark(id,s){P.fc[id]=s;sb.from('flashcard_marks').upsert({user_id:ME.id,flashcard_id:id,status:s}).then(r=>r.error&&toast(r.error.message));nav2(1)}
 function study(){const d=deck(),k=FF.k||'q',rs="FC.i=0;route()",
-bar=`<div class="bar">${dd('ffK',[['q','From the question bank'],['off','Official cards'],['img','Formula cards (images)'],['own','My cards']],k,"FF.k=v;"+rs)}${dd('ffC',[['','All components'],...C],FF.c,"FF.c=v;FF.s='';FF.t='';"+rs)}${k=='q'&&FF.c?dd('ffS',[['','All subjects'],...subs(FF.c)],FF.s,"FF.s=v;FF.t='';"+rs):''}${k=='q'&&FF.s?dd('ffT',[['','All topics'],...tops(FF.c,FF.s)],FF.t,"FF.t=v;"+rs):''}${dd('ffM',[['','All cards'],['review','Need review'],['known','Known'],['new','Not marked yet']],FF.m,"FF.m=v;"+rs)}</div>`;
-if(!d.length)return bar+empty(k=='q'?'No questions match this selection.':'No cards here yet. Add your own under My Cards.');
+bar=`<div class="bar">${dd('ffK',[['q','All questions'],['qo','Official questions'],['qm','My questions'],['off','Official cards'],['img','Formula / figure cards'],['own','My cards']],k,"FF.k=v;FF.s='';FF.t='';"+rs)}${dd('ffC',[['','All components'],...C],FF.c,"FF.c=v;FF.s='';FF.t='';"+rs)}${k[0]=='q'&&FF.c?dd('ffS',[['','All subjects'],...subs(FF.c)],FF.s,"FF.s=v;FF.t='';"+rs):''}${k[0]=='q'&&FF.s?dd('ffT',[['','All topics'],...tops(FF.c,FF.s)],FF.t,"FF.t=v;"+rs):''}${dd('ffM',[['','All cards'],['review','Need review'],['known','Known'],['new','Not marked yet']],FF.m,"FF.m=v;"+rs)}${dd('ffO',[['','Original order'],['az','A → Z']],FF.so,"FF.so=v;FC.o=null;"+rs)}</div>`;
+if(!d.length)return bar+empty(k[0]=='q'?'No questions match this selection.':'No cards here yet. Add your own under My Cards.');
 FC.i=Math.min(FC.i,d.length-1);const c=d[FC.i],s=P.fc[c.id];
-return bar+flip(c.fh,c.bh)+`<p class="mu sm" style="text-align:center">Card ${FC.i+1} of ${d.length} · ${c.c} · ${c.src} · ${s=='known'?'Known':s=='review'?'Need review':'Not marked'} · click the card to flip</p><div class="row" style="justify-content:center"><button class="btn" onclick="nav2(-1)">←</button><button class="btn" onclick="mark('${c.id}','review')">Need Review</button><button class="btn p" onclick="mark('${c.id}','known')">Known</button><button class="btn" onclick="nav2(1)">→</button><button class="btn" onclick="FC.o=sh(deck().map(x=>x.id));FC.i=0;route()">Shuffle</button></div>`}
-function readImg(id,cb){const f=$('#'+id).files[0];if(!f)return cb();const r=new FileReader();r.onload=()=>{const i=new Image();i.onload=()=>{const k=Math.min(1,900/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(i,0,0,c.width,c.height);c.toBlob(cb,'image/jpeg',.8)};i.onerror=()=>toast('Could not read that image');i.src=r.result};r.readAsDataURL(f)}
-function saveF(own){const f=v('ff').trim(),b=v('fb').trim();if(!f)return toast('Add a title for the front');
-readImg('fi',async blob=>{const e=own&&D.F.find(x=>x.id==ED);if(!b&&!blob&&!(e&&e.img))return toast('Add back text or an image');
-const oid=own?ME.id:null;let ip=e?e.ip:'';
-if(blob){ip=(oid||'official')+'/'+crypto.randomUUID()+'.jpg';const u=await sb.storage.from('flashcard-images').upload(ip,blob,{contentType:'image/jpeg'});if(u.error)return toast(u.error.message)}
-const row={component:v('fk'),front:f,back:b,image_path:ip||null};
-const r=e?await sb.from('flashcards').update(row).eq('id',e.id).select().single():await sb.from('flashcards').insert({...row,owner_id:oid}).select().single();
-if(r.error)return toast(r.error.message);
-let img=e?e.img:'';if(blob){const s=await sb.storage.from('flashcard-images').createSignedUrl(ip,3600);img=s.data?s.data.signedUrl:''}
-const x={id:r.data.id,c:row.component,f,b,img,ip:ip||'',pub:r.data.published,own:own?1:0};if(e)Object.assign(e,x);else D.F.push(x);ED=null;route()})}
-const fform=(e,own)=>`${dd('fk',C,e.c||C[0])}<input id="ff" placeholder="Front / title" value="${E(e.f||'')}" style="width:100%"><textarea id="fb" placeholder="Back / answer (optional if you add an image)">${E(e.b||'')}</textarea><div><p class="lb">Formula image (optional)</p><input type="file" id="fi" accept="image/*">${e.img?'<p class="mu sm">Current image is kept unless you choose a new one.</p>':''}</div><div class="row"><button class="btn p" onclick="saveF(${own})">Save</button>${ED&&own?'<button class="btn" onclick="ED=null;route()">Cancel</button>':''}</div>`;
-function mine(){const e=D.F.find(x=>x.id==ED)||{};return `<div class="card stack"><h3>${ED?'Edit card':'New card'} <span class="mu sm">(private to you)</span></h3>${fform(e,1)}</div><div class="g" style="margin-top:16px">${D.F.filter(x=>x.own).map(x=>`<div class="card"><b>${E(x.f)}</b> ${x.img?'<span class="tag">image</span>':''}<p class="mu sm">${x.c}</p><div class="row"><button class="btn" onclick="ED='${x.id}';route()">Edit</button><button class="btn" onclick="del('F','${x.id}')">Delete</button></div></div>`).join('')||empty('You have no personal cards yet.')}</div>`}
+return bar+flip(c.fh,c.bh)+`<p class="mu sm" style="text-align:center">Card ${FC.i+1} of ${d.length} · ${c.c} · ${c.src} · ${s=='known'?'Known':s=='review'?'Need review':'Not marked'} · click the card to flip</p><div class="row" style="justify-content:center"><button class="btn" onclick="nav2(-1)">←</button><button class="btn" onclick="mark('${c.id}','review')">Need Review</button><button class="btn p" onclick="mark('${c.id}','known')">Known</button><button class="btn" onclick="nav2(1)">→</button><button class="btn" onclick="FF.so='';FC.o=sh(deck().map(x=>x.id));FC.i=0;route()">Shuffle</button></div>`}
+
+/* card editor (front and back text + a figure on each side) */
+function openCardEd(id,off){const x=id?D.F.find(c=>c.id==id):null,e=x||{c:'',f:'',b:'',img:'',fimg:''};
+openMdl({title:(x?'Edit':'New')+' card'+(off?' (official)':''),wide:1,okText:'Save',body:`<div class="field"><label>Component</label>${dd('ceC',C,e.c||FF.c||C[0])}</div><div class="field"><label>Front text / title</label><textarea id="ceF">${E(e.f)}</textarea></div>${imgField('ceFI','Front image (optional)',e.fimg)}<div class="field"><label>Back text / answer</label><textarea id="ceB">${E(e.b)}</textarea></div>${imgField('ceBI','Back image, such as a formula (optional)',e.img)}`,onOk:()=>saveCard(x,off)})}
+async function saveCard(x,off){const f=v('ceF').trim(),b=v('ceB').trim();if(!f){toast('Add text for the front');return false}
+const bf=await imgBlob($('#ceFI').files[0]),bb=await imgBlob($('#ceBI').files[0]),
+fp=bf?await putImg(bf,off):($('#ceFIR')&&$('#ceFIR').checked?'':(x?x.fip:'')),bp=bb?await putImg(bb,off):($('#ceBIR')&&$('#ceBIR').checked?'':(x?x.ip:''));
+if(!b&&!bp){toast('Add back text or a back image');return false}
+const row={component:v('ceC'),front:f,back:b,front_image_path:fp||null,image_path:bp||null},
+r=x?await sb.from('flashcards').update(row).eq('id',x.id).select().single():await sb.from('flashcards').insert({...row,owner_id:off?null:ME.id}).select().single();
+if(r.error){toast(r.error.message);return false}
+const su={};su[fp]=await sUrl(fp);su[bp]=await sUrl(bp);const n=mapF(r.data,su),i=D.F.findIndex(z=>z.id==n.id);i<0?D.F.push(n):D.F[i]=n;toast('Card saved');route()}
+async function dupCard(id){const x=D.F.find(c=>c.id==id);if(!x)return;const r=await sb.from('flashcards').insert({component:x.c,front:x.f+' (copy)',back:x.b,front_image_path:x.fip||null,image_path:x.ip||null,owner_id:x.own?ME.id:null}).select().single();if(r.error)return toast(r.error.message);D.F.push(mapF(r.data,{[x.ip]:x.img,[x.fip]:x.fimg}));toast('Card duplicated');route()}
+function mine(){const l=sortBy(D.F.filter(x=>x.own),FSORT,x=>x.f,x=>x.ts);
+return `<div class="row" style="justify-content:space-between;margin:0 0 14px"><button class="btn p" onclick="openCardEd(null,0)">＋ New card</button>${dd('msort',SORTS,FSORT,"FSORT=v;route()")}</div><div class="g">${l.map(x=>`<div class="card fr"><div class="fl" onclick="openCardEd('${x.id}',0)"><h3>${E(x.f)}</h3></div><div class="fx"><span class="tag">${x.c}</span>${x.img||x.fimg?'<span class="tag">image</span>':''}<button class="dots" onclick="toggleMenu('c_${x.id}',event)" aria-label="Card menu">⋮</button></div>${mnu('c_'+x.id,[['Edit',`openCardEd('${x.id}',0)`],['Duplicate',`dupCard('${x.id}')`],['Delete',`showConfirm('Delete card','Delete this card?',()=>del('F','${x.id}'))`,1]])}</div>`).join('')||empty('You have no personal cards yet.')}</div>`}
 V.cards=()=>hd('Flashcards','Study cards made from the question bank, plus official, formula and your own cards.')+`<div class="w sec"><div class="tabs">${[['s','Study'],['m','My Cards']].map(([k,n])=>`<a class="${FT==k?'on':''}" onclick="FT='${k}';route()">${n}</a>`).join('')}</div>${FT=='s'?study():mine()}</div>`;
 
+/* ===== FIGURES (images for questions, explanations and cards) ===== */
+function imgBlob(f){return new Promise((res,rej)=>{if(!f)return res(null);const r=new FileReader();r.onerror=()=>rej(new Error('Could not read that image'));r.onload=()=>{const i=new Image();i.onerror=()=>rej(new Error('That file is not a readable image'));
+i.onload=()=>{const k=Math.min(1,1400/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=Math.round(i.width*k);c.height=Math.round(i.height*k);const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(i,0,0,c.width,c.height);c.toBlob(b=>b?res(b):rej(new Error('Image conversion failed')),'image/jpeg',.85)};i.src=r.result};r.readAsDataURL(f)})}
+async function putImg(blob,off){if(!blob)return '';const p=(off?'official':ME.id)+'/'+crypto.randomUUID()+'.jpg',u=await sb.storage.from('flashcard-images').upload(p,blob,{contentType:'image/jpeg'});if(u.error)throw u.error;return p}
+async function sUrl(p){if(!p)return '';const s=await sb.storage.from('flashcard-images').createSignedUrl(p,3600);return s.data?s.data.signedUrl:''}
+const imgField=(id,label,cur)=>`<div class="field"><label>${label}</label><input type="file" id="${id}" accept="image/*">${cur?`<div class="row" style="margin:6px 0 0"><img src="${cur}" alt="" style="height:54px;border-radius:4px;border:1px solid var(--bd)"><label class="sm"><input type="checkbox" id="${id}R"> Remove current image</label></div>`:''}</div>`;
+
+/* ===== QUESTION EDITOR (admin: official questions, students: their own) ===== */
+const fq=id=>OQ.find(x=>x.id==id)||D.MQ.find(x=>x.id==id);
+function openQEd(id,off){const x=id?fq(id):null,e=x||{c:'',s:'',t:'',q:'',o:['','','',''],a:0,e:'',d:'Medium',st:'Verified',src:'',pub:1,qi:'',ei:''},all=[...OQ,...D.MQ],
+sl=[...new Set(all.map(q=>q.s))].sort(cmp),tl=[...new Set(all.map(q=>q.t))].sort(cmp);
+openMdl({title:(x?'Edit':'Add')+' question'+(off?' (official)':''),wide:1,okText:'Save',body:`<datalist id="dsl">${sl.map(s=>`<option value="${E(s)}">`).join('')}</datalist><datalist id="dtl">${tl.map(s=>`<option value="${E(s)}">`).join('')}</datalist>
+<div class="g2"><div class="field"><label>Component</label>${dd('qeC',C,e.c||QS.c||C[0])}</div><div class="field"><label>Subject</label><input id="qeS" list="dsl" value="${E(e.s)}"></div><div class="field"><label>Topic</label><input id="qeT" list="dtl" value="${E(e.t)}"></div></div>
+<div class="field"><label>Question</label><textarea id="qeQ">${E(e.q)}</textarea></div>${imgField('qeQI','Figure for the question (optional)',e.qi)}
+<div class="g2">${[0,1,2,3].map(i=>`<div class="field"><label>Choice ${'ABCD'[i]}</label><input id="qeO${i}" value="${E(e.o[i])}"></div>`).join('')}</div>
+<div class="g2"><div class="field"><label>Correct answer</label>${dd('qeK',[0,1,2,3].map(i=>[i,'ABCD'[i]]),e.a)}</div><div class="field"><label>Difficulty</label>${dd('qeD',['Easy','Medium','Hard'],e.d||'Medium')}</div></div>
+<div class="field"><label>Explanation / solution</label><textarea id="qeE">${E(e.e)}</textarea></div>${imgField('qeEI','Figure for the explanation (optional)',e.ei)}
+${off?`<div class="g2"><div class="field"><label>Source</label><input id="qeR" value="${E(e.src)}"></div><div class="field"><label>Status</label>${dd('qeX',['Verified','Needs Review'],/need/i.test(e.st)?'Needs Review':'Verified')}</div></div><label class="sm"><input type="checkbox" id="qeP" ${e.pub?'checked':''}> Published (visible to students)</label>`:''}`,onOk:()=>saveQ(x,off)})}
+async function saveQ(x,off){const o=[0,1,2,3].map(i=>v('qeO'+i).trim()),q=v('qeQ').trim(),s=v('qeS').trim(),t=v('qeT').trim();if(!q||!s||!t||o.some(z=>!z)){toast('Fill in subject, topic, question and all 4 choices');return false}
+const row={component:v('qeC'),subject:s,topic:t,question:q,choice_a:o[0],choice_b:o[1],choice_c:o[2],choice_d:o[3],correct_answer:'ABCD'[+v('qeK')],explanation:v('qeE').trim(),difficulty:v('qeD')};
+if(off){row.source=v('qeR').trim()||null;row.verification_status=v('qeX');row.published=$('#qeP').checked}
+const bq=await imgBlob($('#qeQI').files[0]),be=await imgBlob($('#qeEI').files[0]);
+row.question_image=bq?await putImg(bq,off):($('#qeQIR')&&$('#qeQIR').checked?null:(x&&x.qp)||null);
+row.explanation_image=be?await putImg(be,off):($('#qeEIR')&&$('#qeEIR').checked?null:(x&&x.ep)||null);
+const r=x?await sb.from('questions').update(row).eq('id',x.id).select().single():await sb.from('questions').insert({...row,owner_id:off?null:ME.id}).select().single();
+if(r.error){toast(r.error.message);return false}
+const n=dbq(r.data);n.qi=await sUrl(n.qp);n.ei=await sUrl(n.ep);const arr=off?OQ:D.MQ,i=arr.findIndex(z=>z.id==n.id);i<0?arr.push(n):arr[i]=n;toast('Question saved');route()}
+function prevQ(id){const x=fq(id);if(!x)return;openMdl({title:'Question preview',wide:1,noCancel:1,okText:'Close',body:`<p class="qt">${E(x.q)}</p>${fig(x.qi)}${x.o.map((o,j)=>`<div class="opt ${j==x.a?'ok':''}">${'ABCD'[j]}. ${E(o)}</div>`).join('')}<div class="exp">${E(x.e||'No explanation.')}${fig(x.ei)}</div>`})}
+async function dupQ(id){const x=fq(id);if(!x)return;const r=await sb.from('questions').insert({component:x.c,subject:x.s,topic:x.t,question:x.q,choice_a:x.o[0],choice_b:x.o[1],choice_c:x.o[2],choice_d:x.o[3],correct_answer:'ABCD'[x.a],explanation:x.e,difficulty:x.d,source:x.src||null,verification_status:x.st||null,published:true,question_image:x.qp||null,explanation_image:x.ep||null,owner_id:x.own?ME.id:null}).select().single();
+if(r.error)return toast(r.error.message);const n=dbq(r.data);n.qi=x.qi;n.ei=x.ei;(x.own?D.MQ:OQ).push(n);toast('Question duplicated');route()}
+async function setQ(id,patch,loc){const x=fq(id);if(!x)return;const r=await sb.from('questions').update(patch).eq('id',id);if(r.error)return toast(r.error.message);Object.assign(x,loc);route()}
+
+/* ===== CSV IMPORT / TEMPLATE (admin: official, students: their own) ===== */
+async function impCsv(el,own){const f=el.files[0];el.value='';if(!f)return;if(!own&&role!='admin')return toast('Admins only');const rows=[];
+csv((await f.text()).replace(/^\uFEFF/,'')).slice(1).filter(r=>r.length>=14).forEach(r=>{const x=r.length-14,g=i=>(r[i<9?i:i+x]||'').trim(),a=g(9).toUpperCase();/* rows with 2 extra columns are auto-repaired */
+if(a.length!=1||!'ABCD'.includes(a)||!C.includes(g(1).toUpperCase()))return;rows.push({question_number:+g(0)||null,component:g(1).toUpperCase(),subject:g(2),topic:g(3),question:g(4),choice_a:g(5),choice_b:g(6),choice_c:g(7),choice_d:g(8),correct_answer:a,explanation:g(10),difficulty:g(11),source:g(12),verification_status:g(13),owner_id:own?ME.id:null})});
+if(!rows.length)return toast('No valid rows found. Use the template for the right columns.');
+showConfirm('Import questions','Add '+rows.length+' '+(own?'personal':'official')+' questions?',async()=>{for(let i=0;i<rows.length;i+=100){const r=await sb.from('questions').insert(rows.slice(i,i+100));if(r.error)throw r.error}toast('Added '+rows.length+' questions');await load();route()})}
+function dlTemplate(){saveBlob(new Blob(['question_number,component,subject,topic,question,choice_a,choice_b,choice_c,choice_d,correct_answer,explanation,difficulty,source,verification_status\n1,MSTC,Algebra,Age Problems,"Sample question text?",10,20,30,40,B,"Explanation text.",Easy,My notes,Verified\n'],{type:'text/csv'}),'questions-template.csv')}
+
 /* ===== MY QUESTIONS ===== */
-async function addQ(off){const o=[0,1,2,3].map(i=>v('o'+i).trim()),q=v('mq').trim(),s=v('ms').trim(),t=v('mt').trim();if(!q||!s||!t||o.some(x=>!x))return toast('Fill in subject, topic, question and all 4 choices');
-const r=await sb.from('questions').insert({component:v('mc'),subject:s,topic:t,question:q,choice_a:o[0],choice_b:o[1],choice_c:o[2],choice_d:o[3],correct_answer:'ABCD'[+v('ma')],explanation:v('me').trim(),owner_id:off?null:ME.id}).select().single();
-if(r.error)return toast(r.error.message);const x=dbq(r.data);off?OQ.push(x):D.MQ.push(x);toast('Question added');route()}
-const qform=off=>`<div class="card stack">${dd('mc',C,C[0])}<div class="row"><input id="ms" placeholder="Subject" list="sl"><input id="mt" placeholder="Topic"></div><datalist id="sl">${[...new Set(allQ().map(x=>x.s))].map(s=>`<option value="${E(s)}">`).join('')}</datalist><textarea id="mq" placeholder="Question"></textarea>${[0,1,2,3].map(i=>`<input id="o${i}" placeholder="Choice ${'ABCD'[i]}" style="width:100%">`).join('')}<div class="row">${dd('ma',[0,1,2,3].map(i=>[i,'Correct: '+'ABCD'[i]]),0)}</div><textarea id="me" placeholder="Explanation / solution"></textarea><button class="btn p" onclick="addQ(${off})">Add question</button></div>`;
-V.myq=()=>hd('My Questions','Add your own questions. They are private and appear in your quizzes.')+`<div class="w sec stack">${qform(0)}${D.MQ.map(x=>`<div class="card"><p class="mu sm">${x.c} › ${E(x.s)} › ${E(x.t)}</p><p>${E(x.q)}</p><a class="lk" onclick="del('MQ','${x.id}')">Delete</a></div>`).join('')}</div>`;
+let MQF={q:'',so:'az'};
+V.myq=()=>{const l=sortBy(D.MQ.filter(x=>!MQF.q||(x.q+' '+x.s+' '+x.t).toLowerCase().includes(MQF.q.toLowerCase())),MQF.so,x=>x.q,x=>x.ts);
+return hd('My Questions','Your own questions are private. They appear in quizzes and flashcards when you choose “My questions”.')+`<div class="w sec stack"><div class="row" style="margin:0;justify-content:space-between"><div class="row" style="margin:0"><button class="btn p" onclick="openQEd(null,0)">＋ Add question</button><label class="btn">↑ Import CSV<input type="file" accept=".csv" hidden onchange="impCsv(this,1)"></label><a class="lk sm" onclick="dlTemplate()">CSV template</a></div><div class="row" style="margin:0"><input id="mqs" placeholder="Search…" value="${E(MQF.q)}" oninput="MQF.q=this.value;route();const i=$('#mqs');i.focus();i.setSelectionRange(99,99)">${dd('mqo',SORTS,MQF.so,"MQF.so=v;route()")}</div></div>
+<div class="g">${l.map(x=>`<div class="card fr"><div class="fl" onclick="openQEd('${x.id}',0)"><span class="qtx">${E(x.q.slice(0,90))}${x.q.length>90?'…':''}</span></div><div class="fx"><span class="tag">${x.c}</span><button class="dots" onclick="toggleMenu('mq_${x.id}',event)" aria-label="Question menu">⋮</button></div><p class="mu sm fd">${E(x.s)} › ${E(x.t)}</p>${mnu('mq_'+x.id,[['Edit',`openQEd('${x.id}',0)`],['Preview',`prevQ('${x.id}')`],['Duplicate',`dupQ('${x.id}')`],['Delete',`showConfirm('Delete question','Delete this question?',()=>del('MQ','${x.id}'))`,1]])}</div>`).join('')||empty('You have not added any questions yet.')}</div></div>`};
 
 /* ===== ADMIN ===== */
-let AT='o';
+let AT='o',AQ={c:'',s:'',t:'',d:'',x:'',p:'',so:'num',q:'',pg:0},QSEL=new Set(),AC={c:'',q:'',so:'az'},CSEL=new Set(),AUS={q:'',so:'az'};
+const PER=20,isNR=x=>/need/i.test(x.st);
+function aqList(){const q=AQ.q.toLowerCase(),l=OQ.filter(x=>(!AQ.c||x.c==AQ.c)&&(!AQ.s||x.s==AQ.s)&&(!AQ.t||x.t==AQ.t)&&(!AQ.d||x.d==AQ.d)&&(!AQ.x||(AQ.x=='nr')==isNR(x))&&(!AQ.p||(AQ.p=='h')==!x.pub)&&(!q||(x.q+' '+x.s+' '+x.t).toLowerCase().includes(q)));
+return l.sort(AQ.so=='az'?(a,b)=>cmp(a.q,b.q):AQ.so=='sub'?(a,b)=>cmp(a.s+' '+a.t,b.s+' '+b.t):AQ.so=='new'?(a,b)=>b.ts-a.ts:(a,b)=>cmp(a.c,b.c)||cmp(a.s,b.s)||((a.n||0)-(b.n||0)))}
+const aqRst="AQ.pg=0;route()";
+function aqBar(){const b=OQ.filter(x=>!AQ.c||x.c==AQ.c),sj=[...new Set(b.map(x=>x.s))].sort(cmp),tp=[...new Set(b.filter(x=>!AQ.s||x.s==AQ.s).map(x=>x.t))].sort(cmp);
+return `<div class="bar">${dd('aqC',[['','All components'],...C],AQ.c,"AQ.c=v;AQ.s='';AQ.t='';"+aqRst)}${dd('aqS',[['','All subjects'],...sj],AQ.s,"AQ.s=v;AQ.t='';"+aqRst)}${dd('aqT',[['','All topics'],...tp],AQ.t,"AQ.t=v;"+aqRst)}${dd('aqD',[['','Any difficulty'],'Easy','Medium','Hard'],AQ.d,"AQ.d=v;"+aqRst)}${dd('aqX',[['','Any status'],['ok','Verified'],['nr','Needs review']],AQ.x,"AQ.x=v;"+aqRst)}${dd('aqP',[['','Published and hidden'],['v','Published only'],['h','Hidden only']],AQ.p,"AQ.p=v;"+aqRst)}${dd('aqO',[['num','Question number'],['az','Question A → Z'],['sub','Subject / topic A → Z'],['new','Newest first']],AQ.so,"AQ.so=v;"+aqRst)}<input id="aqq" placeholder="Search questions…" value="${E(AQ.q)}" oninput="AQ.q=this.value;AQ.pg=0;route();const i=$('#aqq');i.focus();i.setSelectionRange(99,99)"></div>`}
+function qSel(id){QSEL.has(id)?QSEL.delete(id):QSEL.add(id);route()}
+const qIds=()=>[...QSEL].filter(id=>OQ.some(x=>x.id==id));
+async function qBulk(a){const ids=qIds();if(!ids.length)return toast('Select questions first');
+const chunks=async fn=>{for(let i=0;i<ids.length;i+=50){const r=await fn(ids.slice(i,i+50));if(r.error)throw r.error}};
+if(a=='del')return showConfirm('Delete questions','Delete '+ids.length+' question(s) permanently?',async()=>{await chunks(c=>sb.from('questions').delete().in('id',c));OQ=OQ.filter(x=>!ids.includes(x.id));QSEL.clear();toast('Deleted');route()});
+if(a=='mv')return openMdl({title:'Move '+ids.length+' question(s)',okText:'Move',body:`<div class="g2"><div class="field"><label>Component</label>${dd('bmC',[['','Keep as is'],...C],'')}</div><div class="field"><label>Subject</label><input id="bmS" placeholder="Keep as is"></div><div class="field"><label>Topic</label><input id="bmT" placeholder="Keep as is"></div></div>`,
+onOk:async()=>{const p={},c=v('bmC'),s=v('bmS').trim(),t=v('bmT').trim();if(c)p.component=c;if(s)p.subject=s;if(t)p.topic=t;if(!Object.keys(p).length){toast('Choose something to change');return false}
+await chunks(k=>sb.from('questions').update(p).in('id',k));OQ.forEach(x=>{if(ids.includes(x.id)){if(c)x.c=c;if(s)x.s=s;if(t)x.t=t}});toast('Moved');route()}});
+const m={pub:[{published:true},{pub:1}],hide:[{published:false},{pub:0}],ver:[{verification_status:'Verified'},{st:'Verified'}],nr:[{verification_status:'Needs Review'},{st:'Needs Review'}]}[a];
+await chunks(k=>sb.from('questions').update(m[0]).in('id',k));OQ.forEach(x=>{if(ids.includes(x.id))Object.assign(x,m[1])});toast('Updated '+ids.length+' question(s)');route()}
+const aqRow=x=>{const on=QSEL.has(x.id);return `<div class="card fr ${on?'selected':''}"><label class="fl"><input type="checkbox" class="selbox" ${on?'checked':''} onchange="qSel('${x.id}')"><span class="qtx"><b>${x.n?'#'+x.n+' · ':''}</b>${E(x.q.slice(0,120))}${x.q.length>120?'…':''}</span></label><div class="fx"><span class="tag">${x.c}</span><span class="tag">${E(x.s)}</span>${x.pub?'':'<span class="tag">Hidden</span>'}${isNR(x)?'<span class="tag">Needs review</span>':''}${x.qi||x.ei?'<span class="tag">figure</span>':''}<button class="dots" onclick="toggleMenu('aq_${x.id}',event)" aria-label="Question menu">⋮</button></div>${mnu('aq_'+x.id,[['Edit',`openQEd('${x.id}',1)`],['Preview',`prevQ('${x.id}')`],['Duplicate',`dupQ('${x.id}')`],[x.pub?'Hide from students':'Publish',`setQ('${x.id}',{published:${!x.pub}},{pub:${x.pub?0:1}})`],[isNR(x)?'Mark as verified':'Mark as needs review',`setQ('${x.id}',{verification_status:'${isNR(x)?'Verified':'Needs Review'}'},{st:'${isNR(x)?'Verified':'Needs Review'}'})`],['Delete',`showConfirm('Delete question','Delete this question permanently?',()=>qDel('${x.id}'))`,1]])}</div>`};
+async function qDel(id){const r=await sb.from('questions').delete().eq('id',id);if(r.error)return toast(r.error.message);OQ=OQ.filter(x=>x.id!=id);QSEL.delete(id);route()}
+const pager=(n,pg,fn)=>n>PER?`<div class="pgn"><button class="btn" ${pg?'':'disabled'} onclick="${fn}(-1)">← Prev</button><span class="mu sm">${pg*PER+1}–${Math.min(n,(pg+1)*PER)} of ${n}</span><button class="btn" ${(pg+1)*PER<n?'':'disabled'} onclick="${fn}(1)">Next →</button></div>`:'';
+function aqPage(d){AQ.pg=Math.max(0,AQ.pg+d);route()}
+function aqQ(){const l=aqList(),pg=Math.min(AQ.pg,Math.max(0,Math.ceil(l.length/PER)-1)),rows=l.slice(pg*PER,(pg+1)*PER),nr=OQ.filter(isNR).length;AQ.pg=pg;
+return `<div class="row" style="margin:0 0 12px;justify-content:space-between"><div class="row" style="margin:0"><button class="btn p" onclick="openQEd(null,1)">＋ Add question</button><label class="btn">↑ Import CSV<input type="file" accept=".csv" hidden onchange="impCsv(this,0)"></label><a class="lk sm" onclick="dlTemplate()">CSV template</a></div><span class="mu sm">${OQ.length} official questions${nr?' · '+nr+' need review':''}</span></div>${aqBar()}
+${QSEL.size?`<div class="selbar"><b>${QSEL.size} selected</b><a class="lk sm" onclick="aqList().forEach(x=>QSEL.add(x.id));route()">Select all ${l.length} filtered</a><a class="lk sm" onclick="QSEL.clear();route()">Clear</a><span class="sp"></span><button class="btn" onclick="qBulk('pub')">Publish</button><button class="btn" onclick="qBulk('hide')">Hide</button><button class="btn" onclick="qBulk('ver')">Mark verified</button><button class="btn" onclick="qBulk('mv')">Move…</button><button class="btn" onclick="qBulk('del')">Delete</button></div>`:`<p class="mu sm" style="margin:0 0 8px">Tick questions to select several at once.</p>`}
+<div class="stack" style="margin-top:12px">${rows.map(aqRow).join('')||empty('No questions match these filters.')}</div>${pager(l.length,pg,'aqPage')}`}
+
+/* official cards */
+const acList=()=>sortBy(D.F.filter(x=>!x.own&&(!AC.c||x.c==AC.c)&&(!AC.q||(x.f+' '+x.b).toLowerCase().includes(AC.q.toLowerCase()))),AC.so,x=>x.f,x=>x.ts);
+function cSel(id){CSEL.has(id)?CSEL.delete(id):CSEL.add(id);route()}
+async function cBulk(a){const ids=[...CSEL].filter(id=>D.F.some(x=>x.id==id));if(!ids.length)return toast('Select cards first');
+if(a=='del')return showConfirm('Delete cards','Delete '+ids.length+' card(s)?',async()=>{const r=await sb.from('flashcards').delete().in('id',ids);if(r.error)throw r.error;D.F=D.F.filter(x=>!ids.includes(x.id));CSEL.clear();toast('Deleted');route()});
+const p=a=='pub';const r=await sb.from('flashcards').update({published:p}).in('id',ids);if(r.error)return toast(r.error.message);D.F.forEach(x=>{if(ids.includes(x.id))x.pub=p});toast('Updated');route()}
 async function pub(id){const x=D.F.find(x=>x.id==id),r=await sb.from('flashcards').update({published:!x.pub}).eq('id',id);if(r.error)return toast(r.error.message);x.pub=!x.pub;route()}
-async function impCsv(el){const f=el.files[0];if(!f)return;const rows=[];
-csv((await f.text()).replace(/^\uFEFF/,'')).slice(1).filter(r=>r.length>=14).forEach(r=>{const x=r.length-14,g=i=>(r[i<9?i:i+x]||'').trim(),a=g(9).toUpperCase();/* rows with 2 extra columns are auto-repaired */
-if(a.length!=1||!'ABCD'.includes(a))return;rows.push({question_number:+g(0)||null,component:g(1).toUpperCase(),subject:g(2),topic:g(3),question:g(4),choice_a:g(5),choice_b:g(6),choice_c:g(7),choice_d:g(8),correct_answer:a,explanation:g(10),difficulty:g(11),source:g(12),verification_status:g(13),owner_id:null})});
-if(!rows.length)return toast('No valid rows found. Check the columns.');if(!confirm('Add '+rows.length+' official questions?'))return;
-for(let i=0;i<rows.length;i+=100){const r=await sb.from('questions').insert(rows.slice(i,i+100));if(r.error)return toast(r.error.message)}
-toast('Added '+rows.length+' questions');await load();route()}
+function aqCards(){const l=acList();return `<div class="row" style="margin:0 0 12px;justify-content:space-between"><button class="btn p" onclick="openCardEd(null,1)">＋ New official card</button><div class="row" style="margin:0">${dd('acC',[['','All components'],...C],AC.c,"AC.c=v;route()")}<input id="acq" placeholder="Search…" value="${E(AC.q)}" oninput="AC.q=this.value;route();const i=$('#acq');i.focus();i.setSelectionRange(99,99)">${dd('acO',SORTS,AC.so,"AC.so=v;route()")}</div></div>
+${CSEL.size?`<div class="selbar"><b>${CSEL.size} selected</b><a class="lk sm" onclick="acList().forEach(x=>CSEL.add(x.id));route()">Select all ${l.length}</a><a class="lk sm" onclick="CSEL.clear();route()">Clear</a><span class="sp"></span><button class="btn" onclick="cBulk('pub')">Publish</button><button class="btn" onclick="cBulk('hide')">Hide</button><button class="btn" onclick="cBulk('del')">Delete</button></div>`:''}
+<div class="stack" style="margin-top:12px">${l.map(x=>{const on=CSEL.has(x.id);return `<div class="card fr ${on?'selected':''}"><label class="fl"><input type="checkbox" class="selbox" ${on?'checked':''} onchange="cSel('${x.id}')"><span class="qtx">${E(x.f.slice(0,100))}</span></label><div class="fx"><span class="tag">${x.c}</span>${x.pub?'':'<span class="tag">Hidden</span>'}${x.img||x.fimg?'<span class="tag">figure</span>':''}<button class="dots" onclick="toggleMenu('ac_${x.id}',event)" aria-label="Card menu">⋮</button></div>${mnu('ac_'+x.id,[['Edit',`openCardEd('${x.id}',1)`],['Duplicate',`dupCard('${x.id}')`],[x.pub?'Hide':'Publish',`pub('${x.id}')`],['Delete',`showConfirm('Delete card','Delete this card?',()=>del('F','${x.id}'))`,1]])}</div>`}).join('')||empty('No official cards yet.')}</div>`}
+
 const AD={
 o:()=>`<div class="g">${[['Users',D.U.length],['Official questions',OQ.length],['Folders',D.FO.length],['Folder items',D.M.length],['Official flashcards',D.F.filter(x=>!x.own).length]].map(([n,x])=>`<div class="card art stat"><b>${x}</b><span class="mu sm">${n}</span></div>`).join('')}</div>`,
-u:()=>`<table><tr><th>Name</th><th>Role</th><th>Joined</th></tr>${D.U.map(u=>`<tr><td>${E(u.display_name||'')}</td><td>${u.role}</td><td class="mu sm">${new Date(u.created_at).toLocaleDateString()}</td></tr>`).join('')}</table><p class="mu sm">To change someone's role, edit the profiles table in Supabase (Table Editor).</p>`,
-f:()=>`<div class="card stack"><h3>New official card</h3>${fform({},0)}</div><table>${D.F.filter(x=>!x.own).map(x=>`<tr><td>${E(x.f)} ${x.img?'🖼':''}</td><td class="mu sm">${x.c}</td><td><a class="lk" onclick="pub('${x.id}')">${x.pub?'Published':'Hidden'}</a></td><td><a class="lk" onclick="del('F','${x.id}')">Delete</a></td></tr>`).join('')}</table>`,
-q:()=>{const m={};OQ.forEach(x=>{const k=x.c+' › '+x.s+' › '+x.t;m[k]=(m[k]||0)+1});const fl=OQ.filter(x=>/need/i.test(x.st)).length;
-return `<div class="card stack"><h3>Official questions: ${OQ.length}</h3><p class="mu sm">Add one below, or import a CSV with the same columns as before. New questions show up for everyone right away.</p><div><p class="lb">Import CSV</p><input type="file" accept=".csv" onchange="impCsv(this)"></div>${fl?`<p class="sm">${fl} question(s) are marked "Needs Review".</p>`:''}</div><h3 style="margin-top:18px">Add one official question</h3>${qform(1)}<table>${Object.entries(m).map(([k,n])=>`<tr><td>${E(k)}</td><td>${n}</td></tr>`).join('')}</table>`}};
+u:()=>{const l=sortBy(D.U.filter(u=>!AUS.q||(u.display_name||'').toLowerCase().includes(AUS.q.toLowerCase())),AUS.so,u=>u.display_name||'',u=>T0(u.created_at));
+return `<div class="row" style="margin:0 0 12px"><input id="aus" placeholder="Search users…" value="${E(AUS.q)}" oninput="AUS.q=this.value;route();const i=$('#aus');i.focus();i.setSelectionRange(99,99)">${dd('auo',SORTS,AUS.so,"AUS.so=v;route()")}</div><table><tr><th>Name</th><th>Role</th><th>Joined</th></tr>${l.map(u=>`<tr><td>${E(u.display_name||'')}</td><td>${u.role}</td><td class="mu sm">${new Date(u.created_at).toLocaleDateString()}</td></tr>`).join('')}</table><p class="mu sm">To change someone's role, edit the profiles table in Supabase (Table Editor).</p>`},
+f:aqCards,q:aqQ};
 V.admin=()=>hd('Admin Dashboard','Manage official content. Security is enforced by the database rules (RLS).')+`<div class="w sec"><div class="tabs">${[['o','Overview'],['u','Users'],['f','Official cards'],['q','Questions']].map(([k,n])=>`<a class="${AT==k?'on':''}" onclick="AT='${k}';route()">${n}</a>`).join('')}</div>${AD[AT]()}</div>`;
 
 /* ===== MENU, TOP BAR, LOGIN, ROUTER ===== */
-const drawer=()=>{const a=(h,t)=>`<a onclick="dr(0);${h}">${t}</a>`;return a("go('dash')",'Dashboard')+a("go('quiz')",'Quiz')+a("go('hist')",'Quiz History')+`<p class="dl">Components</p>`+C.map(c=>a(`go('c/${c}')`,c)).join('')+`<p class="dl">Study</p>`+a("FF={c:'',k:''};go('cards')",'Flashcards')+a("FF={c:'',k:'img'};go('cards')",'Formula Cards')+a("go('myq')",'My Questions')+(role=='admin'?`<p class="dl">Admin</p>`+a("go('admin')",'Admin Dashboard'):'')+`<p class="dl"></p>`+a("out()",'Log out')};
+const drawer=(n,a)=>{const cur=n=='f'?(D.FO.find(x=>x.id==a)||{}).c:a,lnk=(h,t,on)=>`<a${on?' class="on"':''} onclick="dr(0);${h}">${t}</a>`;
+return lnk("go('dash')",'Dashboard',n=='dash')+lnk("go('quiz')",'Quiz',n=='quiz')+lnk("go('hist')",'Quiz History',n=='hist')+`<p class="dl">Components</p>`+C.map(c=>lnk(`go('c/${c}')`,c,(n=='c'||n=='f')&&cur==c)).join('')+`<p class="dl">Study</p>`+lnk("FF={c:'',k:''};go('cards')",'Flashcards',n=='cards'&&FF.k!='img')+lnk("FF={c:'',k:'img'};go('cards')",'Formula Cards',n=='cards'&&FF.k=='img')+lnk("go('myq')",'My Questions',n=='myq')+(role=='admin'?`<p class="dl">Admin</p>`+lnk("go('admin')",'Admin Dashboard',n=='admin'):'')+`<p class="dl"></p>`+lnk("out()",'Log out',false)};
 const tbar=()=>ME?`<span class="sm mu" style="white-space:nowrap">${E(PR&&PR.display_name||'')} <span class="tag">${role}</span></span>`:`<button class="btn" onclick="AU.mode='in';AU.msg='';go('auth')">Log in</button> <button class="btn p" onclick="AU.mode='up';AU.msg='';go('auth')">Sign up</button>`;
 function out(){sb.auth.signOut()}
 V.auth=()=>{const m=AU.mode,T={in:'Log in',up:'Create account',reset:'Reset password',newpw:'Set a new password'};
@@ -559,7 +699,7 @@ if(!ME&&!['home','auth'].includes(n))n='auth';
 if(ME&&n=='auth'&&AU.mode!='newpw')n='dash';
 if(n=='admin'&&role!='admin'){toast('Admins only');n='dash'}
 const ap=$('#app');ap.innerHTML=V[n](a);if(nv){ap.className='';void ap.offsetWidth;ap.className='in';nv=0}
-$('#tb').innerHTML=tbar();$('#dr').innerHTML=ME?drawer():'';$('#bg').style.display=ME?'':'none';
+$('#tb').innerHTML=tbar();$('#dr').innerHTML=ME?drawer(n,a):'';syncTheme();$('#bg').style.display=ME?'':'none';
 renderFab();
 renderCustomConfirm();
 renderFileViewer();
@@ -570,7 +710,7 @@ addEventListener('keydown',e=>{if(e.key=='Enter'&&location.hash=='#/auth'&&e.tar
 sb.auth.onAuthStateChange((ev,s)=>setTimeout(async()=>{
 if(ev=='PASSWORD_RECOVERY')AU.mode='newpw';
 ME=s&&s.user||null;
-if(!ME){CU=null;D={FO:[],M:[],F:[],MQ:[],U:[]};P={h:[],q:{},fc:{},bm:[]};OQ=[];PR=null;role='student';QZ=null;QL=1;if(ev=='SIGNED_OUT')go('home');else route();return}
+if(!ME){CU=null;D={FO:[],M:[],F:[],MQ:[],U:[]};P={h:[],q:{},fc:{},bm:[],op:{}};OQ=[];PR=null;role='student';QZ=null;QL=1;if(ev=='SIGNED_OUT')go('home');else route();return}
 if(ME.id!=CU){CU=ME.id;QL=0;route();await load();QL=1}
 if(AU.mode=='newpw')go('auth');else if(location.hash=='#/auth')go('dash');else route()},0));
 route();
