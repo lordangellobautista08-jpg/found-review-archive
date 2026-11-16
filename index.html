@@ -169,6 +169,40 @@ footer{border-top:1px solid var(--bd);padding:22px 0;color:var(--mu);font-size:.
   background: var(--soft);
   color: var(--ink);
 }
+/* ===== ADDED: mastery ring ===== */
+@property --p{syntax:'<number>';inherits:false;initial-value:0}
+@keyframes ringin{from{--p:0}}
+.ring{--p:0;width:92px;height:92px;flex:none;border-radius:50%;background:conic-gradient(var(--teal) calc(var(--p)*1%),var(--soft) 0);display:grid;place-items:center;animation:ringin .8s ease-out}
+.ring span{width:70px;height:70px;border-radius:50%;background:#fff;display:grid;place-items:center;font-weight:700;font-size:1.15rem;color:var(--ink)}
+.mrow{display:flex;align-items:center;gap:14px}.mrow small{display:block;color:var(--mu);font-size:.85rem}
+/* ===== ADDED: quiz history rows ===== */
+.hrow{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;flex-wrap:wrap}
+.hl,.hr{display:flex;flex-direction:column;gap:2px}.hr{align-items:flex-end;text-align:right;gap:8px}
+.hscore{font-size:1.4rem;font-weight:700;line-height:1.1;color:var(--ink)}.hscore small{font-size:.85rem;font-weight:500}
+/* ===== ADDED: folder and file rows, popup menus ===== */
+.fr{position:relative;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px}
+.fl{display:flex;align-items:center;gap:10px;cursor:pointer;flex:1;min-width:0}
+.fl h3{margin:0;font-size:1rem;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fx{display:flex;align-items:center;gap:8px}.fx .star{margin-left:0}
+.fd{flex-basis:100%;margin:0}.g.list .fd{display:none}
+.dots{border:0;background:transparent;font-size:1.2rem;cursor:pointer;padding:2px 8px;color:var(--tx)}
+.pop{position:absolute;right:12px;top:42px;background:#fff;border:1px solid var(--bd);box-shadow:0 4px 16px #0002;border-radius:var(--r);z-index:20;padding:6px 0;min-width:150px}
+.pop a{display:block;padding:8px 14px;font-size:.9rem;cursor:pointer}.pop a:hover{background:var(--soft)}.pop a.dng{color:#d9534f}
+.fm-card.viewer{max-width:1000px;height:90vh;display:flex;flex-direction:column;padding:16px}
+.vh{display:flex;justify-content:space-between;align-items:center;gap:10px;border-bottom:1px solid var(--bd);padding-bottom:10px;margin-bottom:10px}
+.vh h2{font-size:1.1rem;margin:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vb{flex:1;overflow:auto;background:var(--bg2);border-radius:var(--r);display:flex;align-items:center;justify-content:center}.vb img{max-width:100%;max-height:100%;object-fit:contain}
+/* custom dropdown fits forms and modals */
+.stack>.custom-dropdown,.field .custom-dropdown{display:block;width:100%}
+.custom-option.sel{background:var(--soft)}
+/* ===== ADDED: mobile only: pinned, smaller footer ===== */
+@media(max-width:600px){
+body{padding-bottom:34px}
+footer{position:fixed;left:0;right:0;bottom:0;z-index:15;padding:7px 0;font-size:.68rem;background-color:#fffffff2;background-size:70px}
+footer .w{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#fabRoot{bottom:50px}
+.hr{align-items:flex-start;text-align:left}
+}
 </style>
 </head>
 <body>
@@ -190,384 +224,96 @@ sh=a=>[...a].sort(()=>Math.random()-.5),mmss=s=>Math.floor(s/60)+':'+String(s%60
 go=h=>{if(location.hash=='#/'+h)route();else location.hash='#/'+h},
 CD={MSTC:'Mathematics, Surveying and Transportation Engineering.',HPGE:'Hydraulics and Geotechnical Engineering.',PSAD:'Structural Analysis and Design.'};
 let D={FO:[],M:[],F:[],MQ:[],U:[]},P={h:[],q:{},fc:{},bm:[]},role='student',nv=0,tk,QL=0,OQ=[],ME=null,PR=null,CU=null,AU={mode:'in',msg:''};
-let folderView='grid';
-let fabOpen=false,fabMode='folder',fabComponent='',fabDestination='';
-let activeMenu = null;
-/* ===== CUSTOM CONFIRMATION MODAL STATE ===== */
-let confirmModalState = null; // { title, message, onYes }
+/* ===== UI CORE: modals, custom dropdown, menus ===== */
+let folderView='grid',activeMenu=null,viewerFile=null,MD=null,FQ='';
+let fab={open:false,mode:'upload',c:'',d:'',busy:false};
 
-  // Native File Viewer State
-let viewerFile = null; // { title, url, type }
+/* one reusable modal: confirm, prompt, info and custom bodies */
+function openMdl(m){MD=m;renderCustomConfirm();setTimeout(()=>{const i=$('#mdlIn');if(i){i.focus();i.select()}},0)}
+function closeMdl(){MD=null;renderCustomConfirm()}
+function mdlOk(){const r=MD&&MD.onOk?MD.onOk():0;if(r===false)return;closeMdl()}
+function renderCustomConfirm(){let r=$('#mdlRoot');if(!r){r=document.createElement('div');r.id='mdlRoot';document.body.appendChild(r)}
+r.innerHTML=MD?`<div class="fm-backdrop" onclick="closeMdl()"><div class="fm-card" onclick="event.stopPropagation();ddc()"><h2>${E(MD.title)}</h2>${MD.body||''}<div class="fm-actions">${MD.noCancel?'':'<button class="btn" onclick="closeMdl()">Cancel</button>'}<button class="btn p" onclick="mdlOk()">${E(MD.okText||'Confirm')}</button></div></div></div>`:''}
+const showConfirm=(t,m,fn)=>openMdl({title:t,body:`<p class="mu">${E(m)}</p>`,onOk:fn});
+const showInfo=(t,rows)=>openMdl({title:t,noCancel:1,okText:'Close',body:`<table style="margin:0">${rows.map(([a,b])=>`<tr><td class="mu">${a}</td><td>${E(b)}</td></tr>`).join('')}</table>`});
+function showPrompt(t,l,val,fn){openMdl({title:t,okText:'Save',body:`<div class="field"><label>${E(l)}</label><input id="mdlIn" value="${E(val)}"></div>`,onOk:()=>{const n=$('#mdlIn').value.trim();if(!n){toast('Please enter a name');return false}fn(n)}})}
 
-async function openM(id) {
-  const m = D.M.find(x => x.id == id);
-  if (!m || !m.path) return toast('File not found');
+/* custom dropdown: renders a hidden input with the same id, so v('id') still works */
+const dd=(id,opts,val,cb)=>{const o=opts.map(x=>Array.isArray(x)?x:[x,x]),cur=o.find(x=>String(x[0])==String(val))||o[0]||['',''];
+return `<div class="custom-dropdown" data-cb="${E(cb||'')}"><input type="hidden" id="${id}" value="${E(cur[0])}"><div class="custom-select-trigger" onclick="ddt(event,this)"><span>${E(cur[1])}</span><span>▾</span></div><div class="custom-options">${o.map(x=>`<div class="custom-option" data-v="${E(x[0])}" onclick="ddp(this)">${E(x[1])}</div>`).join('')}</div></div>`};
+const ddc=()=>document.querySelectorAll('.custom-dropdown.open').forEach(x=>x.classList.remove('open'));
+function ddt(e,t){e.stopPropagation();const d=t.parentNode,was=d.classList.contains('open');ddc();if(!was)d.classList.add('open')}
+function ddp(el){const d=el.closest('.custom-dropdown'),val=el.dataset.v;d.querySelector('input').value=val;d.querySelector('.custom-select-trigger span').textContent=el.textContent;d.classList.remove('open');if(d.dataset.cb)new Function('v',d.dataset.cb)(val)}
 
-  const r = await sb.storage.from('review-materials').createSignedUrl(m.path, 3600);
-  if (r.error) return toast(r.error.message);
+/* ⋮ menus */
+function toggleMenu(id,e){e.stopPropagation();activeMenu=activeMenu===id?null:id;route()}
+const mnu=(id,items)=>activeMenu===id?`<div class="pop" onclick="event.stopPropagation()">${items.filter(Boolean).map(([t,fn,d])=>`<a class="${d?'dng':''}" onclick="${fn}">${t}</a>`).join('')}</div>`:'';
+document.addEventListener('click',()=>{ddc();if(activeMenu){activeMenu=null;route()}});
+addEventListener('keydown',e=>{if(e.key=='Enter'&&e.target.id=='mdlIn')mdlOk()});
+function toggleFolderView(){folderView=folderView=='grid'?'list':'grid';route()}
 
-  const url = r.data.signedUrl;
-  const ext = m.type.toLowerCase();
+/* ===== FOLDERS AND FILES ===== */
+const fpath=f=>{const p=[];let x=f;while(x){p.unshift(x.name);x=x.parent?D.FO.find(y=>y.id==x.parent):null}return p.join(' › ')};
+const dsc=id=>{const r=[id];D.FO.filter(x=>x.parent==id).forEach(x=>r.push(...dsc(x.id)));return r};
+function renameFolder(id){const f=D.FO.find(x=>x.id==id);if(!f)return;showPrompt('Rename folder','Folder name',f.name,async n=>{const r=await sb.from('folders').update({name:n}).eq('id',id);if(r.error)return toast(r.error.message);f.name=n;toast('Folder renamed');route()})}
+function renameMaterial(id){const m=D.M.find(x=>x.id==id);if(!m)return;showPrompt('Rename file','File name',m.title,async n=>{const r=await sb.from('materials').update({title:n}).eq('id',id);if(r.error)return toast(r.error.message);m.title=n;toast('File renamed');route()})}
+async function delFo(id){const f=D.FO.find(x=>x.id==id);if(!f)return;const ids=dsc(id),paths=D.M.filter(m=>ids.includes(m.fo)).map(m=>m.path).filter(Boolean);
+for(const i of ids.slice().reverse()){const r=await sb.from('folders').delete().eq('id',i);if(r.error)return toast(r.error.message)}
+if(paths.length)await sb.storage.from('review-materials').remove(paths);
+D.FO=D.FO.filter(x=>!ids.includes(x.id));D.M=D.M.filter(m=>!ids.includes(m.fo));P.bm=P.bm.filter(b=>D.M.some(m=>m.id==b));toast('Folder deleted');go(f.parent?'f/'+f.parent:'c/'+f.c)}
+async function delM(id){const m=D.M.find(x=>x.id==id);if(!m)return;const r=await sb.from('materials').delete().eq('id',id);if(r.error)return toast(r.error.message);
+if(m.path){const s=await sb.storage.from('review-materials').remove([m.path]);if(s.error)toast('Deleted, but the stored file could not be removed.')}
+D.M=D.M.filter(x=>x.id!=id);P.bm=P.bm.filter(x=>x!==id);route()}
+function moveMaterial(id){const m=D.M.find(x=>x.id==id),cur=m&&D.FO.find(x=>x.id==m.fo);if(!cur)return;
+const opts=D.FO.filter(f=>f.c==cur.c&&(m.own||!f.own)).map(f=>[f.id,fpath(f)]).sort((a,b)=>a[1].localeCompare(b[1]));
+openMdl({title:'Move file',okText:'Move',body:`<p class="mu sm">${E(m.title)}</p><div class="field"><label>Destination folder (${cur.c})</label>${dd('mvTo',opts,m.fo)}</div>`,onOk:async()=>{const to=v('mvTo');if(to==m.fo)return;const r=await sb.from('materials').update({folder_id:to}).eq('id',id);if(r.error)return toast(r.error.message);m.fo=to;toast('File moved');route()}})}
+function folderInfo(id){const f=D.FO.find(x=>x.id==id);if(!f)return;showInfo('Folder information',[['Name',f.name],['Component',f.c],['Type',f.def?'Default folder':f.own?'Personal':'Official'],['Subfolders',D.FO.filter(x=>x.parent==id).length],['Files',D.M.filter(m=>m.fo==id).length]])}
+function fileInfo(id){const m=D.M.find(x=>x.id==id),f=m&&D.FO.find(x=>x.id==m.fo);if(!m)return;showInfo('File information',[['Title',m.title],['Type',m.type],['Folder',f?fpath(f):'None'],['Description',m.desc||'None'],['Access',m.own?'Personal (only you)':'Official']])}
 
-  // Open natively in-site if PDF or image, otherwise open in new tab
-  if (['pdf', 'jpg', 'jpeg', 'png', 'webp'].includes(ext)) {
-    viewerFile = { title: m.title, url, type: ext };
-    route();
-  } else {
-    window.open(url, '_blank', 'noopener');
-  }
-}
+/* open a file: PDFs and images show inside the site, other types download in a new tab */
+async function openM(id){const m=D.M.find(x=>x.id==id);if(!m||!m.path)return toast('File not found');
+const r=await sb.storage.from('review-materials').createSignedUrl(m.path,3600);if(r.error)return toast(r.error.message);
+const ext=m.type.toLowerCase(),url=r.data.signedUrl;if(['pdf','jpg','jpeg','png','webp'].includes(ext)){viewerFile={title:m.title,url,type:ext};route()}else window.open(url,'_blank','noopener')}
+function closeViewer(){viewerFile=null;route()}
+function renderFileViewer(){let r=$('#fileViewerRoot');if(!r){r=document.createElement('div');r.id='fileViewerRoot';document.body.appendChild(r)}
+if(!viewerFile){r.innerHTML='';return}const pdf=viewerFile.type==='pdf';
+r.innerHTML=`<div class="fm-backdrop" onclick="closeViewer()"><div class="fm-card viewer" onclick="event.stopPropagation()"><div class="vh"><h2>${E(viewerFile.title)}</h2><div class="row" style="margin:0"><a href="${viewerFile.url}" target="_blank" rel="noopener" class="btn">Download</a><button class="btn" onclick="closeViewer()">✕ Close</button></div></div><div class="vb">${pdf?`<object data="${viewerFile.url}" type="application/pdf" style="width:100%;height:100%"><div style="padding:30px;text-align:center"><p style="margin-bottom:12px">This browser can't show the PDF here.</p><a href="${viewerFile.url}" target="_blank" rel="noopener" class="btn p">Open PDF in a new tab</a></div></object>`:`<img src="${viewerFile.url}" alt="">`}</div></div></div>`}
 
-function closeViewer() {
-  viewerFile = null;
-  route();
-}
-
-function renderFileViewer() {
-  let root = $('#fileViewerRoot');
-  if (!root) {
-    const div = document.createElement('div');
-    div.id = 'fileViewerRoot';
-    document.body.appendChild(div);
-    root = div;
-  }
-  if (!viewerFile) {
-    root.innerHTML = '';
-    return;
-  }
-  const isPdf = viewerFile.type === 'pdf';
-  root.innerHTML = `
-    <div class="fm-backdrop" onclick="closeViewer()" style="padding:20px;">
-      <div class="fm-card" onclick="event.stopPropagation()" style="max-width:960px; width:100%; height:85vh; display:flex; flex-direction:column; padding:16px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--bd); padding-bottom:10px; margin-bottom:10px;">
-          <h2 style="font-size:1.1rem; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:80%;">${E(viewerFile.title)}</h2>
-          <button class="btn" onclick="closeViewer()">✕ Close</button>
-        </div>
-        <div style="flex:1; width:100%; height:100%; overflow:hidden; background:#f0f0f0; border-radius:var(--r); display:flex; align-items:center; justify-content:center;">
-          ${isPdf 
-            ? `<iframe src="${viewerFile.url}" style="width:100%; height:100%; border:none;"></iframe>`
-            : `<img src="${viewerFile.url}" style="max-width:100%; max-height:100%; object-fit:contain;" alt="">`
-          }
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-function showConfirm(title, message, onYes) {
-  confirmModalState = { title, message, onYes };
-  route();
-}
-
-function closeConfirm() {
-  confirmModalState = null;
-  route();
-}
-
-function toggleMenu(id, event) {
-  event.stopPropagation();
-  activeMenu = activeMenu === id ? null : id;
-  route();
-}
-
-document.addEventListener('click', () => {
-  if (activeMenu) {
-    activeMenu = null;
-    route();
-  }
-});
-
-function renameFolder(id) {
-  const f = D.FO.find(x => x.id == id);
-  if (!f) return;
-  const newName = prompt('Enter new folder name:', f.name);
-  if (!newName || !newName.trim()) return;
-  sb.from('folders').update({ name: newName.trim() }).eq('id', id).then(r => {
-    if (r.error) return toast(r.error.message);
-    f.name = newName.trim();
-    toast('Folder renamed');
-    route();
-  });
-}
-
-function toggleFolderView(){
-  folderView=folderView==='grid'?'list':'grid';
-  route();
-}
-function openFab(mode='folder'){
-  fabMode=mode;
-  fabOpen=true;
-
-  const parts=location.hash.slice(2).split('/');
-  const page=parts[0];
-  const current=page==='f'?D.FO.find(x=>x.id==parts[1]):null;
-
-  fabComponent=current?current.c:C.includes(parts[1])?parts[1]:'';
-  fabDestination=current?current.id:'';
-
-  renderFab();
-}
-
-function closeFab(){
-  fabOpen=false;
-  renderFab();
-}
-
-function fabFolders(){
-  const list=D.FO.filter(f=>
-    f.c===fabComponent &&
-    (fabMode==='folder'||f.own||f.def||role==='admin')
-  );
-
-  return list.map(f=>`
-    <option value="${f.id}" ${fabDestination===f.id?'selected':''}>
-      ${f.def ? '📁 [Default] ' : '— '.repeat(folderDepth(f))}${E(f.name)}
-    </option>
-  `).join('');
-}
-function folderDepth(f){
-  let depth=0,p=f.parent;
-  while(p){
-    const parent=D.FO.find(x=>x.id==p);
-    if(!parent)break;
-    depth++;
-    p=parent.parent;
-  }
-  return depth;
-}
-
-function updateFabFolders(){
-  fabDestination='';
-  const el=$('#fabFolder');
-  if(!el)return;
-
-  el.innerHTML=fabFolders();
-}
-
-function renderFab(){
-  const root=$('#fabRoot');
-  if(!root)return;
-
-  if(!ME){
-    root.innerHTML='';
-    return;
-  }
-
-  root.innerHTML=`
-    <button class="fab" onclick="openFab()" aria-label="Create or upload">+</button>
-
-    ${fabOpen?`
-      <div class="fm-backdrop" onclick="closeFab()">
-        <div class="fm-card" onclick="event.stopPropagation()">
-
-          <div class="row" style="justify-content:space-between;margin:0 0 14px">
-            <h2 style="margin:0">Create or upload</h2>
-            <button class="btn" onclick="closeFab()">✕</button>
-          </div>
-
-          <div class="fm-modes">
-            <button class="btn ${fabMode==='folder'?'p':''}" onclick="openFab('folder')">📁 New folder</button>
-            <button class="btn ${fabMode==='upload'?'p':''}" onclick="openFab('upload')">↑ Upload files</button>
-          </div>
-
-          <div class="field">
-            <label>Component</label>
-            <select id="fabComponent" onchange="fabComponent=this.value;fabDestination='';updateFabFolders()">
-              <option value="">Choose component</option>
-              ${C.map(c=>`
-                <option value="${c}" ${fabComponent===c?'selected':''}>${c}</option>
-              `).join('')}
-            </select>
-          </div>
-
-          <div class="field">
-            <label>${fabMode==='folder'?'Parent folder':'Upload destination'}</label>
-            <select id="fabFolder" onchange="fabDestination=this.value">
-              <option value="">${fabMode==='folder'?'Component root':'Choose a folder'}</option>
-              ${fabFolders()}
-            </select>
-          </div>
-
-          ${fabMode==='folder'?`
-            <div class="field">
-              <label>Folder name</label>
-              <input id="fabName" placeholder="Enter folder name">
-            </div>
-          `:`
-            <div class="field">
-              <label>Select files</label>
-              <input id="fabFiles" type="file" multiple
-                accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.webp"
-                onchange="$('#fabFileCount').textContent=this.files.length+' file(s) selected'">
-              <p id="fabFileCount" class="mu sm">You can select multiple files.</p>
-            </div>
-            <div class="field">
-              <label>Description (optional, applies to all files)</label>
-              <textarea id="fabDesc" placeholder="Add a description"></textarea>
-            </div>
-            <p class="mu sm">PDF, Word, PowerPoint, Excel or image. Maximum 25 MB per file. Each file will use its filename as its title.</p>
-          `}
-
-          <div class="fm-actions">
-            <button class="btn" onclick="closeFab()">Cancel</button>
-            <button class="btn p" onclick="${fabMode==='folder'?'createFabFolder()':'uploadFabFiles()'}">
-              ${fabMode==='folder'?'Create folder':'Upload files'}
-            </button>
-          </div>
-        </div>
-      </div>
-    `:''}
-  `;
-}
-
-function renderCustomConfirm() {
-  let root = $('#confirmModalRoot');
-  if (!root) {
-    const div = document.createElement('div');
-    div.id = 'confirmModalRoot';
-    document.body.appendChild(div);
-    root = div;
-  }
-  if (!confirmModalState) {
-    root.innerHTML = '';
-    return;
-  }
-  root.innerHTML = `
-    <div class="fm-backdrop" onclick="closeConfirm()">
-      <div class="fm-card" onclick="event.stopPropagation()">
-        <h2>${E(confirmModalState.title)}</h2>
-        <p class="mu" style="margin-bottom:20px">${E(confirmModalState.message)}</p>
-        <div class="fm-actions">
-          <button class="btn" onclick="closeConfirm()">Cancel</button>
-          <button class="btn p" onclick="confirmModalState.onYes(); closeConfirm();">Confirm</button>
-        </div>
-      </div>
-    </div>
-  `;
-}
-  
-async function createFabFolder(){
-  const name=$('#fabName').value.trim();
-
-  if(!fabComponent)return toast('Choose a component first');
-  if(!name)return toast('Enter a folder name');
-
-  const parent=fabDestination||null;
-  const parentFolder=parent?D.FO.find(x=>x.id==parent):null;
-
-  if(parent&&!parentFolder)return toast('Parent folder not found');
-  if(parentFolder&&parentFolder.c!==fabComponent)
-    return toast('Choose a folder from the selected component');
-
-  const owner=parentFolder?.own?ME.id:role==='admin'?null:ME.id;
-
-  const result=await sb.from('folders').insert({
-    component:fabComponent,
-    name,
-    parent_id:parent,
-    owner_id:owner
-  }).select().single();
-
-  if(result.error)return toast(result.error.message);
-
-  D.FO.push({
-    id:result.data.id,
-    c:fabComponent,
-    name,
-    parent,
-    def:false,
-    own:result.data.owner_id?1:0
-  });
-
-  fabOpen=false;
-  toast('Folder created');
-  route();
-}
-async function uploadFabFiles(){
-  const fo=fabDestination;
-  const files=[...($('#fabFiles')?.files||[])];
-  const desc=$('#fabDesc').value.trim();
-
-  if(!fabComponent)return toast('Choose a component first');
-  if(!fo)return toast('Choose an upload destination');
-
-  const folder=D.FO.find(x=>x.id==fo);
-  if(!folder)return toast('Folder not found');
-
-  if(!folder.own&&role!=='admin')
-    return toast('You can only upload to your own folders');
-
-  if(!files.length)return toast('Choose at least one file');
-
-  const allowed=['pdf','doc','docx','ppt','pptx','xls','xlsx','jpg','jpeg','png','webp'];
-
-  for(const file of files){
-    const ext=file.name.split('.').pop().toLowerCase();
-
-    if(file.size>25*1024*1024)
-      return toast(file.name+' exceeds the 25 MB limit');
-
-    if(!allowed.includes(ext))
-      return toast(file.name+' has an unsupported file type');
-  }
-
-  const uploaded=[];
-  const records=[];
-
-  for(const [i,file] of files.entries()){
-    const ext=file.name.split('.').pop().toLowerCase();
-    const owner=folder.own?ME.id:'official';
-    const safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
-    const path=`${owner}/${fo}/${Date.now()}_${i}_${U()}_${safeName}`;
-
-    const upload=await sb.storage.from('review-materials').upload(path,file,{
-      cacheControl:'3600',
-      upsert:false
-    });
-
-    if(upload.error){
-      if(uploaded.length)
-        await sb.storage.from('review-materials').remove(uploaded);
-      return toast(upload.error.message);
-    }
-
-    uploaded.push(path);
-
-    records.push({
-      folder_id:fo,
-      title:file.name.replace(/\.[^.]+$/,''),
-      description:desc,
-      file_type:ext.toUpperCase(),
-      file_path:path,
-      published:folder.own?true:role==='admin',
-      owner_id:folder.own?ME.id:null
-    });
-  }
-
-  const result=await sb.from('materials').insert(records).select();
-
-  if(result.error){
-    await sb.storage.from('review-materials').remove(uploaded);
-    return toast(result.error.message);
-  }
-
-  result.data.forEach(x=>{
-    D.M.push({
-      id:x.id,
-      fo:x.folder_id,
-      title:x.title,
-      desc:x.description||'',
-      type:x.file_type||'',
-      path:x.file_path||'',
-      pub:x.published,
-      own:x.owner_id?1:0
-    });
-  });
-
-  fabOpen=false;
-  toast(files.length+' file(s) uploaded successfully');
-  route();
-}
+/* ===== CREATE FOLDER / UPLOAD (the + button, and "Upload here" buttons) ===== */
+function openFab(mode,dest){activeMenu=null;const p=location.hash.slice(2).split('/'),f=dest?D.FO.find(x=>x.id==dest):(dest===undefined&&p[0]=='f')?D.FO.find(x=>x.id==p[1]):null;
+fab={open:true,mode:mode||'upload',c:f?f.c:C.includes(p[1])?p[1]:'',d:f?f.id:'',busy:false};route()}
+function closeFab(){fab.open=false;renderFab()}
+function setFabMode(m){fab.mode=m;renderFab()}
+const fabOpts=()=>[['',fab.mode=='folder'?'Component root':'Choose a folder'],...D.FO.filter(f=>f.c==fab.c).map(f=>[f.id,fpath(f)]).sort((a,b)=>a[1].localeCompare(b[1]))];
+function renderFab(){const r=$('#fabRoot');if(!r)return;if(!ME){r.innerHTML='';return}const up=fab.mode=='upload';
+r.innerHTML=`<button class="fab" onclick="openFab()" aria-label="Create or upload">+</button>`+(fab.open?`<div class="fm-backdrop" onclick="closeFab()"><div class="fm-card" onclick="event.stopPropagation();ddc()"><div class="row" style="justify-content:space-between;margin:0 0 14px"><h2 style="margin:0">Create or upload</h2><button class="btn" onclick="closeFab()">✕</button></div>
+<div class="fm-modes"><button class="btn ${up?'':'p'}" onclick="setFabMode('folder')">📁 New folder</button><button class="btn ${up?'p':''}" onclick="setFabMode('upload')">↑ Upload files</button></div>
+<div class="field"><label>Component</label>${dd('fabC',[['','Choose component'],...C],fab.c,"fab.c=v;fab.d='';renderFab()")}</div>
+<div class="field"><label>${up?'Upload destination':'Parent folder'}</label>${dd('fabF',fabOpts(),fab.d,"fab.d=v")}</div>
+${up?`<div class="field"><label>Select files</label><input id="fabFiles" type="file" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.jpg,.jpeg,.png,.webp" onchange="$('#fabCount').textContent=this.files.length+' file(s) selected'"><p id="fabCount" class="mu sm">You can select several files.</p></div><div class="field"><label>Description (optional)</label><textarea id="fabDesc" placeholder="Applies to all selected files"></textarea></div><p class="mu sm">PDF, Word, PowerPoint, Excel or image, up to 25 MB each. ${role=='admin'?'Files added to official folders are visible to everyone.':'Files you upload are private to you.'}</p>`:`<div class="field"><label>Folder name</label><input id="fabName" placeholder="Enter folder name"></div>`}
+<div class="fm-actions"><button class="btn" onclick="closeFab()">Cancel</button><button class="btn p" ${fab.busy?'disabled':''} onclick="${up?'uploadFabFiles()':'createFabFolder()'}">${fab.busy?'Working…':up?'Upload files':'Create folder'}</button></div></div></div>`:'')}
+async function createFabFolder(){const name=v('fabName').trim();if(!fab.c)return toast('Choose a component first');if(!name)return toast('Enter a folder name');
+const par=fab.d?D.FO.find(x=>x.id==fab.d):null;if(fab.d&&!par)return toast('Parent folder not found');
+const mine=role!='admin'||(par&&par.own);fab.busy=true;renderFab();
+const r=await sb.from('folders').insert({component:fab.c,name,parent_id:par?par.id:null,owner_id:mine?ME.id:null}).select().single();
+if(r.error){fab.busy=false;renderFab();return toast(r.error.message)}
+D.FO.push({id:r.data.id,c:fab.c,name,parent:par?par.id:null,def:false,own:r.data.owner_id?1:0});fab={open:false,mode:'upload',c:'',d:'',busy:false};toast('Folder created');route()}
+/* everyone can upload into any folder they can see, including the default ones.
+   Students and personal folders: the file is private to the uploader. Admins in official folders: visible to everyone. */
+async function uploadFabFiles(){const fo=fab.d,files=[...(($('#fabFiles')||{}).files||[])],desc=(($('#fabDesc')||{}).value||'').trim();
+if(!fab.c)return toast('Choose a component first');if(!fo)return toast('Choose an upload destination');
+const folder=D.FO.find(x=>x.id==fo);if(!folder)return toast('Folder not found');if(!files.length)return toast('Choose at least one file');
+const ok=['pdf','doc','docx','ppt','pptx','xls','xlsx','jpg','jpeg','png','webp'],ex=f=>f.name.split('.').pop().toLowerCase();
+for(const f of files){if(f.size>25*1024*1024)return toast(f.name+' is over 25 MB');if(!ok.includes(ex(f)))return toast(f.name+' is not a supported file type')}
+const off=role=='admin'&&!folder.own,up=[],rec=[];fab.busy=true;renderFab();
+for(const[i,f]of files.entries()){toast('Uploading '+(i+1)+' of '+files.length+'…');
+const path=`${off?'official':ME.id}/${fo}/${Date.now()}_${i}_${U()}_${f.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`,u=await sb.storage.from('review-materials').upload(path,f,{cacheControl:'3600',upsert:false});
+if(u.error){if(up.length)await sb.storage.from('review-materials').remove(up);fab.busy=false;renderFab();return toast(u.error.message)}
+up.push(path);rec.push({folder_id:fo,title:f.name.replace(/\.[^.]+$/,''),description:desc,file_type:ex(f).toUpperCase(),file_path:path,published:true,owner_id:off?null:ME.id})}
+const r=await sb.from('materials').insert(rec).select();
+if(r.error){await sb.storage.from('review-materials').remove(up);fab.busy=false;renderFab();return toast(r.error.message)}
+r.data.forEach(x=>D.M.push({id:x.id,fo:x.folder_id,title:x.title,desc:x.description||'',type:x.file_type||'',path:x.file_path||'',pub:x.published,own:x.owner_id?1:0}));
+fab={open:false,mode:'upload',c:'',d:'',busy:false};toast(files.length+' file(s) uploaded');route()}
 const save=()=>{};
 function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',3200)}
 function dr(x){$('#dr').classList.toggle('on',!!x);$('#ov').classList.toggle('on',!!x)}
@@ -589,7 +335,7 @@ const csv=tx=>{const R=[];let r=[],f='',q=0;for(let i=0;i<tx.length;i++){const c
 const dbq=x=>({id:x.id,c:x.component,s:x.subject,t:x.topic,q:x.question,o:[x.choice_a,x.choice_b,x.choice_c,x.choice_d],a:'ABCD'.indexOf(x.correct_answer),e:x.explanation||'',d:x.difficulty||'',st:x.verification_status||'',own:x.owner_id?1:0});
 const allQ=()=>[...OQ,...D.MQ],subs=c=>[...new Set(allQ().filter(x=>x.c==c).map(x=>x.s))],tops=(c,s)=>[...new Set(allQ().filter(x=>x.c==c&&x.s==s).map(x=>x.t))];
 const stat=f=>{const q=allQ().filter(f);let ok=0,n=0,m=0,at=0;q.forEach(x=>{const s=P.q[x.id];if(s){at++;ok+=s[0];n+=s[1];m+=s[2]}});return{n:q.length,at,acc:n?Math.round(100*ok/n):0,ms:q.length?Math.round(100*m/q.length):0}};
-const bars=s=>`<p class="sm" style="margin-top:10px">Accuracy ${s.acc}%</p><div class="pb"><b style="width:${s.acc}%"></b></div><p class="sm">Mastery ${s.ms}%</p><div class="pb"><b style="width:${s.ms}%"></b></div><p class="mu sm">${s.at} of ${s.n} questions attempted</p>`;
+const bars=s=>`<div class="mrow" style="margin-top:12px"><div class="ring" style="--p:${s.ms}"><span>${s.ms}%</span></div><div><b>Mastery</b><small>Questions you last answered correctly</small></div></div><p class="sm" style="margin-top:14px">Accuracy ${s.acc}%</p><div class="pb"><b style="width:${s.acc}%"></b></div>`;
 async function pg(t,f){let a=[],i=0;for(;;){const r=await f(sb.from(t).select('*')).range(i,i+999);if(r.error)return{data:a,error:r.error};a=a.concat(r.data);if(r.data.length<1000)return{data:a};i+=1000}}
 async function load(){
   try {
@@ -688,318 +434,22 @@ V.dash=()=>{const a=stat(()=>1),h=P.h.slice(0,4);return hd('Welcome, '+E(PR&&PR.
 <div class="g"><div class="card"><h3>Recent quizzes</h3>${h.map(x=>`<p class="sm">${x.k}/${x.n} · ${E(x.sc)}</p>`).join('')||'<p class="mu sm">None yet.</p>'}<div class="row"><button class="btn" onclick="go('hist')">View history</button></div></div>
 <div class="card"><h3>Study</h3><div class="row"><button class="btn" onclick="FF={c:'',k:''};go('cards')">Flashcards</button><button class="btn" onclick="FF={c:'',k:'img'};go('cards')">Formula cards</button></div></div></div></div>`};
 
-V.c = c => {
-  if (!C.includes(c)) return V.dash();
-  const s = stat(x => x.c == c), fo = D.FO.filter(f => f.c == c && !f.parent);
-  return hd(c, CD[c]) + `<div class="w sec stack"><div class="card art"><h3>Quiz</h3><p class="mu">${s.n} questions available in ${c}. Pick one subject, several topics, or everything.</p><button class="btn p" onclick="go('quiz/${c}')">Take a ${c} quiz</button>${bars(s)}</div>
-<div>
-  <div class="row" style="justify-content:space-between">
-    <h2>Folders</h2>
-    <button class="btn" onclick="toggleFolderView()">
-      ${folderView === 'grid' ? 'List view ☰' : 'Grid view ▦'}
-    </button>
-  </div>
-  <div class="g ${folderView}">
-  ${fo.map(f => {
-    const count = D.M.filter(m => m.fo == f.id).length + D.FO.filter(x => x.parent == f.id).length;
-    const canManageFolder = f.own || role === 'admin';
-    if (folderView === 'list') {
-      return `
-        <div class="card" style="display:flex; align-items:center; justify-content:space-between; padding:12px 18px; position:relative;">
-          <div style="display:flex; align-items:center; gap:12px; cursor:pointer; flex:1; min-width:0;" onclick="go('f/${f.id}')">
-            <span style="font-size:1.2rem;">📁</span>
-            <h3 style="margin:0; font-size:1rem; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${E(f.name)}</h3>
-          </div>
-          <div style="display:flex; align-items:center; gap:16px;">
-            <span class="tag">${count} items</span>
-            <button class="btn" style="padding:4px 8px; border:none; background:transparent; font-size:1.2rem; cursor:pointer;" onclick="toggleMenu('fo_${f.id}', event)">⋮</button>
-          </div>
-          ${activeMenu === 'fo_' + f.id ? `
-            <div style="position:absolute; right:16px; top:45px; background:#fff; border:1px solid var(--bd); box-shadow:0 4px 16px #0002; border-radius:var(--r); z-index:20; padding:6px 0; min-width:140px" onclick="event.stopPropagation()">
-              <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="renameFolder('${f.id}')">Rename</a>
-              ${canManageFolder ? `<a style="display:block; padding:8px 14px; font-size:.9rem; color:#d9534f; cursor:pointer;" onclick="showConfirm('Delete Folder', 'Are you sure?', () => delFo('${f.id}'))">Delete</a>` : ''}
-            </div>
-          ` : ''}
-        </div>
-      `;
-    } else {
-      return `
-        <div class="card" style="position:relative;">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start">
-            <h3 style="cursor:pointer; margin:0; display:flex; align-items:center; gap:8px;" onclick="go('f/${f.id}')">📁 ${E(f.name)}</h3>
-            <button class="btn" style="padding:2px 8px; border:none; background:transparent; font-size:1.2rem; cursor:pointer;" onclick="toggleMenu('fo_${f.id}', event)">⋮</button>
-          </div>
-          <span class="tag" style="margin-top:12px; display:inline-block">${count} items</span>
-          ${activeMenu === 'fo_' + f.id ? `
-            <div style="position:absolute; right:16px; top:40px; background:#fff; border:1px solid var(--bd); box-shadow:0 4px 16px #0002; border-radius:var(--r); z-index:20; padding:6px 0; min-width:140px" onclick="event.stopPropagation()">
-              <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="folderInfo('${f.id}')">Info</a>
-              <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="renameFolder('${f.id}')">Rename</a>
-              ${canManageFolder ? `<a style="display:block; padding:8px 14px; font-size:.9rem; color:#d9534f; cursor:pointer;" onclick="showConfirm('Delete Folder', 'Are you sure?', () => delFo('${f.id}'))">Delete</a>` : ''}
-            </div>
-          ` : ''}
-        </div>
-      `;
-    }
-  }).join('') || empty('No folders here yet.')}
-</div></div>
-<div><h2>Subject statistics</h2><div class="card" style="overflow-x:auto"><table style="margin:0"><tr><th>Subject / topic</th><th>Questions</th><th>Accuracy</th><th>Mastery</th></tr>${subs(c).map(sb => { const t = stat(x => x.c == c && x.s == sb); return `<tr><td><b>${E(sb)}</b></td><td>${t.n}</td><td>${t.acc}%</td><td>${t.ms}%</td></tr>` + tops(c, sb).map(p => { const u = stat(x => x.c == c && x.s == sb && x.t == p); return `<tr class="mu sm"><td>&nbsp;&nbsp;${E(p)}</td><td>${u.n}</td><td>${u.acc}%</td><td>${u.ms}%</td></tr>` }).join('') }).join('') || '<tr><td class="mu">No questions yet for this component.</td></tr>'}</table></div></div></div>`;
-};
+/* ===== COMPONENT PAGE + FOLDER PAGE ===== */
+const folderCard=f=>{const n=D.M.filter(m=>m.fo==f.id).length+D.FO.filter(x=>x.parent==f.id).length,ed=!f.def&&(f.own||role=='admin');
+return `<div class="card fr"><div class="fl" onclick="go('f/${f.id}')"><span>📁</span><h3>${E(f.name)}</h3></div><div class="fx">${f.own?'<span class="tag">Personal</span>':''}<span class="tag">${n} items</span><button class="dots" onclick="toggleMenu('fo_${f.id}',event)" aria-label="Folder menu">⋮</button></div>${mnu('fo_'+f.id,[['Open',`go('f/${f.id}')`],['Upload here',`openFab('upload','${f.id}')`],['Info',`folderInfo('${f.id}')`],ed&&['Rename',`renameFolder('${f.id}')`],ed&&['Delete',`showConfirm('Delete folder','This also deletes everything inside it.',()=>delFo('${f.id}'))`,1]])}</div>`};
+const fileCard=m=>{const ed=m.own||role=='admin';
+return `<div class="card fr"><div class="fl" onclick="openM('${m.id}')">${tag(m.type)}<h3>${E(m.title)}</h3></div><div class="fx">${m.own?'<span class="tag">Personal</span>':''}<a class="star" onclick="bm('${m.id}')">${P.bm.includes(m.id)?'★':'☆'}</a><button class="dots" onclick="toggleMenu('m_${m.id}',event)" aria-label="File menu">⋮</button></div>${m.desc?`<p class="mu sm fd">${E(m.desc)}</p>`:''}${mnu('m_'+m.id,[['Open',`openM('${m.id}')`],['Info',`fileInfo('${m.id}')`],ed&&['Rename',`renameMaterial('${m.id}')`],ed&&['Move to…',`moveMaterial('${m.id}')`],ed&&['Delete',`showConfirm('Delete file','Delete this file permanently?',()=>delM('${m.id}'))`,1]])}</div>`};
+const viewBtn=()=>`<button class="btn" onclick="toggleFolderView()">${folderView=='grid'?'List ☰':'Grid ▦'}</button>`;
 
-async function delFo(id){const f=D.FO.find(x=>x.id==id);if(!confirm('Delete this folder?'))return;const r=await sb.from('folders').delete().eq('id',id);if(r.error)return toast(r.error.message);D.FO=D.FO.filter(x=>x.id!=id);go('c/'+f.c)}
+V.c=c=>{if(!C.includes(c))return V.dash();const s=stat(x=>x.c==c),fo=D.FO.filter(f=>f.c==c&&!f.parent);
+return hd(c,CD[c])+`<div class="w sec stack"><div class="card art"><h3>Quiz</h3><p class="mu">${s.n} questions available in ${c}. Pick one subject, several topics, or everything.</p><button class="btn p" onclick="go('quiz/${c}')">Take a ${c} quiz</button>${bars(s)}</div>
+<div><div class="row" style="justify-content:space-between;margin:0 0 12px"><h2 style="margin:0">Folders</h2><div class="row" style="margin:0"><button class="btn" onclick="openFab('upload','')">↑ Upload</button><button class="btn" onclick="openFab('folder','')">＋ New folder</button>${viewBtn()}</div></div><div class="g ${folderView}">${fo.map(folderCard).join('')||empty('No folders here yet.')}</div></div>
+<div><h2>Subject statistics</h2><div class="card" style="overflow-x:auto"><table style="margin:0"><tr><th>Subject / topic</th><th>Questions</th><th>Accuracy</th><th>Mastery</th></tr>${subs(c).map(su=>{const t=stat(x=>x.c==c&&x.s==su);return `<tr><td><b>${E(su)}</b></td><td>${t.n}</td><td>${t.acc}%</td><td>${t.ms}%</td></tr>`+tops(c,su).map(p=>{const u=stat(x=>x.c==c&&x.s==su&&x.t==p);return `<tr class="mu sm"><td>&nbsp;&nbsp;${E(p)}</td><td>${u.n}</td><td>${u.acc}%</td><td>${u.ms}%</td></tr>`}).join('')}).join('')||'<tr><td class="mu">No questions yet for this component.</td></tr>'}</table></div></div></div>`};
 
-async function openM(id) {
-  const m = D.M.find(x => x.id == id);
-  if (!m || !m.path) return toast('File not found');
-
-  const r = await sb.storage.from('review-materials').createSignedUrl(m.path, 3600);
-  if (r.error) return toast(r.error.message);
-
-  const url = r.data.signedUrl;
-  const ext = m.type.toLowerCase();
-
-  // Open natively in-site if PDF or image, otherwise open in new tab
-  if (['pdf', 'jpg', 'jpeg', 'png', 'webp'].includes(ext)) {
-    viewerFile = { title: m.title, url, type: ext };
-    route();
-  } else {
-    window.open(url, '_blank', 'noopener');
-  }
-}
-
-
-
-function closeViewer() {
-  viewerFile = null;
-  route();
-}
-
-function renderFileViewer() {
-  let root = $('#fileViewerRoot');
-  if (!root) {
-    const div = document.createElement('div');
-    div.id = 'fileViewerRoot';
-    document.body.appendChild(div);
-    root = div;
-  }
-  if (!viewerFile) {
-    root.innerHTML = '';
-    return;
-  }
-  const isPdf = viewerFile.type === 'pdf';
-  root.innerHTML = `
-    <div class="fm-backdrop" onclick="closeViewer()" style="padding:20px;">
-      <div class="fm-card" onclick="event.stopPropagation()" style="max-width:1000px; width:100%; height:90vh; display:flex; flex-direction:column; padding:16px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--bd); padding-bottom:10px; margin-bottom:10px;">
-          <h2 style="font-size:1.1rem; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:70%;">${E(viewerFile.title)}</h2>
-          <div style="display:flex; gap:8px; align-items:center;">
-            <a href="${viewerFile.url}" target="_blank" class="btn sm">Download File</a>
-            <button class="btn" onclick="closeViewer()">✕ Close</button>
-          </div>
-        </div>
-        <div style="flex:1; width:100%; height:100%; overflow:auto; background:#f7fafa; border-radius:var(--r); display:flex; align-items:center; justify-content:center;">
-          ${isPdf 
-            ? `<object data="${viewerFile.url}" type="application/pdf" style="width:100%; height:100%;">
-                 <div style="padding:30px; text-align:center;">
-                   <p style="margin-bottom:12px;">Unable to display PDF directly in this browser frame.</p>
-                   <a href="${viewerFile.url}" target="_blank" class="btn p">Open PDF in New Tab</a>
-                 </div>
-               </object>`
-            : `<img src="${viewerFile.url}" style="max-width:100%; max-height:100%; object-fit:contain;" alt="">`
-          }
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-function moveMaterial(id) {
-  const m = D.M.find(x => x.id == id);
-  if (!m) return;
-  const foldersList = D.FO.map(f => `ID: ${f.id} — [${f.c}] ${f.name}`).join('\n');
-  const destId = prompt(`Move "${m.title}" to which folder? Enter Folder ID:\n\n${foldersList}`);
-  if (!destId || !destId.trim()) return;
-  const target = D.FO.find(x => x.id == destId.trim());
-  if (!target) return toast('Invalid Folder ID');
-
-  sb.from('materials').update({ folder_id: target.id }).eq('id', id).then(r => {
-    if (r.error) return toast(r.error.message);
-    m.fo = target.id;
-    toast('File moved successfully');
-    route();
-  });
-}
-
-function fileInfo(id) {
-  const m = D.M.find(x => x.id == id);
-  if (!m) return;
-  const folder = D.FO.find(x => x.id == m.fo);
-  showConfirm(
-    'File Information',
-    `Title: ${m.title}\nType: ${m.type}\nFolder: ${folder ? folder.name : 'None'}\nDescription: ${m.desc || 'None'}\nAccess: ${m.own ? 'Personal' : 'Official'}`
-  );
-}
-
-function folderInfo(id) {
-  const f = D.FO.find(x => x.id == id);
-  if (!f) return;
-  const subCount = D.FO.filter(x => x.parent == f.id).length;
-  const fileCount = D.M.filter(m => m.fo == f.id).length;
-  showConfirm(
-    'Folder Information',
-    `Name: ${f.name}\nComponent: ${f.c}\nType: ${f.def ? 'Default Folder' : f.own ? 'Personal' : 'Official'}\nSubfolders: ${subCount}\nFiles: ${fileCount}`
-  );
-}
-
-  
-function renameMaterial(id) {
-  const m = D.M.find(x => x.id == id);
-  if (!m) return;
-  const newTitle = prompt('Enter new file name:', m.title);
-  if (!newTitle || !newTitle.trim()) return;
-  sb.from('materials').update({ title: newTitle.trim() }).eq('id', id).then(r => {
-    if (r.error) return toast(r.error.message);
-    m.title = newTitle.trim();
-    toast('File renamed');
-    route();
-  });
-}
-
-async function delM(id){
-  const m=D.M.find(x=>x.id==id);
-  if(!m)return;
-
-  if(!confirm('Delete this material and its uploaded file?'))return;
-
-  const r=await sb.from('materials').delete().eq('id',id);
-  if(r.error)return toast(r.error.message);
-
-  if(m.path){
-    const s=await sb.storage.from('review-materials').remove([m.path]);
-    if(s.error)toast('Material deleted, but its stored file could not be removed.');
-  }
-
-  D.M=D.M.filter(x=>x.id!=id);
-  P.bm=P.bm.filter(x=>x!==id);
-  route();
-}
-
-V.f = id => {
-  const f = D.FO.find(x => x.id == id);
-  if (!f) return V.dash();
-
-  const it = D.M.filter(m => m.fo == id);
-  const sub = D.FO.filter(x => x.parent == id);
-  const parent = f.parent ? D.FO.find(x => x.id == f.parent) : null;
-  const canManage = f.own || role === 'admin';
-
-  return hd('📁 ' + E(f.name),
-    `<a class="lk" onclick="go('${parent ? 'f/' + parent.id : 'c/' + f.c}')">
-      ← ${parent ? E(parent.name) : f.c}
-    </a>`
-  ) + `<div class="w sec stack">
-
-    <div class="row" style="justify-content:space-between">
-      <h2>Folders & Files</h2>
-      <button class="btn" onclick="toggleFolderView()">
-        ${folderView === 'grid' ? 'List view ☰' : 'Grid view ▦'}
-      </button>
-    </div>
-
-    <div class="g ${folderView}">
-      ${sub.map(x => {
-        const count = D.M.filter(m => m.fo == x.id).length + D.FO.filter(y => y.parent == x.id).length;
-        if (folderView === 'list') {
-          return `
-            <div class="card" style="display:flex; align-items:center; justify-content:space-between; padding:12px 18px; position:relative;">
-              <div style="display:flex; align-items:center; gap:12px; cursor:pointer; flex:1; min-width:0;" onclick="go('f/${x.id}')">
-                <span style="font-size:1.2rem;">📁</span>
-                <h3 style="margin:0; font-size:1rem; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${E(x.name)}</h3>
-              </div>
-              <div style="display:flex; align-items:center; gap:16px;">
-                <span class="tag">${count} items</span>
-                <button class="btn" style="padding:4px 8px; border:none; background:transparent; font-size:1.2rem; cursor:pointer;" onclick="toggleMenu('fo_${x.id}', event)">⋮</button>
-              </div>
-              ${activeMenu === 'fo_' + x.id ? `
-                <div style="position:absolute; right:16px; top:45px; background:#fff; border:1px solid var(--bd); box-shadow:0 4px 16px #0002; border-radius:var(--r); z-index:20; padding:6px 0; min-width:140px" onclick="event.stopPropagation()">
-                  <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="renameFolder('${x.id}')">Rename</a>
-                  <a style="display:block; padding:8px 14px; font-size:.9rem; color:#d9534f; cursor:pointer;" onclick="showConfirm('Delete Folder', 'Are you sure?', () => delFo('${x.id}'))">Delete</a>
-                </div>
-              ` : ''}
-            </div>
-          `;
-        } else {
-          return `
-            <div class="card" style="position:relative;">
-              <div style="display:flex; justify-content:space-between; align-items:flex-start">
-                <h3 style="cursor:pointer; margin:0; display:flex; align-items:center; gap:8px;" onclick="go('f/${x.id}')">📁 ${E(x.name)}</h3>
-                <button class="btn" style="padding:2px 8px; border:none; background:transparent; font-size:1.2rem; cursor:pointer;" onclick="toggleMenu('fo_${x.id}', event)">⋮</button>
-              </div>
-              <span class="tag" style="margin-top:12px; display:inline-block">${count} items</span>
-              ${activeMenu === 'fo_' + x.id ? `
-                <div style="position:absolute; right:16px; top:40px; background:#fff; border:1px solid var(--bd); box-shadow:0 4px 16px #0002; border-radius:var(--r); z-index:20; padding:6px 0; min-width:140px" onclick="event.stopPropagation()">
-                  <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="renameFolder('${x.id}')">Rename</a>
-                  <a style="display:block; padding:8px 14px; font-size:.9rem; color:#d9534f; cursor:pointer;" onclick="showConfirm('Delete Folder', 'Are you sure?', () => delFo('${x.id}'))">Delete</a>
-                </div>
-              ` : ''}
-            </div>
-          `;
-        }
-      }).join('') || ''}
-
-      ${it.map(m => {
-        if (folderView === 'list') {
-          return `
-            <div class="card" style="display:flex; align-items:center; justify-content:space-between; padding:12px 18px; position:relative;">
-              <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:0; cursor:pointer;" onclick="openM('${m.id}')">
-                ${tag(m.type)}
-                <h3 style="margin:0; font-size:1rem; color:var(--ink); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${E(m.title)}</h3>
-              </div>
-              <div style="display:flex; align-items:center; gap:16px;">
-                <a class="star" onclick="event.stopPropagation(); bm('${m.id}')">${P.bm.includes(m.id) ? '★' : '☆'}</a>
-                <button class="btn" style="padding:4px 8px; border:none; background:transparent; font-size:1.2rem; cursor:pointer;" onclick="toggleMenu('m_${m.id}', event)">⋮</button>
-              </div>
-              ${activeMenu === 'm_' + m.id ? `
-                <div style="position:absolute; right:16px; top:45px; background:#fff; border:1px solid var(--bd); box-shadow:0 4px 16px #0002; border-radius:var(--r); z-index:20; padding:6px 0; min-width:140px" onclick="event.stopPropagation()">
-                  <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="openM('${m.id}')">Open File</a>
-                  <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="fileInfo('${m.id}')">Info</a>
-                  ${canManage ? `
-                    <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="renameMaterial('${m.id}')">Rename</a>
-                    <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="moveMaterial('${m.id}')">📂 Move To</a>
-                    <a style="display:block; padding:8px 14px; font-size:.9rem; color:#d9534f; cursor:pointer;" onclick="showConfirm('Delete Material', 'Delete this file permanently?', () => delM('${m.id}'))">Delete</a>
-                  ` : ''}
-                </div>
-              ` : ''}
-            </div>
-          `;
-        } else {
-          return `
-            <div class="card" style="position:relative;">
-              <div class="row" style="margin:0; justify-content:space-between">
-                ${tag(m.type)}
-                <div style="display:flex; gap:6px; align-items:center">
-                  <a class="star" onclick="bm('${m.id}')">${P.bm.includes(m.id) ? '★' : '☆'}</a>
-                  <button class="btn" style="padding:2px 8px; border:none; background:transparent; font-size:1.2rem; cursor:pointer" onclick="toggleMenu('m_${m.id}', event)">⋮</button>
-                </div>
-              </div>
-              <h3 style="margin-top:8px; cursor:pointer; color:var(--ink);" onclick="openM('${m.id}')">${E(m.title)}</h3>
-              <p class="mu">${E(m.desc)}</p>
-              
-              ${activeMenu === 'm_' + m.id ? `
-                <div style="position:absolute; right:16px; top:40px; background:#fff; border:1px solid var(--bd); box-shadow:0 4px 16px #0002; border-radius:var(--r); z-index:20; padding:6px 0; min-width:140px" onclick="event.stopPropagation()">
-                  <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="openM('${m.id}')">Open File</a>
-                  ${canManage ? `<a style="display:block; padding:8px 14px; font-size:.9rem; color:#d9534f; cursor:pointer;" onclick="showConfirm('Delete Material', 'Delete this file permanently?', () => delM('${m.id}'))">Delete</a>` : ''}
-                </div>
-              ` : ''}
-            </div>
-          `;
-        }
-      }).join('')}
-
-      ${!sub.length && !it.length ? empty('This folder is empty.') : ''}
-    </div>
-
-  </div>`;
-};
+V.f=id=>{const f=D.FO.find(x=>x.id==id);if(!f)return V.dash();const q=FQ.toLowerCase(),par=f.parent?D.FO.find(x=>x.id==f.parent):null,
+sub=D.FO.filter(x=>x.parent==id&&(!q||x.name.toLowerCase().includes(q))),it=D.M.filter(m=>m.fo==id&&(!q||(m.title+' '+m.desc).toLowerCase().includes(q))),all=D.M.some(m=>m.fo==id)||D.FO.some(x=>x.parent==id);
+return hd('📁 '+E(f.name),`<a class="lk" onclick="FQ='';go('${par?'f/'+par.id:'c/'+f.c}')">← ${par?E(par.name):f.c}</a>`)+`<div class="w sec stack"><div class="row" style="justify-content:space-between;margin:0"><input id="fq" placeholder="Search in this folder" value="${E(FQ)}" style="flex:1;min-width:160px;max-width:320px" oninput="FQ=this.value;route();const i=$('#fq');i.focus();i.setSelectionRange(99,99)"><div class="row" style="margin:0"><button class="btn p" onclick="openFab('upload','${id}')">↑ Upload here</button><button class="btn" onclick="openFab('folder','${id}')">＋ New subfolder</button>${viewBtn()}</div></div>
+<div class="g ${folderView}">${sub.map(folderCard).join('')}${it.map(fileCard).join('')}${!sub.length&&!it.length?empty(all?'Nothing matches your search.':'This folder is empty. Use “Upload here” to add files.'):''}</div></div>`};
 
 /* ===== QUIZ ===== */
 let QZ=null;const QS={n:10,t:0,c:null,sel:new Set()};
@@ -1034,75 +484,23 @@ function replay(h){const l=h.it.map(i=>({i,q:allQ().find(x=>x.id==i.id)})).filte
 bk=`<div class="row" style="margin:0 0 12px"><button class="btn" onclick="HV=null;route()">← History</button><label class="sm"><input type="checkbox" ${HW?'checked':''} onchange="HW=this.checked?1:0;HI=0;route()"> Wrong answers only</label></div>`;
 if(!l.length)return bk+empty('Nothing to show.');HI=Math.min(HI,l.length-1);const{i,q}=l[HI],n=l.length;
 return bk+flip(`<div>${E(q.q)}<div class="sm mu" style="margin-top:10px">${q.o.map((o,j)=>'ABCD'[j]+'. '+E(o)).join('<br>')}</div></div>`,`<div><b>${i.ok?'✓ You were correct':'✗ You were wrong'}</b><p>Your answer: ${i.ch==null?'(none)':E(i.ch)}</p><p>Correct: ${E(q.o[q.a])}</p><p class="sm mu">${E(q.e)}</p></div>`)+`<p class="mu sm" style="text-align:center">Question ${HI+1} of ${n} · click the card to flip</p><div class="row" style="justify-content:center"><button class="btn" onclick="HI=(HI+${n-1})%${n};route()">←</button><button class="btn" onclick="HI=(HI+1)%${n};route()">→</button></div>`}
-V.hist=()=>{const h=P.h.find(x=>x.id==HV);return hd('Quiz History','Every quiz you finish is saved here. Green = correct, red = wrong.')+`<div class="w sec">${h?replay(h):`<div class="stack">${P.h.map(x=>`<div class="card"><div class="row" style="margin:0"><b>${x.k} / ${x.n}</b><span class="mu sm">${Math.round(100*x.k/x.n)}% · ${new Date(x.ts).toLocaleDateString()} · ${mmss(x.secs)}</span></div><p class="sm">${E(x.sc)}</p><div class="strip">${x.it.map(i=>`<i class="${i.ok?'g':''}"></i>`).join('')}</div><button class="btn" onclick="HV='${x.id}';HI=0;HW=0;route()">Review as flashcards</button></div>`).join('')||empty('No quizzes taken yet.')}</div>`}</div>`};
+V.hist=()=>{const h=P.h.find(x=>x.id==HV),dt=t=>new Date(t).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}),tm=t=>new Date(t).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
+return hd('Quiz History','Every quiz you finish is saved here. Green = correct, red = wrong.')+`<div class="w sec">${h?replay(h):`<div class="stack">${P.h.map(x=>`<div class="card"><div class="hrow"><div class="hl"><b>${dt(x.ts)}</b><span class="mu sm">${tm(x.ts)}</span><span class="mu sm">⏱ ${mmss(x.secs)} taken</span></div><div class="hr"><span class="hscore">${x.k} / ${x.n} <small class="mu">${Math.round(100*x.k/x.n)}%</small></span><button class="btn p" onclick="HV='${x.id}';HI=0;HW=0;route()">Review as flashcards</button><span class="tag">${E(x.sc)}</span></div></div><div class="strip">${x.it.map(i=>`<i class="${i.ok?'g':''}"></i>`).join('')}</div></div>`).join('')||empty('No quizzes taken yet.')}</div>`}</div>`};
 
-/* ===== FLASHCARDS ===== */
-let FT='s',FC={i:0,o:null},ED=null,FF={c:'',k:''};
-
-const deck = () => {
-  if (FF.k === 'questions') {
-    return allQ()
-      .filter(x => (!FF.c || x.c == FF.c) && (!FF.s || x.s == FF.s) && (!FF.t || x.t == FF.t))
-      .map(x => ({
-        id: x.id,
-        c: x.c,
-        f: `[Question Bank] ${x.q}`,
-        b: `<b>Correct Answer:</b> ${'ABCD'[x.a]}<br><br>${x.e ? E(x.e) : 'No explanation provided.'}`,
-        img: '',
-        own: x.own
-      }));
-  }
-  const d = D.F.filter(x => (x.pub || x.own) && (!FF.c || x.c == FF.c) && (!FF.k || (FF.k == 'img' ? x.img : FF.k == 'own' ? x.own : !x.own)));
-  return FC.o ? d.sort((a, b) => FC.o.indexOf(a.id) - FC.o.indexOf(b.id)) : d;
-};
-
-function study() {
-  const d = deck();
-  const bar = `
-    <div class="bar" style="align-items:center;gap:8px;flex-wrap:wrap">
-      <select onchange="FF.c=this.value;FF.s='';FF.t='';FC.i=0;route()">
-        <option value="">All components</option>
-        ${C.map(c => `<option value="${c}" ${FF.c == c ? 'selected' : ''}>${c}</option>`).join('')}
-      </select>
-
-      <select onchange="FF.k=this.value;FF.s='';FF.t='';FC.i=0;route()">
-        <option value="">Official cards</option>
-        <option value="img" ${FF.k == 'img' ? 'selected' : ''}>Formula cards (images)</option>
-        <option value="own" ${FF.k == 'own' ? 'selected' : ''}>My cards</option>
-        <option value="questions" ${FF.k == 'questions' ? 'selected' : ''}>Question Bank Cards</option>
-      </select>
-
-      ${FF.k === 'questions' && FF.c ? `
-        <select onchange="FF.s=this.value;FF.t='';FC.i=0;route()">
-          <option value="">All subjects</option>
-          ${subs(FF.c).map(s => `<option value="${s}" ${FF.s == s ? 'selected' : ''}>${s}</option>`).join('')}
-        </select>
-      ` : ''}
-
-      ${FF.k === 'questions' && FF.s ? `
-        <select onchange="FF.t=this.value;FC.i=0;route()">
-          <option value="">All topics</option>
-          ${tops(FF.c, FF.s).map(t => `<option value="${t}" ${FF.t == t ? 'selected' : ''}>${t}</option>`).join('')}
-        </select>
-      ` : ''}
-    </div>`;
-
-  if (!d.length) return bar + empty('No questions found for this selection. Make sure questions are loaded and a component is selected.');
-  FC.i = Math.min(FC.i, d.length - 1);
-  const c = d[FC.i], s = P.fc[c.id];
-
-  return bar + flip(
-    `<div>${E(c.f)}</div>`,
-    `<div>${c.b ? c.b : ''}${c.img ? `<img src="${c.img}" alt="">` : ''}</div>`
-  ) + `
-    <p class="mu sm" style="text-align:center">Card ${FC.i + 1} of ${d.length} · ${c.c} · click card to flip</p>
-    <div class="row" style="justify-content:center">
-      <button class="btn" onclick="nav2(-1)">←</button>
-      <button class="btn p" onclick="nav2(1)">→</button>
-    </div>`;
-}
-function nav2(n){const l=deck().length;FC.i=(FC.i+n+l)%l;route()}
+/* ===== FLASHCARDS: generated from the question bank, plus official, formula and personal cards ===== */
+let FT='s',FC={i:0,o:null},ED=null,FF={c:'',k:'q',s:'',t:'',m:''};
+const qcard=x=>({id:x.id,c:x.c,own:x.own,src:'Question bank',fh:`<div>${E(x.q)}<div class="sm mu" style="margin-top:10px">${x.o.map((o,j)=>'ABCD'[j]+'. '+E(o)).join('<br>')}</div></div>`,bh:`<div><b>${'ABCD'[x.a]}. ${E(x.o[x.a])}</b>${x.e?`<p class="sm mu" style="margin-top:10px">${E(x.e)}</p>`:''}</div>`});
+const fcard=x=>({id:x.id,c:x.c,own:x.own,src:x.own?'Personal':'Official',fh:`<div>${E(x.f)}</div>`,bh:`<div>${x.b?E(x.b):''}${x.img?`<img src="${x.img}" alt="">`:''}</div>`});
+const deck=()=>{const k=FF.k||'q',m=FF.m;let d=k=='q'?allQ().filter(x=>(!FF.c||x.c==FF.c)&&(!FF.s||x.s==FF.s)&&(!FF.t||x.t==FF.t)).map(qcard)
+:D.F.filter(x=>(x.pub||x.own)&&(!FF.c||x.c==FF.c)&&(k=='img'?x.img:k=='own'?x.own:!x.own)).map(fcard);
+if(m)d=d.filter(x=>m=='new'?!P.fc[x.id]:P.fc[x.id]==m);return FC.o?d.sort((a,b)=>FC.o.indexOf(a.id)-FC.o.indexOf(b.id)):d};
+function nav2(n){const l=deck().length;if(!l)return route();FC.i=(FC.i+n+l)%l;route()}
 function mark(id,s){P.fc[id]=s;sb.from('flashcard_marks').upsert({user_id:ME.id,flashcard_id:id,status:s}).then(r=>r.error&&toast(r.error.message));nav2(1)}
+function study(){const d=deck(),k=FF.k||'q',rs="FC.i=0;route()",
+bar=`<div class="bar">${dd('ffK',[['q','From the question bank'],['off','Official cards'],['img','Formula cards (images)'],['own','My cards']],k,"FF.k=v;"+rs)}${dd('ffC',[['','All components'],...C],FF.c,"FF.c=v;FF.s='';FF.t='';"+rs)}${k=='q'&&FF.c?dd('ffS',[['','All subjects'],...subs(FF.c)],FF.s,"FF.s=v;FF.t='';"+rs):''}${k=='q'&&FF.s?dd('ffT',[['','All topics'],...tops(FF.c,FF.s)],FF.t,"FF.t=v;"+rs):''}${dd('ffM',[['','All cards'],['review','Need review'],['known','Known'],['new','Not marked yet']],FF.m,"FF.m=v;"+rs)}</div>`;
+if(!d.length)return bar+empty(k=='q'?'No questions match this selection.':'No cards here yet. Add your own under My Cards.');
+FC.i=Math.min(FC.i,d.length-1);const c=d[FC.i],s=P.fc[c.id];
+return bar+flip(c.fh,c.bh)+`<p class="mu sm" style="text-align:center">Card ${FC.i+1} of ${d.length} · ${c.c} · ${c.src} · ${s=='known'?'Known':s=='review'?'Need review':'Not marked'} · click the card to flip</p><div class="row" style="justify-content:center"><button class="btn" onclick="nav2(-1)">←</button><button class="btn" onclick="mark('${c.id}','review')">Need Review</button><button class="btn p" onclick="mark('${c.id}','known')">Known</button><button class="btn" onclick="nav2(1)">→</button><button class="btn" onclick="FC.o=sh(deck().map(x=>x.id));FC.i=0;route()">Shuffle</button></div>`}
 function readImg(id,cb){const f=$('#'+id).files[0];if(!f)return cb();const r=new FileReader();r.onload=()=>{const i=new Image();i.onload=()=>{const k=Math.min(1,900/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(i,0,0,c.width,c.height);c.toBlob(cb,'image/jpeg',.8)};i.onerror=()=>toast('Could not read that image');i.src=r.result};r.readAsDataURL(f)}
 function saveF(own){const f=v('ff').trim(),b=v('fb').trim();if(!f)return toast('Add a title for the front');
 readImg('fi',async blob=>{const e=own&&D.F.find(x=>x.id==ED);if(!b&&!blob&&!(e&&e.img))return toast('Add back text or an image');
@@ -1113,18 +511,15 @@ const r=e?await sb.from('flashcards').update(row).eq('id',e.id).select().single(
 if(r.error)return toast(r.error.message);
 let img=e?e.img:'';if(blob){const s=await sb.storage.from('flashcard-images').createSignedUrl(ip,3600);img=s.data?s.data.signedUrl:''}
 const x={id:r.data.id,c:row.component,f,b,img,ip:ip||'',pub:r.data.published,own:own?1:0};if(e)Object.assign(e,x);else D.F.push(x);ED=null;route()})}
-const fform=(e,own)=>`<select id="fk">${C.map(c=>`<option ${e.c==c?'selected':''}>${c}</option>`).join('')}</select><input id="ff" placeholder="Front / title" value="${E(e.f||'')}" style="width:100%"><textarea id="fb" placeholder="Back / answer (optional if you add an image)">${E(e.b||'')}</textarea><div><p class="lb">Formula image (optional)</p><input type="file" id="fi" accept="image/*">${e.img?'<p class="mu sm">Current image is kept unless you choose a new one.</p>':''}</div><div class="row"><button class="btn p" onclick="saveF(${own})">Save</button>${ED&&own?'<button class="btn" onclick="ED=null;route()">Cancel</button>':''}</div>`;
-function study(){const d=deck(),bar=`<div class="bar"><select onchange="FF.c=this.value;FC.i=0;route()"><option value="">All components</option>${C.map(c=>`<option ${FF.c==c?'selected':''}>${c}</option>`).join('')}</select><select onchange="FF.k=this.value;FC.i=0;route()">${[['','All cards'],['img','Formula cards (images)'],['own','My cards'],['off','Official cards']].map(([k,t])=>`<option value="${k}" ${FF.k==k?'selected':''}>${t}</option>`).join('')}</select></div>`;
-if(!d.length)return bar+empty('No cards here yet. Add formula cards under My Cards.');FC.i=Math.min(FC.i,d.length-1);const c=d[FC.i],s=P.fc[c.id];
-return bar+flip(`<div>${E(c.f)}</div>`,`<div>${c.b?E(c.b):''}${c.img?`<img src="${c.img}" alt="">`:''}</div>`)+`<p class="mu sm" style="text-align:center">Card ${FC.i+1} of ${d.length} · ${c.c} · ${c.own?'Personal':'Official'} · ${s=='known'?'Known':s=='review'?'Need review':'Unmarked'} · click the card to flip</p><div class="row" style="justify-content:center"><button class="btn" onclick="nav2(-1)">←</button><button class="btn" onclick="mark('${c.id}','review')">Need Review</button><button class="btn p" onclick="mark('${c.id}','known')">Known</button><button class="btn" onclick="nav2(1)">→</button><button class="btn" onclick="FC.o=sh(D.F.map(x=>x.id));FC.i=0;route()">Shuffle</button></div>`}
+const fform=(e,own)=>`${dd('fk',C,e.c||C[0])}<input id="ff" placeholder="Front / title" value="${E(e.f||'')}" style="width:100%"><textarea id="fb" placeholder="Back / answer (optional if you add an image)">${E(e.b||'')}</textarea><div><p class="lb">Formula image (optional)</p><input type="file" id="fi" accept="image/*">${e.img?'<p class="mu sm">Current image is kept unless you choose a new one.</p>':''}</div><div class="row"><button class="btn p" onclick="saveF(${own})">Save</button>${ED&&own?'<button class="btn" onclick="ED=null;route()">Cancel</button>':''}</div>`;
 function mine(){const e=D.F.find(x=>x.id==ED)||{};return `<div class="card stack"><h3>${ED?'Edit card':'New card'} <span class="mu sm">(private to you)</span></h3>${fform(e,1)}</div><div class="g" style="margin-top:16px">${D.F.filter(x=>x.own).map(x=>`<div class="card"><b>${E(x.f)}</b> ${x.img?'<span class="tag">image</span>':''}<p class="mu sm">${x.c}</p><div class="row"><button class="btn" onclick="ED='${x.id}';route()">Edit</button><button class="btn" onclick="del('F','${x.id}')">Delete</button></div></div>`).join('')||empty('You have no personal cards yet.')}</div>`}
-V.cards=()=>hd('Flashcards','Official cards, formula cards (images) and your private cards.')+`<div class="w sec"><div class="tabs">${[['s','Study'],['m','My Cards']].map(([k,n])=>`<a class="${FT==k?'on':''}" onclick="FT='${k}';route()">${n}</a>`).join('')}</div>${FT=='s'?study():mine()}</div>`;
+V.cards=()=>hd('Flashcards','Study cards made from the question bank, plus official, formula and your own cards.')+`<div class="w sec"><div class="tabs">${[['s','Study'],['m','My Cards']].map(([k,n])=>`<a class="${FT==k?'on':''}" onclick="FT='${k}';route()">${n}</a>`).join('')}</div>${FT=='s'?study():mine()}</div>`;
 
 /* ===== MY QUESTIONS ===== */
 async function addQ(off){const o=[0,1,2,3].map(i=>v('o'+i).trim()),q=v('mq').trim(),s=v('ms').trim(),t=v('mt').trim();if(!q||!s||!t||o.some(x=>!x))return toast('Fill in subject, topic, question and all 4 choices');
 const r=await sb.from('questions').insert({component:v('mc'),subject:s,topic:t,question:q,choice_a:o[0],choice_b:o[1],choice_c:o[2],choice_d:o[3],correct_answer:'ABCD'[+v('ma')],explanation:v('me').trim(),owner_id:off?null:ME.id}).select().single();
 if(r.error)return toast(r.error.message);const x=dbq(r.data);off?OQ.push(x):D.MQ.push(x);toast('Question added');route()}
-const qform=off=>`<div class="card stack"><select id="mc">${C.map(c=>`<option>${c}</option>`).join('')}</select><div class="row"><input id="ms" placeholder="Subject" list="sl"><input id="mt" placeholder="Topic"></div><datalist id="sl">${[...new Set(allQ().map(x=>x.s))].map(s=>`<option value="${E(s)}">`).join('')}</datalist><textarea id="mq" placeholder="Question"></textarea>${[0,1,2,3].map(i=>`<input id="o${i}" placeholder="Choice ${'ABCD'[i]}" style="width:100%">`).join('')}<div class="row"><select id="ma">${[0,1,2,3].map(i=>`<option value="${i}">Correct: ${'ABCD'[i]}</option>`).join('')}</select></div><textarea id="me" placeholder="Explanation / solution"></textarea><button class="btn p" onclick="addQ(${off})">Add question</button></div>`;
+const qform=off=>`<div class="card stack">${dd('mc',C,C[0])}<div class="row"><input id="ms" placeholder="Subject" list="sl"><input id="mt" placeholder="Topic"></div><datalist id="sl">${[...new Set(allQ().map(x=>x.s))].map(s=>`<option value="${E(s)}">`).join('')}</datalist><textarea id="mq" placeholder="Question"></textarea>${[0,1,2,3].map(i=>`<input id="o${i}" placeholder="Choice ${'ABCD'[i]}" style="width:100%">`).join('')}<div class="row">${dd('ma',[0,1,2,3].map(i=>[i,'Correct: '+'ABCD'[i]]),0)}</div><textarea id="me" placeholder="Explanation / solution"></textarea><button class="btn p" onclick="addQ(${off})">Add question</button></div>`;
 V.myq=()=>hd('My Questions','Add your own questions. They are private and appear in your quizzes.')+`<div class="w sec stack">${qform(0)}${D.MQ.map(x=>`<div class="card"><p class="mu sm">${x.c} › ${E(x.s)} › ${E(x.t)}</p><p>${E(x.q)}</p><a class="lk" onclick="del('MQ','${x.id}')">Delete</a></div>`).join('')}</div>`;
 
 /* ===== ADMIN ===== */
