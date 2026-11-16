@@ -196,6 +196,64 @@ let activeMenu = null;
 /* ===== CUSTOM CONFIRMATION MODAL STATE ===== */
 let confirmModalState = null; // { title, message, onYes }
 
+  // Native File Viewer State
+let viewerFile = null; // { title, url, type }
+
+async function openM(id) {
+  const m = D.M.find(x => x.id == id);
+  if (!m || !m.path) return toast('File not found');
+
+  const r = await sb.storage.from('review-materials').createSignedUrl(m.path, 3600);
+  if (r.error) return toast(r.error.message);
+
+  const url = r.data.signedUrl;
+  const ext = m.type.toLowerCase();
+
+  // Open natively in-site if PDF or image, otherwise open in new tab
+  if (['pdf', 'jpg', 'jpeg', 'png', 'webp'].includes(ext)) {
+    viewerFile = { title: m.title, url, type: ext };
+    route();
+  } else {
+    window.open(url, '_blank', 'noopener');
+  }
+}
+
+function closeViewer() {
+  viewerFile = null;
+  route();
+}
+
+function renderFileViewer() {
+  let root = $('#fileViewerRoot');
+  if (!root) {
+    const div = document.createElement('div');
+    div.id = 'fileViewerRoot';
+    document.body.appendChild(div);
+    root = div;
+  }
+  if (!viewerFile) {
+    root.innerHTML = '';
+    return;
+  }
+  const isPdf = viewerFile.type === 'pdf';
+  root.innerHTML = `
+    <div class="fm-backdrop" onclick="closeViewer()" style="padding:20px;">
+      <div class="fm-card" onclick="event.stopPropagation()" style="max-width:960px; width:100%; height:85vh; display:flex; flex-direction:column; padding:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--bd); padding-bottom:10px; margin-bottom:10px;">
+          <h2 style="font-size:1.1rem; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:80%;">${E(viewerFile.title)}</h2>
+          <button class="btn" onclick="closeViewer()">✕ Close</button>
+        </div>
+        <div style="flex:1; width:100%; height:100%; overflow:hidden; background:#f0f0f0; border-radius:var(--r); display:flex; align-items:center; justify-content:center;">
+          ${isPdf 
+            ? `<iframe src="${viewerFile.url}" style="width:100%; height:100%; border:none;"></iframe>`
+            : `<img src="${viewerFile.url}" style="max-width:100%; max-height:100%; object-fit:contain;" alt="">`
+          }
+        </div>
+      </div>
+    </div>
+  `;
+}
+
 function showConfirm(title, message, onYes) {
   confirmModalState = { title, message, onYes };
   route();
@@ -579,33 +637,56 @@ V.dash=()=>{const a=stat(()=>1),h=P.h.slice(0,4);return hd('Welcome, '+E(PR&&PR.
 <div class="card"><h3>Study</h3><div class="row"><button class="btn" onclick="FF={c:'',k:''};go('cards')">Flashcards</button><button class="btn" onclick="FF={c:'',k:'img'};go('cards')">Formula cards</button></div></div></div></div>`};
 
 V.c = c => {
-  if (!C.includes(c)) return V.dash();
-  const s = stat(x => x.c == c), fo = D.FO.filter(f => f.c == c && !f.parent);
-  return hd(c, CD[c]) + `<div class="w sec stack"><div class="card art"><h3>Quiz</h3><p class="mu">${s.n} questions available in ${c}. Pick one subject, several topics, or everything.</p><button class="btn p" onclick="go('quiz/${c}')">Take a ${c} quiz</button>${bars(s)}</div>
+  if (!C.includes(c)) return V.dash();
+  const s = stat(x => x.c == c), fo = D.FO.filter(f => f.c == c && !f.parent);
+  return hd(c, CD[c]) + `<div class="w sec stack"><div class="card art"><h3>Quiz</h3><p class="mu">${s.n} questions available in ${c}. Pick one subject, several topics, or everything.</p><button class="btn p" onclick="go('quiz/${c}')">Take a ${c} quiz</button>${bars(s)}</div>
 <div>
-  <div class="row" style="justify-content:space-between">
-    <h2>Folders</h2>
-    <button class="btn" onclick="toggleFolderView()">
-      ${folderView === 'grid' ? 'List view ☰' : 'Grid view ▦'}
-    </button>
-  </div>
-  <div class="g ${folderView}">
-  ${fo.map(f => `
-    <div class="card" style="position:relative">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start">
-        <h3 style="cursor:pointer;margin:0" onclick="go('f/${f.id}')">📁 ${E(f.name)}</h3>
-        <button class="btn" style="padding:2px 8px;border:none;background:transparent;font-size:1.2rem;cursor:pointer" onclick="toggleMenu('fo_${f.id}', event)">⋮</button>
-      </div>
-      <span class="tag" style="margin-top:8px;display:inline-block">${D.M.filter(m => m.fo == f.id).length + D.FO.filter(x => x.parent == f.id).length} items</span>
-
-      ${activeMenu === 'fo_' + f.id ? `
-        <div style="position:absolute;right:16px;top:40px;background:#fff;border:1px solid var(--bd);box-shadow:0 4px 16px #0002;border-radius:var(--r);z-index:20;padding:6px 0;min-width:140px" onclick="event.stopPropagation()">
-          <a style="display:block;padding:8px 14px;font-size:.9rem;cursor:pointer;" onclick="renameFolder('${f.id}')">✏️ Rename</a>
-          <a style="display:block;padding:8px 14px;font-size:.9rem;color:#d9534f;cursor:pointer;" onclick="showConfirm('Delete Folder', 'Are you sure you want to delete this folder?', () => delFo('${f.id}'))">🗑️ Delete</a>
-        </div>
-      ` : ''}
-    </div>
-  `).join('') || empty('No folders here yet.')}
+  <div class="row" style="justify-content:space-between">
+    <h2>Folders</h2>
+    <button class="btn" onclick="toggleFolderView()">
+      ${folderView === 'grid' ? 'List view ☰' : 'Grid view ▦'}
+    </button>
+  </div>
+  <div class="g ${folderView}">
+  ${fo.map(f => {
+    const count = D.M.filter(m => m.fo == f.id).length + D.FO.filter(x => x.parent == f.id).length;
+    if (folderView === 'list') {
+      return `
+        <div class="card" style="display:flex; align-items:center; justify-content:space-between; padding:12px 18px; position:relative;">
+          <div style="display:flex; align-items:center; gap:12px; cursor:pointer; flex:1; min-width:0;" onclick="go('f/${f.id}')">
+            <span style="font-size:1.2rem;">📁</span>
+            <h3 style="margin:0; font-size:1rem; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${E(f.name)}</h3>
+          </div>
+          <div style="display:flex; align-items:center; gap:16px;">
+            <span class="tag">${count} items</span>
+            <button class="btn" style="padding:4px 8px; border:none; background:transparent; font-size:1.2rem; cursor:pointer;" onclick="toggleMenu('fo_${f.id}', event)">⋮</button>
+          </div>
+          ${activeMenu === 'fo_' + f.id ? `
+            <div style="position:absolute; right:16px; top:45px; background:#fff; border:1px solid var(--bd); box-shadow:0 4px 16px #0002; border-radius:var(--r); z-index:20; padding:6px 0; min-width:140px" onclick="event.stopPropagation()">
+              <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="renameFolder('${f.id}')">✏️ Rename</a>
+              <a style="display:block; padding:8px 14px; font-size:.9rem; color:#d9534f; cursor:pointer;" onclick="showConfirm('Delete Folder', 'Are you sure you want to delete this folder?', () => delFo('${f.id}'))">🗑️ Delete</a>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    } else {
+      return `
+        <div class="card" style="position:relative;">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start">
+            <h3 style="cursor:pointer; margin:0; display:flex; align-items:center; gap:8px;" onclick="go('f/${f.id}')">📁 ${E(f.name)}</h3>
+            <button class="btn" style="padding:2px 8px; border:none; background:transparent; font-size:1.2rem; cursor:pointer;" onclick="toggleMenu('fo_${f.id}', event)">⋮</button>
+          </div>
+          <span class="tag" style="margin-top:12px; display:inline-block">${count} items</span>
+          ${activeMenu === 'fo_' + f.id ? `
+            <div style="position:absolute; right:16px; top:40px; background:#fff; border:1px solid var(--bd); box-shadow:0 4px 16px #0002; border-radius:var(--r); z-index:20; padding:6px 0; min-width:140px" onclick="event.stopPropagation()">
+              <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="renameFolder('${f.id}')">✏️ Rename</a>
+              <a style="display:block; padding:8px 14px; font-size:.9rem; color:#d9534f; cursor:pointer;" onclick="showConfirm('Delete Folder', 'Are you sure?', () => delFo('${f.id}'))">🗑️ Delete</a>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+  }).join('') || empty('No folders here yet.')}
 </div></div>
 <div><h2>Subject statistics</h2><div class="card" style="overflow-x:auto"><table style="margin:0"><tr><th>Subject / topic</th><th>Questions</th><th>Accuracy</th><th>Mastery</th></tr>${subs(c).map(sb => { const t = stat(x => x.c == c && x.s == sb); return `<tr><td><b>${E(sb)}</b></td><td>${t.n}</td><td>${t.acc}%</td><td>${t.ms}%</td></tr>` + tops(c, sb).map(p => { const u = stat(x => x.c == c && x.s == sb && x.t == p); return `<tr class="mu sm"><td>&nbsp;&nbsp;${E(p)}</td><td>${u.n}</td><td>${u.acc}%</td><td>${u.ms}%</td></tr>` }).join('') }).join('') || '<tr><td class="mu">No questions yet for this component.</td></tr>'}</table></div></div></div>`;
 };
@@ -645,73 +726,116 @@ async function delM(id){
 }
 
 V.f = id => {
-  const f = D.FO.find(x => x.id == id);
-  if (!f) return V.dash();
+  const f = D.FO.find(x => x.id == id);
+  if (!f) return V.dash();
 
-  const it = D.M.filter(m => m.fo == id);
-  const sub = D.FO.filter(x => x.parent == id);
-  const parent = f.parent ? D.FO.find(x => x.id == f.parent) : null;
-  const canManage = f.own || role === 'admin';
+  const it = D.M.filter(m => m.fo == id);
+  const sub = D.FO.filter(x => x.parent == id);
+  const parent = f.parent ? D.FO.find(x => x.id == f.parent) : null;
+  const canManage = f.own || role === 'admin';
 
-  return hd('📁 ' + E(f.name),
-    `<a class="lk" onclick="go('${parent ? 'f/' + parent.id : 'c/' + f.c}')">
-      ← ${parent ? E(parent.name) : f.c}
-    </a>`
-  ) + `<div class="w sec stack">
+  return hd('📁 ' + E(f.name),
+    `<a class="lk" onclick="go('${parent ? 'f/' + parent.id : 'c/' + f.c}')">
+      ← ${parent ? E(parent.name) : f.c}
+    </a>`
+  ) + `<div class="w sec stack">
 
-    <div class="row" style="justify-content:space-between">
-      <h2>Folders & Files</h2>
-      <button class="btn" onclick="toggleFolderView()">
-        ${folderView === 'grid' ? 'List view ☰' : 'Grid view ▦'}
-      </button>
-    </div>
+    <div class="row" style="justify-content:space-between">
+      <h2>Folders & Files</h2>
+      <button class="btn" onclick="toggleFolderView()">
+        ${folderView === 'grid' ? 'List view ☰' : 'Grid view ▦'}
+      </button>
+    </div>
 
-    <div class="g ${folderView}">
-      ${sub.map(x => `
-        <div class="card" style="position:relative">
-          <div style="display:flex;justify-content:space-between;align-items:flex-start">
-            <h3 style="cursor:pointer;margin:0" onclick="go('f/${x.id}')">📁 ${E(x.name)}</h3>
-            <button class="btn" style="padding:2px 8px;border:none;background:transparent;font-size:1.2rem;cursor:pointer" onclick="toggleMenu('fo_${x.id}', event)">⋮</button>
-          </div>
-          <span class="tag" style="margin-top:8px;display:inline-block">${D.M.filter(m => m.fo == x.id).length + D.FO.filter(y => y.parent == x.id).length} items</span>
+    <div class="g ${folderView}">
+      ${sub.map(x => {
+        const count = D.M.filter(m => m.fo == x.id).length + D.FO.filter(y => y.parent == x.id).length;
+        if (folderView === 'list') {
+          return `
+            <div class="card" style="display:flex; align-items:center; justify-content:space-between; padding:12px 18px; position:relative;">
+              <div style="display:flex; align-items:center; gap:12px; cursor:pointer; flex:1; min-width:0;" onclick="go('f/${x.id}')">
+                <span style="font-size:1.2rem;">📁</span>
+                <h3 style="margin:0; font-size:1rem; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${E(x.name)}</h3>
+              </div>
+              <div style="display:flex; align-items:center; gap:16px;">
+                <span class="tag">${count} items</span>
+                <button class="btn" style="padding:4px 8px; border:none; background:transparent; font-size:1.2rem; cursor:pointer;" onclick="toggleMenu('fo_${x.id}', event)">⋮</button>
+              </div>
+              ${activeMenu === 'fo_' + x.id ? `
+                <div style="position:absolute; right:16px; top:45px; background:#fff; border:1px solid var(--bd); box-shadow:0 4px 16px #0002; border-radius:var(--r); z-index:20; padding:6px 0; min-width:140px" onclick="event.stopPropagation()">
+                  <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="renameFolder('${x.id}')">✏️ Rename</a>
+                  <a style="display:block; padding:8px 14px; font-size:.9rem; color:#d9534f; cursor:pointer;" onclick="showConfirm('Delete Folder', 'Are you sure?', () => delFo('${x.id}'))">🗑️ Delete</a>
+                </div>
+              ` : ''}
+            </div>
+          `;
+        } else {
+          return `
+            <div class="card" style="position:relative;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start">
+                <h3 style="cursor:pointer; margin:0; display:flex; align-items:center; gap:8px;" onclick="go('f/${x.id}')">📁 ${E(x.name)}</h3>
+                <button class="btn" style="padding:2px 8px; border:none; background:transparent; font-size:1.2rem; cursor:pointer;" onclick="toggleMenu('fo_${x.id}', event)">⋮</button>
+              </div>
+              <span class="tag" style="margin-top:12px; display:inline-block">${count} items</span>
+              ${activeMenu === 'fo_' + x.id ? `
+                <div style="position:absolute; right:16px; top:40px; background:#fff; border:1px solid var(--bd); box-shadow:0 4px 16px #0002; border-radius:var(--r); z-index:20; padding:6px 0; min-width:140px" onclick="event.stopPropagation()">
+                  <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="renameFolder('${x.id}')">✏️ Rename</a>
+                  <a style="display:block; padding:8px 14px; font-size:.9rem; color:#d9534f; cursor:pointer;" onclick="showConfirm('Delete Folder', 'Are you sure?', () => delFo('${x.id}'))">🗑️ Delete</a>
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }
+      }).join('') || ''}
 
-          ${activeMenu === 'fo_' + x.id ? `
-            <div style="position:absolute;right:16px;top:40px;background:#fff;border:1px solid var(--bd);box-shadow:0 4px 16px #0002;border-radius:var(--r);z-index:20;padding:6px 0;min-width:140px" onclick="event.stopPropagation()">
-              <a style="display:block;padding:8px 14px;font-size:.9rem;cursor:pointer;" onclick="renameFolder('${x.id}')">✏️ Rename</a>
-              <a style="display:block;padding:8px 14px;font-size:.9rem;color:#d9534f;cursor:pointer;" onclick="showConfirm('Delete Folder', 'Are you sure?', () => delFo('${x.id}'))">🗑️ Delete</a>
-            </div>
-          ` : ''}
-        </div>
-      `).join('') || ''}
+      ${it.map(m => {
+        if (folderView === 'list') {
+          return `
+            <div class="card" style="display:flex; align-items:center; justify-content:space-between; padding:12px 18px; position:relative;">
+              <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:0; cursor:pointer;" onclick="openM('${m.id}')">
+                ${tag(m.type)}
+                <h3 style="margin:0; font-size:1rem; color:var(--ink); font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${E(m.title)}</h3>
+              </div>
+              <div style="display:flex; align-items:center; gap:16px;">
+                <a class="star" onclick="event.stopPropagation(); bm('${m.id}')">${P.bm.includes(m.id) ? '★' : '☆'}</a>
+                <button class="btn" style="padding:4px 8px; border:none; background:transparent; font-size:1.2rem; cursor:pointer;" onclick="toggleMenu('m_${m.id}', event)">⋮</button>
+              </div>
+              ${activeMenu === 'm_' + m.id ? `
+                <div style="position:absolute; right:16px; top:45px; background:#fff; border:1px solid var(--bd); box-shadow:0 4px 16px #0002; border-radius:var(--r); z-index:20; padding:6px 0; min-width:140px" onclick="event.stopPropagation()">
+                  <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="openM('${m.id}')">👁️ Open File</a>
+                  ${canManage ? `<a style="display:block; padding:8px 14px; font-size:.9rem; color:#d9534f; cursor:pointer;" onclick="showConfirm('Delete Material', 'Delete this file permanently?', () => delM('${m.id}'))">🗑️ Delete</a>` : ''}
+                </div>
+              ` : ''}
+            </div>
+          `;
+        } else {
+          return `
+            <div class="card" style="position:relative;">
+              <div class="row" style="margin:0; justify-content:space-between">
+                ${tag(m.type)}
+                <div style="display:flex; gap:6px; align-items:center">
+                  <a class="star" onclick="bm('${m.id}')">${P.bm.includes(m.id) ? '★' : '☆'}</a>
+                  <button class="btn" style="padding:2px 8px; border:none; background:transparent; font-size:1.2rem; cursor:pointer" onclick="toggleMenu('m_${m.id}', event)">⋮</button>
+                </div>
+              </div>
+              <h3 style="margin-top:8px; cursor:pointer; color:var(--ink);" onclick="openM('${m.id}')">${E(m.title)}</h3>
+              <p class="mu">${E(m.desc)}</p>
+              
+              ${activeMenu === 'm_' + m.id ? `
+                <div style="position:absolute; right:16px; top:40px; background:#fff; border:1px solid var(--bd); box-shadow:0 4px 16px #0002; border-radius:var(--r); z-index:20; padding:6px 0; min-width:140px" onclick="event.stopPropagation()">
+                  <a style="display:block; padding:8px 14px; font-size:.9rem; cursor:pointer;" onclick="openM('${m.id}')">👁️ Open File</a>
+                  ${canManage ? `<a style="display:block; padding:8px 14px; font-size:.9rem; color:#d9534f; cursor:pointer;" onclick="showConfirm('Delete Material', 'Delete this file permanently?', () => delM('${m.id}'))">🗑️ Delete</a>` : ''}
+                </div>
+              ` : ''}
+            </div>
+          `;
+        }
+      }).join('')}
 
-      ${it.map(m => `
-        <div class="card" style="position:relative">
-          <div class="row" style="margin:0;justify-content:space-between">
-            ${tag(m.type)}
-            <div style="display:flex;gap:6px;align-items:center">
-              <a class="star" onclick="bm('${m.id}')">${P.bm.includes(m.id) ? '★' : '☆'}</a>
-              <button class="btn" style="padding:2px 8px;border:none;background:transparent;font-size:1.2rem;cursor:pointer" onclick="toggleMenu('m_${m.id}', event)">⋮</button>
-            </div>
-          </div>
-          <h3 style="margin-top:8px">${E(m.title)}</h3>
-          <p class="mu">${E(m.desc)}</p>
-          <div class="row">
-            <button class="btn" onclick="openM('${m.id}')">Open</button>
-          </div>
+      ${!sub.length && !it.length ? empty('This folder is empty.') : ''}
+    </div>
 
-          ${activeMenu === 'm_' + m.id ? `
-            <div style="position:absolute;right:16px;top:40px;background:#fff;border:1px solid var(--bd);box-shadow:0 4px 16px #0002;border-radius:var(--r);z-index:20;padding:6px 0;min-width:140px" onclick="event.stopPropagation()">
-              <a style="display:block;padding:8px 14px;font-size:.9rem;cursor:pointer;" onclick="openM('${m.id}')">👁️ Open File</a>
-              ${canManage ? `<a style="display:block;padding:8px 14px;font-size:.9rem;color:#d9534f;cursor:pointer;" onclick="showConfirm('Delete Material', 'Delete this file permanently?', () => delM('${m.id}'))">🗑️ Delete</a>` : ''}
-            </div>
-          ` : ''}
-        </div>
-      `).join('')}
-
-      ${!sub.length && !it.length ? empty('This folder is empty.') : ''}
-    </div>
-
-  </div>`;
+  </div>`;
 };
 
 /* ===== QUIZ ===== */
@@ -879,6 +1003,7 @@ const ap=$('#app');ap.innerHTML=V[n](a);if(nv){ap.className='';void ap.offsetWid
 $('#tb').innerHTML=tbar();$('#dr').innerHTML=ME?drawer():'';$('#bg').style.display=ME?'':'none';
 renderFab();
 renderCustomConfirm();
+renderFileViewer();
 if(n=='quiz'&&QZ&&!QZ.done){cnt();if(QZ.end)tick()}else smry()}
 addEventListener('hashchange',()=>{nv=1;scrollTo(0,0);route()});
 addEventListener('keydown',e=>{if(e.key=='Enter'&&location.hash=='#/auth'&&e.target.tagName=='INPUT')doAuth()});
