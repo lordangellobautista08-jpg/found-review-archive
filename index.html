@@ -93,16 +93,16 @@ footer{border-top:1px solid var(--bd);padding:22px 0;color:var(--mu);font-size:.
 .g.list>.card p{
   margin:4px 0;
 }
-/* ===== FLOATING ACTION BUTTON + MODAL ===== */
-#fabRoot{position:fixed;right:36px;bottom:36px;z-index:40}
+/* ===== FLOATING ACTION BUTTON: Relocated & Prominent ===== */
+#fabRoot{position:fixed;right:48px;bottom:70px;z-index:40}
 .fab{
-  width:60px;height:60px;border:0;border-radius:50%;
-  background:var(--teal);color:#fff;font-size:2.2rem;
-  line-height:1;cursor:pointer;box-shadow:0 6px 20px #0004;
+  width:64px;height:64px;border:0;border-radius:50%;
+  background:var(--teal);color:#fff;font-size:2.4rem;
+  line-height:1;cursor:pointer;box-shadow:0 8px 24px #0005;
   display:flex;align-items:center;justify-content:center;
-  transition:transform .15s, background .15s;
+  transition:transform .2s, background .2s, box-shadow .2s;
 }
-.fab:hover{background:var(--ink);transform:scale(1.05)}
+.fab:hover{background:var(--ink);transform:scale(1.1);box-shadow:0 12px 32px #0006}
 .fm-backdrop{
   position:fixed;inset:0;background:#0006;z-index:50;
   display:flex;align-items:center;justify-content:center;padding:18px;
@@ -192,7 +192,19 @@ CD={MSTC:'Mathematics, Surveying and Transportation Engineering.',HPGE:'Hydrauli
 let D={FO:[],M:[],F:[],MQ:[],U:[]},P={h:[],q:{},fc:{},bm:[]},role='student',nv=0,tk,QL=0,OQ=[],ME=null,PR=null,CU=null,AU={mode:'in',msg:''};
 let folderView='grid';
 let fabOpen=false,fabMode='folder',fabComponent='',fabDestination='';
-let activeMenu = null; 
+let activeMenu = null;
+/* ===== CUSTOM CONFIRMATION MODAL STATE ===== */
+let confirmModalState = null; // { title, message, onYes }
+
+function showConfirm(title, message, onYes) {
+  confirmModalState = { title, message, onYes };
+  route();
+}
+
+function closeConfirm() {
+  confirmModalState = null;
+  route();
+}
 
 function toggleMenu(id, event) {
   event.stopPropagation();
@@ -350,6 +362,33 @@ function renderFab(){
     `:''}
   `;
 }
+
+function renderCustomConfirm() {
+  let root = $('#confirmModalRoot');
+  if (!root) {
+    const div = document.createElement('div');
+    div.id = 'confirmModalRoot';
+    document.body.appendChild(div);
+    root = div;
+  }
+  if (!confirmModalState) {
+    root.innerHTML = '';
+    return;
+  }
+  root.innerHTML = `
+    <div class="fm-backdrop" onclick="closeConfirm()">
+      <div class="fm-card" onclick="event.stopPropagation()">
+        <h2>${E(confirmModalState.title)}</h2>
+        <p class="mu" style="margin-bottom:20px">${E(confirmModalState.message)}</p>
+        <div class="fm-actions">
+          <button class="btn" onclick="closeConfirm()">Cancel</button>
+          <button class="btn p" onclick="confirmModalState.onYes(); closeConfirm();">Confirm</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+  
 async function createFabFolder(){
   const name=$('#fabName').value.trim();
 
@@ -797,6 +836,7 @@ else if(m=='reset'){r=await sb.auth.resetPasswordForEmail(e,{redirectTo:location
 else{r=await sb.auth.updateUser({password:p});if(!r.error){AU.mode='in';toast('Password updated');return go('dash')}}
 if(r.error)return toast(r.error.message);
 if(m=='up'&&!r.data.session){AU.msg='Account created. Check your email to confirm it, then log in.';route()}}
+  
 function route(){clearTimeout(tk);const[n0,a]=(location.hash.slice(2)||'home').split('/');let n=V[n0]?n0:'home';
 if(!QL){$('#app').innerHTML='<div class="w sec">'+empty('Loading…')+'</div>';$('#tb').innerHTML='';$('#bg').style.display='none';return}
 if(!ME&&!['home','auth'].includes(n))n='auth';
@@ -805,6 +845,7 @@ if(n=='admin'&&role!='admin'){toast('Admins only');n='dash'}
 const ap=$('#app');ap.innerHTML=V[n](a);if(nv){ap.className='';void ap.offsetWidth;ap.className='in';nv=0}
 $('#tb').innerHTML=tbar();$('#dr').innerHTML=ME?drawer():'';$('#bg').style.display=ME?'':'none';
 renderFab();
+renderCustomConfirm();
 if(n=='quiz'&&QZ&&!QZ.done){cnt();if(QZ.end)tick()}else smry()}
 addEventListener('hashchange',()=>{nv=1;scrollTo(0,0);route()});
 addEventListener('keydown',e=>{if(e.key=='Enter'&&location.hash=='#/auth'&&e.target.tagName=='INPUT')doAuth()});
