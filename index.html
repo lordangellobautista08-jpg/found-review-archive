@@ -339,6 +339,9 @@ body.dg .fr[data-drop],body.dg .ph a.lk{transition:transform .12s,box-shadow .12
 
 /* ===== DASHBOARD LAYOUT + QUICKIZ ===== */
 .dgrid{display:grid;grid-template-columns:3fr 2fr;gap:16px;align-items:stretch}
+.dgrid>.stack{display:flex;flex-direction:column;gap:16px}
+.dgrid>.stack>*{margin-top:0!important}
+.dgrid>.stack>.card:not(.stMob){flex:1 1 auto;display:flex;flex-direction:column;justify-content:center}
 .dph{border-style:dashed;display:flex;align-items:center;justify-content:center;text-align:center;min-height:200px}
 @media(max-width:700px){.dgrid{grid-template-columns:1fr}.dgrid>.stack{order:-1}}
 .qkd{display:flex;gap:6px;margin:6px 0}.qkd i{width:16px;height:16px;border-radius:50%;border:1px solid var(--teal);background:transparent}.qkd i.on{background:var(--teal)}
@@ -397,8 +400,14 @@ body.sbo #fabRoot{right:344px}
 
 /* ===== STUDY TRACKER (streak palette is deliberately warm orange so it stands out from the teal/purple theme) ===== */
 .stCard{display:flex;flex-direction:column;gap:12px}
-.stBig{font-size:clamp(2.6rem,7vw,4rem);font-weight:800;line-height:1.05;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.stBig{font-size:clamp(2.21rem,5.95vw,3.4rem);font-weight:800;line-height:1.05;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
 .stRow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.stCols{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
+.stL,.stR{display:flex;flex-direction:column;gap:10px;min-width:0}.stL>.btn{width:100%}
+.stR{border-left:1px solid var(--bd);padding-left:18px}
+.stKv{display:flex;justify-content:space-between;align-items:baseline;gap:10px}.stKv b{text-align:right}
+.stTL{font-size:1.9rem;font-weight:800;line-height:1.1;color:var(--ink);font-variant-numeric:tabular-nums}
+@media(max-width:900px){.stCols{grid-template-columns:1fr}.stR{border-left:0;padding-left:0;border-top:1px solid var(--bd);padding-top:12px}}
 .stRow .custom-dropdown{min-width:140px}
 .btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
 .sd{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;border:2px dashed var(--bd);filter:grayscale(1);opacity:.4;font-size:15px}
@@ -1337,7 +1346,7 @@ tmd=ms=>tm(ms)+(phDay(ms)!=phDay()?' (tomorrow)':''),
 hms=s=>{s=Math.max(0,s);return String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor(s/60)%60).padStart(2,'0')+':'+String(s%60).padStart(2,'0')},
 dur=s=>{const m=Math.round(s/60);return m<60?m+' min':Math.floor(m/60)+' h'+(m%60?' '+m%60+' min':'')},
 fm=n=>{const w=Math.floor(n);return n%1?(w||'')+'½':''+n},
-FULL=[180,240,300,360,420,480],MINI=[30,45,60,75,90],gl=m=>m<60?m+' min':Math.floor(m/60)+' hr'+(m%60?' '+m%60+' min':'');
+FULL=[120,180,240,300,360,420,480],MINI=[30,45,60,75,90],gl=m=>m<60?m+' min':Math.floor(m/60)+' hr'+(m%60?' '+m%60+' min':'');
 let stPh='';
 const stLoad=()=>{let s={};try{s=JSON.parse(localStorage.getItem('st_'+ME.id)||'{}')}catch(e){}
 s=Object.assign({goal:0,gk:'',pm:'full',a:null,h:[],streak:0,last:'',dc:{},rv:{m:'',u:0}},s);
@@ -1351,6 +1360,8 @@ stExp=s=>{const a=s.a;return tmd(Date.now()+(a?Math.max(0,a.g-stEl(a)):s.goal*60
 stName=m=>`<div class="stT lt">${m=='mini'?'Mini Lock In':'Lock in Study'}</div>`,
 stBrk=d=>`<div class="stBrk sm">💔 Streak broken. You lost a ${fm(d.lost)}-day streak. Revive it, your choice how.<div class="stRow" style="margin-top:8px"><button class="btn p" ${d.rv<1?'disabled':''} onclick="stRevive()">🔥 Revive</button><span>${d.rv} of 7 revives left this month</span></div></div>`,
 stWarn=(o,w)=>`<p class="stWarn sm">⏰ Timer done! Declare your study ended: tap <b>End study</b> within <b data-st="grace">${mmss(Math.max(0,w-o))}</b> or this session won't count.</p>`,
+stXN=(o)=>`<p class="stWarn sm">✅ 2-hour minimum reached. Tap <b>End study</b> now, or keep going: +½ streak day for every extra full hour. Bonus so far: <b data-st="xb">${fm(.5*Math.floor(o/3600))}</b> day</p>`,
+stOv=(a,o,w)=>a.x?stXN(o):stWarn(o,w),
 stLog=l=>`<p class="sm mu">${{start:'▶ Started',pause:'⏸ Paused',resume:'⏯ Resumed',end:'✔ Ended'}[l.t]} ${tm(l.ts)}${l.t=='pause'?' · after '+dur(l.m*60)+' of study':l.t=='resume'?' · paused for '+dur(l.m*60):''}</p>`;
 function stStreak(s){const d=stDer(s),n=d.cur,full=n>0&&n%7==0,c=full?7:n%7,nx=(Math.floor(n/7)+1)*7,nxi=Math.floor(c);
 return `<div class="stS"><div class="stSh"><b>🔥 ${fm(n)} day${n==1?'':'s'} streak</b>${full?`<span class="stM">🏆 ${fm(n)} days straight!</span>`:''}</div><div class="stDots">${[0,1,2,3,4,5,6].map(i=>{const f=Math.min(1,Math.max(0,c-i));return `<span class="sd${f>=1?' on':f>0?' half':i==nxi&&!d.today?' nx':''}">🔥</span>`}).join('')}</div><p class="sm mu">Next milestone: <b class="stM">${nx} days</b> · ${fm(nx-n)} to go</p></div>`}
@@ -1360,42 +1371,48 @@ function stDashHtml(){const s=stLoad(),d=stDer(s),a=s.a,run=!!a,pm=d.fd?'mini':s
 nm=a?(a.mode=='mini'||a.mn?'mini':'full'):pm;
 return `${stName(nm)}<div><div class="stBig" data-st="clock">${tms(Date.now())}</div><p class="mu sm"><span data-st="date">${phF({weekday:'long',month:'long',day:'numeric'},Date.now())}</span> · Philippine Time</p></div>
 ${stStreak(s)}${d.br&&!run?stBrk(d):''}
+<div class="stCols"><div class="stL">
 <div class="seg" ${run?'style="pointer-events:none;opacity:.5"':''} style="align-self:flex-start"><button class="${pm=='full'?'on':''}" ${d.fd?'disabled':''} onclick="stMode('full')">Lock in Study${d.fd?' ✓':''}</button><button class="${pm=='mini'?'on':''}" onclick="stMode('mini')">Mini Lock In</button></div>
 <div class="stRow"><div ${run?'style="pointer-events:none;opacity:.5"':''}>${dd('stGoal',[['','Select timer']].concat((pm=='mini'?MINI:FULL).map(x=>[x,gl(x)])),g||'')}</div><button class="btn" ${run?'disabled':''} onclick="stSet()">Set</button>${g&&!run?`<span class="tag">Timer set: ${gl(g)}</span>`:''}</div>
-<p class="sm">Time left <b data-st="rem">${hms(run?r:g*60)}</b> · Expected end <b data-st="exp">${g||run?stExp(s):'--'}</b></p>
-<div class="stRow"><button class="btn p" ${g&&!run?'':'disabled'} onclick="stAsk()">▶ Start study</button><span class="sm mu">Started: <b>${sd}</b></span></div>
-<div class="stRow"><button class="btn p" ${run?'':'disabled'} onclick="stEnd()">■ End study</button><span class="sm mu">Ended: <b>${ed}</b></span></div>
-${run?`<p class="sm mu">End in the last ${w/60} min of the timer to earn streak credit. Ending earlier is allowed but only logs your time.</p>`:''}${ov?stWarn(ov,w):''}
-<div class="stRow"><button class="btn" ${run?'':'disabled'} onclick="stStop()">Stop</button><button class="btn" ${run||g?'':'disabled'} onclick="stReset()">Reset</button></div>${stHist(s)}`}
+<button class="btn p" ${g&&!run?'':'disabled'} onclick="stAsk()">▶ Start study</button>
+<button class="btn p" ${run?'':'disabled'} onclick="stEnd()">■ End study</button>
+<div class="stRow"><button class="btn" ${run?'':'disabled'} onclick="stStop()">Stop</button><button class="btn" ${run||g?'':'disabled'} onclick="stReset()">Reset</button></div>
+</div><div class="stR">
+<div class="stKv"><span class="mu sm">Time left</span><b class="stTL" data-st="rem">${hms(run?r:g*60)}</b></div>
+<div class="stKv sm"><span class="mu">Expected end</span><b data-st="exp">${g||run?stExp(s):'--'}</b></div>
+<div class="stKv sm"><span class="mu">Started</span><b>${sd}</b></div>
+<div class="stKv sm"><span class="mu">Ended</span><b>${ed}</b></div>
+${run?`<p class="sm mu">End in the last ${w/60} min of the timer to earn streak credit. Ending earlier is allowed but only logs your time.</p>`:''}${ov?stOv(a,ov,w):''}
+${stHist(s)}</div></div>`}
 function stPanel(mini){const s=stLoad(),d=stDer(s),a=s.a;if(!a&&!d.br)return'';
 const e=a?stEl(a):0,r=a?Math.max(0,a.g-e):0,ov=a?Math.max(0,e-a.g):0,rvm=a&&a.mode=='revive'&&!a.mn;
 let h=`<div class="stFull">${stName(a&&(a.mode=='mini'||a.mn)?'mini':'full')}<div class="stTiny"><span class="mu sm">PH time</span><b data-st="clock">${tms(Date.now())}</b></div>`;
-if(a)h+=`<div class="stLab">${ov?'⏰ Overtime':a.pa?'⏸ Paused':rvm?'🔥 Revive · straight':'📖 Studying'}</div><div class="stRem" data-st="rem">${hms(r)}</div>
+if(a)h+=`<div class="stLab">${ov?(a.x?'✅ Bonus time':'⏰ Overtime'):a.pa?'⏸ Paused':rvm?'🔥 Revive · straight':'📖 Studying'}</div><div class="stRem" data-st="rem">${hms(r)}</div>
 <button class="btn p" style="width:100%" ${ov||rvm?'disabled':''} onclick="stPause()">${a.pa?'▶ Resume study':'⏸ Pause study'}</button>
-<p class="sm mu">Expected end <b data-st="exp">${stExp(s)}</b></p><button class="btn" style="width:100%" onclick="stEnd()">✔ End study</button>${ov?stWarn(ov,stW(a)):''}`;
+<p class="sm mu">Expected end <b data-st="exp">${stExp(s)}</b></p><button class="btn" style="width:100%" onclick="stEnd()">✔ End study</button>${ov?stOv(a,ov,stW(a)):''}`;
 h+=stStreak(s)+(!a?stBrk(d):'')+'</div>';
 return h+(mini?`<div class="stMin" onclick="$('#stRail').classList.toggle('open')">${a?`⏱ <span data-st="rem">${hms(r)}</span>`:'💔 Streak'}</div>`:'')}
 function stRender(){const r=$('#stRail');if(!r)return;const s=ME?stLoad():null,p=ME?stPanel(1):'';r.innerHTML=p;r.classList.toggle('on',!!p);document.body.classList.toggle('stp',!!p);
 const dr=document.querySelector('.stDr');if(dr)dr.innerHTML=ME?stPanel(0):'';const x=$('#stDash');if(x)x.innerHTML=ME?stDashHtml():'';const m=$('#stMobBox');if(m)m.innerHTML=ME?stStreak(s):'';stPh=ME?stPhase(s):''}
 function stMode(m){const s=stLoad();if(s.a||(m=='full'&&stDer(s).fd))return;s.pm=m;if(s.gk!=m)s.goal=0;stSave(s);stRender()}
 function stSet(){const g=+v('stGoal');if(!g)return toast('Pick a timer first');const s=stLoad(),pm=stDer(s).fd?'mini':s.pm;s.goal=g;s.gk=pm;stSave(s);stRender();toast('Timer set: '+gl(g))}
-function stAsk(mode,rm){const s=stLoad(),d=stDer(s),rv=mode=='revive',mn=!rv&&s.gk=='mini';if(s.a)return;if(rv&&(!d.br||d.rv<1))return toast('No revive available');const m=rv?(rm||240):s.goal;if(!m)return;
+function stAsk(mode,rm){const s=stLoad(),d=stDer(s),rv=mode=='revive',mn=!rv&&s.gk=='mini';if(s.a)return;if(rv&&(!d.br||d.rv<1))return toast('No revive available');const m=rv?(rm||120):s.goal;if(!m)return;
 const g=m*60,w=mn||rm?300:600,n=Date.now(),old=s.dc[d.t]||0,add=(mn||rm?Math.max(old,.5):1)-old,R=(a,b)=>`<div class="stSr"><span class="mu">${a}</span><b>${b}</b></div>`;
-openMdl({title:rv?(rm?'⚡ Revive with Mini Lock In':'🔥 Revive with a 4-hour study'):mn?'⚡ Mini Lock In':'🔒 Lock in Study',okText:rv?(rm?'Start mini revive':'Start 4-hour revive'):'Lock in',onOk:()=>stStart(mode,rm),body:`<div class="stSum">${R('Timer',rv&&!rm?'4 hours, straight':gl(m))}${R('Starts',tms(n)+' PHT')}${R('Expected end',tmd(n+g*1000))}${R('Streak credit',add>0?'+'+fm(add)+' day':'Already earned today')}<ul><li>⏱ Press <b>End study</b> in the last ${w/60} minutes to earn streak credit. Ending earlier is allowed (life happens) but only logs your time.</li><li>⏰ When the timer hits zero you get ${w/60} extra minutes to clock out with <b>End study</b>. Miss it and the session won't count.</li><li>🔁 Refreshing or logging out won't stop the clock.</li><li>${rv&&!rm?'⛔ Revive sessions can\'t be paused. It also counts as today\'s full study.':'⏸ You can pause anytime. The expected end moves while you\'re paused.'}</li></ul></div>`})}
-function stStart(mode,rm){const s=stLoad(),rv=mode=='revive';if(s.a)return;const n=Date.now(),mn=!rv&&s.gk=='mini';s.a={start:n,g:(rv?(rm||240):s.goal)*60,w:mn||rm?300:600,pt:0,pa:0,mn:rm?1:0,mode:rv?'revive':mn?'mini':'n',log:[{t:'start',ts:n}]};stSave(s);stRender();toast('Locked in. Good luck! 💪')}
+openMdl({title:rv?(rm?'⚡ Revive with Mini Lock In':'🔥 Revive with a 2-hour study'):mn?'⚡ Mini Lock In':'🔒 Lock in Study',okText:rv?(rm?'Start mini revive':'Start 2-hour revive'):'Lock in',onOk:()=>stStart(mode,rm),body:`<div class="stSum">${R('Timer',rv&&!rm?'2 hours minimum, straight':gl(m))}${R('Starts',tms(n)+' PHT')}${R('Expected end',tmd(n+g*1000))}${R('Streak credit',add>0?'+'+fm(add)+' day':'Already earned today')}<ul>${rv&&!rm?'<li>⏱ Study at least 2 hours straight, then press <b>End study</b> to revive your streak. Ending earlier is allowed but only logs your time.</li><li>➕ Keep going past 2 hours and earn +½ streak day for every extra full hour.</li>':`<li>⏱ Press <b>End study</b> in the last ${w/60} minutes to earn streak credit. Ending earlier is allowed (life happens) but only logs your time.</li><li>⏰ When the timer hits zero you get ${w/60} extra minutes to clock out with <b>End study</b>. Miss it and the session won't count.</li>`}<li>🔁 Refreshing or logging out won't stop the clock.</li><li>${rv&&!rm?'⛔ Revive sessions can\'t be paused. It also counts as today\'s full study.':'⏸ You can pause anytime. The expected end moves while you\'re paused.'}</li></ul></div>`})}
+function stStart(mode,rm){const s=stLoad(),rv=mode=='revive';if(s.a)return;const n=Date.now(),mn=!rv&&s.gk=='mini';s.a={start:n,g:(rv?(rm||120):s.goal)*60,w:mn||rm?300:600,x:rv&&!rm?1:0,pt:0,pa:0,mn:rm?1:0,mode:rv?'revive':mn?'mini':'n',log:[{t:'start',ts:n}]};stSave(s);stRender();toast('Locked in. Good luck! 💪')}
 function stPause(){const s=stLoad(),a=s.a,n=Date.now();if(!a||(a.mode=='revive'&&!a.mn)||stEl(a)>=a.g)return;
 if(a.pa){a.log.push({t:'resume',ts:n,m:Math.round((n-a.pa)/60000)});a.pt+=n-a.pa;a.pa=0}else{a.log.push({t:'pause',ts:n,m:Math.floor(stEl(a)/60)});a.pa=n}stSave(s);stRender()}
 function stClose(s,res,secs){const a=s.a,n=Date.now();if(a.pa){a.log.push({t:'resume',ts:n,m:Math.round((n-a.pa)/60000)});a.pt+=n-a.pa;a.pa=0}
 a.log.push({t:'end',ts:n});s.h.unshift({start:a.start,end:n,g:a.g,secs,mode:a.mode,res,log:a.log,day:phDay(n)});s.h=s.h.slice(0,30);s.a=null;if(res=='done')s.goal=0}
 function stEnd(){const s=stLoad(),a=s.a;if(!a)return;const el=stEl(a);
-if(a.g-el>stW(a))return showConfirm('End study early?','Your '+dur(el)+' is saved in history, but it only counts toward your streak if you end within the last '+stW(a)/60+' minutes of the timer.',()=>{const s=stLoad();if(!s.a)return;stClose(s,'early',stEl(s.a));stSave(s);stRender();toast('Session ended early. Time logged.')});
-const d=stDer(s),rv=a.mode=='revive',mn=a.mode=='mini'||!!a.mn,g=a.g,old=s.dc[d.t]||0,nw=mn?Math.max(old,.5):1,add=nw-old;stClose(s,'done',g);
+if(a.x?el<a.g:a.g-el>stW(a))return showConfirm('End study early?','Your '+dur(el)+' is saved in history, but it only counts toward your streak '+(a.x?'once you reach the 2-hour minimum.':'if you end within the last '+stW(a)/60+' minutes of the timer.'),()=>{const s=stLoad();if(!s.a)return;stClose(s,'early',stEl(s.a));stSave(s);stRender();toast('Session ended early. Time logged.')});
+const d=stDer(s),rv=a.mode=='revive',mn=a.mode=='mini'||!!a.mn,g=a.g,old=s.dc[d.t]||0,nw=mn?Math.max(old,.5):1,bonus=a.x?.5*Math.floor(Math.max(0,el-g)/3600):0,add=nw-old+bonus,sec=a.x?el:g;stClose(s,'done',sec);
 s.streak=(d.br&&!rv?0:s.streak)+add;if(add>0)s.last=d.t;s.dc[d.t]=nw;s.dc=Object.fromEntries(Object.entries(s.dc).slice(-14));
 if(rv){const m=d.t.slice(0,7);if(s.rv.m!=m)s.rv={m,u:0};s.rv.u++}
 const tot=s.h.filter(x=>x.day==d.t&&x.res=='done').reduce((t,x)=>t+x.secs,0);stSave(s);stRender();
-openMdl({title:rv?'🔥 Streak revived!':mn?'⚡ Mini Lock In complete!':'🎉 Study complete!',noCancel:1,okText:'Awesome!',body:`<div class="stHero"><div class="stConf">${Array.from({length:28},(_,i)=>`<i style="left:${Math.random()*100}%;background:${['#FF8A00','#FFD23F','#FF4D00','#2F7F80','#9FD3D0'][i%5]};animation-delay:${Math.random()*.6}s"></i>`).join('')}</div><p class="mu">You studied</p><big>${dur(g)}</big><p>Total today: <b>${dur(tot)}</b></p><p class="stM" style="font-size:1.15rem;margin-top:10px">🔥 ${add>0?'+'+fm(add)+' day! ':'Already earned today. '}Streak: ${fm(s.streak)} day${s.streak==1?'':'s'}</p>${s.streak%7==0&&add>0?'<p class="stM">🏆 Week milestone reached!</p>':''}<p class="mu sm" style="margin-top:8px">Great work. Rest well and keep it going!</p></div>`})}
+openMdl({title:rv?'🔥 Streak revived!':mn?'⚡ Mini Lock In complete!':'🎉 Study complete!',noCancel:1,okText:'Awesome!',body:`<div class="stHero"><div class="stConf">${Array.from({length:28},(_,i)=>`<i style="left:${Math.random()*100}%;background:${['#FF8A00','#FFD23F','#FF4D00','#2F7F80','#9FD3D0'][i%5]};animation-delay:${Math.random()*.6}s"></i>`).join('')}</div><p class="mu">You studied</p><big>${dur(sec)}</big><p>Total today: <b>${dur(tot)}</b></p><p class="stM" style="font-size:1.15rem;margin-top:10px">🔥 ${add>0?'+'+fm(add)+' day! ':'Already earned today. '}${bonus>0?'(incl. +'+fm(bonus)+' bonus) ':''}Streak: ${fm(s.streak)} day${s.streak==1?'':'s'}</p>${s.streak%7==0&&add>0?'<p class="stM">🏆 Week milestone reached!</p>':''}<p class="mu sm" style="margin-top:8px">Great work. Rest well and keep it going!</p></div>`})}
 function stRevive(){const d=stDer(stLoad());if(!d.br||d.rv<1)return toast('No revive available');
-openMdl({title:'🔥 Revive your streak',noCancel:1,okText:'Not now',body:`<p class="mu">Choose how to bring back your ${fm(d.lost)}-day streak. Each option uses 1 of your ${d.rv} revives left this month.</p><div class="stRow" style="flex-direction:column;align-items:stretch;margin-top:12px"><button class="btn p" onclick="closeMdl();stRevSimple()">⚡ Simple revive<br><span class="sm">Instant. No studying needed.</span></button><button class="btn" onclick="closeMdl();stAsk('revive')">⏱ Revive with 4-hour study<br><span class="sm">One straight 4 h session. Also counts as today's full study.</span></button><div class="stSm sm mu" style="margin-top:4px">Or revive with a Mini Lock In (earns ½ day, pausing allowed):</div><div class="stRow" style="flex-wrap:nowrap"><div style="flex:1">${dd('stRvM',MINI.map(x=>[x,gl(x)]),30)}</div><button class="btn p" onclick="stRvMini()">⚡ Revive with Mini</button></div></div>`})}
+openMdl({title:'🔥 Revive your streak',noCancel:1,okText:'Not now',body:`<p class="mu">Choose how to bring back your ${fm(d.lost)}-day streak. Each option uses 1 of your ${d.rv} revives left this month.</p><div class="stRow" style="flex-direction:column;align-items:stretch;margin-top:12px"><button class="btn p" onclick="closeMdl();stRevSimple()">⚡ Simple revive<br><span class="sm">Instant. No studying needed.</span></button><button class="btn" onclick="closeMdl();stAsk('revive')">⏱ Revive with 2-hour study<br><span class="sm">One straight session of 2 h or more (+½ day per extra hour). Also counts as today's full study.</span></button><div class="stSm sm mu" style="margin-top:4px">Or revive with a Mini Lock In (earns ½ day, pausing allowed):</div><div class="stRow" style="flex-wrap:nowrap"><div style="flex:1">${dd('stRvM',MINI.map(x=>[x,gl(x)]),30)}</div><button class="btn p" onclick="stRvMini()">⚡ Revive with Mini</button></div></div>`})}
 function stRvMini(){const m=+v('stRvM')||30;closeMdl();stAsk('revive',m)}
 function stRevSimple(){const s=stLoad(),d=stDer(s);if(!d.br||d.rv<1||s.a)return;const m=d.t.slice(0,7);if(s.rv.m!=m)s.rv={m,u:0};s.rv.u++;s.last=phDay(Date.now()-864e5);stSave(s);stRender();toast('Streak revived! Study today to keep it going 🔥')}
 function stStop(){showConfirm('Stop this study session?','It is saved in your history as "Stopped" and earns no streak credit.',()=>{const s=stLoad();if(!s.a)return;stClose(s,'stopped',stEl(s.a));stSave(s);stRender();toast('Session stopped')})}
@@ -1405,7 +1422,7 @@ function stExpire(s){stClose(s,'expired',stEl(s.a));stSave(s);stRender();toast('
 function stAlert(w){if($('#stAl'))return;const d=document.createElement('div');d.id='stAl';d.innerHTML=`<div class="stAlc"><div class="stBell">⏰</div><h2 class="lt">Time's up!</h2><p>Your study timer has run out. Tap <b>End study</b> to clock out so this session counts.</p><p class="mu sm">Time left to clock out: <b data-st="grace" style="color:#FF6A00;font-size:1.4rem">${mmss(w)}</b></p><button class="btn p" onclick="this.closest('#stAl').remove()">Close</button></div>`;document.body.appendChild(d)}
 function stTick(){if(!ME)return;const s=stLoad(),a=s.a,n=Date.now(),T=(k,x)=>document.querySelectorAll('[data-st="'+k+'"]').forEach(e=>e.textContent=x);
 T('clock',tms(n));T('date',phF({weekday:'long',month:'long',day:'numeric'},n));
-if(a){const e=stEl(a,n),w=stW(a);if(e-a.g>=w)return stExpire(s);if(e>=a.g&&!a.al){a.al=1;stSave(s);stAlert(w-(e-a.g))}T('rem',hms(a.g-e));T('grace',mmss(Math.max(0,w-Math.max(0,e-a.g))));T('exp',stExp(s))}else{T('exp',s.goal?stExp(s):'--');const x=$('#stAl');if(x)x.remove()}
+if(a){const e=stEl(a,n),w=a.x?36000:stW(a);if(e-a.g>=w)return stExpire(s);if(e>=a.g&&!a.al){a.al=1;stSave(s);if(a.x)toast('✅ 2-hour minimum reached. End now, or keep going for bonus.');else stAlert(w-(e-a.g))}if(a.x)T('xb',fm(.5*Math.floor(Math.max(0,e-a.g)/3600)));T('rem',hms(a.g-e));T('grace',mmss(Math.max(0,w-Math.max(0,e-a.g))));T('exp',stExp(s))}else{T('exp',s.goal?stExp(s):'--');const x=$('#stAl');if(x)x.remove()}
 if(stPhase(s)!=stPh)stRender()}
 setInterval(stTick,1000);document.addEventListener('visibilitychange',stTick);
 
