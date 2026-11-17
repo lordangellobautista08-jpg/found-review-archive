@@ -3,9 +3,17 @@
 <head>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Righteous&display=swap" rel="stylesheet">
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#9FD3D0">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="CE Review">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <title>Found / CE Review Archive</title>
-<script>try{if(localStorage.getItem("theme")=="dark")document.documentElement.dataset.theme="dark"}catch(e){}</script>
+<script>/* light mode is the default; dark only when the person chose it with the moon button */try{document.documentElement.dataset.theme=localStorage.getItem("theme")=="dark"?"dark":"light"}catch(e){document.documentElement.dataset.theme="light"}</script>
 <style>
 /* ===== COLOR SYSTEM: change colors here only ===== */
 :root{
@@ -257,9 +265,10 @@ footer .w{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 body.sbo .notes.dflt{right:334px}
 .notes .nh{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px 10px;border-bottom:1px solid var(--bd);font-size:.85rem;cursor:move;user-select:none;-webkit-user-select:none;touch-action:none;white-space:nowrap}
 .notes .nh a{margin-left:10px;cursor:pointer;color:var(--teal)}
+@media(max-width:899px){.notes .nh a.ntp{display:none}}
 .notes textarea{display:block;flex:1 1 auto;width:100%;min-height:0;height:38px;border:0;border-radius:0;resize:none;overflow-y:auto;font-size:.9rem;line-height:1.4;background:transparent;padding:8px 10px;color:var(--tx)}
 .notes.min{width:auto!important;height:auto!important;min-width:0}
-.notes.min .nh{border-bottom:0;cursor:pointer}.notes.min textarea,.notes.min .ngr,.notes.min .nc{display:none}
+.notes.min .nh{border-bottom:0;cursor:pointer}.notes.min textarea,.notes.min .ngr,.notes.min .nc,.notes.min .ntp{display:none}
 .ngr{position:absolute;bottom:0;width:14px;height:14px;z-index:2;touch-action:none;background:linear-gradient(135deg,transparent 52%,var(--mu) 52%,var(--mu) 62%,transparent 62%,transparent 74%,var(--mu) 74%,var(--mu) 84%,transparent 84%);opacity:.7}
 .ngr.se{right:0;cursor:nwse-resize}.ngr.sw{left:0;cursor:nesw-resize;transform:scaleX(-1)}
 @media(max-width:700px){
@@ -407,8 +416,8 @@ body.sbo #fabRoot{right:344px}
 .stTop .stSh{justify-content:flex-end}.stTop .stDots{justify-content:flex-end;flex-wrap:nowrap;gap:5px;margin:8px 0}
 .stTop .sd{width:26px;height:26px;font-size:13px}.stTop .stS p{margin:0}
 @media(max-width:1000px){.stTop .stS{margin-left:0;text-align:left;width:100%}.stTop .stSh,.stTop .stDots{justify-content:flex-start}}
-.stCols{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:start}
-.stL,.stR{display:flex;flex-direction:column;gap:10px;min-width:0}.stL>.btn{width:100%}
+.stCols{display:grid;grid-template-columns:1fr 1fr;gap:18px;align-items:stretch;flex:1 1 auto}
+.stL,.stR{display:flex;flex-direction:column;gap:10px;min-width:0}.stL>.btn{width:100%}.stL{justify-content:space-between}.stR>.btn:last-child{margin-top:auto}
 .stR{border-left:1px solid var(--bd);padding-left:18px}
 .stKv{display:flex;justify-content:space-between;align-items:baseline;gap:10px}.stKv b{text-align:right}
 .stTL{font-size:1.9rem;font-weight:800;line-height:1.1;color:var(--ink);font-variant-numeric:tabular-nums}
@@ -429,12 +438,27 @@ body.sbo #fabRoot{right:344px}
 .stTiny{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:1.05rem}
 .stRem{font-size:2rem;font-weight:800;line-height:1.1;color:var(--ink);font-variant-numeric:tabular-nums;margin:2px 0 8px}
 .stLab{font-weight:600;color:var(--teal);margin-top:10px}
-#stRail:not(.on){display:none}
+#stRail:not(.on):not(.peek){display:none}
 .stFull>*+*{margin-top:8px}
-.stMob{display:none}
+.stMob{display:none}.stMob .stT{margin-bottom:2px}.stMob .stMc{font-size:2rem;font-weight:800;line-height:1.1;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.02em}.stMob .stS{margin-top:10px}
 @media(min-width:701px){.stack>.stMob+*{margin-top:0}}
 @media(max-width:700px){.stMob{display:block}.stCard{display:none}}
-@media(min-width:900px){#stRail.on{position:fixed;top:56px;left:0;bottom:0;width:224px;z-index:6;overflow:auto;padding:12px;background:var(--card);border-right:1px solid var(--bd)}
+@media(min-width:900px){#stRail.on,#stRail.peek{position:fixed;top:56px;left:0;bottom:0;width:224px;z-index:6;overflow:auto;padding:12px;background:var(--card);border-right:1px solid var(--bd);display:flex;flex-direction:column}
+#stRailIn{flex:none}
+#ntDock{display:none;flex:1 1 auto;min-height:0;flex-direction:column;margin-top:0}
+#stRailIn:not(:empty)+#ntDock{margin-top:12px;padding-top:12px;border-top:1px solid var(--bd)}
+#stRail.pin #ntDock,body.ntdrag #ntDock{display:flex}
+#ntZone{display:none;flex:1 1 auto;min-height:130px;align-items:center;justify-content:center;text-align:center;padding:14px;border:2px dashed var(--teal);border-radius:var(--r);background:var(--soft);color:var(--ink);font-size:.88rem;font-weight:600;transition:background-color .12s,transform .12s}
+body.ntdrag:not(.ntpin) #ntZone{display:flex}
+#ntZone.over{background:var(--aq);color:var(--onaq);transform:scale(1.02)}
+.notes.pinned{position:static;width:auto;min-width:0;max-width:none;flex:1 1 auto;min-height:150px;height:auto!important;box-shadow:none;border-radius:var(--r);z-index:auto}
+.notes.pinned.min{flex:none;min-height:0;width:auto!important}
+.notes.pinned .nh{cursor:grab}
+.notes.pinned .ngr{display:none}
+.notes.pinned textarea{height:auto;flex:1 1 auto;min-height:100px}
+body.ntdrag .notes:not(.pinned) textarea,body.ntdrag .notes:not(.pinned) .ngr{display:none}
+body.ntdrag .notes:not(.pinned){opacity:.9;cursor:grabbing}
+body.ntdrag .vb{pointer-events:none}
 body.stp main,body.stp footer{margin-left:224px}.stMin{display:none}}
 @media(max-width:899px){#stRail.on{position:fixed;left:8px;bottom:44px;z-index:16;max-width:min(92vw,320px)}
 #stRail .stFull{display:none;background:var(--card);border:1px solid var(--teal);border-radius:var(--r);padding:12px;box-shadow:0 6px 22px #0003;max-height:70vh;overflow:auto;margin-bottom:6px}
@@ -466,7 +490,7 @@ h3.fq{font-size:1.35rem}
 </head>
 <body>
 <header><div class="w hi"><button class="btn" id="bg" onclick="dr(1)" aria-label="Menu">☰</button><a class="brand" onclick="go(ME ? 'dash' : 'home')">Found <i>/</i> CE Review Archive</a><button class="btn thm" id="thm" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Dark mode">🌙</button><div id="tb"></div></div></header>
-<div id="ov" onclick="dr(0)"></div><aside id="dr"></aside><div id="stRail"></div>
+<div id="ov" onclick="dr(0)"></div><aside id="dr"></aside><div id="stRail"><div id="stRailIn"></div><div id="ntDock"><div id="ntZone"><span>📌 Drop here to pin your notes</span></div></div></div>
 <main id="app"></main>
 <footer class="art"><div class="w">Found / CE Review Archive · Your progress and your own content are saved to your account</div></footer>
 <div id="toast"></div>
@@ -490,7 +514,7 @@ let selMode=false,SEL=new Set(),VIS=[],selFor='',CB=null;
 let fab={open:false,mode:'upload',c:'',d:'',busy:false};
 const EXT=['pdf','doc','docx','ppt','pptx','xls','xlsx','jpg','jpeg','png','webp'],LIM=30*1024*1024,ex=f=>f.name.split('.').pop().toLowerCase();
 
-function toggleTheme(){const d=document.documentElement,on=d.dataset.theme!='dark';d.dataset.theme=on?'dark':'';try{localStorage.setItem('theme',on?'dark':'')}catch(e){}syncTheme()}
+function toggleTheme(){const d=document.documentElement,on=d.dataset.theme!='dark';d.dataset.theme=on?'dark':'light';try{localStorage.setItem('theme',on?'dark':'')}catch(e){}syncTheme()}
 function syncTheme(){const b=$('#thm');if(b)b.classList.toggle('on',document.documentElement.dataset.theme=='dark')}
 
 /* one reusable modal: confirm, prompt, info, editors. If onOk returns a promise the modal stays open until it finishes. */
@@ -870,7 +894,7 @@ V.home=()=>`<section class="hero art"><div class="w"><p class="eyebrow">Civil En
 
 V.dash=()=>{const a=stat(()=>1),h=P.h.slice(0,4),op=P.op||{},top5=D.M.filter(m=>op[m.id]).sort((x,y)=>op[y.id]-op[x.id]).slice(0,5);
 return hd('Welcome, '+E(PR&&PR.display_name||'Student'),'Your progress across all components.')+`<div class="w sec stack">
-<div class="dgrid"><div class="card stCard" id="stDash">${stDashHtml()}</div><div class="stack"><div class="card stMob" id="stMobBox">${stStreak(stLoad())}</div><div class="card art stack"><h3>Quiz</h3><p class="mu">Draws from all ${a.n} questions across MSTC, HPGE and PSAD. You can also start a quiz inside each component.</p><button class="btn p" onclick="go('quiz')">Start a quiz</button></div>${qkCard()}</div></div>
+<div class="dgrid"><div class="card stCard" id="stDash">${stDashHtml()}</div><div class="stack"><div class="card stMob" id="stMobBox">${stMobHtml(stLoad())}</div><div class="card art stack"><h3>Quiz</h3><p class="mu">Draws from all ${a.n} questions across MSTC, HPGE and PSAD. You can also start a quiz inside each component.</p><button class="btn p" onclick="go('quiz')">Start a quiz</button></div>${qkCard()}</div></div>
 <div class="g">${C.map(c=>`<div class="card art" onclick="go('c/${c}')"><h3>${c}</h3>${bars(stat(x=>x.c==c))}</div>`).join('')}</div>
 <p class="mu sm">Accuracy = correct answers ÷ answers given. Mastery = questions you last answered correctly ÷ all questions.</p>
 <div class="card"><h3>Most opened files</h3>${top5.map(m=>`<div class="row" style="justify-content:space-between;margin:8px 0 0"><a class="lk" onclick="openM('${m.id}')">${tag(m.type)} ${E(m.title)}</a><span class="mu sm">${op[m.id]} ${op[m.id]==1?'open':'opens'}</span></div>`).join('')||'<p class="mu sm">Files you open will show up here.</p>'}</div>
@@ -1189,7 +1213,15 @@ addEventListener('keydown',e=>{if(MD||e.target!==document.body)return;const c=do
 if(e.key=='ArrowRight'){e.preventDefault();swNext(c)}else if(e.key=='ArrowLeft'&&c.dataset.sw=='study'){e.preventDefault();nav2(-1)}else if(e.key==' '||e.key=='Enter'){e.preventDefault();if(c.dataset.sw!='qk'||c.dataset.ans)c.classList.toggle('on')}});
 
 /* ===== NOTES PANEL: one scratch note on every page except quizzes/history (those have a note per question) ===== */
-const NT={f:''};let ntMin=1,ntPos=null,ntSz=null,ntObs=null;
+const NT={f:''};let ntMin=1,ntPos=null,ntSz=null,ntObs=null,ntDragging=0,ntPin=(()=>{try{return !!localStorage.getItem('ntPin')}catch(e){return false}})();
+/* pinning only exists where the Lock in sidebar is a real left sidebar (900px and wider) */
+const NTP=()=>ntPin&&matchMedia('(min-width:900px)').matches;
+/* put the notes where they belong: inside the left sidebar dock when pinned, otherwise floating */
+function ntPlace(){const p=$('#nt');if(!p)return;const pn=NTP(),want=pn?$('#ntDock'):$('#notesRoot');if(want&&p.parentNode!==want)want.appendChild(p);p.classList.toggle('pinned',pn);document.body.classList.toggle('ntpin',pn)}
+/* show or hide the left sidebar depending on lock in content and pinned notes */
+function ntRail(){const r=$('#stRail'),i=$('#stRailIn');if(!r||!i)return;const pin=!!$('#nt')&&NTP(),has=i.innerHTML.trim()!=='';r.classList.toggle('on',has||pin);r.classList.toggle('pin',pin);r.classList.toggle('peek',!!ntDragging&&!(has||pin));document.body.classList.toggle('stp',has||pin)}
+function ntPinSet(on){ntPin=!!on;try{localStorage.setItem('ntPin',on?'1':'')}catch(e){}if(on&&ntMin)ntMin=0;ntPlace();ntApply();ntGrow();ntRail();ntLay();const b=$('#nt .ntp');if(b)b.title=NTP()?'Unpin from sidebar':'Pin to sidebar'}
+function ntPinToggle(){ntPinSet(!NTP())}
 const NTM=()=>matchMedia('(max-width:700px)').matches;
 function ntReset(){NT.f='';ntMin=1;ntPos=null;ntSz=null}
 /* every question gets its own note: serialised as {"v":2,"q":{questionId:text}} inside quiz_attempts.notes, older plain-text notes still display */
@@ -1198,30 +1230,40 @@ function agrow(t){t.style.height='0';t.style.height=Math.min(t.scrollHeight+2,26
 function qNote(i,t){(QZ.nt||(QZ.nt={}))[i]=t.value;agrow(t)}
 function ntLay(){const p=$('#nt'),m=NTM(),f=document.querySelector('footer'),d=document.documentElement.style;/* phones pin the footer to the bottom, so the notes dock sits right above it */
 d.setProperty('--ftH',m&&f&&getComputedStyle(f).position=='fixed'?f.offsetHeight+'px':'0px');document.body.classList.toggle('nto',!!p&&m);d.setProperty('--ntH',p&&m?p.offsetHeight+'px':'0px')}
-function ntApply(){const p=$('#nt');if(!p)return;p.classList.toggle('min',!!ntMin);p.classList.toggle('dflt',!ntPos);p.classList.toggle('mv',!!ntPos);
-p.style.left=ntPos?ntPos.x+'px':'';p.style.top=ntPos?ntPos.y+'px':'';p.style.width=ntSz?ntSz.w+'px':'';p.style.height=ntSz&&ntSz.h?ntSz.h+'px':'';
+function ntApply(){const p=$('#nt');if(!p)return;const pn=NTP();p.classList.toggle('min',!!ntMin);p.classList.toggle('dflt',!ntPos);p.classList.toggle('mv',!!ntPos);
+p.style.left=ntPos&&!pn?ntPos.x+'px':'';p.style.top=ntPos&&!pn?ntPos.y+'px':'';p.style.width=ntSz&&!pn?ntSz.w+'px':'';p.style.height=ntSz&&ntSz.h&&!pn?ntSz.h+'px':'';
 const b=p.querySelector('.ntm');if(b)b.textContent=ntMin?'+':'–'}
 /* text box starts tiny and stretches with the text (until the person sizes it by hand on desktop) */
-function ntGrow(){const p=$('#nt'),t=p&&p.querySelector('textarea');if(!t||ntMin)return;const m=NTM();
+function ntGrow(){const p=$('#nt'),t=p&&p.querySelector('textarea');if(!t||ntMin)return;if(NTP()){t.style.height='';return ntLay()}const m=NTM();
 if(!m&&ntSz&&ntSz.h){t.style.height='';return ntLay()}
 t.style.height='0';const hh=p.querySelector('.nh').offsetHeight,top=m?0:p.getBoundingClientRect().top,max=m?innerHeight*.4:Math.max(60,innerHeight-top-hh-12);
 t.style.height=Math.max(38,Math.min(t.scrollHeight,max))+'px';ntLay()}
 /* keep the panel fully on screen */
-function ntFit(){const p=$('#nt');if(!p)return;if(NTM()){ntLay();return ntGrow()}
+function ntFit(){const p=$('#nt');if(!p)return;ntPlace();ntRail();if(NTM()){ntLay();return ntGrow()}if(NTP()){ntApply();return ntGrow()}
 if(ntSz){ntSz.w=Math.min(ntSz.w,innerWidth-8);if(ntSz.h)ntSz.h=Math.min(ntSz.h,innerHeight-8)}
 ntApply();if(ntPos){const r=p.getBoundingClientRect();ntPos.x=Math.max(0,Math.min(ntPos.x,innerWidth-r.width));ntPos.y=Math.max(0,Math.min(ntPos.y,innerHeight-r.height));ntApply()}
 ntGrow()}
 function ntToggleMin(){ntMin=!ntMin;ntApply();ntFit();if(!ntMin){const t=$('#nt textarea');if(t&&!NTM())t.focus()}ntLay()}
 /* the right details panel opened: tuck the notes away, unless the person opens them again while it is open */
-function ntSide(on){if(on&&!ntMin){ntMin=1;ntApply()}ntFit()}
+function ntSide(on){if(on&&!ntMin&&!NTP()){ntMin=1;ntApply()}ntFit()}
 function ntClr(){const t=$('#nt textarea');if(t){t.value='';NT.f='';ntGrow()}}
 function ntHdr(e){if(!NTM()||e.target.closest('a'))return;ntToggleMin()}
-function ntDown(e){if(NTM()||e.button||e.target.closest('a'))return;const p=$('#nt');if(!p)return;const h=e.currentTarget,r=p.getBoundingClientRect(),sx=e.clientX,sy=e.clientY;let mv=0;
-try{h.setPointerCapture(e.pointerId)}catch(_){}
-const mo=ev=>{const dx=ev.clientX-sx,dy=ev.clientY-sy;if(!mv&&Math.abs(dx)+Math.abs(dy)<4)return;mv=1;
-ntPos={x:Math.max(0,Math.min(r.left+dx,innerWidth-r.width)),y:Math.max(0,Math.min(r.top+dy,innerHeight-r.height))};ntApply()};
-const up=()=>{h.removeEventListener('pointermove',mo);h.removeEventListener('pointerup',up);h.removeEventListener('pointercancel',up);if(!mv&&ntMin)ntToggleMin();else if(mv)ntGrow()};
-h.addEventListener('pointermove',mo);h.addEventListener('pointerup',up);h.addEventListener('pointercancel',up)}
+function ntDown(e){if(NTM()||e.button||e.target.closest('a'))return;const p=$('#nt');if(!p)return;
+const can=matchMedia('(min-width:900px)').matches,wasPin=NTP(),sx=e.clientX,sy=e.clientY,pid=e.pointerId;let r=p.getBoundingClientRect(),ox=sx-r.left,oy=sy-r.top,mv=0,over=0;
+const cap=()=>{try{$('#nt .nh').setPointerCapture(pid)}catch(_){}};cap();
+const hit=ev=>{const z=$('#ntDock');if(!z||!can)return 0;const b=z.getBoundingClientRect();return ev.clientX>=b.left&&ev.clientX<=b.right&&ev.clientY>=b.top&&ev.clientY<=b.bottom};
+const mo=ev=>{if(!mv&&Math.abs(ev.clientX-sx)+Math.abs(ev.clientY-sy)<4)return;
+if(!mv){mv=1;if(can){ntDragging=1;document.body.classList.add('ntdrag')}
+/* dragging the header of a pinned note makes it float again */
+if(wasPin){ntPin=0;try{localStorage.setItem('ntPin','')}catch(_){}ntPlace();ntApply();ntRail();cap();ox=Math.min(ox,Math.max(40,(ntSz?ntSz.w:240)-40))}else if(can)ntRail()}
+const q=$('#nt');if(!q)return;const w=q.offsetWidth,h=q.offsetHeight;
+ntPos={x:Math.max(0,Math.min(ev.clientX-ox,innerWidth-w)),y:Math.max(0,Math.min(ev.clientY-oy,innerHeight-h))};ntApply();
+if(can&&!NTP()){over=hit(ev);const z=$('#ntZone');if(z)z.classList.toggle('over',!!over)}};
+const up=ev=>{removeEventListener('pointermove',mo);removeEventListener('pointerup',up);removeEventListener('pointercancel',up);
+const z=$('#ntZone');if(z)z.classList.remove('over');
+if(mv){ntDragging=0;document.body.classList.remove('ntdrag');if(can&&ev.type=='pointerup'&&hit(ev))ntPinSet(1);else{ntApply();ntGrow();ntFit();ntRail()}}
+else if(ntMin)ntToggleMin()};
+addEventListener('pointermove',mo);addEventListener('pointerup',up);addEventListener('pointercancel',up)}
 function ntGrip(e,side){if(NTM()||e.button)return;e.preventDefault();e.stopPropagation();const p=$('#nt');if(!p)return;const g=e.currentTarget,r=p.getBoundingClientRect(),sx=e.clientX,sy=e.clientY;
 try{g.setPointerCapture(e.pointerId)}catch(_){}
 const mo=ev=>{const dx=ev.clientX-sx,dy=ev.clientY-sy,h=Math.min(Math.max(120,r.height+dy),innerHeight-r.top);let w,x=r.left;
@@ -1231,10 +1273,10 @@ const up=()=>{g.removeEventListener('pointermove',mo);g.removeEventListener('poi
 g.addEventListener('pointermove',mo);g.addEventListener('pointerup',up);g.addEventListener('pointercancel',up)}
 function renderNotes(n){let r=$('#notesRoot');if(!r){r=document.createElement('div');r.id='notesRoot';document.body.appendChild(r)}
 const on=ME&&n!='quiz'&&n!='hist'&&n!='auth'&&n!='quickiz';
-if(!on){if(r.firstChild)r.innerHTML='';if(ntObs)ntObs.disconnect();document.body.classList.remove('nto');document.documentElement.style.removeProperty('--ntH');document.documentElement.style.removeProperty('--ftH');return}
-if(r.firstChild){ntFit();return}
-r.innerHTML=`<div class="notes" id="nt"><div class="nh" onpointerdown="ntDown(event)" onclick="ntHdr(event)"><b>📝 Notes</b><span><a class="nc" onclick="ntClr()">Clear</a><a class="ntm" onclick="ntToggleMin()" title="Minimize / expand">–</a></span></div><textarea rows="1" placeholder="Type what you are thinking…" oninput="NT.f=this.value;ntGrow()">${E(NT.f)}</textarea><i class="ngr sw" onpointerdown="ntGrip(event,'w')"></i><i class="ngr se" onpointerdown="ntGrip(event,'e')"></i></div>`;
-ntApply();ntFit();
+if(!on){r.innerHTML='';const o=$('#nt');if(o)o.remove();ntPlace();ntRail();if(ntObs)ntObs.disconnect();document.body.classList.remove('nto');document.documentElement.style.removeProperty('--ntH');document.documentElement.style.removeProperty('--ftH');return}
+if($('#nt')){ntFit();return}
+r.innerHTML=`<div class="notes" id="nt"><div class="nh" onpointerdown="ntDown(event)" onclick="ntHdr(event)"><b>📝 Notes</b><span><a class="nc" onclick="ntClr()">Clear</a><a class="ntp" onclick="ntPinToggle()" title="Pin to sidebar">📌</a><a class="ntm" onclick="ntToggleMin()" title="Minimize / expand">–</a></span></div><textarea rows="1" placeholder="Type what you are thinking…" oninput="NT.f=this.value;ntGrow()">${E(NT.f)}</textarea><i class="ngr sw" onpointerdown="ntGrip(event,'w')"></i><i class="ngr se" onpointerdown="ntGrip(event,'e')"></i></div>`;
+ntPlace();ntApply();ntFit();const pb=$('#nt .ntp');if(pb)pb.title=NTP()?'Unpin from sidebar':'Pin to sidebar';
 if(window.ResizeObserver){if(!ntObs)ntObs=new ResizeObserver(ntLay);ntObs.disconnect();ntObs.observe($('#nt'))}}
 addEventListener('resize',ntFit);
 
@@ -1372,6 +1414,9 @@ stWarn=(o,w)=>`<p class="stWarn sm">⏰ Timer done! Declare your study ended: ta
 stXN=(o)=>`<p class="stWarn sm">✅ 2-hour minimum reached. Tap <b>End study</b> now, or keep going: +½ streak day for every extra full hour. Bonus so far: <b data-st="xb">${fm(.5*Math.floor(o/3600))}</b> day</p>`,
 stOv=(a,o,w)=>a.x?stXN(o):stWarn(o,w),
 stLog=l=>`<p class="sm mu">${{start:'▶ Started',pause:'⏸ Paused',resume:'⏯ Resumed',end:'✔ Ended'}[l.t]} ${tm(l.ts)}${l.t=='pause'?' · after '+dur(l.m*60)+' of study':l.t=='resume'?' · paused for '+dur(l.m*60):''}</p>`;
+/* phone version of the Lock in card: title, live clock, then the streak */
+function stMobHtml(s){const d=stDer(s),a=s.a,nm=a?(a.mode=='mini'||a.mn?'mini':'full'):(d.fd?'mini':s.pm);
+return `${stName(nm)}<div class="stMc" data-st="clock">${tms(Date.now())}</div><p class="mu sm" style="margin:0"><span data-st="date">${phF({weekday:'long',month:'long',day:'numeric'},Date.now())}</span> · ${tzn()}</p>${stStreak(s)}`}
 function stStreak(s){const d=stDer(s),n=d.cur,full=n>0&&n%7==0,c=full?7:n%7,nx=(Math.floor(n/7)+1)*7,nxi=Math.floor(c);
 return `<div class="stS"><div class="stSh"><b>🔥 ${fm(n)} day${n==1?'':'s'} streak</b>${full?`<span class="stM">🏆 ${fm(n)} days straight!</span>`:''}</div><div class="stDots">${[0,1,2,3,4,5,6].map(i=>{const f=Math.min(1,Math.max(0,c-i));return `<span class="sd${f>=1?' on':f>0?' half':i==nxi&&!d.today?' nx':''}">🔥</span>`}).join('')}</div><p class="sm mu">Next milestone: <b class="stM">${nx} days</b> · ${fm(nx-n)} to go</p></div>`}
 const stDelOk=(s,x)=>x.res!='live'&&x.day==phDay()&&(!x.sn||s.h.find(y=>y.sn&&y.day==x.day)===x);
@@ -1409,8 +1454,8 @@ if(a)h+=`<div class="stLab">${ov?(a.x?'✅ Bonus time':'⏰ Overtime'):a.pa?'⏸
 <p class="sm mu">Expected end <b data-st="exp">${stExp(s)}</b></p><button class="btn" style="width:100%" onclick="stEnd()">✔ End study</button>${ov?stOv(a,ov,stW(a)):''}`;
 h+=stStreak(s)+(!a?stBrk(d):'')+'</div>';
 return h+(mini?`<div class="stMin" onclick="$('#stRail').classList.toggle('open')">${a?`⏱ <span data-st="rem">${hms(r)}</span>`:'💔 Streak'}</div>`:'')}
-function stRender(){const r=$('#stRail');if(!r)return;const s=ME?stLoad():null,p=ME?stPanel(1):'';r.innerHTML=p;r.classList.toggle('on',!!p);document.body.classList.toggle('stp',!!p);
-const dr=document.querySelector('.stDr');if(dr)dr.innerHTML=ME?stPanel(0):'';const x=$('#stDash');if(x)x.innerHTML=ME?stDashHtml():'';const m=$('#stMobBox');if(m)m.innerHTML=ME?stStreak(s):'';stPh=ME?stPhase(s):''}
+function stRender(){const r=$('#stRailIn');if(!r)return;const s=ME?stLoad():null,p=ME?stPanel(1):'';r.innerHTML=p;ntRail();
+const dr=document.querySelector('.stDr');if(dr)dr.innerHTML=ME?stPanel(0):'';const x=$('#stDash');if(x)x.innerHTML=ME?stDashHtml():'';const m=$('#stMobBox');if(m)m.innerHTML=ME?stMobHtml(s):'';stPh=ME?stPhase(s):''}
 function stMode(m){const s=stLoad();if(s.a||(m=='full'&&stDer(s).fd))return;s.pm=m;if(s.gk!=m)s.goal=0;stSave(s);stRender()}
 function stSet(){const g=+v('stGoal');if(!g)return toast('Pick a timer first');const s=stLoad(),pm=stDer(s).fd?'mini':s.pm;s.goal=g;s.gk=pm;stSave(s);stRender();toast('Timer set: '+gl(g))}
 function stAsk(mode,rm){const s=stLoad(),d=stDer(s),rv=mode=='revive',mn=!rv&&s.gk=='mini';if(s.a)return;if(rv&&(!d.br||d.rv<1))return toast('No revive available');const m=rv?(rm||120):s.goal;if(!m)return;
@@ -1455,6 +1500,8 @@ if(ev=='SIGNED_OUT'){const own=USER_OUT;USER_OUT=0;go('home');if(!own)toast('You
 if(ME.id!=CU){CU=ME.id;ntReset();QL=0;route();await load();QL=1}
 if(AU.mode=='newpw')go('auth');else if(location.hash=='#/auth')go('dash');else route()},0));
 route();
+/* PWA: lets the app install on PC and phones and open its shell offline */
+if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('SW:',e)));
 </script>
 </body>
 </html>
