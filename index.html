@@ -1261,7 +1261,7 @@ ntPos={x:Math.max(0,Math.min(ev.clientX-ox,innerWidth-w)),y:Math.max(0,Math.min(
 if(can&&!NTP()){over=hit(ev);const z=$('#ntZone');if(z)z.classList.toggle('over',!!over)}};
 const up=ev=>{removeEventListener('pointermove',mo);removeEventListener('pointerup',up);removeEventListener('pointercancel',up);
 const z=$('#ntZone');if(z)z.classList.remove('over');
-if(mv){ntDragging=0;document.body.classList.remove('ntdrag');if(can&&ev.type=='pointerup'&&hit(ev))ntPinSet(1);else{ntApply();ntGrow();ntFit();ntRail()}}
+if(mv){const ok=can&&ev.type=='pointerup'&&(hit(ev)||over);/* measure the drop area BEFORE the drag state hides it */ntDragging=0;document.body.classList.remove('ntdrag');if(ok)ntPinSet(1);else{ntApply();ntGrow();ntFit();ntRail()}}
 else if(ntMin)ntToggleMin()};
 addEventListener('pointermove',mo);addEventListener('pointerup',up);addEventListener('pointercancel',up)}
 function ntGrip(e,side){if(NTM()||e.button)return;e.preventDefault();e.stopPropagation();const p=$('#nt');if(!p)return;const g=e.currentTarget,r=p.getBoundingClientRect(),sx=e.clientX,sy=e.clientY;
