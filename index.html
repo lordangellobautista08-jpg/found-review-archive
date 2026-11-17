@@ -491,6 +491,11 @@ h3.fq{font-size:1.35rem}
 .sd.half{border:2px solid #FF8A00;filter:none;opacity:1;background:linear-gradient(90deg,#FF8A00 50%,transparent 50%);box-shadow:0 0 8px #FF8A0066}
 .seg button:disabled{opacity:.5;cursor:not-allowed}
 .stHot{color:#FF6A00!important;font-size:1.15rem}.shr{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--bd)}.shr:first-child{border-top:0}.shc{display:flex;flex-direction:column;gap:8px;align-items:flex-start;cursor:pointer}.shc .ic{width:34px;height:34px}
+.stCard .ic,.stFull .ic,.stSum .ic,.stAlc .ic,.stBrk .ic,.stWarn .ic,.stHero .ic,.stMin .ic,.stHl .ic,.stHd .ic,.stUc .ic,#stWxN .ic,.stRow .ic{margin-right:5px}
+#stGr .ic{margin:0 0 0 6px}.sd .ic{margin:0;width:16px;height:16px}.sd.on .ic{color:#fff}.sd.half .ic{color:#B34700}.stBell .ic,.stT .ic{margin:0}.stBell .ic{width:1em;height:1em}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--bd);margin-right:7px;vertical-align:1px}.dot.on{background:#2ecc71;box-shadow:0 0 0 3px #2ecc7133}
+.nph{background:var(--soft);border:1px dashed var(--bd);border-radius:8px;padding:6px 10px;margin:6px 0;font-size:.85rem;opacity:.85}
+@media(max-width:700px){.ntb button[onclick="ntPick()"]{display:none}}
 #stAl,#stNp{position:fixed;inset:0;z-index:80;background:#000b;display:grid;place-items:center;padding:16px}
 .stAlc{background:var(--card);border:2px solid #FF8A00;border-radius:12px;padding:26px 24px;max-width:420px;width:100%;text-align:center;box-shadow:0 0 44px #FF8A0066;animation:stPop .3s}
 .stAlc h2{font-size:1.8rem;margin:4px 0 8px}.stAlc p{margin:8px 0}
@@ -1032,7 +1037,7 @@ P.q={};g(7).forEach(x=>P.q[x.question_id]=[x.correct_count,x.total_count,+x.last
 P.op={};g(9).forEach(x=>P.op[x.material_id]=x.opens);D.AG=g(10);
 const at=g(8),an=at.length?(await pg('quiz_answers',q=>q.in('attempt_id',at.map(x=>x.id)).order('id'))).data:[];
 P.h=at.map(a=>({id:a.id,ts:T0(a.created_at),sc:a.scope||'',n:a.total,k:a.correct,secs:a.seconds||0,notes:a.notes||'',it:an.filter(x=>x.attempt_id==a.id).sort((x,y)=>x.position-y.position).map(x=>({id:x.question_id,ch:x.chosen,ok:+x.is_correct}))}));
-D.U=[];if(role=='admin'){const u=await sb.from('profiles').select('*');D.U=u.data||[]}
+D.U=[];D.SS=[];if(role=='admin'){const u=await sb.from('profiles').select('*');D.U=u.data||[];const ss=await sb.from('study_state').select('user_id,data');D.SS=ss.error?[]:(ss.data||[])}
 {const rs=await sb.from('restrictions').select('*');D.RS=rs.error?[]:(rs.data||[]);if(rs.error)console.warn('Restrictions table not ready:',rs.error.message);RSE=null}
 await qkPull();await stPull();fcLoad()}catch(err){console.error(err);toast('Database connection error. Check the console (F12).')}}
 
@@ -1356,8 +1361,8 @@ ${s.on?`<div class="field"><label class="lb sm">${f.who}</label>${dd('rsm_'+f.k,
 <div class="row" style="margin:0"><button class="btn p" onclick="rsSave('${f.k}')">Save</button></div></div>`}).join('')}</div>`}
 const AD={
 o:()=>`<div class="g">${[['Users',D.U.length],['Official questions',OQ.length],['Folders',D.FO.length],['Folder items',D.M.length],['Official flashcards',D.F.filter(x=>!x.own).length]].map(([n,x])=>`<div class="card art stat"><b>${x}</b><span class="mu sm">${n}</span></div>`).join('')}</div><div class="card stack" style="margin-top:16px"><h3>QuickiZ</h3><p class="mu sm">Lets everyone who already finished today's QuickiZ play it again. Streaks are kept and no extra day is added.</p><button class="btn" onclick="showConfirm('Reset today\\'s QuickiZ','Everyone who finished today can play again. Streaks stay.',qkAdminReset)">Reset today's QuickiZ for everyone</button></div>`,
-u:()=>{const l=sortBy(D.U.filter(u=>!AUS.q||(u.display_name||'').toLowerCase().includes(AUS.q.toLowerCase())),AUS.so,u=>u.display_name||'',u=>T0(u.created_at));
-return `<div class="row" style="margin:0 0 12px"><input id="aus" placeholder="Search users…" value="${E(AUS.q)}" oninput="AUS.q=this.value;route();const i=$('#aus');i.focus();i.setSelectionRange(99,99)">${dd('auo',SORTS,AUS.so,"AUS.so=v;route()")}</div><table><tr><th>Name</th><th>Role</th><th>Joined</th></tr>${l.map(u=>`<tr><td>${E(u.display_name||'')}</td><td>${u.role}</td><td class="mu sm">${new Date(u.created_at).toLocaleDateString()}</td></tr>`).join('')}</table><p class="mu sm">To change someone's role, edit the profiles table in Supabase (Table Editor).</p>`},
+u:()=>{const l=sortBy(D.U.filter(u=>!AUS.q||((u.display_name||'')+' '+(u.email||'')).toLowerCase().includes(AUS.q.toLowerCase())),AUS.so,u=>u.display_name||'',u=>T0(u.created_at));
+return `<div class="row" style="margin:0 0 12px"><input id="aus" placeholder="Search users…" value="${E(AUS.q)}" oninput="AUS.q=this.value;route();const i=$('#aus');i.focus();i.setSelectionRange(99,99)">${dd('auo',SORTS,AUS.so,"AUS.so=v;route()")}</div><p class="sm mu" style="margin:0 0 8px">${stUsSum()}</p><div style="overflow-x:auto"><table><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Joined</th><th></th></tr>${l.map(u=>`<tr><td>${E(u.display_name||'')}</td><td class="sm">${E(u.email||'—')}</td><td>${u.role}</td><td class="sm stUc">${stUsCell(u)}</td><td class="mu sm">${new Date(u.created_at).toLocaleDateString()}</td><td>${u.id==ME.id?'<span class="mu sm">You</span>':`<button class="btn" onclick="admRole('${u.id}','${u.role=='admin'?'student':'admin'}')">${u.role=='admin'?'Remove admin':'Make admin'}</button>`}</td></tr>`).join('')}</table></div><p class="mu sm">Role changes apply the next time that person logs in.</p>`},
 f:aqCards,q:aqQ,fl:aqFiles,r:aqRestr};
 V.admin=()=>hd('Admin Dashboard','Manage official content. Security is enforced by the database rules (RLS).')+`<div class="w sec"><div class="tabs">${[['o','Overview'],['u','Users'],['fl','Files'],['f','Official cards'],['q','Questions'],['r','Restrictions']].map(([k,n])=>`<a class="${AT==k?'on':''}" onclick="AT='${k}';route()">${n}</a>`).join('')}</div>${AD[AT]()}</div>`;
 
@@ -1406,8 +1411,26 @@ if(!ed.firstChild)ed.innerHTML='<div><br></div>';
 if(isAtt(ed.lastElementChild))ed.insertAdjacentHTML('beforeend','<div><br></div>');
 if(isAtt(ed.firstElementChild))ed.insertAdjacentHTML('afterbegin','<div><br></div>');
 if(ch&&an&&ed.contains(an))caretTo(an,ao)}
-function ntSync(){const ed=NED();if(!ed)return;ntNorm();ed.classList.toggle('emp',!ed.textContent.trim()&&!ed.querySelector('.nimg,.nfile,[data-cb]'));NT.h=ed.innerHTML;ntGrow()}
-function ntInit(){const ed=NED();if(!ed)return;ed.innerHTML=NT.h||'<div><br></div>';
+function ntSync(){const ed=NED();if(!ed)return;ntNorm();ed.classList.toggle('emp',!ed.textContent.trim()&&!ed.querySelector('.nimg,.nfile,.nph,[data-cb]'));NT.h=ntExp(ed.innerHTML);ntStore();ntGrow()}
+/* Notes: remembered per account and synced through the notes_state table (run notes_state.sql once). Newest copy wins.
+   On phones only the text shows: attached images/files become a small placeholder and are kept intact in the saved copy. */
+let ntQuiet=0,ntPT=null,NTOK=true,NTB=0;
+const ntQ=()=>{ntQuiet=1;setTimeout(()=>{ntQuiet=0},400)},ntMob=()=>innerWidth<=700;
+function ntView(h){if(!h||!ntMob())return h;const d=new DOMParser().parseFromString(h,'text/html');d.body.querySelectorAll('.nimg,.nfile').forEach(el=>{const p=d.createElement('div');p.className='nph';p.contentEditable='false';p.dataset.o=el.outerHTML;p.textContent=(el.classList.contains('nimg')?'Image':'File')+' attached. Open on PC to view.';el.replaceWith(p)});return d.body.innerHTML}
+function ntExp(h){if(!h||h.indexOf('nph')<0)return h;const d=new DOMParser().parseFromString(h,'text/html');d.body.querySelectorAll('.nph').forEach(p=>{const o=new DOMParser().parseFromString(p.dataset.o||'','text/html').body.firstChild;if(o)p.replaceWith(d.importNode(o,true));else p.remove()});return d.body.innerHTML}
+function ntStore(){if(!ME||ntQuiet)return;try{const ed=NED(),k='nt_'+ME.id,v=(!NT.h||(ed&&ed.classList.contains('emp')))?'':NT.h;if(v===(localStorage.getItem(k)||''))return;v?localStorage.setItem(k,v):localStorage.removeItem(k);localStorage.setItem('ntts_'+ME.id,Date.now());ntPush()}catch(e){}}
+function ntPush(){if(!NTOK||!ME)return;clearTimeout(ntPT);const uid=ME.id;ntPT=setTimeout(()=>{if(!ME||ME.id!=uid)return;
+sb.from('notes_state').upsert({user_id:uid,html:localStorage.getItem('nt_'+uid)||'',updated_at:new Date(+localStorage.getItem('ntts_'+uid)||Date.now()).toISOString()}).then(r=>{if(r.error){NTOK=false;console.warn('Notes sync is off (run notes_state.sql):',r.error.message)}})},1200)}
+function ntApplyRemote(h,ts){const uid=ME.id,k='nt_'+uid;try{h?localStorage.setItem(k,h):localStorage.removeItem(k);localStorage.setItem('ntts_'+uid,ts)}catch(e){}NT.h=h;const ed=NED();if(!ed)return;ntQ();ed.innerHTML=ntView(h)||'<div><br></div>';ntSync();
+ed.querySelectorAll('.nimg[data-mid]').forEach(b=>{const id=b.dataset.mid;if(id)ntUrl(id).then(u=>{const im=b.querySelector('img');if(im&&im.getAttribute('src')!==u)im.src=u}).catch(()=>{})})}
+async function ntPull(){if(!ME||!NTOK||NTB)return;NTB=1;try{const uid=ME.id,r=await sb.from('notes_state').select('html,updated_at').eq('user_id',uid).maybeSingle();
+if(r.error){NTOK=false;console.warn('Notes sync is off (run notes_state.sql):',r.error.message);return}
+const lt=+localStorage.getItem('ntts_'+uid)||0,rt=r.data?Date.parse(r.data.updated_at):0;
+if(rt>lt+1000){const ed=NED();if(ed&&document.activeElement&&ed.contains(document.activeElement))return;ntApplyRemote(r.data.html||'',rt)}
+else if(lt>rt+1000)ntPush();
+else if(!r.data&&localStorage.getItem('nt_'+uid)){try{localStorage.setItem('ntts_'+uid,Date.now())}catch(e){}ntPush()}}catch(e){}finally{NTB=0}}
+const ntSyncNow=()=>{if(ME&&NTOK&&!document.hidden)ntPull()};setInterval(ntSyncNow,10000);addEventListener('focus',ntSyncNow);
+function ntInit(){const ed=NED();if(!ed)return;if(!NT.h&&ME){try{NT.h=localStorage.getItem('nt_'+ME.id)||''}catch(e){}}ntQ();ed.innerHTML=ntView(NT.h)||'<div><br></div>';setTimeout(ntPull,300);
 ed.addEventListener('load',()=>ntGrow(),true);
 ed.addEventListener('error',e=>{const im=e.target;if(!im||im.tagName!='IMG')return;const b=im.closest('.nimg');if(b&&b.dataset.mid&&!im.dataset.rt){im.dataset.rt=1;ntUrl(b.dataset.mid,1).then(u=>{im.src=u}).catch(()=>{})}},true);
 ed.querySelectorAll('.nimg[data-mid]').forEach(b=>{const id=b.dataset.mid;if(id)ntUrl(id).then(u=>{const im=b.querySelector('img');if(im&&im.getAttribute('src')!==u)im.src=u}).catch(()=>{})});
@@ -1507,7 +1530,7 @@ r.classList.toggle('on',any);r.classList.toggle('pin',pin);r.classList.toggle('p
 function ntPinSet(on){ntPin=!!on;try{localStorage.setItem('ntPin',on?'1':'')}catch(e){}if(on&&ntMin)ntMin=0;ntPlace();ntApply();ntGrow();ntRail();ntLay();ntPinUi()}
 function ntPinToggle(){ntPinSet(!NTP())}
 const NTM=()=>matchMedia('(max-width:700px)').matches;
-function ntReset(){NT.h='';ntMin=1;ntPos=null;ntSz=null}
+function ntReset(){clearTimeout(ntPT);NT.h='';ntMin=1;ntPos=null;ntSz=null}
 /* every question gets its own note: serialised as {"v":2,"q":{questionId:text}} inside quiz_attempts.notes, older plain-text notes still display */
 const pNotes=raw=>{if(!raw)return{};try{const o=JSON.parse(raw);if(o&&o.v==2&&o.q)return{q:o.q}}catch(e){}return{l:String(raw)}};
 function agrow(t){t.style.height='0';t.style.height=Math.min(t.scrollHeight+2,260)+'px'}
@@ -1530,7 +1553,12 @@ ntGrow()}
 function ntToggleMin(){ntMin=!ntMin;ntApply();ntFit();if(!ntMin){const t=$('#nt .ned');if(t&&!NTM())t.focus()}ntLay()}
 /* the right details panel opened: tuck the notes away, unless the person opens them again while it is open */
 function ntSide(on){if(on&&!ntMin&&!NTP()){ntMin=1;ntApply()}ntFit()}
-function ntClr(){const ed=$('#ned');if(ed){ed.innerHTML='<div><br></div>';ntSync()}else NT.h=''}
+function ntClr(){const ed=$('#ned');if(ed){ed.innerHTML='<div><br></div>';ntSync()}else{NT.h='';ntStore()}}
+/* floating notes while writing: clicking elsewhere or pressing Esc minimizes them (not when pinned) */
+function ntAutoMin(){const ed=NED();if(ed)ed.blur();if(!ntMin)ntToggleMin()}
+const ntWriting=()=>{const p=$('#nt'),ed=NED();return !!p&&!!ed&&!ntMin&&!NTP()&&ed.contains(document.activeElement)};
+document.addEventListener('pointerdown',e=>{if(!ntWriting()||ntDragging||MD)return;const t=e.target;if(t.closest&&t.closest('#nt,#mdlRoot,#zmo,.custom-options,#toast'))return;ntAutoMin()},true);
+addEventListener('keydown',e=>{if(e.key!='Escape'||e.defaultPrevented||MD||$('#zmo')||!ntWriting())return;e.preventDefault();ntAutoMin()},true);
 function ntHdr(e){if(!NTM()||e.target.closest('a'))return;ntToggleMin()}
 function ntDown(e){if(NTM()||e.button||e.target.closest('a'))return;const p=$('#nt');if(!p)return;
 const can=matchMedia('(min-width:900px)').matches,wasPin=NTP(),sx=e.clientX,sy=e.clientY,pid=e.pointerId;let r=p.getBoundingClientRect(),ox=sx-r.left,oy=sy-r.top,mv=0,over=0;
@@ -1680,6 +1708,27 @@ stRender();qkHook(n)}
 addEventListener('hashchange',()=>{nv=1;scrollTo(0,0);route()});
 addEventListener('keydown',e=>{if(e.key=='Enter'&&location.hash=='#/auth'&&e.target.tagName=='INPUT')doAuth()});
 /* ===== LOCK IN STUDY + MINI LOCK IN (Philippine time). Per-account state in localStorage as timestamps, so the clock keeps running through refresh and logout. ===== */
+Object.assign(ICP,{flame:'<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>',
+trophy:'<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>',
+lock:'<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+zap:'<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>',
+timer:'<path d="M10 2h4"/><path d="M12 14l3-3"/><circle cx="12" cy="14" r="8"/>',
+bell:'<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
+pause:'<rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/>',
+play:'<polygon points="6 3 20 12 6 21 6 3"/>',
+square:'<rect width="14" height="14" x="5" y="5" rx="2"/>',
+check:'<path d="M20 6 9 17l-5-5"/>',
+book:'<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/>',
+ban:'<circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/>',
+repeat:'<path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/>',
+heartCrack:'<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/><path d="m12 13-1-1 2-2-3-3 2-2"/>',
+star:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+history:'<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>',
+trash:'<path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>',
+utensils:'<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>',
+cloudRain:'<path d="M4 14.9A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.2"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/>',
+cloudLightning:'<path d="M6 16.326A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 .5 8.973"/><path d="m13 12-3 5h4l-3 5"/>',
+mapPin:'<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>'});
 const TZ=(()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone||'Asia/Manila'}catch(e){return'Asia/Manila'}})(),
 tzn=()=>{try{return new Intl.DateTimeFormat('en',{timeZone:TZ,timeZoneName:'long'}).formatToParts(Date.now()).find(x=>x.type=='timeZoneName').value}catch(e){return TZ}},
 tzs=()=>{try{return new Intl.DateTimeFormat('en',{timeZone:TZ,timeZoneName:'short'}).formatToParts(Date.now()).find(x=>x.type=='timeZoneName').value}catch(e){return TZ}},
@@ -1713,7 +1762,7 @@ setInterval(stSyncNow,8000);addEventListener('focus',stSyncNow);document.addEven
 const stLoad=()=>{let s={};try{s=JSON.parse(localStorage.getItem('st_'+ME.id)||'{}')}catch(e){}
 s=Object.assign({goal:0,gk:'',pm:'full',a:null,h:[],streak:0,last:'',dc:{},rv:{m:'',u:0}},s);
 if(!s.gk){s.gk='full';if(s.goal&&s.goal<=8)s.goal*=60}return s},
-stSave=s=>{s.ts=Date.now();try{localStorage.setItem('st_'+ME.id,JSON.stringify(s))}catch(e){}stPush()},
+stSave=s=>{s.ts=Date.now();try{localStorage.setItem('st_'+ME.id,JSON.stringify(s))}catch(e){}stPush();stPresTrack()},
 stEl=(a,n=Date.now())=>Math.max(0,Math.floor((n-a.start-a.pt-(a.pa?n-a.pa:0))/1000)),
 stW=a=>a.w||600,
 stPl=a=>a.pl||((a.mode=='mini'||a.mn)?900:3600),stPlLeft=a=>Math.max(0,Math.floor((stPl(a)*1000-a.pt-(a.pa?Date.now()-a.pa:0))/1000)),
@@ -1721,17 +1770,17 @@ stDer=s=>{const t=phDay(),gap=s.last?dayDiff(s.last,t):99,br=s.streak>0&&gap>=2;
 stPhase=s=>{const a=s.a;if(!a)return'i';const r=a.g-stEl(a);return a.pa?'p':r<=0?'o':'r'},
 stExp=s=>{const a=s.a;return tmd(Date.now()+(a?Math.max(0,a.g-stEl(a)):s.goal*60)*1000)},
 stName=m=>`<div class="stT lt">${m=='mini'?'Mini Lock In':'Lock in Study'}</div>`,
-stBrk=d=>`<div class="stBrk sm">💔 Streak broken. You lost a ${fm(d.lost)}-day streak. Revive it, your choice how.<div class="stRow" style="margin-top:8px"><button class="btn p" ${d.rv<1?'disabled':''} onclick="stRevive()">🔥 Revive</button><span>${d.rv} of 7 revives left this month</span></div></div>`,
-stWarn=(o,w)=>`<p class="stWarn sm">⏰ Timer done! Declare your study ended: tap <b>End study</b> within <b data-st="grace">${mmss(Math.max(0,w-o))}</b> or this session won't count.</p>`,
-stXN=(o)=>`<p class="stWarn sm">✅ 2-hour minimum reached. Tap <b>End study</b> now, or keep going: +½ streak day for every extra full hour. Bonus so far: <b data-st="xb">${fm(.5*Math.floor(o/3600))}</b> day</p>`,
+stBrk=d=>`<div class="stBrk sm">${ico('heartCrack')}Streak broken. You lost a ${fm(d.lost)}-day streak. Revive it, your choice how.<div class="stRow" style="margin-top:8px"><button class="btn p" ${d.rv<1?'disabled':''} onclick="stRevive()">${ico('flame')}Revive</button><span>${d.rv} of 7 revives left this month</span></div></div>`,
+stWarn=(o,w)=>`<p class="stWarn sm">${ico('bell')}Timer done! Declare your study ended: tap <b>End study</b> within <b data-st="grace">${mmss(Math.max(0,w-o))}</b> or this session won't count.</p>`,
+stXN=(o)=>`<p class="stWarn sm">${ico('check')}2-hour minimum reached. Tap <b>End study</b> now, or keep going: +½ streak day for every extra full hour. Bonus so far: <b data-st="xb">${fm(.5*Math.floor(o/3600))}</b> day</p>`,
 stOv=(a,o,w)=>a.x?stXN(o):stWarn(o,w),
-stLog=l=>`<p class="sm mu">${{start:'▶ Started',pause:'⏸ Paused',resume:'⏯ Resumed',end:'✔ Ended'}[l.t]} ${tm(l.ts)}${l.t=='pause'?' · after '+dur(l.m*60)+' of study':l.t=='resume'?' · paused for '+dur(l.m*60):''}</p>`;
+stLog=l=>`<p class="sm mu">${{start:''+ico('play')+'Started',pause:''+ico('pause')+'Paused',resume:''+ico('play')+'Resumed',end:''+ico('check')+'Ended'}[l.t]} ${tm(l.ts)}${l.t=='pause'?' · after '+dur(l.m*60)+' of study':l.t=='resume'?' · paused for '+dur(l.m*60):''}</p>`;
 /* phone version of the Lock in card: title, live clock, then the streak */
 function stMobHtml(s){const d=stDer(s),a=s.a,nm=a?(a.mode=='mini'||a.mn?'mini':'full'):(d.fd?'mini':s.pm);
 const hide=rsBlocked('ms');/* streak hidden by the admin: only the clock stays */
 return `${hide?'':stName(nm)}<div class="stMc" data-st="clock">${tms(Date.now())}</div><p class="mu sm" style="margin:0"><span data-st="date">${phF({weekday:'long',month:'long',day:'numeric'},Date.now())}</span> · ${tzn()}</p>${hide?'':stStreak(s)}`}
 function stStreak(s){const d=stDer(s),n=d.cur,full=n>0&&n%7==0,c=full?7:n%7,nx=(Math.floor(n/7)+1)*7,nxi=Math.floor(c);
-return `<div class="stS"><div class="stSh"><b>🔥 ${fm(n)} day${n==1?'':'s'} streak</b>${full?`<span class="stM">🏆 ${fm(n)} days straight!</span>`:''}</div><div class="stDots">${[0,1,2,3,4,5,6].map(i=>{const f=Math.min(1,Math.max(0,c-i));return `<span class="sd${f>=1?' on':f>0?' half':i==nxi&&!d.today?' nx':''}">🔥</span>`}).join('')}</div><p class="sm mu">Next milestone: <b class="stM">${nx} days</b> · ${fm(nx-n)} to go</p></div>`}
+return `<div class="stS"><div class="stSh"><b>${ico('flame')}${fm(n)} day${n==1?'':'s'} streak</b>${full?`<span class="stM">${ico('trophy')}${fm(n)} days straight!</span>`:''}</div><div class="stDots">${[0,1,2,3,4,5,6].map(i=>{const f=Math.min(1,Math.max(0,c-i));return `<span class="sd${f>=1?' on':f>0?' half':i==nxi&&!d.today?' nx':''}">${ico('flame')}</span>`}).join('')}</div><p class="sm mu">Next milestone: <b class="stM">${nx} days</b> · ${fm(nx-n)} to go</p></div>`}
 const stDelOk=(s,x)=>x.res!='live'&&x.day==phDay()&&(!x.sn||s.h.find(y=>y.sn&&y.day==x.day)===x);
 function stDel(st){const s=stLoad();if(s.a)return toast('Finish or stop your current session first');const x=s.h.find(y=>y.start==st);
 if(!x||!stDelOk(s,x))return toast('Only today\'s sessions can be deleted. If two earned streak credit, delete the latest one first.');
@@ -1740,17 +1789,17 @@ if(sn){s.streak=sn.streak;s.last=sn.last;if(sn.dcv)s.dc[t]=sn.dcv;else delete s.
 s.h.splice(i,1);stSave(s);stRender();toast('Session deleted. You can try again.');setTimeout(stHistOpen,0)})}
 const stTy=x=>x.mini||x.mode=='mini'||x.mn?'Mini Lock In':'Lock in Study',stFd=ms=>phF({weekday:'short',month:'short',day:'numeric',year:'numeric'},ms)+' · '+tms(ms);
 function stHistOpen(){const s=stLoad(),all=(s.a?[Object.assign({},s.a,{res:'live',secs:stEl(s.a)})]:[]).concat(s.h),R=(a,b)=>`<div class="stSr"><span class="mu">${a}</span><b>${b}</b></div>`;
-openMdl({title:'Study history',noCancel:1,okText:'Close',body:`<div class="stHl">${all.map(x=>`<details class="stHi"><summary><span><b>${stTy(x)}</b>${x.mode=='revive'?' '+tag('Revive'):''}</span><span class="mu sm">${dur(x.secs)} · ${phF({month:'short',day:'numeric'},x.start)}</span></summary><div class="stHd">${R('Started',stFd(x.start))}${R('Ended',x.end?stFd(x.end):'In progress')}${R('Timer set',dur(x.g))}${R('Studied',dur(x.secs))}${R('Status',{done:'Completed',live:'In progress',stopped:'Stopped',early:'Ended early',expired:'Expired'}[x.res])}${x.res=='live'?'':R('Streak credit',x.sn?'Earned':'None')}${x.log.map(stLog).join('')}${stDelOk(s,x)?`<button class="btn" style="padding:2px 10px;font-size:.8rem;margin-top:8px" onclick="stDel(${x.start})">🗑 Delete session</button>`:''}</div></details>`).join('')||'<p class="mu sm">No sessions yet.</p>'}</div>`})}
-const stHist=s=>`<button class="btn" onclick="stHistOpen()">🕘 Study history${s.h.length+(s.a?1:0)?' ('+(s.h.length+(s.a?1:0))+')':''}</button>`;
+openMdl({title:'Study history',noCancel:1,okText:'Close',body:`<div class="stHl">${all.map(x=>`<details class="stHi"><summary><span><b>${stTy(x)}</b>${x.mode=='revive'?' '+tag('Revive'):''}</span><span class="mu sm">${dur(x.secs)} · ${phF({month:'short',day:'numeric'},x.start)}</span></summary><div class="stHd">${R('Started',stFd(x.start))}${R('Ended',x.end?stFd(x.end):'In progress')}${R('Timer set',dur(x.g))}${R('Studied',dur(x.secs))}${R('Status',{done:'Completed',live:'In progress',stopped:'Stopped',early:'Ended early',expired:'Expired'}[x.res])}${x.res=='live'?'':R('Streak credit',x.sn?'Earned':'None')}${x.log.map(stLog).join('')}${stDelOk(s,x)?`<button class="btn" style="padding:2px 10px;font-size:.8rem;margin-top:8px" onclick="stDel(${x.start})">${ico('trash')}Delete session</button>`:''}</div></details>`).join('')||'<p class="mu sm">No sessions yet.</p>'}</div>`})}
+const stHist=s=>`<button class="btn" onclick="stHistOpen()">${ico('history')}Study history${s.h.length+(s.a?1:0)?' ('+(s.h.length+(s.a?1:0))+')':''}</button>`;
 function stDashHtml(){const s=stLoad(),d=stDer(s),a=s.a,run=!!a,pm=d.fd?'mini':s.pm,g=s.gk==pm?s.goal:0,w=a?stW(a):0,e=a?stEl(a):0,r=a?Math.max(0,a.g-e):0,ov=a?Math.max(0,e-a.g):0,l=a||s.h.find(x=>x.day==d.t),sd=l?tm(l.start):'--',ed=!a&&l&&l.end?tm(l.end):'--',
 nm=a?(a.mode=='mini'||a.mn?'mini':'full'):pm;
 return `${stName(nm)}<div class="stTop"><div><div class="stBig" data-st="clock">${tms(Date.now())}</div><p class="mu sm"><span data-st="date">${phF({weekday:'long',month:'long',day:'numeric'},Date.now())}</span> · ${tzn()}</p></div>${stStreak(s)}</div>
 ${d.br&&!run?stBrk(d):''}
 <div class="stCols"><div class="stL">
-<div class="seg" ${run?'style="pointer-events:none;opacity:.5"':''} style="align-self:flex-start"><button class="${pm=='full'?'on':''}" ${d.fd?'disabled':''} onclick="stMode('full')">Lock in Study${d.fd?' ✓':''}</button><button class="${pm=='mini'?'on':''}" onclick="stMode('mini')">Mini Lock In</button></div>
+<div class="seg" ${run?'style="pointer-events:none;opacity:.5"':''} style="align-self:flex-start"><button class="${pm=='full'?'on':''}" ${d.fd?'disabled':''} onclick="stMode('full')">Lock in Study${d.fd?' '+ico('check')+'':''}</button><button class="${pm=='mini'?'on':''}" onclick="stMode('mini')">Mini Lock In</button></div>
 <div class="stRow"><div ${run?'style="pointer-events:none;opacity:.5"':''}>${dd('stGoal',[['','Select timer']].concat((pm=='mini'?MINI:FULL).map(x=>[x,gl(x)])),g||'')}</div><button class="btn" ${run?'disabled':''} onclick="stSet()">Set</button>${g&&!run?`<span class="tag">Timer set: ${gl(g)}</span>`:''}</div>
-<button class="btn p" ${g&&!run?'':'disabled'} onclick="stAsk()">▶ Start study</button>
-<button class="btn p" ${run?'':'disabled'} onclick="stEnd()">■ End study</button>
+<button class="btn p" ${g&&!run?'':'disabled'} onclick="stAsk()">${ico('play')}Start study</button>
+<button class="btn p" ${run?'':'disabled'} onclick="stEnd()">${ico('square')}End study</button>
 <div class="stRow"><button class="btn" ${run?'':'disabled'} onclick="stStop()">Stop</button><button class="btn" ${run||g?'':'disabled'} onclick="stReset()">Reset</button></div>
 </div><div class="stR">
 <div class="stKv"><span class="mu sm">Time left</span><b class="stTL" data-st="rem">${hms(run?r:g*60)}</b></div>
@@ -1762,19 +1811,19 @@ ${stHist(s)}</div></div>`}
 function stPanel(mini){const s=stLoad(),d=stDer(s),a=s.a;if(!a&&!d.br)return'';
 const e=a?stEl(a):0,r=a?Math.max(0,a.g-e):0,ov=a?Math.max(0,e-a.g):0,rvm=a&&a.mode=='revive'&&!a.mn;
 let h=`<div class="stFull">${stName(a&&(a.mode=='mini'||a.mn)?'mini':'full')}<div class="stTiny"><span class="mu sm">${tzs()}</span><b data-st="clock">${tms(Date.now())}</b></div>`;
-if(a)h+=`<div class="stLab">${ov?(a.x?'✅ Bonus time':'⏰ Overtime'):a.pa?'⏸ Paused':rvm?'🔥 Revive · straight':'📖 Studying'}</div><div class="stRem" data-st="rem">${hms(r)}</div>
-<button class="btn p" style="width:100%" ${ov||rvm?'disabled':''} onclick="stPause()">${a.pa?'▶ Resume study':'⏸ Pause study'}</button>
-<p class="sm mu">Expected end <b data-st="exp">${stExp(s)}</b></p>${rvm?'':`<div class="stKv sm"><span class="mu">Pause left</span><b data-st="pl">${mmss(stPlLeft(a))}</b></div>`}${a.x?'':`<div class="stKv sm"><span class="mu">Clock-out window</span><b data-st="grace" class="${ov?'stHot':''}">${mmss(Math.max(0,stW(a)-ov))}</b></div>`}<button class="btn" style="width:100%" onclick="stEnd()">✔ End study</button>${ov?stOv(a,ov,stW(a)):''}`;
+if(a)h+=`<div class="stLab">${ov?(a.x?''+ico('check')+'Bonus time':''+ico('bell')+'Overtime'):a.pa?''+ico('pause')+'Paused':rvm?''+ico('flame')+'Revive · straight':''+ico('book')+'Studying'}</div><div class="stRem" data-st="rem">${hms(r)}</div>
+<button class="btn p" style="width:100%" ${ov||rvm?'disabled':''} onclick="stPause()">${a.pa?''+ico('play')+'Resume study':''+ico('pause')+'Pause study'}</button>
+<p class="sm mu">Expected end <b data-st="exp">${stExp(s)}</b></p>${rvm?'':`<div class="stKv sm"><span class="mu">Pause left</span><b data-st="pl">${mmss(stPlLeft(a))}</b></div>`}${a.x?'':`<div class="stKv sm"><span class="mu">Clock-out window</span><b data-st="grace" class="${ov?'stHot':''}">${mmss(Math.max(0,stW(a)-ov))}</b></div>`}<button class="btn" style="width:100%" onclick="stEnd()">${ico('check')}End study</button>${ov?stOv(a,ov,stW(a)):''}`;
 h+=stStreak(s)+(!a?stBrk(d):'')+'</div>';
-return h+(mini?`<div class="stMin" onclick="$('#stRail').classList.toggle('open')">${a?`⏱ <span data-st="rem">${hms(r)}</span>`:'💔 Streak'}</div>`:'')}
-function stRender(){const r=$('#stRailIn');if(!r)return;const s=ME?stLoad():null,p=ME?stPanel(1):'';r.innerHTML=p;ntRail();
+return h+(mini?`<div class="stMin" onclick="$('#stRail').classList.toggle('open')">${a?`${ico('timer')}<span data-st="rem">${hms(r)}</span>`:''+ico('heartCrack')+'Streak'}</div>`:'')}
+function stRender(){const r=$('#stRailIn');if(!r)return;if(ME){stPresInit();stEmailSync()}const s=ME?stLoad():null,p=ME?stPanel(1):'';r.innerHTML=p;ntRail();
 const dr=document.querySelector('.stDr');if(dr)dr.innerHTML=ME?stPanel(0):'';const x=$('#stDash');if(x)x.innerHTML=ME?stDashHtml():'';const m=$('#stMobBox');if(m)m.innerHTML=ME?stMobHtml(s):'';stPh=ME?stPhase(s):''}
 function stMode(m){const s=stLoad();if(s.a||(m=='full'&&stDer(s).fd))return;s.pm=m;if(s.gk!=m)s.goal=0;stSave(s);stRender()}
 function stSet(){const g=+v('stGoal');if(!g)return toast('Pick a timer first');const s=stLoad(),pm=stDer(s).fd?'mini':s.pm;s.goal=g;s.gk=pm;stSave(s);stRender();toast('Timer set: '+gl(g))}
 function stAsk(mode,rm){const s=stLoad(),d=stDer(s),rv=mode=='revive',mn=!rv&&s.gk=='mini';if(s.a)return;if(rv&&(!d.br||d.rv<1))return toast('No revive available');const m=rv?(rm||120):s.goal;if(!m)return;
 const g=m*60,w=mn||rm?300:600,n=Date.now(),old=s.dc[d.t]||0,add=(mn||rm?(old>=1?old:old>=.5?1:.5):1)-old,R=(a,b)=>`<div class="stSr"><span class="mu">${a}</span><b>${b}</b></div>`;
-openMdl({title:rv?(rm?'⚡ Revive with Mini Lock In':'🔥 Revive with a 2-hour study'):mn?'⚡ Mini Lock In':'🔒 Lock in Study',okText:rv?(rm?'Start mini revive':'Start 2-hour revive'):'Lock in',onOk:()=>stStart(mode,rm),body:`<div class="stSum">${R('Timer',rv&&!rm?'2 hours minimum, straight':gl(m))}${R('Starts',tms(n)+' '+tzs())}${R('Expected end',tmd(n+g*1000))}${R('Streak credit',add>0?'+'+fm(add)+' day':'Already earned today')}<ul>${rv&&!rm?'<li>⏱ Study at least 2 hours straight, then press <b>End study</b> to revive your streak. Ending earlier is allowed but only logs your time.</li><li>➕ Keep going past 2 hours and earn +½ streak day for every extra full hour.</li>':`<li>⏱ Press <b>End study</b> in the last ${w/60} minutes to earn streak credit. Ending earlier is allowed (life happens) but only logs your time.</li><li>⏰ When the timer hits zero you get ${w/60} extra minutes to clock out with <b>End study</b>. Miss it and the session won't count.</li>`}<li>🔁 Refreshing or logging out won't stop the clock.</li><li>${rv&&!rm?'⛔ Revive sessions can\'t be paused. It also counts as today\'s full study.':'⏸ You have '+(mn||rm?'15 min':'1 hour')+' of total pause time. The expected end moves while you\'re paused.'}</li></ul></div>`})}
-function stStart(mode,rm){const s=stLoad(),rv=mode=='revive';if(s.a)return;const n=Date.now(),mn=!rv&&s.gk=='mini';s.a={start:n,g:(rv?(rm||120):s.goal)*60,w:mn||rm?300:600,x:rv&&!rm?1:0,pt:0,pa:0,mn:rm?1:0,mode:rv?'revive':mn?'mini':'n',log:[{t:'start',ts:n}]};stSave(s);stRender();toast('Locked in. Good luck! 💪')}
+openMdl({title:rv?(rm?'Revive with Mini Lock In':'Revive with a 2-hour study'):mn?'Mini Lock In':'Lock in Study',okText:rv?(rm?'Start mini revive':'Start 2-hour revive'):'Lock in',onOk:()=>stStart(mode,rm),body:`<div class="stSum">${R('Timer',rv&&!rm?'2 hours minimum, straight':gl(m))}${R('Starts',tms(n)+' '+tzs())}${R('Expected end',tmd(n+g*1000))}${R('Streak credit',add>0?'+'+fm(add)+' day':'Already earned today')}<ul>${rv&&!rm?'<li>'+ico('timer')+'Study at least 2 hours straight, then press <b>End study</b> to revive your streak. Ending earlier is allowed but only logs your time.</li><li>'+ico('plus')+'Keep going past 2 hours and earn +½ streak day for every extra full hour.</li>':`<li>${ico('timer')}Press <b>End study</b> in the last ${w/60} minutes to earn streak credit. Ending earlier is allowed (life happens) but only logs your time.</li><li>${ico('bell')}When the timer hits zero you get ${w/60} extra minutes to clock out with <b>End study</b>. Miss it and the session won't count.</li>`}<li>${ico('repeat')}Refreshing or logging out won't stop the clock.</li><li>${rv&&!rm?''+ico('ban')+'Revive sessions can\'t be paused. It also counts as today\'s full study.':''+ico('pause')+'You have '+(mn||rm?'15 min':'1 hour')+' of total pause time. The expected end moves while you\'re paused.'}</li></ul></div>`})}
+function stStart(mode,rm){const s=stLoad(),rv=mode=='revive';if(s.a)return;const n=Date.now(),mn=!rv&&s.gk=='mini';s.a={start:n,g:(rv?(rm||120):s.goal)*60,w:mn||rm?300:600,x:rv&&!rm?1:0,pt:0,pa:0,mn:rm?1:0,mode:rv?'revive':mn?'mini':'n',log:[{t:'start',ts:n}]};stSave(s);stRender();toast('Locked in. Good luck!')}
 function stPause(){const s=stLoad(),a=s.a,n=Date.now();if(!a||(a.mode=='revive'&&!a.mn)||stEl(a)>=a.g)return;
 if(a.pa){a.log.push({t:'resume',ts:n,m:Math.round((n-a.pa)/60000)});a.pt+=n-a.pa;a.pa=0}else{if(a.pt>=stPl(a)*1000)return stNoPause(a.pt/1000);a.log.push({t:'pause',ts:n,m:Math.floor(stEl(a)/60)});a.pa=n}stSave(s);stRender()}
 function stClose(s,res,secs){const a=s.a,n=Date.now();if(a.pa){a.log.push({t:'resume',ts:n,m:Math.round((n-a.pa)/60000)});a.pt+=n-a.pa;a.pa=0}
@@ -1785,37 +1834,55 @@ const d=stDer(s),rv=a.mode=='revive',mn=a.mode=='mini'||!!a.mn,g=a.g,old=s.dc[d.
 s.streak=(d.br&&!rv?0:s.streak)+add;if(add>0)s.last=d.t;s.dc[d.t]=nw;s.dc=Object.fromEntries(Object.entries(s.dc).slice(-14));
 if(rv){const m=d.t.slice(0,7);if(s.rv.m!=m)s.rv={m,u:0};s.rv.u++}
 const tot=s.h.filter(x=>x.day==d.t&&x.res=='done').reduce((t,x)=>t+x.secs,0);stSave(s);stRender();
-openMdl({title:rv?'🔥 Streak revived!':mn?'⚡ Mini Lock In complete!':'🎉 Study complete!',noCancel:1,okText:'Awesome!',body:`<div class="stHero"><div class="stConf">${Array.from({length:28},(_,i)=>`<i style="left:${Math.random()*100}%;background:${['#FF8A00','#FFD23F','#FF4D00','#2F7F80','#9FD3D0'][i%5]};animation-delay:${Math.random()*.6}s"></i>`).join('')}</div><p class="mu">You studied</p><big>${dur(sec)}</big><p>Total today: <b>${dur(tot)}</b></p><p class="stM" style="font-size:1.15rem;margin-top:10px">🔥 ${add>0?'+'+fm(add)+' day! ':'Already earned today. '}${bonus>0?'(incl. +'+fm(bonus)+' bonus) ':''}Streak: ${fm(s.streak)} day${s.streak==1?'':'s'}</p>${s.streak%7==0&&add>0?'<p class="stM">🏆 Week milestone reached!</p>':''}<p class="mu sm" style="margin-top:8px">Great work. Rest well and keep it going!</p></div>`})}
+openMdl({title:rv?'Streak revived!':mn?'Mini Lock In complete!':'Study complete!',noCancel:1,okText:'Awesome!',body:`<div class="stHero"><div class="stConf">${Array.from({length:28},(_,i)=>`<i style="left:${Math.random()*100}%;background:${['#FF8A00','#FFD23F','#FF4D00','#2F7F80','#9FD3D0'][i%5]};animation-delay:${Math.random()*.6}s"></i>`).join('')}</div><p class="mu">You studied</p><big>${dur(sec)}</big><p>Total today: <b>${dur(tot)}</b></p><p class="stM" style="font-size:1.15rem;margin-top:10px">${ico('flame')}${add>0?'+'+fm(add)+' day! ':'Already earned today. '}${bonus>0?'(incl. +'+fm(bonus)+' bonus) ':''}Streak: ${fm(s.streak)} day${s.streak==1?'':'s'}</p>${s.streak%7==0&&add>0?'<p class="stM">'+ico('trophy')+'Week milestone reached!</p>':''}<p class="mu sm" style="margin-top:8px">Great work. Rest well and keep it going!</p></div>`})}
 function stRevive(){const d=stDer(stLoad());if(!d.br||d.rv<1)return toast('No revive available');
-openMdl({title:'🔥 Revive your streak',noCancel:1,okText:'Not now',body:`<p class="mu">Choose how to bring back your ${fm(d.lost)}-day streak. Each option uses 1 of your ${d.rv} revives left this month.</p><div class="stRow" style="flex-direction:column;align-items:stretch;margin-top:12px"><button class="btn p" onclick="closeMdl();stRevSimple()">⚡ Simple revive<br><span class="sm">Instant. No studying needed.</span></button><button class="btn" onclick="closeMdl();stAsk('revive')">⏱ Revive with 2-hour study<br><span class="sm">One straight session of 2 h or more (+½ day per extra hour). Also counts as today's full study.</span></button><div class="stSm sm mu" style="margin-top:4px">Or revive with a Mini Lock In (earns ½ day, pausing allowed):</div><div class="stRow" style="flex-wrap:nowrap"><div style="flex:1">${dd('stRvM',MINI.map(x=>[x,gl(x)]),30)}</div><button class="btn p" onclick="stRvMini()">⚡ Revive with Mini</button></div></div>`})}
+openMdl({title:'Revive your streak',noCancel:1,okText:'Not now',body:`<p class="mu">Choose how to bring back your ${fm(d.lost)}-day streak. Each option uses 1 of your ${d.rv} revives left this month.</p><div class="stRow" style="flex-direction:column;align-items:stretch;margin-top:12px"><button class="btn p" onclick="closeMdl();stRevSimple()">${ico('zap')}Simple revive<br><span class="sm">Instant. No studying needed.</span></button><button class="btn" onclick="closeMdl();stAsk('revive')">${ico('timer')}Revive with 2-hour study<br><span class="sm">One straight session of 2 h or more (+½ day per extra hour). Also counts as today's full study.</span></button><div class="stSm sm mu" style="margin-top:4px">Or revive with a Mini Lock In (earns ½ day, pausing allowed):</div><div class="stRow" style="flex-wrap:nowrap"><div style="flex:1">${dd('stRvM',MINI.map(x=>[x,gl(x)]),30)}</div><button class="btn p" onclick="stRvMini()">${ico('zap')}Revive with Mini</button></div></div>`})}
 function stRvMini(){const m=+v('stRvM')||30;closeMdl();stAsk('revive',m)}
-function stRevSimple(){const s=stLoad(),d=stDer(s);if(!d.br||d.rv<1||s.a)return;const m=d.t.slice(0,7);if(s.rv.m!=m)s.rv={m,u:0};s.rv.u++;s.last=phDay(Date.now()-864e5);stSave(s);stRender();toast('Streak revived! Study today to keep it going 🔥')}
+function stRevSimple(){const s=stLoad(),d=stDer(s);if(!d.br||d.rv<1||s.a)return;const m=d.t.slice(0,7);if(s.rv.m!=m)s.rv={m,u:0};s.rv.u++;s.last=phDay(Date.now()-864e5);stSave(s);stRender();toast('Streak revived! Study today to keep it going')}
 function stStop(){showConfirm('Stop this study session?','It is saved in your history as "Stopped" and earns no streak credit.',()=>{const s=stLoad();if(!s.a)return;stClose(s,'stopped',stEl(s.a));stSave(s);stRender();toast('Session stopped')})}
 function stReset(){const s=stLoad();if(!s.a){s.goal=0;stSave(s);stRender();return}
 showConfirm('Reset the timer?','Your running session is deleted (not saved in history) and the timer setting is cleared.',()=>{const s=stLoad();s.a=null;s.goal=0;stSave(s);stRender();toast('Timer reset')})}
 function stExpire(s){stClose(s,'expired',stEl(s.a));stSave(s);stRender();toast('Study was not clocked out in time, so it did not count.')}
-function stAlert(w){if($('#stAl'))return;const d=document.createElement('div');d.id='stAl';d.innerHTML=`<div class="stAlc"><div class="stBell">⏰</div><h2 class="lt">Time's up!</h2><p>Your study timer has run out. Tap <b>End study</b> to clock out so this session counts.</p><p class="mu sm">Time left to clock out: <b data-st="grace" style="color:#FF6A00;font-size:1.4rem">${mmss(w)}</b></p><button class="btn p" onclick="this.closest('#stAl').remove()">Close</button></div>`;document.body.appendChild(d)}
-function stNoPause(sec){if($('#stNp'))return;const d=document.createElement('div');d.id='stNp';d.innerHTML=`<div class="stAlc"><div class="stBell">⛔</div><h2 class="lt">No more pauses</h2><p>You've used up all your pause time for this session.</p><p class="mu sm">Total pause time consumed: <b style="color:#FF6A00;font-size:1.4rem">${dur(sec)}</b></p><p class="lt" style="font-size:1.25rem;color:#FF6A00;margin-top:14px">Time to lock in!</p><button class="btn p" onclick="this.closest('#stNp').remove()">Lock in</button></div>`;document.body.appendChild(d)}
+function stAlert(w){if($('#stAl'))return;const d=document.createElement('div');d.id='stAl';d.innerHTML=`<div class="stAlc"><div class="stBell">${ico('bell')}</div><h2 class="lt">Time's up!</h2><p>Your study timer has run out. Tap <b>End study</b> to clock out so this session counts.</p><p class="mu sm">Time left to clock out: <b data-st="grace" style="color:#FF6A00;font-size:1.4rem">${mmss(w)}</b></p><button class="btn p" onclick="this.closest('#stAl').remove()">Close</button></div>`;document.body.appendChild(d)}
+function stNoPause(sec){if($('#stNp'))return;const d=document.createElement('div');d.id='stNp';d.innerHTML=`<div class="stAlc"><div class="stBell">${ico('ban')}</div><h2 class="lt">No more pauses</h2><p>You've used up all your pause time for this session.</p><p class="mu sm">Total pause time consumed: <b style="color:#FF6A00;font-size:1.4rem">${dur(sec)}</b></p><p class="lt" style="font-size:1.25rem;color:#FF6A00;margin-top:14px">Time to lock in!</p><button class="btn p" onclick="this.closest('#stNp').remove()">Lock in</button></div>`;document.body.appendChild(d)}
 function stTick(){if(!ME)return;const s=stLoad(),a=s.a,n=Date.now(),T=(k,x)=>document.querySelectorAll('[data-st="'+k+'"]').forEach(e=>e.textContent=x);
 T('clock',tms(n));T('date',phF({weekday:'long',month:'long',day:'numeric'},n));
-if(a){if(a.pa){const lim=stPl(a)*1000,used=a.pt+(n-a.pa);if(used>=lim){const rt=a.pa+(lim-a.pt);a.log.push({t:'resume',ts:rt,m:Math.round((rt-a.pa)/60000)});a.pt=lim;a.pa=0;stSave(s);stRender();stNoPause(lim/1000)}}const e=stEl(a,n),w=a.x?36000:stW(a);if(e-a.g>=w)return stExpire(s);if(e>=a.g&&!a.al){a.al=1;stSave(s);if(a.x)toast('✅ 2-hour minimum reached. End now, or keep going for bonus.');else stAlert(w-(e-a.g))}if(a.x)T('xb',fm(.5*Math.floor(Math.max(0,e-a.g)/3600)));T('pl',mmss(stPlLeft(a)));T('rem',hms(a.g-e));T('grace',mmss(Math.max(0,w-Math.max(0,e-a.g))));T('exp',stExp(s))}else{T('exp',s.goal?stExp(s):'--');const x=$('#stAl');if(x)x.remove();const y=$('#stNp');if(y)y.remove()}
+if(a){if(a.pa){const lim=stPl(a)*1000,used=a.pt+(n-a.pa);if(used>=lim){const rt=a.pa+(lim-a.pt);a.log.push({t:'resume',ts:rt,m:Math.round((rt-a.pa)/60000)});a.pt=lim;a.pa=0;stSave(s);stRender();stNoPause(lim/1000)}}const e=stEl(a,n),w=a.x?36000:stW(a);if(e-a.g>=w)return stExpire(s);if(e>=a.g&&!a.al){a.al=1;stSave(s);if(a.x)toast('2-hour minimum reached. End now, or keep going for bonus.');else stAlert(w-(e-a.g))}if(a.x)T('xb',fm(.5*Math.floor(Math.max(0,e-a.g)/3600)));T('pl',mmss(stPlLeft(a)));T('rem',hms(a.g-e));T('grace',mmss(Math.max(0,w-Math.max(0,e-a.g))));T('exp',stExp(s))}else{T('exp',s.goal?stExp(s):'--');const x=$('#stAl');if(x)x.remove();const y=$('#stNp');if(y)y.remove()}
 if(stPhase(s)!=stPh)stRender()}
 setInterval(stTick,1000);document.addEventListener('visibilitychange',stTick);
 
+/* ===== ADMIN: who is online / in a Lock in session. Online = Supabase Presence (live, nothing stored). Offline sessions come from study_state (needs admin_users.sql). ===== */
+let PCH=null,ONL={},EMS='';
+function stPresInit(){if(PCH||!ME)return;PCH=sb.channel('online-users',{config:{presence:{key:ME.id}}});
+PCH.on('presence',{event:'sync'},()=>{ONL=PCH.presenceState();stAdminRefresh()}).subscribe(st=>{if(st=='SUBSCRIBED')stPresTrack()})}
+function stPresTrack(){if(!PCH||!ME)return;try{const a=stLoad().a;PCH.track({lock:a?{m:a.mode=='mini'||a.mn?'mini':a.mode=='revive'?'revive':'full',end:Date.now()+Math.max(0,a.g-stEl(a))*1000,p:a.pa?1:0}:null,t:Date.now()})}catch(e){}}
+function stEmailSync(){if(PR&&ME.email&&PR.email!==ME.email&&EMS!=ME.id){EMS=ME.id;sb.from('profiles').update({email:ME.email}).eq('id',ME.id).then(r=>{if(!r.error)PR.email=ME.email})}}
+function stAdminRefresh(){if(role=='admin'&&location.hash.slice(2).split('/')[0]=='admin'&&AT=='u'&&!MD&&!(document.activeElement&&document.activeElement.tagName=='INPUT'))route()}
+const stUs=u=>{const m=ONL[u.id]||[],p=m.find(x=>x.lock)||m[0],ss=(D.SS||[]).find(x=>x.user_id==u.id),a=ss&&ss.data&&ss.data.a;let lock=null;
+if(p&&p.lock)lock=p.lock;else if(a){const e=stEl(a),w=a.x?36000:stW(a);if(e-a.g<w)lock={m:a.mode=='mini'||a.mn?'mini':a.mode=='revive'?'revive':'full',end:Date.now()+Math.max(0,a.g-e)*1000,p:a.pa?1:0}}
+return{on:m.length>0,lock}};
+function stUsCell(u){const x=stUs(u);if(x.lock){const l=x.lock,left=(l.end-Date.now())/1000;return `${ico('lock')}<b>${{mini:'Mini Lock In',revive:'Revive study',full:'Lock in Study'}[l.m]}</b>${l.p?' (paused)':''}<br><span class="mu">${left>60?dur(left)+' left':'finishing up'}${x.on?'':' · offline'}</span>`}
+return x.on?'<span class="dot on"></span>Online':'<span class="mu"><span class="dot"></span>Offline</span>'}
+function stUsSum(){const r=D.U.map(stUs);return r.filter(x=>x.on).length+' online · '+r.filter(x=>x.lock).length+' in a Lock in session'}
+setInterval(async()=>{if(role=='admin'&&ME&&!document.hidden){const r=await sb.from('study_state').select('user_id,data');if(!r.error){D.SS=r.data||[];stAdminRefresh()}}},30000);
+function admRole(id,to){const u=D.U.find(x=>x.id==id);if(!u||id==ME.id||role!='admin')return;const nm=u.display_name||u.email||'this user';
+showConfirm(to=='admin'?'Make '+nm+' an admin?':'Remove admin from '+nm+'?',to=='admin'?'They will be able to manage official content, files, restrictions and other users.':'They go back to a regular student account.',async()=>{
+const r=await sb.from('profiles').update({role:to}).eq('id',id).select('id');if(r.error||!(r.data&&r.data.length)){toast('Could not change the role. Run admin_users.sql once to allow admins to edit roles.');return}
+u.role=to;toast('Role updated');route()})}
 /* greeting from the device's time zone and, when location is allowed, the weather (Open-Meteo, free, no key). Only the weather code is cached, never your coordinates. */
 let WX=null,WXB=0;try{WX=JSON.parse(localStorage.getItem('wx')||'null')}catch(e){}
 /* location is only asked after the person taps Enable on a short explainer note; "No thanks" is remembered */
-function stWxFetch(){if(WXB)return;WXB=1;navigator.geolocation.getCurrentPosition(p=>fetch('https://api.open-meteo.com/v1/forecast?latitude='+p.coords.latitude.toFixed(2)+'&longitude='+p.coords.longitude.toFixed(2)+'&current=weather_code').then(r=>r.json()).then(j=>{WX={ts:Date.now(),c:j.current.weather_code};try{localStorage.setItem('wx',JSON.stringify(WX))}catch(e){}const g=$('#stGr');if(g)g.textContent=stGreet()}).catch(()=>{}).finally(()=>{WXB=0}),()=>{WXB=0},{timeout:10000,maximumAge:36e5})}
+function stWxFetch(){if(WXB)return;WXB=1;navigator.geolocation.getCurrentPosition(p=>fetch('https://api.open-meteo.com/v1/forecast?latitude='+p.coords.latitude.toFixed(2)+'&longitude='+p.coords.longitude.toFixed(2)+'&current=weather_code').then(r=>r.json()).then(j=>{WX={ts:Date.now(),c:j.current.weather_code};try{localStorage.setItem('wx',JSON.stringify(WX))}catch(e){}const g=$('#stGr');if(g)g.innerHTML=stGreet()}).catch(()=>{}).finally(()=>{WXB=0}),()=>{WXB=0},{timeout:10000,maximumAge:36e5})}
 function stWxNote(){if(localStorage.getItem('wxNo'))return;const el=$('#stWxN');if(!el||el.innerHTML)return;
-el.innerHTML=`<div class="card sm" style="display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap"><span>🌦️ Allow your location to get a weather-aware greeting (like a rainy-day note). It's only used to check the weather and is never saved.</span><span class="row" style="margin:0"><button class="btn p" onclick="stWxOn()">Enable</button><a class="lk sm mu" onclick="stWxNo()">No thanks</a></span></div>`}
+el.innerHTML=`<div class="card sm" style="display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap"><span>${ico('mapPin')}Allow your location to get a weather-aware greeting (like a rainy-day note). It's only used to check the weather and is never saved.</span><span class="row" style="margin:0"><button class="btn p" onclick="stWxOn()">Enable</button><a class="lk sm mu" onclick="stWxNo()">No thanks</a></span></div>`}
 function stWxOn(){const el=$('#stWxN');if(el)el.innerHTML='';stWxFetch()}
 function stWxNo(){try{localStorage.setItem('wxNo','1')}catch(e){}const el=$('#stWxN');if(el)el.innerHTML=''}
 function stWxGet(){if(WXB||!navigator.geolocation||(WX&&Date.now()-WX.ts<18e5))return;const f=st=>{if(st=='granted')stWxFetch();else if(st=='prompt')stWxNote()};
 try{navigator.permissions.query({name:'geolocation'}).then(r=>f(r.state),()=>f('prompt'))}catch(e){f('prompt')}}
 function stGreet(){stWxGet();const h=+new Intl.DateTimeFormat('en-US',{timeZone:TZ,hour:'numeric',hour12:false}).format(Date.now())%24,c=WX&&Date.now()-WX.ts<108e5?WX.c:-1;
-if(c>=95)return 'Stormy out there, perfect time to lock in! ⛈️';
-if((c>=51&&c<=67)||(c>=80&&c<=82))return 'What a rainy '+(h>=18||h<5?'night':'day')+' to study! 🌧️';
-return h==12?'Happy Lunch Time! 🍱':h>=5&&h<12?'Good morning! ☀️':h>=13&&h<18?'Good afternoon! 🌤️':h>=18&&h<22?'Good evening! 🌙':'Burning the midnight oil! 🌌'}
+if(c>=95)return 'Stormy out there, perfect time to lock in! '+ico('cloudLightning')+'';
+if((c>=51&&c<=67)||(c>=80&&c<=82))return 'What a rainy '+(h>=18||h<5?'night':'day')+' to study! '+ico('cloudRain')+'';
+return h==12?'Happy Lunch Time! '+ico('utensils')+'':h>=5&&h<12?'Good morning! '+ico('sun')+'':h>=13&&h<18?'Good afternoon! '+ico('sun')+'':h>=18&&h<22?'Good evening! '+ico('moon')+'':'Burning the midnight oil! '+ico('moon')+''}
 /* session: runs on page load, login, logout and password-reset links */
 sb.auth.onAuthStateChange((ev,s)=>setTimeout(async()=>{
 if(ev=='PASSWORD_RECOVERY')AU.mode='newpw';
@@ -1823,7 +1890,7 @@ const u=s&&s.user||null;
 /* Coming back to the tab makes Supabase re-send SIGNED_IN / TOKEN_REFRESHED for the same user. Nothing changed, so do not redraw the page. */
 if(u&&ME&&CU==u.id&&ev!='PASSWORD_RECOVERY'&&ev!='USER_UPDATED'){ME=u;return}
 ME=u;
-if(!ME){CU=null;D={FO:[],M:[],F:[],MQ:[],U:[]};P={h:[],q:{},fc:{},bm:[],op:{}};OQ=[];PR=null;role='student';QZ=null;QL=1;VWS=[];ntReset();renderFileViewer();
+if(!ME){if(PCH){try{sb.removeChannel(PCH)}catch(e){}PCH=null}ONL={};CU=null;D={FO:[],M:[],F:[],MQ:[],U:[]};P={h:[],q:{},fc:{},bm:[],op:{}};OQ=[];PR=null;role='student';QZ=null;QL=1;VWS=[];ntReset();renderFileViewer();
 if(ev=='SIGNED_OUT'){const own=USER_OUT;USER_OUT=0;go('home');if(!own)toast('You were signed out (session ended or you signed out on another device or tab). Please sign in again.')}else route();return}
 if(ME.id!=CU){CU=ME.id;ntReset();QL=0;route();await load();QL=1}
 if(AU.mode=='newpw')go('auth');else if(location.hash=='#/auth')go('dash');else route()},0));
