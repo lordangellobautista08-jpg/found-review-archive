@@ -343,6 +343,7 @@ body.dg .fr[data-drop],body.dg .ph a.lk{transition:transform .12s,box-shadow .12
 .qkd{display:flex;gap:6px;margin:6px 0}.qkd i{width:16px;height:16px;border-radius:50%;border:1px solid var(--teal);background:transparent}.qkd i.on{background:var(--teal)}
 .qkh{display:flex;justify-content:space-between;align-items:center;gap:10px;width:min(100%,680px);margin:0 auto 12px}
 @media(max-width:600px){.qkh{width:min(78vw,300px)}}
+.qkoff{background-image:none;background-color:var(--bg2)}.qkoff h3,.qkoff .lb{color:var(--mu)}.qkoff .qkd i{border-color:var(--mu)}.qkoff .qkd i.on{background:var(--mu)}
 .qkn{width:min(100%,680px);margin:0 auto 14px;display:flex;justify-content:center}
 
 /* ===== FILE VIEWER: floating window, move by the title bar, resize from any edge ===== */
@@ -788,7 +789,7 @@ P.op={};g(9).forEach(x=>P.op[x.material_id]=x.opens);D.AG=g(10);
 const at=g(8),an=at.length?(await pg('quiz_answers',q=>q.in('attempt_id',at.map(x=>x.id)).order('id'))).data:[];
 P.h=at.map(a=>({id:a.id,ts:T0(a.created_at),sc:a.scope||'',n:a.total,k:a.correct,secs:a.seconds||0,notes:a.notes||'',it:an.filter(x=>x.attempt_id==a.id).sort((x,y)=>x.position-y.position).map(x=>({id:x.question_id,ch:x.chosen,ok:+x.is_correct}))}));
 D.U=[];if(role=='admin'){const u=await sb.from('profiles').select('*');D.U=u.data||[]}
-}catch(err){console.error(err);toast('Database connection error. Check the console (F12).')}}
+await qkPull()}catch(err){console.error(err);toast('Database connection error. Check the console (F12).')}}
 
 /* delete helper (confirmation is shown by the caller's popup) */
 async function del(k,id){const r=await sb.from(TB[k]).delete().eq('id',id);if(r.error)return toast(r.error.message);D[k]=D[k].filter(x=>x.id!=id);route()}
@@ -812,10 +813,18 @@ ${sharedCard()}
 const QK_RE=/problem[\s_-]*sets?|evaluations?/i,qkTag=x=>QK_RE.test((x.src||'')+' '+(x.t||'')),
 ymd=(o=0)=>{const d=new Date();d.setDate(d.getDate()+o);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')},
 dayDiff=(a,b)=>Math.round((Date.parse(b+'T00:00:00Z')-Date.parse(a+'T00:00:00Z'))/864e5),
-qkEmpty=()=>({streak:0,last:'',seen:{},sub:null,lost:0,rev:{tries:0,lastTry:'',used:[]}});
+qkEmpty=()=>({ts:0,today:null,streak:0,last:'',seen:{},sub:null,lost:0,rev:{tries:0,lastTry:'',used:[]}});
 let QKS=null,QKI=null;
 function qkLoad(){try{return Object.assign(qkEmpty(),JSON.parse(localStorage.getItem('qk_'+ME.id)||'{}'))}catch(e){return qkEmpty()}}
-function qkSave(s){try{localStorage.setItem('qk_'+ME.id,JSON.stringify(s))}catch(e){}}
+let QKOK=false;/* true once the quickiz_state table answered, so progress also syncs through Supabase */
+function qkSave(s){s.ts=Date.now();try{localStorage.setItem('qk_'+ME.id,JSON.stringify(s))}catch(e){}
+if(QKOK)sb.from('quickiz_state').upsert({user_id:ME.id,data:s,updated_at:new Date().toISOString()}).then(r=>r.error&&console.warn('QuickiZ sync:',r.error.message))}
+/* on login: take whichever copy (this device or Supabase) is newer, and push this device's copy if it is newer */
+async function qkPull(){try{const r=await sb.from('quickiz_state').select('data').eq('user_id',ME.id).maybeSingle();
+if(r.error){QKOK=false;console.warn('QuickiZ sync is off:',r.error.message);return}
+QKOK=true;const rm=r.data&&r.data.data,lc=qkLoad();
+if(rm&&(rm.ts||0)>(lc.ts||0)){try{localStorage.setItem('qk_'+ME.id,JSON.stringify(rm))}catch(e){}}
+else if(lc.ts&&(!rm||(rm.ts||0)<lc.ts))qkSave(lc)}catch(e){console.warn(e)}}
 function qkReset(s){s.lost=s.streak;s.streak=0;s.last='';s.seen={};s.rev={tries:0,lastTry:'',used:[]}}
 /* st: new (no streak) | ok (can play today) | done (played today) | rev (missed a day: revive chance available) | revdone (today's revive chance already used) */
 function qkState(){const s=qkLoad(),t=ymd();let st='new';
@@ -831,40 +840,42 @@ return{qs:un.slice(0,5),cyc}}
 function qkRevPick(s){const sub=s.sub||{};let c=allQ().filter(x=>(qkTag(x)||/hard/i.test(x.d))&&!s.rev.used.includes(x.id));if(!c.length)c=allQ();if(!c.length)return null;
 const rk=x=>x.c==sub.c&&x.s==sub.s?(x.t==sub.t?3:2):x.c==sub.c?1:0,m=Math.max(...c.map(rk)),top=c.filter(x=>rk(x)==m);return top[Math.random()*top.length|0]}
 function qkStart(mode){const{s,st}=qkState();
+if(mode=='review'){const t=s.today;if(st!='done'||!t||t.date!=ymd())return;const qs=[],pick=[];t.ids.forEach((id,i)=>{const q=allQ().find(x=>x.id==id);if(q){qs.push(q);pick.push(t.pick[i])}});if(!qs.length)return toast('Those cards are no longer available');QKS={mode,qs,i:0,pick,end:0,res:{}};return go('quickiz')}
 if(mode=='rev'){if(st!='rev')return;const q=qkRevPick(s);if(!q)return toast('No questions available yet');s.rev.tries++;s.rev.lastTry=ymd();s.rev.used.push(q.id);qkSave(s);QKS={mode,qs:[q],i:0,pick:[],end:Date.now()+6e5}}
 else{if(st!='new'&&st!='ok')return;const r=qkPick(s);if(!r.qs.length)return toast('No questions available yet');QKS={mode:'daily',qs:r.qs,i:0,pick:[],end:Date.now()+12e5,cyc:r.cyc}}
 go('quickiz')}
 function qkRevFail(why){const s=qkLoad(),tries=s.rev.tries,out=tries>=3;if(out)qkReset(s);qkSave(s);QKS.res={fail:why,tries,out,lost:s.lost}}
 function qkComplete(){const S=QKS,s=qkLoad();
 if(S.mode=='rev'){if(S.pick[0]==S.qs[0].a){s.last=ymd(-1);s.rev={tries:0,lastTry:'',used:[]};qkSave(s);S.res={ok:1,streak:s.streak}}else qkRevFail('wrong');return}
-const sc=S.qs.filter((q,i)=>S.pick[i]==q.a).length;if(S.cyc)s.seen={};S.qs.forEach(q=>s.seen[q.id]=1);const l=S.qs[S.qs.length-1];s.sub={c:l.c,s:l.s,t:l.t};s.streak++;s.last=ymd();s.lost=0;qkSave(s);S.res={ok:1,sc,streak:s.streak}}
+const sc=S.qs.filter((q,i)=>S.pick[i]==q.a).length;if(S.cyc)s.seen={};S.qs.forEach(q=>s.seen[q.id]=1);const l=S.qs[S.qs.length-1];s.sub={c:l.c,s:l.s,t:l.t};s.today={date:ymd(),ids:S.qs.map(q=>q.id),pick:S.pick.slice()};s.streak++;s.last=ymd();s.lost=0;qkSave(s);S.res={ok:1,sc,streak:s.streak}}
 function qkAns(j){const S=QKS,q=S&&S.qs[S.i];if(!q||S.res||S.pick[S.i]!=null||Date.now()>=S.end)return;S.pick[S.i]=j;
 document.querySelectorAll('.fch').forEach((b,n)=>{b.disabled=true;b.classList.toggle('ok',n==q.a);b.classList.toggle('no',n==j&&j!=q.a);b.classList.toggle('dim',n!=q.a&&n!=j);b.blur()});
 const el=document.querySelector('.fc[data-sw="qk"]');if(el)el.dataset.ans=1;
 if(S.i==S.qs.length-1)qkComplete();
 setTimeout(()=>{if(el&&el.isConnected)el.classList.add('on');const b=$('#qkn');if(b)b.style.visibility='visible'},450)}
-function qkNext(){const S=QKS;if(!S)return;if(S.i<S.qs.length-1){S.i++;route()}else{S.done=1;route()}}
-function qkTick(){const S=QKS,e=$('#qkt');if(!S||S.done)return;const r=Math.max(0,Math.ceil((S.end-Date.now())/1e3));if(e)e.textContent='⏱ '+mmss(r);
+function qkPrev(){if(QKS&&QKS.i>0){QKS.i--;route()}}
+function qkNext(){const S=QKS;if(!S)return;if(S.mode=='review'){if(S.i<S.qs.length-1){S.i++;route()}else go('dash');return}if(S.i<S.qs.length-1){S.i++;route()}else{S.done=1;route()}}
+function qkTick(){const S=QKS,e=$('#qkt');if(!S||S.done||S.mode=='review')return;const r=Math.max(0,Math.ceil((S.end-Date.now())/1e3));if(e)e.textContent='⏱ '+mmss(r);
 if(r<=0&&!S.res){if(S.mode=='rev')qkRevFail('time');else S.res={fail:'time'};S.done=1;route()}}
-function qkHook(n){clearInterval(QKI);if(n=='quickiz'&&QKS&&!QKS.done){qkTick();QKI=setInterval(qkTick,1000)}}
+function qkHook(n){clearInterval(QKI);if(n=='quickiz'&&QKS&&!QKS.done&&QKS.mode!='review'){qkTick();QKI=setInterval(qkTick,1000)}}
 const qkDots=n=>{const p=n?((n-1)%7)+1:0;return `<div class="qkd">${[1,2,3,4,5,6,7].map(i=>`<i class="${i<=p?'on':''}"></i>`).join('')}</div><p class="mu sm">${p} / 7 days</p>`},
 qkLabel=n=>{if(!n)return '<p class="lb">No streak yet</p>';const nx=(Math.floor(n/7)+1)*7;return `<p class="lb">${n%7?'🔥':'🏆'} ${n}-day streak${n%7?'':'!'}</p><p class="mu sm">Next milestone: ${nx}-day streak</p>`};
 function qkCard(){const{s,st}=qkState(),has=allQ().length>0,
 msg={new:'5 flashcards, 20 minutes. Starts with Algebra.',ok:'5 flashcards, 20 minutes. Keep your streak going!',done:'✓ Done for today. Come back tomorrow.',
 rev:`You missed a day. Revive your ${s.streak}-day streak with 1 question (10 minutes). Chances used: ${s.rev.tries} / 3.`,revdone:`Revive chance used today. Try again tomorrow. Chances used: ${s.rev.tries} / 3.`}[st],
-btn=st=='rev'?`<button class="btn p" onclick="qkStart('rev')" ${has?'':'disabled'}>Revive streak</button>`:`<button class="btn p" onclick="qkStart()" ${has&&(st=='new'||st=='ok')?'':'disabled'}>Start a QuickiZ</button>`;
-return `<div class="card art stack"><h3>QuickiZ</h3>${qkLabel(s.streak)}${qkDots(s.streak)}${!s.streak&&s.lost?`<p class="mu sm">Your ${s.lost}-day streak ended. Start again at day 1.</p>`:''}<p class="mu">${msg}</p>${btn}</div>`}
+btn=st=='done'&&s.today&&s.today.date==ymd()?`<button class="btn p" onclick="qkStart('review')">View today's cards</button>`:st=='rev'?`<button class="btn p" onclick="qkStart('rev')" ${has?'':'disabled'}>Revive streak</button>`:`<button class="btn p" onclick="qkStart()" ${has&&(st=='new'||st=='ok')?'':'disabled'}>Start a QuickiZ</button>`;
+return `<div class="card art stack ${st=='done'?'':'qkoff'}"><h3>QuickiZ</h3>${qkLabel(s.streak)}${qkDots(s.streak)}${!s.streak&&s.lost?`<p class="mu sm">Your ${s.lost}-day streak ended. Start again at day 1.</p>`:''}<p class="mu">${msg}</p>${btn}</div>`}
 function qkResult(){const S=QKS,r=S.res,back=`<div class="row"><button class="btn p" onclick="go('dash')">Back to dashboard</button></div>`;
 if(r.fail=='time'&&S.mode!='rev')return `<div class="card art stack"><h3>⏰ Time's up</h3><p class="mu">This QuickiZ didn't count. You can start a new one from the dashboard.</p>${back}</div>`;
 if(S.mode=='rev'){if(r.ok)return `<div class="card art stack"><h3>🔥 Streak revived!</h3><p>Your ${r.streak}-day streak is back. Do today's QuickiZ to add a day.</p>${back}</div>`;
 return `<div class="card art stack"><h3>${r.fail=='time'?"⏰ Time's up":'Not quite'}</h3>${r.out?`<p>All 3 revive chances are used. Your ${r.lost}-day streak ended. Start again at day 1.</p>`:`<p>Try again tomorrow. Chances used: ${r.tries} / 3.</p>`}${back}</div>`}
 return `<div class="card art stack"><h3>🎉 QuickiZ complete!</h3><p>Score: <b>${r.sc} / ${S.qs.length}</b></p><p class="lb">+1 day · Streak: ${r.streak} ${r.streak==1?'day':'days'}</p>${qkDots(r.streak)}${r.streak%7?`<p class="mu sm">Next milestone: ${(Math.floor(r.streak/7)+1)*7}-day streak</p>`:`<p class="lb">🏆 ${r.streak}-day streak!</p>`}${back}</div>`}
-V.quickiz=()=>{const S=QKS,h=hd('QuickiZ',S&&S.mode=='rev'?'Revive your streak: answer 1 question in 10 minutes.':'5 flashcards, 20 minutes.');
+V.quickiz=()=>{const S=QKS,h=hd('QuickiZ',S&&S.mode=='review'?'Your cards from today. Tap a card to flip it.':S&&S.mode=='rev'?'Revive your streak: answer 1 question in 10 minutes.':'5 flashcards, 20 minutes.');
 if(!S)return h+`<div class="w sec"><div class="card stack"><p class="mu">No active QuickiZ.</p><div class="row"><button class="btn p" onclick="go('dash')">Back to dashboard</button></div></div></div>`;
 if(S.done)return h+`<div class="w sec">${qkResult()}</div>`;
-const q=S.qs[S.i],c=qcard(q),a=S.pick[S.i],last=S.i==S.qs.length-1;
-let f=flip(c.fh,c.bh,'qk',S.qs.length);if(a!=null)f=f.replace('class="fc"','class="fc on" data-ans="1"');
-return h+`<div class="w sec"><div class="qkh"><span class="mu sm">Card ${S.i+1} of ${S.qs.length}</span><b id="qkt"></b></div>${f}<div class="fchoices">${q.o.slice(0,4).map((_,j)=>`<button class="fch${a!=null?(j==q.a?' ok':j==a?' no':' dim'):''}" ${a!=null?'disabled':''} onclick="qkAns(${j})" aria-label="Option ${'ABCD'[j]}">${'ABCD'[j]}</button>`).join('')}</div><div class="qkn"><button class="btn p" id="qkn" onclick="qkNext()" style="visibility:${a!=null?'visible':'hidden'}">${last?'See result':'Next →'}</button></div></div>`};
+const q=S.qs[S.i],c=qcard(q),a=S.pick[S.i],last=S.i==S.qs.length-1,rv=S.mode=='review';
+let f=flip(c.fh,c.bh,'qk',S.qs.length);if(a!=null)f=f.replace('class="fc"',rv?'class="fc" data-ans="1"':'class="fc on" data-ans="1"');
+return h+`<div class="w sec"><div class="qkh"><span class="mu sm">Card ${S.i+1} of ${S.qs.length}</span><b id="qkt">${rv?'Today\'s cards':''}</b></div>${f}<div class="fchoices">${q.o.slice(0,4).map((_,j)=>`<button class="fch${a!=null?(j==q.a?' ok':j==a?' no':' dim'):''}" ${a!=null?'disabled':''} onclick="qkAns(${j})" aria-label="Option ${'ABCD'[j]}">${'ABCD'[j]}</button>`).join('')}</div><div class="qkn" style="gap:10px">${rv&&S.i?'<button class="btn" onclick="qkPrev()">← Back</button>':''}<button class="btn p" id="qkn" onclick="qkNext()" style="visibility:${a!=null?'visible':'hidden'}">${rv?(last?'Back to dashboard':'Next →'):last?'See result':'Next →'}</button></div></div>`};
 
 /* ===== COMPONENT PAGE + FOLDER PAGE ===== */
 const rtag=(it)=>role=='admin'&&!it.own&&it.rs?'<span class="tag">Restricted</span>':'';
