@@ -329,6 +329,35 @@ body.dg .fr[data-drop],body.dg .ph a.lk{transition:transform .12s,box-shadow .12
 .vrs[data-d=nw]{top:0;left:0;width:14px;height:14px;cursor:nwse-resize}
 .vrs[data-d=se]{bottom:0;right:0;width:16px;height:16px;cursor:nwse-resize}
 .vrs[data-d=sw]{bottom:0;left:0;width:14px;height:14px;cursor:nesw-resize}
+
+/* ===== 3-dot menu: always in front, opens beside the card (like Google Drive) ===== */
+.fr.mo{z-index:30!important;transform:none!important}
+.g.grid>.fr .pop{top:0;bottom:auto;left:calc(100% + 8px);right:auto;max-height:none;overflow:visible}
+.g.grid>.fr .pop.flip{left:auto;right:calc(100% + 8px)}
+.g.grid>.fr .pop.below{left:auto;right:6px;top:calc(20% + 4px)}
+/* ===== viewer window buttons (icons only) ===== */
+.vwin .vh{padding:4px 6px 4px 12px}
+.vwin .vh h2{font-size:.95rem}
+.vbs{display:flex;gap:2px;flex:none}
+.vbt{width:34px;height:30px;display:inline-flex;align-items:center;justify-content:center;border:0;background:transparent;color:var(--tx);border-radius:6px;cursor:pointer;text-decoration:none;padding:0}
+.vbt:hover{background:rgba(127,127,127,.22)}
+.vbt.x:hover{background:#d9534f;color:#fff}
+.vbt svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.vwin.min{min-width:0;min-height:0}
+.vwin.min .vrs,.vwin.min .vdl{display:none}
+.vwin.min .vh{cursor:default;border-bottom:0}
+/* ===== right details sidebar ===== */
+#sbRoot .sb{position:fixed;top:56px;right:0;bottom:0;width:320px;z-index:7;background:var(--card);border-left:1px solid var(--bd);padding:14px;overflow:auto;box-shadow:-4px 0 18px #0001}
+body.sbo main,body.sbo footer{margin-right:320px}
+body.sbo #fabRoot{right:344px}
+.sbh{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.sbp{aspect-ratio:4/3;border-radius:12px;overflow:hidden;background:var(--bg2);border:1px solid var(--bd);display:flex;align-items:center;justify-content:center}
+.sbp .thm{display:flex;position:static;width:100%;height:100%;align-items:center;justify-content:center}
+.sbp .thm img{object-fit:contain}
+.sbn{font-weight:700;margin:12px 0 8px;word-break:break-word;color:var(--ink)}
+.sbt{width:100%;font-size:.88rem;border-collapse:collapse;margin:0}
+.sbt td{padding:6px 0;vertical-align:top;border-bottom:1px solid var(--bd);word-break:break-word}
+.sbt td:first-child{color:var(--mu);width:92px;padding-right:8px}
 </style>
 </head>
 <body>
@@ -352,7 +381,7 @@ go=h=>{if(location.hash=='#/'+h)route();else location.hash='#/'+h},
 CD={MSTC:'Mathematics, Surveying and Transportation Engineering.',HPGE:'Hydraulics and Geotechnical Engineering.',PSAD:'Structural Analysis and Design.'};
 let D={FO:[],M:[],F:[],MQ:[],U:[]},P={h:[],q:{},fc:{},bm:[],op:{}},role='student',nv=0,tk,QL=0,OQ=[],ME=null,PR=null,CU=null,AU={mode:'in',msg:''};
 /* ===== UI CORE: modals, custom dropdown, menus, dark mode ===== */
-let folderView='list',FSORT='az',FOSORT='old',activeMenu=null,viewerFile=null,MD=null,FQ='',ACT='',ANCH='',PASTING=0,RMFAIL=0,lastOpen=0;
+let folderView='list',FSORT='az',FOSORT='old',activeMenu=null,MD=null,FQ='',ACT='',ANCH='',PASTING=0,RMFAIL=0,lastOpen=0;
 let selMode=false,SEL=new Set(),VIS=[],selFor='',CB=null;
 let fab={open:false,mode:'upload',c:'',d:'',busy:false};
 const EXT=['pdf','doc','docx','ppt','pptx','xls','xlsx','jpg','jpeg','png','webp'],LIM=30*1024*1024,ex=f=>f.name.split('.').pop().toLowerCase();
@@ -408,8 +437,8 @@ const rows=r.data||[];if(!rows.length)return toast('No orphaned files. Storage i
 showConfirm('Delete orphaned files','Found '+rows.length+' stored file(s) that nothing uses. Delete them from Supabase storage permanently?',async()=>{RMFAIL=0;let n=0;
 for(const b of ['review-materials','flashcard-images'])n+=await rmStore(b,rows.filter(x=>x.bucket==b).map(x=>x.path));
 toast('Removed '+n+' of '+rows.length+' orphaned file(s)'+(RMFAIL?'. Some were blocked: check the delete policies in storage_cleanup.sql.':''))})}
-function renameFolder(id){const f=D.FO.find(x=>x.id==id);if(!f)return;showPrompt('Rename folder','Folder name',f.name,async n=>{const r=await sb.from('folders').update({name:n}).eq('id',id);if(r.error)return toast(r.error.message);f.name=n;toast('Folder renamed');route()})}
-function renameMaterial(id){const m=D.M.find(x=>x.id==id);if(!m)return;showPrompt('Rename file','File name',m.title,async n=>{const r=await sb.from('materials').update({title:n}).eq('id',id);if(r.error)return toast(r.error.message);m.title=n;toast('File renamed');route()})}
+function renameFolder(id){const f=D.FO.find(x=>x.id==id);if(!f)return;showPrompt('Rename folder','Folder name',f.name,async n=>{const r=await sb.from('folders').update({name:n}).eq('id',id);if(r.error)return toast(r.error.message);f.name=n;f.mod=Date.now();toast('Folder renamed');route()})}
+function renameMaterial(id){const m=D.M.find(x=>x.id==id);if(!m)return;showPrompt('Rename file','File name',m.title,async n=>{const r=await sb.from('materials').update({title:n}).eq('id',id);if(r.error)return toast(r.error.message);m.title=n;m.mod=Date.now();toast('File renamed');route()})}
 async function delFo(id,quiet){const f=D.FO.find(x=>x.id==id);if(!f)return;const ids=dsc(id),paths=D.M.filter(m=>ids.includes(m.fo)).map(m=>m.path).filter(Boolean);
 for(const i of ids.slice().reverse()){const r=await sb.from('folders').delete().eq('id',i);if(r.error)return toast(r.error.message)}
 if(paths.length){const n=await rmStore('review-materials',paths);if(n<paths.length&&!quiet)toast('Deleted, but '+(paths.length-n)+' stored file(s) were not removed from Supabase storage.')}
@@ -435,7 +464,8 @@ function fileInfo(id){const m=D.M.find(x=>x.id==id),f=m&&D.FO.find(x=>x.id==m.fo
 /* ===== SELECTION ===== */
 function selOn(){selMode=true;SEL.clear();route()}
 function selOff(quiet){selMode=false;SEL.clear();if(!quiet)route()}
-function selTog(k){SEL.has(k)?SEL.delete(k):SEL.add(k);route()}
+function selTog(k){SEL.has(k)?SEL.delete(k):SEL.add(k);ANCH=k;ACT=k;route()}
+function chkClick(e,k){e.stopPropagation();if(e.shiftKey&&PCM()){e.preventDefault();rangeSel(k)}}
 function selAll(){VIS.forEach(k=>SEL.add(k));route()}
 const selKeys=()=>[...SEL].filter(k=>gi(k)),none=()=>toast('Select something first');
 const selBar=()=>selMode?`<div class="selbar"><b>${SEL.size} selected</b><a class="lk sm" onclick="selAll()">Select all</a><a class="lk sm" onclick="SEL.clear();route()">Clear</a><span class="sp"></span><button class="btn" onclick="copySel()">Copy</button><button class="btn" onclick="moveSel()">Move to…</button><button class="btn" onclick="dlSel()">Download</button><button class="btn" onclick="delSel()">Delete</button><button class="btn p" onclick="selOff()">Done</button></div>`:'';
@@ -475,7 +505,7 @@ const copyKey=k=>{CB={keys:[k],cut:false};toast('Copied. Open a folder and press
 const PCM=()=>matchMedia('(hover:hover) and (pointer:fine)').matches;
 function cardOpen(k){if(Date.now()-lastOpen<700)return;lastOpen=Date.now();const it=gi(k);if(!it)return;k[0]=='f'?go('f/'+it.id):openM(it.id)}
 function setActive(k,scroll){ACT=k;ANCH=k;document.querySelectorAll('.fr.active').forEach(x=>x.classList.remove('active'));
-const el=[...document.querySelectorAll('.fr[data-k]')].find(x=>x.dataset.k==k);if(el){el.classList.add('active');if(scroll)el.scrollIntoView({block:'nearest'})}}
+const el=[...document.querySelectorAll('.fr[data-k]')].find(x=>x.dataset.k==k);if(el){el.classList.add('active');if(scroll)el.scrollIntoView({block:'nearest'})}renderSidebar()}
 function rangeSel(k){const a=VIS.indexOf(ANCH||ACT||k),b=VIS.indexOf(k);if(a<0||b<0)return setActive(k);SEL=new Set(VIS.slice(Math.min(a,b),Math.max(a,b)+1));selMode=true;ACT=k;route()}
 function cardClick(e,k){if(e.target.closest('.fx,.pop,.selbox'))return;
 if(selMode){e.shiftKey?rangeSel(k):selTog(k);return}
@@ -485,7 +515,7 @@ if(!PCM()){cardOpen(k);return}
 if(e.target.closest('.nm')){cardOpen(k);return}
 setActive(k)}
 function cardDbl(e,k){if(selMode||!PCM()||e.target.closest('.fx,.pop,.selbox'))return;try{getSelection().removeAllRanges()}catch(_){}cardOpen(k)}
-document.addEventListener('click',e=>{if(ACT&&!e.target.closest('.fr,.selbar,.btn,.pop,.custom-dropdown,#mdlRoot,.fm-backdrop')){ACT='';document.querySelectorAll('.fr.active').forEach(x=>x.classList.remove('active'))}});
+document.addEventListener('click',e=>{if(ACT&&!e.target.closest('.fr,.selbar,.btn,.pop,.custom-dropdown,#mdlRoot,.fm-backdrop,.sb,.vwin')){ACT='';document.querySelectorAll('.fr.active').forEach(x=>x.classList.remove('active'));renderSidebar()}});
 
 /* ===== KEYBOARD SHORTCUTS (folders and files; no extra buttons) =====
  Ctrl/Cmd+A select all · C copy · X cut · V paste · D duplicate · Delete (or Cmd+Backspace) delete · F2 rename · Enter open
@@ -497,7 +527,7 @@ if(key=='Home')i=0;else if(key=='End')i=VIS.length-1;else if(i<0)i=0;
 else i=Math.max(0,Math.min(VIS.length-1,i+(key=='ArrowRight'?1:key=='ArrowLeft'?-1:key=='ArrowDown'?cols:-cols)));
 const k=VIS[i];if(shift){const a=VIS.indexOf(ANCH||ACT||k);SEL=new Set(VIS.slice(Math.min(a,i),Math.max(a,i)+1));selMode=true;ACT=k;route();const el=[...document.querySelectorAll('.fr[data-k]')].find(x=>x.dataset.k==k);el&&el.scrollIntoView({block:'nearest'})}
 else{setActive(k,true)}}
-addEventListener('keydown',e=>{if(MD||viewerFile||e.defaultPrevented||!ME)return;const t=e.target;
+addEventListener('keydown',e=>{if(MD||e.defaultPrevented||!ME)return;const t=e.target;
 if(t&&(/INPUT|TEXTAREA|SELECT/.test(t.tagName)||t.isContentEditable))return;
 const p=location.hash.slice(2).split('/');if(p[0]!='c'&&p[0]!='f')return;
 const mod=e.ctrlKey||e.metaKey,key=e.key,lk=key.length==1?key.toLowerCase():key,btn=t&&/BUTTON|A/.test(t.tagName);
@@ -539,7 +569,7 @@ let AACT='',AANCH='';
 const admSet=()=>({fl:FSELA,f:CSEL,q:QSEL})[AT];
 const admRows=()=>[...document.querySelectorAll('.fr[data-ak]')];
 function admMark(scroll){document.querySelectorAll('.fr.active').forEach(x=>x.classList.remove('active'));const el=admRows().find(x=>x.dataset.ak==AACT);if(el){el.classList.add('active');if(scroll)el.scrollIntoView({block:'nearest'})}}
-addEventListener('keydown',e=>{if(MD||viewerFile||e.defaultPrevented||!ME||role!='admin')return;const t=e.target;
+addEventListener('keydown',e=>{if(MD||e.defaultPrevented||!ME||role!='admin')return;const t=e.target;
 if(t&&(/INPUT|TEXTAREA|SELECT/.test(t.tagName)||t.isContentEditable))return;
 if(location.hash.slice(2).split('/')[0]!='admin')return;const S=admSet();if(!S)return;
 const ids=admRows().map(x=>x.dataset.ak),mod=e.ctrlKey||e.metaKey,key=e.key;if(!ids.length)return;
@@ -550,6 +580,38 @@ if(e.shiftKey){const a=ids.indexOf(AANCH||AACT||k),lo=Math.min(a<0?i:a,i),hi=Mat
 else{AACT=k;AANCH=k;admMark(true)}return}
 if(key==' '&&!/BUTTON|A/.test(t.tagName)){if(!AACT)return;e.preventDefault();S.has(AACT)?S.delete(AACT):S.add(AACT);AANCH=AACT;route();return}
 if(key=='Escape'&&(S.size||AACT)){S.clear();AACT='';AANCH='';route()}});
+
+
+/* ===== RIGHT SIDEBAR: preview on top, details below (PC, when an item is selected) ===== */
+let SB_OPEN=0;const SZ={};
+const sbOK=()=>matchMedia('(hover:hover) and (pointer:fine)').matches&&innerWidth>=900;
+const fdt=t=>t?new Date(t).toLocaleString(undefined,{dateStyle:'medium',timeStyle:'short'}):'—';
+const fsz=n=>n<1024?n+' B':n<1048576?(n/1024).toFixed(1)+' KB':(n/1048576).toFixed(1)+' MB';
+async function sbSize(m){if(SZ[m.id]===undefined){SZ[m.id]=null;try{const i=m.path.lastIndexOf('/'),nm=m.path.slice(i+1),r=await sb.storage.from('review-materials').list(m.path.slice(0,i),{search:nm,limit:20}),o=(r.data||[]).find(x=>x.name===nm);SZ[m.id]=o&&o.metadata&&o.metadata.size!=null?fsz(o.metadata.size):'—'}catch(_){SZ[m.id]='—'}}
+const el=$('#sbSize');if(el&&ACT=='m:'+m.id)el.textContent=SZ[m.id]||'—'}
+function sbClose(){ACT='';ANCH='';document.querySelectorAll('.fr.active').forEach(x=>x.classList.remove('active'));renderSidebar()}
+function renderSidebar(){let r=$('#sbRoot');if(!r){r=document.createElement('div');r.id='sbRoot';document.body.appendChild(r)}
+const pg=location.hash.slice(2).split('/')[0],k=ACT,it=k&&ME&&(pg=='c'||pg=='f')?gi(k):null,on=!!it&&sbOK(),was=SB_OPEN;
+document.body.classList.toggle('sbo',on);SB_OPEN=on;if(on!==!!was)VWS.forEach(vwApply);
+if(!on){r.innerHTML='';return}
+const isF=k[0]=='f',fo=isF?(it.parent?D.FO.find(x=>x.id==it.parent):null):D.FO.find(x=>x.id==it.fo),loc=fo?fpath(fo):(isF?it.c+' (root)':'None'),rows=[];
+if(isF){const nf=D.FO.filter(x=>x.parent==it.id).length,nm=D.M.filter(m=>m.fo==it.id).length;
+rows.push(['Type',it.def?'Folder (default)':it.own?'Folder (personal)':'Folder (official)'],['Component',it.c],['Location',loc],['Contains',nf+' folder(s), '+nm+' file(s)'],['Created',fdt(it.ts)],['Modified',fdt(it.mod||it.ts)])}
+else{rows.push(['Type',(it.type||'').toUpperCase()],['Size','<span id="sbSize">'+(SZ[it.id]||'…')+'</span>',1],['Location',loc],['Component',fo?fo.c:'—'],['Created',fdt(it.ts)],['Modified',fdt(it.mod||it.ts)],['Access',it.own?'Personal (only you)':it.rs?'Restricted':'Official'],['Opened',((P.op||{})[it.id]||0)+' time(s)']);if(it.desc)rows.push(['Description',it.desc])}
+const ph=isF?'<span class="ico">📁</span>':thPh(it),nmx=isF?it.name:it.title;
+r.innerHTML=`<aside class="sb"><div class="sbh"><b>Details</b><button class="vbt x" title="Close" onclick="sbClose()">${IC.x}</button></div><div class="sbp"><div class="thm" ${isF?'':`data-id="${it.id}"`}>${ph}</div></div><div class="sbn">${isF?'📁 ':''}${E(nmx)}</div><table class="sbt">${rows.map(([a,b,raw])=>`<tr><td>${a}</td><td>${raw?b:E(b)}</td></tr>`).join('')}</table><div class="row" style="margin:14px 0 0"><button class="btn p" onclick="cardOpen('${k}')">Open</button>${isF?'':`<button class="btn" onclick="dlKeys(['${k}'])">Download</button>`}</div></aside>`;
+if(!isF){if(TH[it.id])thPaint(it.id);else thWant(it.id);if(it.path)sbSize(it)}
+VWS.forEach(vwApply)}
+function placeMenu(){const p=document.querySelector('.fr .pop');if(!p)return;p.classList.remove('flip','below');p.style.top='';if(!p.closest('.g.grid'))return;
+let r=p.getBoundingClientRect();if(r.right>innerWidth-8){p.classList.add('flip');r=p.getBoundingClientRect()}
+if(r.left<8){p.classList.remove('flip');p.classList.add('below');r=p.getBoundingClientRect()}
+const cur=parseFloat(getComputedStyle(p).top)||0;let dy=0;if(r.bottom>innerHeight-8)dy=-(r.bottom-innerHeight+8);if(r.top+dy<60)dy=60-r.top;if(dy)p.style.top=(cur+dy)+'px'}
+/* shift / ctrl + click on admin rows */
+document.addEventListener('click',e=>{const row=e.target.closest&&e.target.closest('.fr[data-ak]');if(!row||location.hash.slice(2).split('/')[0]!='admin')return;
+if(e.target.closest('.fx,.pop,.dots'))return;const S=admSet(),k=row.dataset.ak;if(!S)return;
+if(e.shiftKey){e.preventDefault();e.stopPropagation();const ids=admRows().map(x=>x.dataset.ak),a=ids.indexOf(AANCH||AACT||k),b=ids.indexOf(k);if(a<0||b<0)return;
+if(!(e.ctrlKey||e.metaKey))S.clear();ids.slice(Math.min(a,b),Math.max(a,b)+1).forEach(x=>S.add(x));AACT=k;if(!AANCH)AANCH=ids[a];route();return}
+AACT=k;AANCH=k},true);
 
 /* ===== DOWNLOAD (one file as is, several items as a zip) ===== */
 const fname=m=>m.title+'.'+m.type.toLowerCase();
@@ -569,31 +631,40 @@ const blob=await zip.generateAsync({type:'blob'}),one=its.length==1?its[0][1].na
 async function openM(id){const m=D.M.find(x=>x.id==id);if(!m||!m.path)return toast('File not found');
 const r=await sb.storage.from('review-materials').createSignedUrl(m.path,3600);if(r.error)return toast(r.error.message);
 P.op=P.op||{};P.op[id]=(P.op[id]||0)+1;sb.from('material_opens').upsert({user_id:ME.id,material_id:id,opens:P.op[id],last_opened:new Date().toISOString()}).then(x=>x.error&&console.warn(x.error.message));
-const e=m.type.toLowerCase(),url=r.data.signedUrl;if(['pdf','jpg','jpeg','png','webp'].includes(e)){viewerFile={vid:id+'_'+Date.now(),title:m.title,url,type:e};renderFileViewer()}else window.open(url,'_blank','noopener')}
-function closeViewer(){viewerFile=null;renderFileViewer()}
-let VW={x:0,y:0,w:0,h:0,max:0};try{const s=JSON.parse(localStorage.getItem('vw')||'null');if(s&&s.w)VW={...VW,...s,max:0}}catch(_){}
-const vwSave=()=>{try{localStorage.setItem('vw',JSON.stringify({x:VW.x,y:VW.y,w:VW.w,h:VW.h}))}catch(_){}};
-function vwInit(){const m=innerWidth<700;if(!VW.w||m){VW.w=m?innerWidth-12:Math.min(960,innerWidth-60);VW.h=m?innerHeight-12:Math.round(innerHeight*.86);VW.x=Math.round((innerWidth-VW.w)/2);VW.y=Math.round((innerHeight-VW.h)/2)}vwClamp()}
-function vwClamp(){VW.w=Math.max(280,Math.min(VW.w,innerWidth));VW.h=Math.max(200,Math.min(VW.h,innerHeight));VW.x=Math.min(Math.max(VW.x,120-VW.w),innerWidth-120);VW.y=Math.min(Math.max(VW.y,0),innerHeight-44)}
-function vwApply(){const w=document.querySelector('#fileViewerRoot .vwin');if(!w)return;const g=VW.max?{x:0,y:0,w:innerWidth,h:innerHeight}:VW;w.style.left=g.x+'px';w.style.top=g.y+'px';w.style.width=g.w+'px';w.style.height=g.h+'px';w.classList.toggle('max',!!VW.max);const b=w.querySelector('.vmax');if(b)b.textContent=VW.max?'❐':'☐'}
-function vwMax(){VW.max=VW.max?0:1;vwApply()}
-function vwDown(e,dir){if(e.button>0||VW.max||(!dir&&e.target.closest('button,a')))return;const w=document.querySelector('#fileViewerRoot .vwin'),el=e.currentTarget;if(!w)return;e.preventDefault();
-const s={x:e.clientX,y:e.clientY,g:{...VW}};w.classList.add('moving');try{el.setPointerCapture(e.pointerId)}catch(_){}
+const e=m.type.toLowerCase(),url=r.data.signedUrl;if(['pdf','jpg','jpeg','png','webp'].includes(e)){vwOpen(m,url,e)}else window.open(url,'_blank','noopener')}
+const IC={min:'<svg viewBox="0 0 12 12"><path d="M2 6h8"/></svg>',max:'<svg viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8" rx="1"/></svg>',res:'<svg viewBox="0 0 12 12"><path d="M4 2h6v6M2 4h6v6H2z"/></svg>',x:'<svg viewBox="0 0 12 12"><path d="M2 2l8 8M10 2l-8 8"/></svg>',dl:'<svg viewBox="0 0 12 12"><path d="M6 1v6.5M3.2 5l2.8 2.8L8.8 5M2 10.5h8"/></svg>'};
+/* up to two file windows at once; each is drawn once and never touched by page redraws, so zoom and scroll stay put */
+let VWS=[];const VWD={w:0,h:0};try{const s=JSON.parse(localStorage.getItem('vw')||'null');if(s&&s.w){VWD.w=s.w;VWD.h=s.h}}catch(_){}
+const vwGet=id=>VWS.find(v=>v.vid==id),vwAW=()=>innerWidth-(SB_OPEN?320:0);
+function vwClamp(v){v.w=Math.max(280,Math.min(v.w,innerWidth));v.h=Math.max(200,Math.min(v.h,innerHeight));v.x=Math.min(Math.max(v.x,120-v.w),innerWidth-120);v.y=Math.min(Math.max(v.y,0),innerHeight-44)}
+function vwDefault(v,n){const m=innerWidth<700,AW=vwAW();v.w=m?innerWidth-12:Math.min(VWD.w||920,AW-60);v.h=m?innerHeight-12:Math.min(VWD.h||Math.round(innerHeight*.84),innerHeight-40);v.x=m?6:Math.round((AW-v.w)/2)+n*34;v.y=m?6:Math.round((innerHeight-v.h)/2)+n*34;vwClamp(v)}
+function vwOpen(m,url,type){let v=VWS.find(x=>x.id==m.id);if(v){v.min=0;vwFocus(v.vid);return}
+if(VWS.length>=2){const old=VWS.find(x=>x.z<46)||VWS[0];VWS=VWS.filter(x=>x!==old);toast('Two files can be open at once, so “'+old.title+'” was closed.')}
+v={vid:m.id+'_'+Date.now(),id:m.id,title:m.title,url,type,x:0,y:0,w:0,h:0,max:0,min:0,z:45};vwDefault(v,VWS.length);VWS.push(v);vwFocus(v.vid)}
+function vwFocus(id){const v=vwGet(id);if(!v)return;VWS.forEach(x=>x.z=x===v?46:45);renderFileViewer()}
+function closeViewer(id){VWS=VWS.filter(v=>v.vid!=id);renderFileViewer()}
+function vwMin(id){const v=vwGet(id);if(!v)return;v.min=!v.min;vwFocus(id)}
+function vwMax(id){const v=vwGet(id);if(!v)return;if(v.min)v.min=0;else v.max=!v.max;vwFocus(id)}
+function vwApply(v){const el=document.querySelector('.vwin[data-vid="'+v.vid+'"]');if(!el)return;let g;
+if(v.min){g={x:12+VWS.filter(x=>x.min).indexOf(v)*272,y:innerHeight-52,w:260,h:42}}else if(v.max)g={x:0,y:0,w:vwAW(),h:innerHeight};else g=v;
+el.style.left=g.x+'px';el.style.top=g.y+'px';el.style.width=g.w+'px';el.style.height=g.h+'px';el.style.zIndex=v.z;
+el.classList.toggle('max',!!v.max&&!v.min);el.classList.toggle('min',!!v.min);
+const mx=el.querySelector('.vmx');if(mx){mx.innerHTML=v.max&&!v.min?IC.res:IC.max;mx.title=v.min?'Restore':v.max?'Restore down':'Maximize'}const mn=el.querySelector('.vmn');if(mn)mn.title=v.min?'Restore':'Minimize'}
+function vwDown(e,id,dir){const v=vwGet(id);if(!v||e.button>0||v.max||v.min||(!dir&&e.target.closest('button,a')))return;const el=e.currentTarget,w=el.closest('.vwin');vwFocus(id);e.preventDefault();
+const s={x:e.clientX,y:e.clientY,g:{x:v.x,y:v.y,w:v.w,h:v.h}};w.classList.add('moving');try{el.setPointerCapture(e.pointerId)}catch(_){}
 const mv=ev=>{const dx=ev.clientX-s.x,dy=ev.clientY-s.y;
-if(!dir){VW.x=s.g.x+dx;VW.y=s.g.y+dy}
+if(!dir){v.x=s.g.x+dx;v.y=s.g.y+dy}
 else{let{x,y,w:W,h:H}=s.g;if(dir.includes('e'))W=s.g.w+dx;if(dir.includes('s'))H=s.g.h+dy;if(dir.includes('w')){W=s.g.w-dx;x=s.g.x+dx}if(dir.includes('n')){H=s.g.h-dy;y=s.g.y+dy}
-if(W<280){if(dir.includes('w'))x-=280-W;W=280}if(H<200){if(dir.includes('n'))y-=200-H;H=200}VW.x=x;VW.y=y;VW.w=W;VW.h=H}
-vwClamp();vwApply()};
-const up=()=>{el.removeEventListener('pointermove',mv);el.removeEventListener('pointerup',up);el.removeEventListener('pointercancel',up);w.classList.remove('moving');vwSave()};
+if(W<280){if(dir.includes('w'))x-=280-W;W=280}if(H<200){if(dir.includes('n'))y-=200-H;H=200}v.x=x;v.y=y;v.w=W;v.h=H}
+vwClamp(v);vwApply(v)};
+const up=()=>{el.removeEventListener('pointermove',mv);el.removeEventListener('pointerup',up);el.removeEventListener('pointercancel',up);w.classList.remove('moving');VWD.w=v.w;VWD.h=v.h;try{localStorage.setItem('vw',JSON.stringify(VWD))}catch(_){}};
 el.addEventListener('pointermove',mv);el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up)}
-addEventListener('resize',()=>{if(viewerFile){vwClamp();vwApply()}});
-addEventListener('keydown',e=>{if(e.key=='Escape'&&viewerFile&&!MD)closeViewer()});
-/* The viewer is drawn once per opened file. Later page redraws leave it alone, so the file keeps its zoom and scroll position. */
+addEventListener('resize',()=>{VWS.forEach(v=>{vwClamp(v);vwApply(v)});renderSidebar()});
+const vwHtml=v=>{const pdf=v.type==='pdf',i=v.vid;return `<div class="vwin" data-vid="${i}" onpointerdown="vwFocus('${i}')"><div class="vh" onpointerdown="vwDown(event,'${i}','')" ondblclick="if(!event.target.closest('button,a'))vwMax('${i}')"><h2>${E(v.title)}</h2><div class="vbs"><a class="vbt vdl" href="${v.url}" target="_blank" rel="noopener" title="Download">${IC.dl}</a><button class="vbt vmn" title="Minimize" onclick="vwMin('${i}')">${IC.min}</button><button class="vbt vmx" title="Maximize" onclick="vwMax('${i}')">${IC.max}</button><button class="vbt x" title="Close" onclick="closeViewer('${i}')">${IC.x}</button></div></div><div class="vb">${pdf?`<object data="${v.url}" type="application/pdf" style="width:100%;height:100%"><div style="padding:30px;text-align:center"><p style="margin-bottom:12px">This browser can't show the PDF here.</p><a href="${v.url}" target="_blank" rel="noopener" class="btn p">Open PDF in a new tab</a></div></object>`:`<img src="${v.url}" alt="">`}</div>${['n','s','e','w','ne','nw','se','sw'].map(d=>`<i class="vrs" data-d="${d}" onpointerdown="vwDown(event,'${i}','${d}')"></i>`).join('')}</div>`};
 function renderFileViewer(){let r=$('#fileViewerRoot');if(!r){r=document.createElement('div');r.id='fileViewerRoot';document.body.appendChild(r)}
-if(!viewerFile){r.innerHTML='';r.dataset.vid='';return}
-if(r.dataset.vid===viewerFile.vid&&r.firstChild)return;
-r.dataset.vid=viewerFile.vid;vwInit();const pdf=viewerFile.type==='pdf';
-r.innerHTML=`<div class="vwin"><div class="vh" onpointerdown="vwDown(event,'')" ondblclick="if(!event.target.closest('button,a'))vwMax()"><h2>${E(viewerFile.title)}</h2><div class="row" style="margin:0"><a href="${viewerFile.url}" target="_blank" rel="noopener" class="btn">Download</a><button class="btn vmax" onclick="vwMax()" title="Maximize / restore">☐</button><button class="btn" onclick="closeViewer()">✕ Close</button></div></div><div class="vb">${pdf?`<object data="${viewerFile.url}" type="application/pdf" style="width:100%;height:100%"><div style="padding:30px;text-align:center"><p style="margin-bottom:12px">This browser can't show the PDF here.</p><a href="${viewerFile.url}" target="_blank" rel="noopener" class="btn p">Open PDF in a new tab</a></div></object>`:`<img src="${viewerFile.url}" alt="">`}</div>${['n','s','e','w','ne','nw','se','sw'].map(d=>`<i class="vrs" data-d="${d}" onpointerdown="vwDown(event,'${d}')"></i>`).join('')}</div>`;vwApply()}
+[...r.children].forEach(c=>{if(!VWS.some(v=>v.vid==c.dataset.vid))c.remove()});
+VWS.forEach(v=>{if(!r.querySelector('.vwin[data-vid="'+v.vid+'"]'))r.insertAdjacentHTML('beforeend',vwHtml(v))});
+VWS.forEach(vwApply)}
 
 /* ===== CREATE FOLDER / UPLOAD FILES / UPLOAD A FOLDER ===== */
 function openFab(mode,dest){activeMenu=null;const p=location.hash.slice(2).split('/'),f=dest?D.FO.find(x=>x.id==dest):(dest===undefined&&p[0]=='f')?D.FO.find(x=>x.id==p[1]):null;
@@ -662,12 +733,16 @@ SORTS=[['az','Name A → Z'],['za','Name Z → A'],['new','Newest first'],['old'
 sortBy=(arr,mode,nm,ts)=>[...arr].sort((a,b)=>mode=='za'?cmp(nm(b),nm(a)):mode=='new'?ts(b)-ts(a):mode=='old'?ts(a)-ts(b):cmp(nm(a),nm(b)));
 const T0=x=>new Date(x||0).getTime();
 const dbq=x=>({id:x.id,n:x.question_number,c:x.component,s:x.subject,t:x.topic,q:x.question,o:[x.choice_a,x.choice_b,x.choice_c,x.choice_d],a:'ABCD'.indexOf(x.correct_answer),e:x.explanation||'',d:x.difficulty||'',st:x.verification_status||'',src:x.source||'',pub:x.published,own:x.owner_id?1:0,qp:x.question_image||'',ep:x.explanation_image||'',qi:'',ei:'',ts:T0(x.created_at)});
-const mapFo=x=>({id:x.id,c:x.component,name:x.name,parent:x.parent_id||null,def:x.is_default,rs:x.restricted,own:x.owner_id?1:0,ts:T0(x.created_at)}),
-mapM=x=>({id:x.id,fo:x.folder_id,title:x.title,desc:x.description||'',type:x.file_type||'',path:x.file_path||'',rs:x.restricted,pub:x.published,own:x.owner_id?1:0,ts:T0(x.created_at)}),
+const mapFo=x=>({id:x.id,c:x.component,name:x.name,parent:x.parent_id||null,def:x.is_default,rs:x.restricted,own:x.owner_id?1:0,ts:T0(x.created_at),mod:T0(x.updated_at||x.created_at)}),
+mapM=x=>({id:x.id,fo:x.folder_id,title:x.title,desc:x.description||'',type:x.file_type||'',path:x.file_path||'',rs:x.restricted,pub:x.published,own:x.owner_id?1:0,ts:T0(x.created_at),mod:T0(x.updated_at||x.created_at)}),
 mapF=(x,su)=>({id:x.id,c:x.component,f:x.front,b:x.back||'',img:su[x.image_path]||'',ip:x.image_path||'',fimg:su[x.front_image_path]||'',fip:x.front_image_path||'',pub:x.published,own:x.owner_id?1:0,ts:T0(x.created_at)});
 const allQ=()=>[...OQ,...D.MQ].filter(x=>x.pub),
 subs=c=>[...new Set(allQ().filter(x=>x.c==c).map(x=>x.s))].sort(cmp),
 tops=(c,s)=>[...new Set(allQ().filter(x=>x.c==c&&x.s==s).map(x=>x.t))].sort(cmp);
+const SUBF={};
+function subStats(c){const list=subs(c),sel=list.includes(SUBF[c])?SUBF[c]:'',shown=sel?[sel]:list;
+return `<div><div class="row" style="justify-content:space-between;margin:0 0 12px"><h2 style="margin:0">Subject statistics</h2>${dd('ssf_'+c,[['','All subjects'],...list.map(x=>[x,x])],sel,`SUBF['${c}']=v;route()`)}</div><div class="card" style="overflow-x:auto"><table style="margin:0"><tr><th>Subject / topic</th><th>Questions</th><th>Accuracy</th><th>Mastery</th></tr>${shown.map(su=>{const t=stat(x=>x.c==c&&x.s==su),i=list.indexOf(su);
+return `<tr ${sel?'':`class="lk" onclick="SUBF['${c}']=subs('${c}')[${i}];route()"`}><td><b>${E(su)}</b></td><td>${t.n}</td><td>${t.acc}%</td><td>${t.ms}%</td></tr>`+(sel?tops(c,su).map(p=>{const u=stat(x=>x.c==c&&x.s==su&&x.t==p);return `<tr class="mu sm"><td>&nbsp;&nbsp;${E(p)}</td><td>${u.n}</td><td>${u.acc}%</td><td>${u.ms}%</td></tr>`}).join(''):'')}).join('')||'<tr><td class="mu">No questions yet for this component.</td></tr>'}</table></div>${sel?'':'<p class="mu sm" style="margin-top:8px">Pick a subject (or click its row) to see its topics.</p>'}</div>`}
 const stat=f=>{const q=allQ().filter(f);let ok=0,n=0,m=0,at=0;q.forEach(x=>{const s=P.q[x.id];if(s){at++;ok+=s[0];n+=s[1];m+=s[2]}});return{n:q.length,at,acc:n?Math.round(100*ok/n):0,ms:q.length?Math.round(100*m/q.length):0}};
 const bars=s=>`<div class="mrow" style="margin-top:12px"><div class="ring" style="--p:${s.ms}"><span>${s.ms}%</span></div><div><b>Mastery</b><small>Questions you last answered correctly</small></div></div><p class="sm" style="margin-top:14px">Accuracy ${s.acc}%</p><div class="pb"><b style="width:${s.acc}%"></b></div>`;
 async function pg(t,f){let a=[],i=0;for(;;){const r=await f(sb.from(t).select('*')).range(i,i+999);if(r.error)return{data:a,error:r.error};a=a.concat(r.data);if(r.data.length<1000)return{data:a};i+=1000}}
@@ -708,9 +783,9 @@ ${sharedCard()}
 /* ===== COMPONENT PAGE + FOLDER PAGE ===== */
 const rtag=(it)=>role=='admin'&&!it.own&&it.rs?'<span class="tag">Restricted</span>':'';
 const folderCard=f=>{const k='f:'+f.id,n=D.M.filter(m=>m.fo==f.id).length+D.FO.filter(x=>x.parent==f.id).length,ed=canFo(f),on=SEL.has(k);
-return `<div class="card fr ${on?'selected':''} ${ACT==k?'active':''}" data-k="${k}" data-drop="${f.id}" onclick="cardClick(event,'${k}')" ondblclick="cardDbl(event,'${k}')" ${ed?`draggable="true" ondragstart="dgStart(event,'${k}')" ondragend="dgEnd()"`:''} ondragover="dgOver(event,'${f.id}','${f.c}')" ondragleave="dgLeave(event)" ondrop="dgDrop(event,'${f.id}','${f.c}')"><div class="fl">${selMode?`<input type="checkbox" class="selbox" ${on?'checked':''} onclick="event.stopPropagation()" onchange="selTog('${k}')">`:''}<span>📁</span><h3 class="nm">${E(f.name)}</h3></div><div class="thm"><span class="ico">📁</span></div><div class="fx">${f.own?'<span class="tag">Personal</span>':''}${rtag(f)}<span class="tag">${n} items</span>${selMode?'':`<button class="dots" onclick="toggleMenu('fo_${f.id}',event)" aria-label="Folder menu">⋮</button>`}</div>${mnu('fo_'+f.id,[['Open',`go('f/${f.id}')`],['Upload here',`openFab('upload','${f.id}')`],['Copy',`copyKey('${k}')`],['Duplicate',`dupKey('${k}')`],['Download (zip)',`dlKeys(['${k}'])`],['Info',`folderInfo('${f.id}')`],role=='admin'&&!f.own&&['Assign access…',`openAssign(['${k}'])`],ed&&['Rename',`renameFolder('${f.id}')`],ed&&['Move to…',`moveKeys(['${k}'])`],ed&&['Delete',`showConfirm('Delete folder','This also deletes everything inside it.',()=>delFo('${f.id}'))`,1]])}</div>`};
+return `<div class="card fr ${on?'selected':''} ${ACT==k?'active':''} ${activeMenu=='fo_'+f.id?'mo':''}" data-k="${k}" data-drop="${f.id}" onclick="cardClick(event,'${k}')" ondblclick="cardDbl(event,'${k}')" ${ed?`draggable="true" ondragstart="dgStart(event,'${k}')" ondragend="dgEnd()"`:''} ondragover="dgOver(event,'${f.id}','${f.c}')" ondragleave="dgLeave(event)" ondrop="dgDrop(event,'${f.id}','${f.c}')"><div class="fl">${selMode?`<input type="checkbox" class="selbox" ${on?'checked':''} onclick="chkClick(event,'${k}')" onchange="selTog('${k}')">`:''}<span>📁</span><h3 class="nm">${E(f.name)}</h3></div><div class="thm"><span class="ico">📁</span></div><div class="fx">${f.own?'<span class="tag">Personal</span>':''}${rtag(f)}<span class="tag">${n} items</span>${selMode?'':`<button class="dots" onclick="toggleMenu('fo_${f.id}',event)" aria-label="Folder menu">⋮</button>`}</div>${mnu('fo_'+f.id,[['Open',`go('f/${f.id}')`],['Upload here',`openFab('upload','${f.id}')`],['Copy',`copyKey('${k}')`],['Duplicate',`dupKey('${k}')`],['Download (zip)',`dlKeys(['${k}'])`],['Info',`folderInfo('${f.id}')`],role=='admin'&&!f.own&&['Assign access…',`openAssign(['${k}'])`],ed&&['Rename',`renameFolder('${f.id}')`],ed&&['Move to…',`moveKeys(['${k}'])`],ed&&['Delete',`showConfirm('Delete folder','This also deletes everything inside it.',()=>delFo('${f.id}'))`,1]])}</div>`};
 const fileCard=m=>{const k='m:'+m.id,ed=canMat(m),on=SEL.has(k);
-return `<div class="card fr ${on?'selected':''} ${ACT==k?'active':''}" data-k="${k}" onclick="cardClick(event,'${k}')" ondblclick="cardDbl(event,'${k}')" ${ed?`draggable="true" ondragstart="dgStart(event,'${k}')" ondragend="dgEnd()"`:''}><div class="fl">${selMode?`<input type="checkbox" class="selbox" ${on?'checked':''} onclick="event.stopPropagation()" onchange="selTog('${k}')">`:''}${tag(m.type)}<h3 class="nm">${E(m.title)}</h3></div><div class="thm" data-id="${m.id}">${thPh(m)}</div><div class="fx">${m.own?'<span class="tag">Personal</span>':''}${rtag(m)}<a class="star" onclick="bm('${m.id}')">${P.bm.includes(m.id)?'★':'☆'}</a>${selMode?'':`<button class="dots" onclick="toggleMenu('m_${m.id}',event)" aria-label="File menu">⋮</button>`}</div>${m.desc?`<p class="mu sm fd">${E(m.desc)}</p>`:''}${mnu('m_'+m.id,[['Open',`openM('${m.id}')`],['Copy',`copyKey('${k}')`],['Duplicate',`dupKey('${k}')`],['Download',`dlKeys(['${k}'])`],['Info',`fileInfo('${m.id}')`],role=='admin'&&!m.own&&['Assign access…',`openAssign(['${k}'])`],ed&&['Rename',`renameMaterial('${m.id}')`],ed&&['Move to…',`moveKeys(['${k}'])`],ed&&['Delete',`showConfirm('Delete file','Delete this file permanently?',()=>delM('${m.id}'))`,1]])}</div>`};
+return `<div class="card fr ${on?'selected':''} ${ACT==k?'active':''} ${activeMenu=='m_'+m.id?'mo':''}" data-k="${k}" onclick="cardClick(event,'${k}')" ondblclick="cardDbl(event,'${k}')" ${ed?`draggable="true" ondragstart="dgStart(event,'${k}')" ondragend="dgEnd()"`:''}><div class="fl">${selMode?`<input type="checkbox" class="selbox" ${on?'checked':''} onclick="chkClick(event,'${k}')" onchange="selTog('${k}')">`:''}${tag(m.type)}<h3 class="nm">${E(m.title)}</h3></div><div class="thm" data-id="${m.id}">${thPh(m)}</div><div class="fx">${m.own?'<span class="tag">Personal</span>':''}${rtag(m)}<a class="star" onclick="bm('${m.id}')">${P.bm.includes(m.id)?'★':'☆'}</a>${selMode?'':`<button class="dots" onclick="toggleMenu('m_${m.id}',event)" aria-label="File menu">⋮</button>`}</div>${m.desc?`<p class="mu sm fd">${E(m.desc)}</p>`:''}${mnu('m_'+m.id,[['Open',`openM('${m.id}')`],['Copy',`copyKey('${k}')`],['Duplicate',`dupKey('${k}')`],['Download',`dlKeys(['${k}'])`],['Info',`fileInfo('${m.id}')`],role=='admin'&&!m.own&&['Assign access…',`openAssign(['${k}'])`],ed&&['Rename',`renameMaterial('${m.id}')`],ed&&['Move to…',`moveKeys(['${k}'])`],ed&&['Delete',`showConfirm('Delete file','Delete this file permanently?',()=>delM('${m.id}'))`,1]])}</div>`};
 const ftools=(dest,comp)=>`<button class="btn ${selMode?'p':''}" onclick="${selMode?'selOff()':'selOn()'}">☑ ${selMode?'Selecting':'Select'}</button>${CB&&CB.keys.length?`<button class="btn" onclick="pasteHere('${dest}','${comp}')">📋 Paste (${CB.keys.length})</button>`:''}<button class="btn" onclick="openFab('upload','${dest}')">↑ Upload</button><button class="btn" onclick="openFab('folder','${dest}')">＋ Folder</button>${dd('fsort',SORTS,FOSORT,"FOSORT=v;route()")}<button class="btn" onclick="toggleFolderView()">${folderView=='grid'?'List ☰':'Grid ▦'}</button>`;
 const selReset=()=>{if(selFor!==location.hash){selMode=false;SEL.clear();ACT='';ANCH='';selFor=location.hash}};
 const listOf=(fo,it)=>{const a=sortBy(fo,FOSORT,x=>x.name,x=>x.ts),b=sortBy(it,FOSORT,x=>x.title,x=>x.ts);VIS=[...a.map(x=>'f:'+x.id),...b.map(x=>'m:'+x.id)];return a.map(folderCard).join('')+b.map(fileCard).join('')};
@@ -718,7 +793,7 @@ const listOf=(fo,it)=>{const a=sortBy(fo,FOSORT,x=>x.name,x=>x.ts),b=sortBy(it,F
 V.c=c=>{if(!C.includes(c))return V.dash();selReset();const s=stat(x=>x.c==c),fo=D.FO.filter(f=>f.c==c&&!f.parent);
 return hd(c,CD[c])+`<div class="w sec stack"><div class="card art"><h3>Quiz</h3><p class="mu">${s.n} questions available in ${c}. Pick one subject, several topics, or everything.</p><button class="btn p" onclick="go('quiz/${c}')">Take a ${c} quiz</button>${bars(s)}</div>
 <div><div class="row" style="justify-content:space-between;margin:0 0 12px"><h2 style="margin:0">Folders</h2><div class="row" style="margin:0">${ftools('',c)}</div></div>${selBar()}<div class="g ${folderView}" style="margin-top:12px">${listOf(fo,[])||empty('No folders here yet.')}</div></div>
-<div><h2>Subject statistics</h2><div class="card" style="overflow-x:auto"><table style="margin:0"><tr><th>Subject / topic</th><th>Questions</th><th>Accuracy</th><th>Mastery</th></tr>${subs(c).map(su=>{const t=stat(x=>x.c==c&&x.s==su);return `<tr><td><b>${E(su)}</b></td><td>${t.n}</td><td>${t.acc}%</td><td>${t.ms}%</td></tr>`+tops(c,su).map(p=>{const u=stat(x=>x.c==c&&x.s==su&&x.t==p);return `<tr class="mu sm"><td>&nbsp;&nbsp;${E(p)}</td><td>${u.n}</td><td>${u.acc}%</td><td>${u.ms}%</td></tr>`}).join('')}).join('')||'<tr><td class="mu">No questions yet for this component.</td></tr>'}</table></div></div></div>`};
+${subStats(c)}</div>`};
 
 V.f=id=>{const f=D.FO.find(x=>x.id==id);if(!f)return V.dash();selReset();const q=FQ.toLowerCase(),par=f.parent?D.FO.find(x=>x.id==f.parent):null,
 sub=D.FO.filter(x=>x.parent==id&&(!q||x.name.toLowerCase().includes(q))),it=D.M.filter(m=>m.fo==id&&(!q||(m.title+' '+m.desc).toLowerCase().includes(q))),all=D.M.some(m=>m.fo==id)||D.FO.some(x=>x.parent==id),html=listOf(sub,it);
@@ -782,13 +857,15 @@ return hd('Quiz History','Every quiz you finish is saved here, with your notes. 
 
 /* ===== FLASHCARDS: generated from the question bank, plus official, formula and personal cards ===== */
 let FT='s',FC={i:0,o:null},FF={c:'',k:'q',s:'',t:'',m:'',so:''};
-const qcard=x=>({id:x.id,c:x.c,own:x.own,src:x.own?'My question':'Question bank',lbl:x.q,sk:x.src||'',n:x.n||0,ts:x.ts,fh:face(`${E(x.q)}<div class="fopts">${x.o.map((o,j)=>'ABCD'[j]+'. '+E(o)).join('<br>')}</div>`,x.qi),bh:face(`<b>${'ABCD'[x.a]}. ${E(x.o[x.a])}</b>${x.e?`<p class="fopts">${E(x.e)}</p>`:''}`,x.ei)});
+const qcard=x=>({id:x.id,c:x.c,s:x.s,t:x.t,own:x.own,src:x.own?'My question':'Question bank',lbl:x.q,sk:x.src||'',n:x.n||0,ts:x.ts,fh:face(`${E(x.q)}<div class="fopts">${x.o.map((o,j)=>'ABCD'[j]+'. '+E(o)).join('<br>')}</div>`,x.qi),bh:face(`<b>${'ABCD'[x.a]}. ${E(x.o[x.a])}</b>${x.e?`<p class="fopts">${E(x.e)}</p>`:''}`,x.ei)});
 const fcard=x=>({id:x.id,c:x.c,own:x.own,src:x.own?'Personal card':'Official card',lbl:x.f,sk:'',n:0,ts:x.ts,fh:face(E(x.f),x.fimg),bh:face(x.b?E(x.b):'',x.img)});
 const deck=()=>{const k=FF.k||'q',m=FF.m;let d=k[0]=='q'?allQ().filter(x=>(k=='q'||(k=='qm')==!!x.own)&&(!FF.c||x.c==FF.c)&&(!FF.s||x.s==FF.s)&&(!FF.t||x.t==FF.t)).map(qcard)
 :D.F.filter(x=>(x.pub||x.own)&&(!FF.c||x.c==FF.c)&&(k=='img'?(x.img||x.fimg):k=='own'?x.own:!x.own)).map(fcard);
 if(m)d=d.filter(x=>m=='new'?!P.fc[x.id]:P.fc[x.id]==m);
 if(FF.so=='az')return d.sort((a,b)=>cmp(a.lbl,b.lbl));
 if(FF.so=='shuffle'){if(!FC.o||d.some(x=>!FC.o.includes(x.id)))FC.o=sh(d.map(x=>x.id));return d.sort((a,b)=>FC.o.indexOf(a.id)-FC.o.indexOf(b.id))}
+if(d.length&&d[0].s!==undefined){const mn={},kk=x=>x.c+'|'+x.s+'|'+x.t;d.forEach(x=>{mn[kk(x)]=Math.min(mn[kk(x)]??1e9,x.n||1e9)});
+return d.sort((a,b)=>cmp(a.c,b.c)||cmp(a.s,b.s)||(mn[kk(a)]-mn[kk(b)])||cmp(a.t,b.t)||((a.n||1e9)-(b.n||1e9))||a.ts-b.ts)}
 return d.sort((a,b)=>cmp(a.sk,b.sk)||a.n-b.n||a.ts-b.ts)};
 function nav2(n){const l=deck().length;if(!l)return route();FC.i=(FC.i+n+l)%l;route()}
 function mark(id,s){P.fc[id]=s;sb.from('flashcard_marks').upsert({user_id:ME.id,flashcard_id:id,status:s}).then(r=>r.error&&toast(r.error.message));nav2(1)}
@@ -960,7 +1037,7 @@ if(!d&&!(allF&&(role=='admin'||!official)))return{err:'Files can only go into a 
 if(d&&official&&d.own)return{err:'Official items can only go into official folders'};
 if(its.every(([k,it])=>k[0]=='f'?(it.parent||null)==(dest||null):it.fo==dest))return{err:'Already in this folder'};
 return{its,ok:1}}
-async function moveTo(its,dest){let n=0;for(const[k,it]of its){const r=k[0]=='f'?await sb.from('folders').update({parent_id:dest||null}).eq('id',it.id):await sb.from('materials').update({folder_id:dest}).eq('id',it.id);if(r.error){toast(r.error.message);continue}k[0]=='f'?it.parent=dest||null:it.fo=dest;n++}return n}
+async function moveTo(its,dest){let n=0;for(const[k,it]of its){const r=k[0]=='f'?await sb.from('folders').update({parent_id:dest||null}).eq('id',it.id):await sb.from('materials').update({folder_id:dest}).eq('id',it.id);if(r.error){toast(r.error.message);continue}k[0]=='f'?it.parent=dest||null:it.fo=dest;it.mod=Date.now();n++}return n}
 async function doMove(keys,dest,comp){const c=moveCheck(keys,dest,comp);if(!c.ok)return toast(c.err);const n=await moveTo(c.its,dest);toast('Moved '+n+' item(s)');selOff(1);route()}
 function dgStart(e,k){const keys=(selMode&&SEL.has(k))?selKeys():[k];DRAG=keys;e.dataTransfer.effectAllowed='move';e.dataTransfer.setData('text/plain','move');
 const g=document.createElement('div'),it=gi(keys[0])||{};g.className='dragghost';g.textContent=keys.length>1?'📦 '+keys.length+' items':(k[0]=='f'?'📁 ':'📄 ')+(it.name||it.title||'');document.body.appendChild(g);e.dataTransfer.setDragImage(g,18,18);setTimeout(()=>g.remove(),0);
@@ -1048,7 +1125,7 @@ if(n!='cards')NT.f='';const ap=$('#app');ap.innerHTML=V[n](a);if(nv){ap.classNam
 $('#tb').innerHTML=tbar();$('#dr').innerHTML=ME?drawer(n,a):'';syncTheme();fitCards();renderNotes(n);$('#bg').style.display=ME?'':'none';
 renderFab();
 renderCustomConfirm();
-renderFileViewer();hydrateThumbs();if(n=='admin')admMark();
+renderFileViewer();hydrateThumbs();renderSidebar();placeMenu();if(n=='admin')admMark();
 if(n=='quiz'&&QZ&&!QZ.done){cnt();if(QZ.end)tick()}else smry()}
 addEventListener('hashchange',()=>{nv=1;scrollTo(0,0);route()});
 addEventListener('keydown',e=>{if(e.key=='Enter'&&location.hash=='#/auth'&&e.target.tagName=='INPUT')doAuth()});
@@ -1059,7 +1136,7 @@ const u=s&&s.user||null;
 /* Coming back to the tab makes Supabase re-send SIGNED_IN / TOKEN_REFRESHED for the same user. Nothing changed, so do not redraw the page. */
 if(u&&ME&&CU==u.id&&ev!='PASSWORD_RECOVERY'&&ev!='USER_UPDATED'){ME=u;return}
 ME=u;
-if(!ME){CU=null;D={FO:[],M:[],F:[],MQ:[],U:[]};P={h:[],q:{},fc:{},bm:[],op:{}};OQ=[];PR=null;role='student';QZ=null;QL=1;viewerFile=null;renderFileViewer();
+if(!ME){CU=null;D={FO:[],M:[],F:[],MQ:[],U:[]};P={h:[],q:{},fc:{},bm:[],op:{}};OQ=[];PR=null;role='student';QZ=null;QL=1;VWS=[];renderFileViewer();
 if(ev=='SIGNED_OUT'){const own=USER_OUT;USER_OUT=0;go('home');if(!own)toast('You were signed out (session ended or you signed out on another device or tab). Please sign in again.')}else route();return}
 if(ME.id!=CU){CU=ME.id;QL=0;route();await load();QL=1}
 if(AU.mode=='newpw')go('auth');else if(location.hash=='#/auth')go('dash');else route()},0));
