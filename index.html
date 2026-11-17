@@ -250,14 +250,30 @@ footer .w{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fopts{margin-top:8px;font-size:.85em;color:var(--mu)}
 @keyframes cardin{from{opacity:0;transform:scale(.94) translateY(12px)}}
 @media(max-width:600px){.fcw{width:min(82vw,330px);aspect-ratio:5/7}.ff,.fb{padding:14px}.fcont{gap:10px}}
-/* ===== NOTES PANEL ===== */
-.notes{position:fixed;left:14px;top:86px;width:230px;height:322px;min-width:170px;min-height:200px;max-width:420px;max-height:75vh;resize:both;overflow:hidden;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--teal);border-radius:var(--r);box-shadow:0 6px 22px #0003;z-index:12}
-.notes .nh{display:flex;justify-content:space-between;align-items:center;padding:6px 10px;border-bottom:1px solid var(--bd);font-size:.85rem}
+/* ===== NOTES PANEL: floating + movable + resizable on desktop, docked in the layout on phones ===== */
+.notes{position:fixed;right:14px;top:70px;width:240px;min-width:170px;max-width:calc(100vw - 8px);display:flex;flex-direction:column;overflow:hidden;background:var(--card);border:1px solid var(--teal);border-radius:var(--r);box-shadow:0 6px 22px #0003;z-index:12}
+.notes.mv{right:auto}
+body.sbo .notes.dflt{right:334px}
+.notes .nh{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px 10px;border-bottom:1px solid var(--bd);font-size:.85rem;cursor:move;user-select:none;-webkit-user-select:none;touch-action:none;white-space:nowrap}
 .notes .nh a{margin-left:10px;cursor:pointer;color:var(--teal)}
-.notes textarea{flex:1;width:100%;min-height:0;border:0;border-radius:0;resize:none;font-size:.9rem;background:transparent;padding:10px;color:var(--tx)}
-.notes.min{height:auto!important;min-height:0;resize:none}.notes.min textarea{display:none}
-.ntb,.notes .ntx{display:none}
-@media(max-width:700px){.ntb{display:inline-block}.notes{display:none}.notes.show{display:flex;left:50%;top:50%;transform:translate(-50%,-50%);width:min(84vw,330px);height:min(118vw,462px);resize:none;z-index:40}.notes.show .ntx{display:inline}.notes .ntm{display:none}}
+.notes textarea{display:block;flex:1 1 auto;width:100%;min-height:0;height:38px;border:0;border-radius:0;resize:none;overflow-y:auto;font-size:.9rem;line-height:1.4;background:transparent;padding:8px 10px;color:var(--tx)}
+.notes.min{width:auto!important;height:auto!important;min-width:0}
+.notes.min .nh{border-bottom:0;cursor:pointer}.notes.min textarea,.notes.min .ngr,.notes.min .nc{display:none}
+.ngr{position:absolute;bottom:0;width:14px;height:14px;z-index:2;touch-action:none;background:linear-gradient(135deg,transparent 52%,var(--mu) 52%,var(--mu) 62%,transparent 62%,transparent 74%,var(--mu) 74%,var(--mu) 84%,transparent 84%);opacity:.7}
+.ngr.se{right:0;cursor:nwse-resize}.ngr.sw{left:0;cursor:nesw-resize;transform:scaleX(-1)}
+@media(max-width:700px){
+.notes{left:0!important;right:0!important;top:auto!important;bottom:var(--ftH,0px)!important;width:auto!important;max-width:none;height:auto!important;border-width:1px 0 0;border-radius:12px 12px 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}
+.notes .nh{cursor:pointer;touch-action:auto}.ngr{display:none}
+body.nto{padding-bottom:calc(var(--ftH,0px) + var(--ntH,0px))}
+body.nto #fabRoot{bottom:calc(var(--ftH,0px) + var(--ntH,0px) + 16px)}
+}
+@media(max-width:600px){body.nto .fcw{width:min(82vw,330px,max(150px,calc((100vh - 56px - var(--ftH,0px) - var(--ntH,0px) - 230px)*5/7)))}}
+@supports(height:100dvh){@media(max-width:600px){body.nto .fcw{width:min(82vw,330px,max(150px,calc((100dvh - 56px - var(--ftH,0px) - var(--ntH,0px) - 230px)*5/7)))}}}
+.notes textarea:focus{outline:none;background:var(--bg2)}
+.qn:focus{outline:none;border-color:var(--teal)}
+/* per-question notes in quizzes and history */
+.qn{display:block;width:100%;min-height:0;height:34px;margin-top:10px;resize:none;overflow:hidden;font-size:.88rem;line-height:1.4;padding:6px 10px;border:1px dashed var(--bd);background:transparent;color:var(--tx)}
+.qnote{margin-top:10px;font-size:.88rem;padding:8px 10px;border-left:3px solid var(--aq);background:var(--bg2);border-radius:var(--r);white-space:pre-wrap;word-break:break-word}
 /* ===== DRAG AND DROP ===== */
 .fr[draggable=true]{cursor:grab}
 .dragghost{position:fixed;top:-200px;left:-200px;padding:8px 14px;background:var(--aq);color:var(--onaq);border-radius:8px;font-weight:600;box-shadow:0 8px 20px #0004;transform:rotate(-4deg);max-width:240px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -594,7 +610,7 @@ const el=$('#sbSize');if(el&&ACT=='m:'+m.id)el.textContent=SZ[m.id]||'—'}
 function sbClose(){ACT='';ANCH='';document.querySelectorAll('.fr.active').forEach(x=>x.classList.remove('active'));renderSidebar()}
 function renderSidebar(){let r=$('#sbRoot');if(!r){r=document.createElement('div');r.id='sbRoot';document.body.appendChild(r)}
 const pg=location.hash.slice(2).split('/')[0],k=ACT,it=k&&ME&&(pg=='c'||pg=='f')?gi(k):null,on=!!it&&sbOK(),was=SB_OPEN;
-document.body.classList.toggle('sbo',on);SB_OPEN=on;if(on!==!!was)VWS.forEach(vwApply);
+document.body.classList.toggle('sbo',on);SB_OPEN=on;if(on!==!!was){VWS.forEach(vwApply);ntSide(on)}
 if(!on){r.innerHTML='';return}
 const isF=k[0]=='f',fo=isF?(it.parent?D.FO.find(x=>x.id==it.parent):null):D.FO.find(x=>x.id==it.fo),loc=fo?fpath(fo):(isF?it.c+' (root)':'None'),rows=[];
 if(isF){const nf=D.FO.filter(x=>x.parent==it.id).length,nm=D.M.filter(m=>m.fo==it.id).length;
@@ -832,30 +848,34 @@ return `<div class="card stack"><h3>Quiz settings</h3>
 function startQ(){const p=pool();if(p.length<10)return toast('At least 10 questions are needed. Select more subjects or topics.');const n=Math.min(Math.max(10,QS.n|0),p.length),
 allS=msItems('s').every(i=>QS.subj.has(i.k)),allT=msItems('t').every(i=>QS.top.has(i.k)),
 qs=sh(p).slice(0,n).map(x=>{const o=sh(x.o.map((t,i)=>[t,i]));return{...x,o:o.map(a=>a[0]),a:o.findIndex(a=>a[1]==x.a)}});
-QZ={qs,sel:{},t0:Date.now(),end:QS.t>0?Date.now()+QS.t*60000:0,scope:(QS.c||'All components')+' · '+(allS?'all subjects':QS.subj.size+' subjects')+(allT?'':' · '+QS.top.size+' topics')+(QS.src=='own'?' · my questions':QS.src=='off'?' · official':''),done:0,notes:''};route();scrollTo(0,0)}
+QZ={qs,sel:{},t0:Date.now(),end:QS.t>0?Date.now()+QS.t*60000:0,scope:(QS.c||'All components')+' · '+(allS?'all subjects':QS.subj.size+' subjects')+(allT?'':' · '+QS.top.size+' topics')+(QS.src=='own'?' · my questions':QS.src=='off'?' · official':''),done:0,nt:{}};route();scrollTo(0,0)}
 function tick(){const e=$('#tm');if(!QZ||QZ.done||!e)return;const s=Math.max(0,Math.round((QZ.end-Date.now())/1000));e.textContent='⏱ '+mmss(s);e.classList.toggle('low',s<60);if(!s)return submitQ(1);tk=setTimeout(tick,500)}
 function cnt(){const e=$('#ans');if(e&&QZ)e.textContent=Object.keys(QZ.sel).length+' / '+QZ.qs.length+' answered'}
 function submitQ(auto){const z=QZ,un=z.qs.length-Object.keys(z.sel).length;if(!auto&&un&&!confirm(un+' unanswered. Submit anyway?'))return;z.done=1;let sc=0;
 const it=z.qs.map((q,i)=>{const ok=+(z.sel[i]===q.a);sc+=ok;const s=P.q[q.id]||[0,0,0];P.q[q.id]=[s[0]+ok,s[1]+1,ok];return{id:q.id,ch:z.sel[i]==null?null:q.o[z.sel[i]],ok}});
-z.sc=sc;z.it=it;z.secs=Math.round((Date.now()-z.t0)/1000);P.h.unshift({id:U(),ts:Date.now(),sc:z.scope,n:z.qs.length,k:sc,secs:z.secs,notes:z.notes||'',it});route();scrollTo(0,0);
-sb.from('quiz_attempts').insert({user_id:ME.id,scope:z.scope,total:z.qs.length,correct:sc,seconds:z.secs,notes:z.notes||''}).select().single().then(async r=>{if(r.error)return toast('Could not save history: '+r.error.message);P.h[0].id=r.data.id;const a=await sb.from('quiz_answers').insert(it.map((i,n)=>({attempt_id:r.data.id,user_id:ME.id,question_id:i.id,chosen:i.ch,is_correct:!!i.ok,position:n})));if(a.error)toast('Could not save answers: '+a.error.message)})}
+z.sc=sc;z.it=it;z.secs=Math.round((Date.now()-z.t0)/1000);const nq={};z.qs.forEach((q,i)=>{const t=((z.nt||{})[i]||'').trim();if(t)nq[q.id]=t});const nts=Object.keys(nq).length?JSON.stringify({v:2,q:nq}):'';P.h.unshift({id:U(),ts:Date.now(),sc:z.scope,n:z.qs.length,k:sc,secs:z.secs,notes:nts,it});route();scrollTo(0,0);
+sb.from('quiz_attempts').insert({user_id:ME.id,scope:z.scope,total:z.qs.length,correct:sc,seconds:z.secs,...(nts?{notes:nts}:{})}).select().single().then(async r=>{if(r.error)return toast('Could not save history: '+r.error.message);P.h[0].id=r.data.id;const a=await sb.from('quiz_answers').insert(it.map((i,n)=>({attempt_id:r.data.id,user_id:ME.id,question_id:i.id,chosen:i.ch,is_correct:!!i.ok,position:n})));if(a.error)toast('Could not save answers: '+a.error.message)})}
 const fig=u=>u?`<img class="fig" src="${u}" alt="">`:'';
-const run=()=>`<div class="qbar"><b id="tm">${QZ.end?'⏱':'No timer'}</b><span id="ans" class="mu sm"></span><button class="btn ntb" onclick="toggleNotes()">📝</button><span><a class="lk sm" onclick="if(confirm('Quit this quiz? Your answers will be lost.')){QZ=null;route()}">Quit</a> <button class="btn p" onclick="submitQ()">Submit quiz</button></span></div><div class="stack">`+QZ.qs.map((q,i)=>`<div class="card"><p class="mu sm">Q${i+1} · ${E(q.s)} › ${E(q.t)}</p><p class="qt">${E(q.q)}</p>${fig(q.qi)}${q.o.map((o,j)=>`<label class="opt"><input type="radio" name="q${i}" ${QZ.sel[i]===j?'checked':''} onchange="QZ.sel[${i}]=${j};cnt()">${E(o)}</label>`).join('')}</div>`).join('')+`<button class="btn p" onclick="submitQ()">Submit quiz</button></div>`;
-const res=()=>{const z=QZ;return `<div class="card art stack"><h3>Score: ${z.sc} / ${z.qs.length} (${Math.round(100*z.sc/z.qs.length)}%)</h3><p class="mu">Time: ${mmss(z.secs)} · ${E(z.scope)}</p><div class="strip">${z.it.map(i=>`<i class="${i.ok?'g':''}"></i>`).join('')}</div><div class="row"><button class="btn p" onclick="QZ=null;route()">New quiz</button><button class="btn" onclick="go('hist')">History</button></div></div><div class="stack" style="margin-top:16px">`+z.qs.map((q,i)=>`<div class="card"><p class="mu sm">Q${i+1} · ${z.sel[i]==null?'— Not answered':z.it[i].ok?'✓ Correct':'✗ Wrong'} · ${E(q.s)} › ${E(q.t)}</p><p class="qt">${E(q.q)}</p>${fig(q.qi)}${q.o.map((o,j)=>`<div class="opt ${j==q.a?'ok':j==z.sel[i]?'no':''}">${E(o)}</div>`).join('')}<div class="exp">${E(q.e)}${fig(q.ei)}</div></div>`).join('')+'</div>'};
+const run=()=>`<div class="qbar"><b id="tm">${QZ.end?'⏱':'No timer'}</b><span id="ans" class="mu sm"></span><span><a class="lk sm" onclick="if(confirm('Quit this quiz? Your answers will be lost.')){QZ=null;route()}">Quit</a> <button class="btn p" onclick="submitQ()">Submit quiz</button></span></div><div class="stack">`+QZ.qs.map((q,i)=>`<div class="card"><p class="mu sm">Q${i+1} · ${E(q.s)} › ${E(q.t)}</p><p class="qt">${E(q.q)}</p>${fig(q.qi)}${q.o.map((o,j)=>`<label class="opt"><input type="radio" name="q${i}" ${QZ.sel[i]===j?'checked':''} onchange="QZ.sel[${i}]=${j};cnt()">${E(o)}</label>`).join('')}<textarea class="qn" rows="1" placeholder="📝 Note for this question (optional)" oninput="qNote(${i},this)">${E((QZ.nt||{})[i]||'')}</textarea></div>`).join('')+`<button class="btn p" onclick="submitQ()">Submit quiz</button></div>`;
+const res=()=>{const z=QZ;return `<div class="card art stack"><h3>Score: ${z.sc} / ${z.qs.length} (${Math.round(100*z.sc/z.qs.length)}%)</h3><p class="mu">Time: ${mmss(z.secs)} · ${E(z.scope)}</p><div class="strip">${z.it.map(i=>`<i class="${i.ok?'g':''}"></i>`).join('')}</div><div class="row"><button class="btn p" onclick="QZ=null;route()">New quiz</button><button class="btn" onclick="go('hist')">History</button></div></div><div class="stack" style="margin-top:16px">`+z.qs.map((q,i)=>`<div class="card"><p class="mu sm">Q${i+1} · ${z.sel[i]==null?'— Not answered':z.it[i].ok?'✓ Correct':'✗ Wrong'} · ${E(q.s)} › ${E(q.t)}</p><p class="qt">${E(q.q)}</p>${fig(q.qi)}${q.o.map((o,j)=>`<div class="opt ${j==q.a?'ok':j==z.sel[i]?'no':''}">${E(o)}</div>`).join('')}<div class="exp">${E(q.e)}${fig(q.ei)}</div>${z.nt&&(z.nt[i]||'').trim()?`<div class="qnote">📝 ${E(z.nt[i].trim())}</div>`:''}</div>`).join('')+'</div>'};
 V.quiz=a=>{const c=C.includes(a)?a:'';return hd(c?c+' Quiz':'Quiz',c?'Questions from '+c+' only.':'Questions from every component.')+`<div class="w sec">${QZ?(QZ.done?res():run()):!QL?empty('Loading questions…'):allQ().length?`<div class="stack">${setup(c)}</div>`:`<div class="stack"><div class="card art stack"><h3>No questions yet</h3><p class="mu">An admin can add official questions, or add your own below.</p></div>${ownTools()}</div>`}</div>`};
 
 /* ===== HISTORY ===== */
 let HV=null,HI=0,HW=0;
+function histNotes(x){const o=pNotes(x.notes),pr='<p style="white-space:pre-wrap;margin-top:6px">';let b='';
+if(o.l)b=pr+E(o.l)+'</p>';else if(o.q)b=x.it.map((i,n)=>o.q[i.id]?pr+'<b>Q'+(n+1)+'.</b> '+E(o.q[i.id])+'</p>':'').join('');
+return b?'<details class="sm"><summary>📝 Notes</summary>'+b+'</details>':''}
 /* a card face: text on the left, picture (if any) on the right. fitCards() shrinks the text so everything fits. */
 const face=(t,img)=>{const has=String(t||'').replace(/<[^>]*>/g,'').trim().length>0,im=img?`<div class="fimgw"><img src="${img}" alt="" draggable="false"></div>`:'';
 return `<div class="fcont ${img?(has?'both':'imgonly'):'noimg'}">${has||!img?`<div class="ftxt">${t}</div>`:''}${im}</div>`};
 const flip=(f,b,sw,n)=>`<div class="fcw"><div class="fc" data-sw="${sw||''}" data-n="${n||0}"><div class="fi"><div class="ff">${f}</div><div class="fb">${b}</div></div></div></div>`;
 function replay(h){const l=h.it.map(i=>({i,q:allQ().find(x=>x.id==i.id)})).filter(x=>x.q&&(!HW||!x.i.ok)),
-bk=`<div class="row" style="margin:0 0 12px"><button class="btn" onclick="HV=null;route()">← History</button><label class="sm"><input type="checkbox" ${HW?'checked':''} onchange="HW=this.checked?1:0;HI=0;route()"> Wrong answers only</label><button class="btn ntb" onclick="toggleNotes()">📝 Notes</button></div>`;
-if(!l.length)return bk+empty('Nothing to show.');HI=Math.min(HI,l.length-1);const{i,q}=l[HI],n=l.length;
-return bk+flip(face(`${E(q.q)}<div class="fopts">${q.o.map((o,j)=>'ABCD'[j]+'. '+E(o)).join('<br>')}</div>`,q.qi),face(`<b>${i.ok?'✓ You were correct':'✗ You were wrong'}</b><p>Your answer: ${i.ch==null?'(none)':E(i.ch)}</p><p>Correct: ${E(q.o[q.a])}</p><p class="fopts">${E(q.e)}</p>`,q.ei),'replay',n)+`<p class="mu sm" style="text-align:center">Question ${HI+1} of ${n} · tap to flip · swipe for the next one</p><div class="row" style="justify-content:center"><button class="btn" onclick="HI=(HI+${n-1})%${n};route()">←</button><button class="btn" onclick="HI=(HI+1)%${n};route()">→</button></div>`}
+bk=`<div class="row" style="margin:0 0 12px"><button class="btn" onclick="HV=null;route()">← History</button><label class="sm"><input type="checkbox" ${HW?'checked':''} onchange="HW=this.checked?1:0;HI=0;route()"> Wrong answers only</label></div>`;
+const o=pNotes(h.notes),lg=o.l?`<details class="sm" style="margin:0 0 12px"><summary>📝 Quiz notes</summary><p style="white-space:pre-wrap;margin-top:6px">${E(o.l)}</p></details>`:'';
+if(!l.length)return bk+lg+empty('Nothing to show.');HI=Math.min(HI,l.length-1);const{i,q}=l[HI],n=l.length,nn=o.q&&o.q[i.id]?`<div class="qnote" style="max-width:680px;margin:0 auto 14px">📝 ${E(o.q[i.id])}</div>`:'';
+return bk+lg+flip(face(`${E(q.q)}<div class="fopts">${q.o.map((o,j)=>'ABCD'[j]+'. '+E(o)).join('<br>')}</div>`,q.qi),face(`<b>${i.ok?'✓ You were correct':'✗ You were wrong'}</b><p>Your answer: ${i.ch==null?'(none)':E(i.ch)}</p><p>Correct: ${E(q.o[q.a])}</p><p class="fopts">${E(q.e)}</p>`,q.ei),'replay',n)+nn+`<p class="mu sm" style="text-align:center">Question ${HI+1} of ${n} · tap to flip · swipe for the next one</p><div class="row" style="justify-content:center"><button class="btn" onclick="HI=(HI+${n-1})%${n};route()">←</button><button class="btn" onclick="HI=(HI+1)%${n};route()">→</button></div>`}
 V.hist=()=>{const h=P.h.find(x=>x.id==HV),dt=t=>new Date(t).toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'}),tm=t=>new Date(t).toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'});
-return hd('Quiz History','Every quiz you finish is saved here, with your notes. Green = correct, red = wrong.')+`<div class="w sec">${h?replay(h):`<div class="stack">${P.h.map(x=>`<div class="card"><div class="hrow"><div class="hl"><b>${dt(x.ts)}</b><span class="mu sm">${tm(x.ts)}</span><span class="mu sm">⏱ ${mmss(x.secs)} taken</span></div><div class="hr"><span class="hscore">${x.k} / ${x.n} <small class="mu">${Math.round(100*x.k/x.n)}%</small></span><button class="btn p" onclick="HV='${x.id}';HI=0;HW=0;route()">Review as flashcards</button><span class="tag">${E(x.sc)}</span></div></div><div class="strip">${x.it.map(i=>`<i class="${i.ok?'g':''}"></i>`).join('')}</div>${x.notes?`<details class="sm"><summary>📝 Notes</summary><p style="white-space:pre-wrap;margin-top:6px">${E(x.notes)}</p></details>`:''}</div>`).join('')||empty('No quizzes taken yet.')}</div>`}</div>`};
+return hd('Quiz History','Every quiz you finish is saved here, with your notes. Green = correct, red = wrong.')+`<div class="w sec">${h?replay(h):`<div class="stack">${P.h.map(x=>`<div class="card"><div class="hrow"><div class="hl"><b>${dt(x.ts)}</b><span class="mu sm">${tm(x.ts)}</span><span class="mu sm">⏱ ${mmss(x.secs)} taken</span></div><div class="hr"><span class="hscore">${x.k} / ${x.n} <small class="mu">${Math.round(100*x.k/x.n)}%</small></span><button class="btn p" onclick="HV='${x.id}';HI=0;HW=0;route()">Review as flashcards</button><span class="tag">${E(x.sc)}</span></div></div><div class="strip">${x.it.map(i=>`<i class="${i.ok?'g':''}"></i>`).join('')}</div>${histNotes(x)}</div>`).join('')||empty('No quizzes taken yet.')}</div>`}</div>`};
 
 /* ===== FLASHCARDS: generated from the question bank, plus official, formula and personal cards ===== */
 let FT='s',FC={i:0,o:null},FF={c:'',k:'q',s:'',t:'',m:'',so:''};
@@ -872,7 +892,7 @@ return d.sort((a,b)=>cmp(a.sk,b.sk)||a.n-b.n||a.ts-b.ts)};
 function nav2(n){const l=deck().length;if(!l)return route();FC.i=(FC.i+n+l)%l;route()}
 function mark(id,s){P.fc[id]=s;sb.from('flashcard_marks').upsert({user_id:ME.id,flashcard_id:id,status:s}).then(r=>r.error&&toast(r.error.message));nav2(1)}
 function study(){const d=deck(),k=FF.k||'q',rs="FC.i=0;route()",
-bar=`<div class="bar">${dd('ffK',[['q','All questions'],['qo','Official questions'],['qm','My questions'],['off','Official cards'],['img','Formula / figure cards'],['own','My cards']],k,"FF.k=v;FF.s='';FF.t='';"+rs)}${dd('ffC',[['','All components'],...C],FF.c,"FF.c=v;FF.s='';FF.t='';"+rs)}${k[0]=='q'&&FF.c?dd('ffS',[['','All subjects'],...subs(FF.c)],FF.s,"FF.s=v;FF.t='';"+rs):''}${k[0]=='q'&&FF.s?dd('ffT',[['','All topics'],...tops(FF.c,FF.s)],FF.t,"FF.t=v;"+rs):''}${dd('ffM',[['','All cards'],['review','Need review'],['known','Known'],['new','Not marked yet']],FF.m,"FF.m=v;"+rs)}${dd('ffO',[['','Original order'],['az','A → Z'],['shuffle','Shuffled']],FF.so,"FF.so=v;FC.o=null;"+rs)}<button class="btn ntb" onclick="toggleNotes()">📝 Notes</button></div>`;
+bar=`<div class="bar">${dd('ffK',[['q','All questions'],['qo','Official questions'],['qm','My questions'],['off','Official cards'],['img','Formula / figure cards'],['own','My cards']],k,"FF.k=v;FF.s='';FF.t='';"+rs)}${dd('ffC',[['','All components'],...C],FF.c,"FF.c=v;FF.s='';FF.t='';"+rs)}${k[0]=='q'&&FF.c?dd('ffS',[['','All subjects'],...subs(FF.c)],FF.s,"FF.s=v;FF.t='';"+rs):''}${k[0]=='q'&&FF.s?dd('ffT',[['','All topics'],...tops(FF.c,FF.s)],FF.t,"FF.t=v;"+rs):''}${dd('ffM',[['','All cards'],['review','Need review'],['known','Known'],['new','Not marked yet']],FF.m,"FF.m=v;"+rs)}${dd('ffO',[['','Original order'],['az','A → Z'],['shuffle','Shuffled']],FF.so,"FF.so=v;FC.o=null;"+rs)}</div>`;
 if(!d.length)return bar+empty(k[0]=='q'?'No questions match this selection.':'No cards here yet. Add your own under My Cards.');
 FC.i=Math.min(FC.i,d.length-1);const c=d[FC.i],s=P.fc[c.id];
 return bar+flip(c.fh,c.bh,'study',d.length)+`<p class="mu sm" style="text-align:center">Card ${FC.i+1} of ${d.length} · ${c.c} · ${c.src} · ${s=='known'?'Known':s=='review'?'Need review':'Not marked'} · tap to flip, swipe for the next card</p><div class="row" style="justify-content:center"><button class="btn" onclick="nav2(-1)">←</button><button class="btn" onclick="mark('${c.id}','review')">Need Review</button><button class="btn p" onclick="mark('${c.id}','known')">Known</button><button class="btn" onclick="nav2(1)">→</button><button class="btn" onclick="FF.so='shuffle';FC.o=sh(deck().map(x=>x.id));FC.i=0;route()">Shuffle</button></div>`}
@@ -1012,20 +1032,55 @@ document.addEventListener('pointerup',swEnd);document.addEventListener('pointerc
 addEventListener('keydown',e=>{if(MD||e.target!==document.body)return;const c=document.querySelector('.fc[data-sw]');if(!c)return;
 if(e.key=='ArrowRight'){e.preventDefault();swNext(c)}else if(e.key=='ArrowLeft'&&c.dataset.sw=='study'){e.preventDefault();nav2(-1)}else if(e.key==' '||e.key=='Enter'){e.preventDefault();c.classList.toggle('on')}});
 
-/* ===== NOTES PANEL (quiz, flashcards, saved quiz notes) ===== */
-const NT={f:''};let ntMin=0,ntMode=null;
-function noteIn(t){if(ntMode=='quiz'&&QZ)QZ.notes=t;else if(ntMode=='cards')NT.f=t}
-function toggleNotes(){const p=$('#nt');if(p)p.classList.toggle('show')}
-function ntClr(){const t=$('#nt textarea');if(t&&!t.readOnly){t.value='';noteIn('')}}
-function ntToggleMin(){ntMin=!ntMin;const p=$('#nt');if(p)p.classList.toggle('min',ntMin)}
+/* ===== NOTES PANEL: one scratch note on every page except quizzes/history (those have a note per question) ===== */
+const NT={f:''};let ntMin=1,ntPos=null,ntSz=null,ntObs=null;
+const NTM=()=>matchMedia('(max-width:700px)').matches;
+function ntReset(){NT.f='';ntMin=1;ntPos=null;ntSz=null}
+/* every question gets its own note: serialised as {"v":2,"q":{questionId:text}} inside quiz_attempts.notes, older plain-text notes still display */
+const pNotes=raw=>{if(!raw)return{};try{const o=JSON.parse(raw);if(o&&o.v==2&&o.q)return{q:o.q}}catch(e){}return{l:String(raw)}};
+function agrow(t){t.style.height='0';t.style.height=Math.min(t.scrollHeight+2,260)+'px'}
+function qNote(i,t){(QZ.nt||(QZ.nt={}))[i]=t.value;agrow(t)}
+function ntLay(){const p=$('#nt'),m=NTM(),f=document.querySelector('footer'),d=document.documentElement.style;/* phones pin the footer to the bottom, so the notes dock sits right above it */
+d.setProperty('--ftH',m&&f&&getComputedStyle(f).position=='fixed'?f.offsetHeight+'px':'0px');document.body.classList.toggle('nto',!!p&&m);d.setProperty('--ntH',p&&m?p.offsetHeight+'px':'0px')}
+function ntApply(){const p=$('#nt');if(!p)return;p.classList.toggle('min',!!ntMin);p.classList.toggle('dflt',!ntPos);p.classList.toggle('mv',!!ntPos);
+p.style.left=ntPos?ntPos.x+'px':'';p.style.top=ntPos?ntPos.y+'px':'';p.style.width=ntSz?ntSz.w+'px':'';p.style.height=ntSz&&ntSz.h?ntSz.h+'px':'';
+const b=p.querySelector('.ntm');if(b)b.textContent=ntMin?'+':'–'}
+/* text box starts tiny and stretches with the text (until the person sizes it by hand on desktop) */
+function ntGrow(){const p=$('#nt'),t=p&&p.querySelector('textarea');if(!t||ntMin)return;const m=NTM();
+if(!m&&ntSz&&ntSz.h){t.style.height='';return ntLay()}
+t.style.height='0';const hh=p.querySelector('.nh').offsetHeight,top=m?0:p.getBoundingClientRect().top,max=m?innerHeight*.4:Math.max(60,innerHeight-top-hh-12);
+t.style.height=Math.max(38,Math.min(t.scrollHeight,max))+'px';ntLay()}
+/* keep the panel fully on screen */
+function ntFit(){const p=$('#nt');if(!p)return;if(NTM()){ntLay();return ntGrow()}
+if(ntSz){ntSz.w=Math.min(ntSz.w,innerWidth-8);if(ntSz.h)ntSz.h=Math.min(ntSz.h,innerHeight-8)}
+ntApply();if(ntPos){const r=p.getBoundingClientRect();ntPos.x=Math.max(0,Math.min(ntPos.x,innerWidth-r.width));ntPos.y=Math.max(0,Math.min(ntPos.y,innerHeight-r.height));ntApply()}
+ntGrow()}
+function ntToggleMin(){ntMin=!ntMin;ntApply();ntFit();if(!ntMin){const t=$('#nt textarea');if(t&&!NTM())t.focus()}ntLay()}
+/* the right details panel opened: tuck the notes away, unless the person opens them again while it is open */
+function ntSide(on){if(on&&!ntMin){ntMin=1;ntApply()}ntFit()}
+function ntClr(){const t=$('#nt textarea');if(t){t.value='';NT.f='';ntGrow()}}
+function ntHdr(e){if(!NTM()||e.target.closest('a'))return;ntToggleMin()}
+function ntDown(e){if(NTM()||e.button||e.target.closest('a'))return;const p=$('#nt');if(!p)return;const h=e.currentTarget,r=p.getBoundingClientRect(),sx=e.clientX,sy=e.clientY;let mv=0;
+try{h.setPointerCapture(e.pointerId)}catch(_){}
+const mo=ev=>{const dx=ev.clientX-sx,dy=ev.clientY-sy;if(!mv&&Math.abs(dx)+Math.abs(dy)<4)return;mv=1;
+ntPos={x:Math.max(0,Math.min(r.left+dx,innerWidth-r.width)),y:Math.max(0,Math.min(r.top+dy,innerHeight-r.height))};ntApply()};
+const up=()=>{h.removeEventListener('pointermove',mo);h.removeEventListener('pointerup',up);h.removeEventListener('pointercancel',up);if(!mv&&ntMin)ntToggleMin();else if(mv)ntGrow()};
+h.addEventListener('pointermove',mo);h.addEventListener('pointerup',up);h.addEventListener('pointercancel',up)}
+function ntGrip(e,side){if(NTM()||e.button)return;e.preventDefault();e.stopPropagation();const p=$('#nt');if(!p)return;const g=e.currentTarget,r=p.getBoundingClientRect(),sx=e.clientX,sy=e.clientY;
+try{g.setPointerCapture(e.pointerId)}catch(_){}
+const mo=ev=>{const dx=ev.clientX-sx,dy=ev.clientY-sy,h=Math.min(Math.max(120,r.height+dy),innerHeight-r.top);let w,x=r.left;
+if(side=='e')w=Math.min(Math.max(170,r.width+dx),innerWidth-r.left);else{w=Math.min(Math.max(170,r.width-dx),r.right);x=r.right-w}
+ntSz={w,h};ntPos={x,y:r.top};ntApply();ntGrow()};
+const up=()=>{g.removeEventListener('pointermove',mo);g.removeEventListener('pointerup',up);g.removeEventListener('pointercancel',up)};
+g.addEventListener('pointermove',mo);g.addEventListener('pointerup',up);g.addEventListener('pointercancel',up)}
 function renderNotes(n){let r=$('#notesRoot');if(!r){r=document.createElement('div');r.id='notesRoot';document.body.appendChild(r)}
-let mode=null,text='',key='';
-if(ME&&n=='quiz'&&QZ){mode=QZ.done?'ro':'quiz';text=QZ.notes||'';key=mode+(QZ.done?'res':'')}
-else if(ME&&n=='cards'&&FT=='s'){mode='cards';text=NT.f;key='cards'}
-else if(ME&&n=='hist'&&HV){const h=P.h.find(x=>x.id==HV);if(h){mode='ro';text=h.notes||'';key='ro'+HV}}
-if(!mode){r.innerHTML='';r.dataset.k='';ntMode=null;return}
-ntMode=mode;if(r.dataset.k==key&&r.firstChild)return;r.dataset.k=key;
-r.innerHTML=`<div class="notes${ntMin?' min':''}" id="nt"><div class="nh"><b>📝 ${mode=='ro'?'Quiz notes':'Notes'}</b><span>${mode=='ro'?'':'<a onclick="ntClr()">Clear</a>'}<a onclick="ntToggleMin()" class="ntm">–</a><a class="ntx" onclick="toggleNotes()">✕</a></span></div><textarea ${mode=='ro'?'readonly':''} placeholder="${mode=='ro'?'No notes were saved for this quiz.':'Type what you are thinking…'}" oninput="noteIn(this.value)">${E(text)}</textarea></div>`}
+const on=ME&&n!='quiz'&&n!='hist'&&n!='auth';
+if(!on){if(r.firstChild)r.innerHTML='';if(ntObs)ntObs.disconnect();document.body.classList.remove('nto');document.documentElement.style.removeProperty('--ntH');document.documentElement.style.removeProperty('--ftH');return}
+if(r.firstChild){ntFit();return}
+r.innerHTML=`<div class="notes" id="nt"><div class="nh" onpointerdown="ntDown(event)" onclick="ntHdr(event)"><b>📝 Notes</b><span><a class="nc" onclick="ntClr()">Clear</a><a class="ntm" onclick="ntToggleMin()" title="Minimize / expand">–</a></span></div><textarea rows="1" placeholder="Type what you are thinking…" oninput="NT.f=this.value;ntGrow()">${E(NT.f)}</textarea><i class="ngr sw" onpointerdown="ntGrip(event,'w')"></i><i class="ngr se" onpointerdown="ntGrip(event,'e')"></i></div>`;
+ntApply();ntFit();
+if(window.ResizeObserver){if(!ntObs)ntObs=new ResizeObserver(ntLay);ntObs.disconnect();ntObs.observe($('#nt'))}}
+addEventListener('resize',ntFit);
 
 /* ===== DRAG AND DROP: move items into folders, and drop files to upload ===== */
 let DRAG=null,dzLast=null;
@@ -1123,11 +1178,12 @@ if(!QL){$('#app').innerHTML='<div class="w sec">'+empty('Loading…')+'</div>';$
 if(!ME&&!['home','auth'].includes(n))n='auth';
 if(ME&&n=='auth'&&AU.mode!='newpw')n='dash';
 if(n=='admin'&&role!='admin'){toast('Admins only');n='dash'}
-if(n!='cards')NT.f='';const ap=$('#app');ap.innerHTML=V[n](a);if(nv){ap.className='';void ap.offsetWidth;ap.className='in';nv=0}
+const ap=$('#app');ap.innerHTML=V[n](a);if(nv){ap.className='';void ap.offsetWidth;ap.className='in';nv=0}
 $('#tb').innerHTML=tbar();$('#dr').innerHTML=ME?drawer(n,a):'';syncTheme();fitCards();renderNotes(n);$('#bg').style.display=ME?'':'none';
 renderFab();
 renderCustomConfirm();
 renderFileViewer();hydrateThumbs();renderSidebar();placeMenu();if(n=='admin')admMark();
+document.querySelectorAll('textarea.qn').forEach(agrow);
 if(n=='quiz'&&QZ&&!QZ.done){cnt();if(QZ.end)tick()}else smry()}
 addEventListener('hashchange',()=>{nv=1;scrollTo(0,0);route()});
 addEventListener('keydown',e=>{if(e.key=='Enter'&&location.hash=='#/auth'&&e.target.tagName=='INPUT')doAuth()});
@@ -1138,9 +1194,9 @@ const u=s&&s.user||null;
 /* Coming back to the tab makes Supabase re-send SIGNED_IN / TOKEN_REFRESHED for the same user. Nothing changed, so do not redraw the page. */
 if(u&&ME&&CU==u.id&&ev!='PASSWORD_RECOVERY'&&ev!='USER_UPDATED'){ME=u;return}
 ME=u;
-if(!ME){CU=null;D={FO:[],M:[],F:[],MQ:[],U:[]};P={h:[],q:{},fc:{},bm:[],op:{}};OQ=[];PR=null;role='student';QZ=null;QL=1;VWS=[];renderFileViewer();
+if(!ME){CU=null;D={FO:[],M:[],F:[],MQ:[],U:[]};P={h:[],q:{},fc:{},bm:[],op:{}};OQ=[];PR=null;role='student';QZ=null;QL=1;VWS=[];ntReset();renderFileViewer();
 if(ev=='SIGNED_OUT'){const own=USER_OUT;USER_OUT=0;go('home');if(!own)toast('You were signed out (session ended or you signed out on another device or tab). Please sign in again.')}else route();return}
-if(ME.id!=CU){CU=ME.id;QL=0;route();await load();QL=1}
+if(ME.id!=CU){CU=ME.id;ntReset();QL=0;route();await load();QL=1}
 if(AU.mode=='newpw')go('auth');else if(location.hash=='#/auth')go('dash');else route()},0));
 route();
 </script>
