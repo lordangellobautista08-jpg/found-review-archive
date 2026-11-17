@@ -236,7 +236,7 @@ footer .w{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 /* ===== FLASHCARDS: fixed 7:5 landscape on desktop, 5:7 portrait on phones, never edge to edge ===== */
 .fcw{position:relative;width:min(100%,680px);aspect-ratio:7/5;margin:0 auto 14px}
 .fcw::before{content:'';position:absolute;inset:0;transform:translateY(10px) scale(.95);border:1px solid var(--bd);border-radius:var(--r);background:var(--card);opacity:.7}
-.fc{position:absolute;inset:0;z-index:1;touch-action:none;user-select:none;-webkit-user-select:none;animation:cardin .22s ease-out}
+.fc{position:absolute;inset:0;z-index:1;touch-action:pan-y pinch-zoom;user-select:none;-webkit-user-select:none;animation:cardin .22s ease-out}
 .fc.drag{cursor:grabbing;animation:none}
 .fc img{pointer-events:none;-webkit-user-drag:none}
 .fi{position:absolute;inset:0;min-height:0}
@@ -274,6 +274,41 @@ body.dg .fr[data-drop],body.dg .ph a.lk{transition:transform .12s,box-shadow .12
 .dz.over{border-color:var(--teal);background:var(--soft)}
 .dz input{margin-top:6px}
 .aglist{max-height:260px;overflow:auto;margin-top:8px;border:1px solid var(--bd);border-radius:var(--r)}
+
+/* ===== FOLDER GRID: rounded squares, name in the top 1/5, thumbnail below ===== */
+.g.grid{grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px}
+@media(max-width:600px){.g.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}}
+.fr[data-k]{user-select:none;-webkit-user-select:none}
+.g.grid>.fr{aspect-ratio:1/1;padding:0;border-radius:18px;display:block;position:relative}
+.g.grid>.fr .fl{position:absolute;top:0;left:0;right:0;height:20%;padding:0 12px;gap:6px;border-bottom:1px solid var(--bd);align-items:center;background:transparent;border-radius:18px 18px 0 0;cursor:default}
+.g.grid>.fr .fl>.tag,.g.grid>.fr .fl>span{display:none}
+.g.grid>.fr .fl h3{font-size:.85rem;display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.g.grid>.fr .selbox{margin-right:0}
+.thm{display:none}
+.g.grid>.fr .thm{position:absolute;left:0;right:0;top:20%;bottom:0;border-radius:0 0 17px 17px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--bg2)}
+.fr.selected .thm{background:var(--soft)}
+.thm img{width:100%;height:100%;object-fit:cover;display:block;-webkit-user-drag:none}
+.thm img.pdf{object-position:top center}
+.thm .ico{font-size:3.4rem;line-height:1}
+.thm .ext{font-weight:800;font-size:1.4rem;letter-spacing:.04em;color:var(--teal);border:2px solid var(--aq);border-radius:10px;padding:6px 12px;background:var(--card)}
+.g.grid>.fr .fx{position:absolute;left:6px;right:6px;bottom:6px;z-index:2;flex-wrap:wrap;justify-content:flex-end;gap:4px;pointer-events:none}
+.g.grid>.fr .fx>*{pointer-events:auto}
+.g.grid>.fr .fx .tag,.g.grid>.fr .fx .star,.g.grid>.fr .fx .dots{background:var(--card);border-radius:99px}
+.g.grid>.fr .fx .star{padding:0 8px}
+.g.grid>.fr .fd{display:none}
+.g.grid>.fr .pop{top:calc(20% + 4px);bottom:auto;right:6px;max-height:60vh;overflow:auto}
+.fr.active{border-color:var(--teal);box-shadow:0 0 0 2px var(--aq)}
+@media(hover:hover) and (pointer:fine){.fr[data-k] .fl{cursor:default}.fr[data-k] .nm{cursor:pointer}.fr[data-k] .nm:hover{text-decoration:underline;color:var(--teal)}}
+/* ===== FLASHCARD FACES: picture only = fitted and centered, text + picture = text on top, picture below ===== */
+.fcont{flex-direction:column;align-items:stretch;gap:10px}
+.fcont .ftxt{flex:0 1 auto;max-height:100%}
+.fcont.both .ftxt{max-height:55%}
+.fcont.noimg{justify-content:center}
+.fcont .fimgw{position:relative;flex:1 1 0;min-height:0;width:100%;align-self:stretch}
+.fcont .fimgw img{position:absolute;inset:0;width:100%;height:100%;max-width:none;max-height:none;object-fit:contain;border-radius:6px}
+.fcont.imgonly{justify-content:center}
+.fc{touch-action:pan-y pinch-zoom}
+.zoomed .fc{touch-action:auto}
 </style>
 </head>
 <body>
@@ -297,7 +332,7 @@ go=h=>{if(location.hash=='#/'+h)route();else location.hash='#/'+h},
 CD={MSTC:'Mathematics, Surveying and Transportation Engineering.',HPGE:'Hydraulics and Geotechnical Engineering.',PSAD:'Structural Analysis and Design.'};
 let D={FO:[],M:[],F:[],MQ:[],U:[]},P={h:[],q:{},fc:{},bm:[],op:{}},role='student',nv=0,tk,QL=0,OQ=[],ME=null,PR=null,CU=null,AU={mode:'in',msg:''};
 /* ===== UI CORE: modals, custom dropdown, menus, dark mode ===== */
-let folderView='grid',FSORT='az',activeMenu=null,viewerFile=null,MD=null,FQ='';
+let folderView='list',FSORT='az',FOSORT='old',activeMenu=null,viewerFile=null,MD=null,FQ='',ACT='',ANCH='',PASTING=0,RMFAIL=0,lastOpen=0;
 let selMode=false,SEL=new Set(),VIS=[],selFor='',CB=null;
 let fab={open:false,mode:'upload',c:'',d:'',busy:false};
 const EXT=['pdf','doc','docx','ppt','pptx','xls','xlsx','jpg','jpeg','png','webp'],LIM=30*1024*1024,ex=f=>f.name.split('.').pop().toLowerCase();
@@ -339,15 +374,29 @@ const canFo=f=>!f.def&&(f.own||role=='admin'),canMat=m=>m.own||role=='admin';
 const sibNames=(par,kind,comp)=>kind=='f'?D.FO.filter(x=>x.c==comp&&(x.parent||null)==(par||null)).map(x=>x.name):D.M.filter(x=>x.fo==par).map(x=>x.title);
 const uname=(base,taken)=>{if(!taken.includes(base))return base;let n=1,t;do{t=base+' (copy'+(n>1?' '+n:'')+')';n++}while(taken.includes(t));return t};
 const dn=(n,u)=>{if(!u.includes(n))return n;const i=n.lastIndexOf('.'),b=i>0?n.slice(0,i):n,e=i>0?n.slice(i):'';let k=2;while(u.includes(b+' ('+k+')'+e))k++;return b+' ('+k+')'+e};
+
+/* ===== STORAGE CLEAN DELETE: remove the real file from Supabase and report when it was blocked ===== */
+async function rmStore(bucket,paths){paths=[...new Set((paths||[]).filter(Boolean))];if(!paths.length)return 0;let n=0;
+for(let i=0;i<paths.length;i+=100){const r=await sb.storage.from(bucket).remove(paths.slice(i,i+100));if(r.error){console.warn(r.error.message);continue}n+=(r.data||[]).length}
+if(n<paths.length){RMFAIL+=paths.length-n;console.warn('Storage removed '+n+' of '+paths.length+' in '+bucket+'. A missing storage DELETE policy does this.')}return n}
+async function rmImgs(paths){const used=new Set([...D.F.flatMap(x=>[x.ip,x.fip]),...OQ.flatMap(x=>[x.qp,x.ep]),...D.MQ.flatMap(x=>[x.qp,x.ep])].filter(Boolean));
+const gone=[...new Set((paths||[]).filter(Boolean))].filter(p=>!used.has(p));if(!gone.length)return;
+const n=await rmStore('flashcard-images',gone);if(n<gone.length)toast('Deleted, but '+(gone.length-n)+' stored image(s) were not removed from Supabase storage.')}
+async function cleanOrphans(){const r=await sb.rpc('orphaned_storage_objects');
+if(r.error)return toast(/function|schema cache/i.test(r.error.message)?'Run storage_cleanup.sql in the Supabase SQL editor first.':r.error.message);
+const rows=r.data||[];if(!rows.length)return toast('No orphaned files. Storage is clean.');
+showConfirm('Delete orphaned files','Found '+rows.length+' stored file(s) that nothing uses. Delete them from Supabase storage permanently?',async()=>{RMFAIL=0;let n=0;
+for(const b of ['review-materials','flashcard-images'])n+=await rmStore(b,rows.filter(x=>x.bucket==b).map(x=>x.path));
+toast('Removed '+n+' of '+rows.length+' orphaned file(s)'+(RMFAIL?'. Some were blocked: check the delete policies in storage_cleanup.sql.':''))})}
 function renameFolder(id){const f=D.FO.find(x=>x.id==id);if(!f)return;showPrompt('Rename folder','Folder name',f.name,async n=>{const r=await sb.from('folders').update({name:n}).eq('id',id);if(r.error)return toast(r.error.message);f.name=n;toast('Folder renamed');route()})}
 function renameMaterial(id){const m=D.M.find(x=>x.id==id);if(!m)return;showPrompt('Rename file','File name',m.title,async n=>{const r=await sb.from('materials').update({title:n}).eq('id',id);if(r.error)return toast(r.error.message);m.title=n;toast('File renamed');route()})}
 async function delFo(id,quiet){const f=D.FO.find(x=>x.id==id);if(!f)return;const ids=dsc(id),paths=D.M.filter(m=>ids.includes(m.fo)).map(m=>m.path).filter(Boolean);
 for(const i of ids.slice().reverse()){const r=await sb.from('folders').delete().eq('id',i);if(r.error)return toast(r.error.message)}
-if(paths.length)await sb.storage.from('review-materials').remove(paths);
+if(paths.length){const n=await rmStore('review-materials',paths);if(n<paths.length&&!quiet)toast('Deleted, but '+(paths.length-n)+' stored file(s) were not removed from Supabase storage.')}
 D.FO=D.FO.filter(x=>!ids.includes(x.id));D.M=D.M.filter(m=>!ids.includes(m.fo));P.bm=P.bm.filter(b=>D.M.some(m=>m.id==b));
 if(!quiet){toast('Folder deleted');go(f.parent?'f/'+f.parent:'c/'+f.c)}}
 async function delM(id,quiet){const m=D.M.find(x=>x.id==id);if(!m)return;const r=await sb.from('materials').delete().eq('id',id);if(r.error)return toast(r.error.message);
-if(m.path){const s=await sb.storage.from('review-materials').remove([m.path]);if(s.error&&!quiet)toast('Deleted, but the stored file could not be removed.')}
+if(m.path){const n=await rmStore('review-materials',[m.path]);if(!n&&!quiet)toast('Deleted, but the stored file was not removed from Supabase storage.')}
 D.M=D.M.filter(x=>x.id!=id);P.bm=P.bm.filter(x=>x!==id);if(!quiet)route()}
 function moveMaterial(id){moveKeys(['m:'+id])}
 function moveKeys(keys){const its=keys.map(k=>[k,gi(k)]).filter(x=>x[1]&&(x[0][0]=='f'?canFo(x[1]):canMat(x[1])));
@@ -370,12 +419,13 @@ function selTog(k){SEL.has(k)?SEL.delete(k):SEL.add(k);route()}
 function selAll(){VIS.forEach(k=>SEL.add(k));route()}
 const selKeys=()=>[...SEL].filter(k=>gi(k)),none=()=>toast('Select something first');
 const selBar=()=>selMode?`<div class="selbar"><b>${SEL.size} selected</b><a class="lk sm" onclick="selAll()">Select all</a><a class="lk sm" onclick="SEL.clear();route()">Clear</a><span class="sp"></span><button class="btn" onclick="copySel()">Copy</button><button class="btn" onclick="moveSel()">Move to…</button><button class="btn" onclick="dlSel()">Download</button><button class="btn" onclick="delSel()">Delete</button><button class="btn p" onclick="selOff()">Done</button></div>`:'';
-function copySel(){const k=selKeys();if(!k.length)return none();CB={keys:k};toast('Copied '+k.length+' item(s). Open a folder and press Paste.');selOff()}
+function copySel(){const k=selKeys();if(!k.length)return none();CB={keys:k,cut:false};toast('Copied '+k.length+' item(s). Open a folder and press Paste.');selOff()}
 function moveSel(){const k=selKeys();if(!k.length)return none();moveKeys(k)}
 function dlSel(){const k=selKeys();if(!k.length)return none();dlKeys(k)}
-function delSel(){const k=selKeys();if(!k.length)return none();showConfirm('Delete selected','Delete '+k.length+' selected item(s)? Folders are deleted with everything inside them.',async()=>{let n=0,s=0;
+function delSel(){delKeys(selKeys())}
+function delKeys(k){if(!k.length)return none();RMFAIL=0;showConfirm('Delete selected','Delete '+k.length+' selected item(s)? Folders are deleted with everything inside them.',async()=>{let n=0,s=0;
 for(const x of k){const it=gi(x);if(!it)continue;if(x[0]=='f'){if(canFo(it)){await delFo(it.id,1);n++}else s++}else{if(canMat(it)){await delM(it.id,1);n++}else s++}}
-selOff(1);toast('Deleted '+n+' item(s)'+(s?', '+s+' not allowed':''));route()})}
+ACT='';selOff(1);toast('Deleted '+n+' item(s)'+(s?', '+s+' not allowed':'')+(RMFAIL?', '+RMFAIL+' stored file(s) not removed from Supabase':''));route()})}
 
 /* ===== COPY, DUPLICATE, PASTE ===== */
 async function cloneFile(m,dest,title){const off=role=='admin'&&!dest.own,np=`${off?'official':ME.id}/${dest.id}/${Date.now()}_${U()}_${(title+'.'+m.type.toLowerCase()).replace(/[^a-zA-Z0-9._-]/g,'_')}`;
@@ -385,15 +435,82 @@ if(r.error){await sb.storage.from('review-materials').remove([np]);throw r.error
 async function cloneFo(f,par,name,comp){const mine=role!='admin'||(par&&par.own),r=await sb.from('folders').insert({component:comp,name,parent_id:par?par.id:null,owner_id:mine?ME.id:null}).select().single();if(r.error)throw r.error;
 const nf=mapFo(r.data);D.FO.push(nf);const kids=D.FO.filter(x=>x.parent==f.id&&x.id!=nf.id);
 for(const m of D.M.filter(x=>x.fo==f.id&&x.path))await cloneFile(m,nf,m.title);for(const s of kids)await cloneFo(s,nf,s.name,comp);return nf}
-async function pasteHere(destId,comp){if(!CB||!CB.keys.length)return;const dest=destId?D.FO.find(x=>x.id==destId):null,c=dest?dest.c:comp;let ok=0,bad=0;toast('Pasting…');
-for(const k of CB.keys){const it=gi(k);if(!it){bad++;continue}try{
+async function pasteHere(destId,comp){if(PASTING||!CB||!CB.keys.length)return;const cb=CB;PASTING=1;CB=null;
+try{const dest=destId?D.FO.find(x=>x.id==destId):null,c=dest?dest.c:comp;
+if(cb.cut){const ch=moveCheck(cb.keys.filter(x=>gi(x)),destId||'',c);if(!ch.ok)toast(ch.err);else toast('Moved '+await moveTo(ch.its,destId||'')+' item(s)');selOff(1)}
+else{let ok=0,bad=0;toast('Pasting…');
+for(const k of cb.keys){const it=gi(k);if(!it){bad++;continue}try{
 if(k[0]=='m'){if(!dest){bad++;continue}await cloneFile(it,dest,uname(it.title,sibNames(dest.id,'m')))}
 else{if(dest&&dsc(it.id).includes(dest.id)){bad++;continue}await cloneFo(it,dest,uname(it.name,sibNames(dest?dest.id:null,'f',c)),c)}ok++}catch(e){bad++;toast(e.message||String(e))}}
-toast('Pasted '+ok+' item(s)'+(bad?', '+bad+' skipped (files can only be pasted inside a folder)':''));route()}
+toast('Pasted '+ok+' item(s)'+(bad?', '+bad+' skipped (files can only be pasted inside a folder)':''))}}
+finally{PASTING=0}
+route()}
 async function dupKey(k){const it=gi(k);if(!it)return;toast('Duplicating…');try{
 if(k[0]=='m'){const fo=D.FO.find(x=>x.id==it.fo);await cloneFile(it,fo,uname(it.title,sibNames(fo.id,'m')))}
 else{const par=it.parent?D.FO.find(x=>x.id==it.parent):null;await cloneFo(it,par,uname(it.name,sibNames(it.parent,'f',it.c)),it.c)}toast('Duplicated')}catch(e){toast(e.message||String(e))}route()}
-const copyKey=k=>{CB={keys:[k]};toast('Copied. Open a folder and press Paste.');route()};
+const copyKey=k=>{CB={keys:[k],cut:false};toast('Copied. Open a folder and press Paste.');route()};
+
+
+/* ===== CLICK RULES (PC): one click = select, double click or click on the name = open. Phones: tap opens. ===== */
+const PCM=()=>matchMedia('(hover:hover) and (pointer:fine)').matches;
+function cardOpen(k){if(Date.now()-lastOpen<700)return;lastOpen=Date.now();const it=gi(k);if(!it)return;k[0]=='f'?go('f/'+it.id):openM(it.id)}
+function setActive(k,scroll){ACT=k;ANCH=k;document.querySelectorAll('.fr.active').forEach(x=>x.classList.remove('active'));
+const el=[...document.querySelectorAll('.fr[data-k]')].find(x=>x.dataset.k==k);if(el){el.classList.add('active');if(scroll)el.scrollIntoView({block:'nearest'})}}
+function rangeSel(k){const a=VIS.indexOf(ANCH||ACT||k),b=VIS.indexOf(k);if(a<0||b<0)return setActive(k);SEL=new Set(VIS.slice(Math.min(a,b),Math.max(a,b)+1));selMode=true;ACT=k;route()}
+function cardClick(e,k){if(e.target.closest('.fx,.pop,.selbox'))return;
+if(selMode){e.shiftKey?rangeSel(k):selTog(k);return}
+if(e.shiftKey&&PCM()){rangeSel(k);return}
+if((e.ctrlKey||e.metaKey)&&PCM()){selMode=true;SEL.has(k)?SEL.delete(k):SEL.add(k);ACT=k;ANCH=k;route();return}
+if(!PCM()){cardOpen(k);return}
+if(e.target.closest('.nm')){cardOpen(k);return}
+setActive(k)}
+function cardDbl(e,k){if(selMode||!PCM()||e.target.closest('.fx,.pop,.selbox'))return;try{getSelection().removeAllRanges()}catch(_){}cardOpen(k)}
+document.addEventListener('click',e=>{if(ACT&&!e.target.closest('.fr,.selbar,.btn,.pop,.custom-dropdown,#mdlRoot,.fm-backdrop')){ACT='';document.querySelectorAll('.fr.active').forEach(x=>x.classList.remove('active'))}});
+
+/* ===== KEYBOARD SHORTCUTS (folders and files; no extra buttons) =====
+ Ctrl/Cmd+A select all · C copy · X cut · V paste · D duplicate · Delete (or Cmd+Backspace) delete · F2 rename · Enter open
+ Arrows move · Shift+Arrows extend selection · Space toggle · Home/End · Esc clear · Backspace go up one folder */
+const curKeys=()=>SEL.size?selKeys():(ACT&&gi(ACT)?[ACT]:[]);
+const gridCols=()=>{const c=[...document.querySelectorAll('.fr[data-k]')];if(c.length<2||!document.querySelector('.g.grid'))return 1;const t=c[0].offsetTop;let n=0;for(const x of c){if(x.offsetTop!==t)break;n++}return Math.max(n,1)};
+function kbMove(key,shift){if(!VIS.length)return;const cols=gridCols();let i=VIS.indexOf(ACT);
+if(key=='Home')i=0;else if(key=='End')i=VIS.length-1;else if(i<0)i=0;
+else i=Math.max(0,Math.min(VIS.length-1,i+(key=='ArrowRight'?1:key=='ArrowLeft'?-1:key=='ArrowDown'?cols:-cols)));
+const k=VIS[i];if(shift){const a=VIS.indexOf(ANCH||ACT||k);SEL=new Set(VIS.slice(Math.min(a,i),Math.max(a,i)+1));selMode=true;ACT=k;route();const el=[...document.querySelectorAll('.fr[data-k]')].find(x=>x.dataset.k==k);el&&el.scrollIntoView({block:'nearest'})}
+else{setActive(k,true)}}
+addEventListener('keydown',e=>{if(MD||viewerFile||e.defaultPrevented||!ME)return;const t=e.target;
+if(t&&(/INPUT|TEXTAREA|SELECT/.test(t.tagName)||t.isContentEditable))return;
+const p=location.hash.slice(2).split('/');if(p[0]!='c'&&p[0]!='f')return;
+const mod=e.ctrlKey||e.metaKey,key=e.key,lk=key.length==1?key.toLowerCase():key,btn=t&&/BUTTON|A/.test(t.tagName);
+const here=p[0]=='f'?p[1]:'',comp=p[0]=='f'?(D.FO.find(x=>x.id==p[1])||{}).c:p[1];
+if(mod&&lk=='a'){e.preventDefault();selMode=true;SEL=new Set(VIS);route();return}
+if(mod&&lk=='c'){if(String(getSelection())||!curKeys().length)return;e.preventDefault();const k=curKeys();CB={keys:k,cut:false};toast('Copied '+k.length+' item(s). Press Ctrl+V in a folder.');route();return}
+if(mod&&lk=='x'){if(String(getSelection()))return;const k=curKeys();if(!k.length)return;e.preventDefault();const ok=k.filter(x=>x[0]=='f'?canFo(gi(x)):canMat(gi(x)));if(!ok.length)return toast('You can only cut items you own');CB={keys:ok,cut:true};toast('Cut '+ok.length+' item(s). Press Ctrl+V in the destination folder.');route();return}
+if(mod&&lk=='v'){if(CB&&CB.keys.length){e.preventDefault();pasteHere(here,comp)}return}
+if(mod&&lk=='d'){const k=curKeys();e.preventDefault();if(!k.length)return;(async()=>{for(const x of k)await dupKey(x)})();return}
+if(key=='Delete'||(mod&&key=='Backspace')){const k=curKeys();if(!k.length)return;e.preventDefault();delKeys(k);return}
+if(key=='F2'){const k=curKeys();if(k.length!=1)return;e.preventDefault();const it=gi(k[0]);if(k[0][0]=='f'){if(canFo(it))renameFolder(it.id)}else if(canMat(it))renameMaterial(it.id);return}
+if(key=='Enter'&&!btn){const k=curKeys();if(k.length==1){e.preventDefault();cardOpen(k[0])}return}
+if(key==' '&&!btn){if(!ACT)return;e.preventDefault();selMode=true;SEL.has(ACT)?SEL.delete(ACT):SEL.add(ACT);route();return}
+if(/^Arrow(Left|Right|Up|Down)$/.test(key)||key=='Home'||key=='End'){if(mod)return;e.preventDefault();kbMove(key,e.shiftKey);return}
+if(key=='Escape'){if(selMode||SEL.size||ACT){ACT='';ANCH='';selOff()}return}
+if(key=='Backspace'&&!btn&&!curKeys().length){e.preventDefault();const f=p[0]=='f'?D.FO.find(x=>x.id==p[1]):null;if(f){FQ='';go(f.parent?'f/'+f.parent:'c/'+f.c)}}});
+
+/* ===== THUMBNAILS for the grid: images, first page of PDFs, badge for Word/Excel/PowerPoint ===== */
+const TH={},TP=new Set(),IMGX=['jpg','jpeg','png','webp'];let thIO=null,thQ=Promise.resolve(),pdfL=null;
+const thPh=m=>{const e=(m.type||'').toLowerCase();return `<span class="ext">${E((m.type||'FILE').toUpperCase().slice(0,4))}</span>`};
+function thPaint(id){const u=TH[id];if(!u)return;const m=D.M.find(x=>x.id==id),pdf=m&&m.type.toLowerCase()=='pdf';
+document.querySelectorAll('.thm[data-id="'+id+'"]').forEach(el=>{if(el.querySelector('img'))return;const i=document.createElement('img');i.alt='';i.draggable=false;if(pdf)i.className='pdf';i.onerror=()=>{delete TH[id];TP.delete(id)};i.src=u;el.innerHTML='';el.appendChild(i)})}
+function loadPdfJs(){return pdfL||(pdfL=new Promise((ok,no)=>{if(window.pdfjsLib)return ok(window.pdfjsLib);const s=document.createElement('script');s.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+s.onload=()=>{try{const w='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';pdfjsLib.GlobalWorkerOptions.workerSrc=URL.createObjectURL(new Blob(['importScripts("'+w+'")'],{type:'text/javascript'}));ok(pdfjsLib)}catch(e){no(e)}};s.onerror=()=>no(new Error('pdf.js failed to load'));document.head.appendChild(s)}))}
+async function pdfThumb(url){const L=await loadPdfJs(),doc=await L.getDocument({url}).promise,pg=await doc.getPage(1),v0=pg.getViewport({scale:1}),v=pg.getViewport({scale:360/Math.max(v0.width,1)}),cv=document.createElement('canvas');cv.width=v.width;cv.height=v.height;
+await pg.render({canvasContext:cv.getContext('2d'),viewport:v}).promise;const u=cv.toDataURL('image/jpeg',.72);try{doc.destroy()}catch(_){}return u}
+async function thWork(id){const m=D.M.find(x=>x.id==id);if(!m||!m.path){TH[id]='';return}const e=m.type.toLowerCase();
+try{const r=await sb.storage.from('review-materials').createSignedUrl(m.path,3600);if(r.error)throw r.error;const url=r.data.signedUrl;TH[id]=e=='pdf'?await pdfThumb(url):url}catch(err){TH[id]=''}thPaint(id)}
+function thWant(id){if(TP.has(id)||TH[id]!==undefined)return;const m=D.M.find(x=>x.id==id);if(!m)return;const e=m.type.toLowerCase();
+if(IMGX.includes(e)){TP.add(id);thWork(id)}else if(e=='pdf'){TP.add(id);thQ=thQ.then(()=>thWork(id)).catch(()=>{})}else TH[id]=''}
+function hydrateThumbs(){const els=document.querySelectorAll('.g.grid .thm[data-id]');if(!els.length||!window.IntersectionObserver)return;
+if(!thIO)thIO=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){thIO.unobserve(en.target);thWant(en.target.dataset.id)}}),{rootMargin:'250px'});
+els.forEach(el=>{const id=el.dataset.id;if(TH[id])thPaint(id);else if(TH[id]===undefined)thIO.observe(el)})}
 
 /* ===== DOWNLOAD (one file as is, several items as a zip) ===== */
 const fname=m=>m.title+'.'+m.type.toLowerCase();
@@ -467,10 +584,12 @@ empty=t=>`<div class="card empty art"><p class="mu">${t}</p></div>`;
 const TB={M:'materials',F:'flashcards',MQ:'questions'};
 async function del(k, id) {
   showConfirm('Delete Item', 'Are you sure you want to delete this item?', async () => {
+    const it = (D[k] || []).find(x => x.id == id), pp = it ? [it.ip, it.fip, it.qp, it.ep] : [];
     const r = await sb.from(TB[k]).delete().eq('id', id);
     if (r.error) return toast(r.error.message);
     D[k] = D[k].filter(x => x.id != id);
     route();
+    rmImgs(pp);
   });
 }
 async function bm(id){const i=P.bm.indexOf(id),r=i<0?await sb.from('bookmarks').insert({user_id:ME.id,material_id:id}):await sb.from('bookmarks').delete().eq('material_id',id).eq('user_id',ME.id);if(r.error)return toast(r.error.message);i<0?P.bm.push(id):P.bm.splice(i,1);route()}
@@ -530,12 +649,12 @@ ${sharedCard()}
 /* ===== COMPONENT PAGE + FOLDER PAGE ===== */
 const rtag=(it)=>role=='admin'&&!it.own&&it.rs?'<span class="tag">Restricted</span>':'';
 const folderCard=f=>{const k='f:'+f.id,n=D.M.filter(m=>m.fo==f.id).length+D.FO.filter(x=>x.parent==f.id).length,ed=canFo(f),on=SEL.has(k);
-return `<div class="card fr ${on?'selected':''}" data-k="${k}" data-drop="${f.id}" ${ed?`draggable="true" ondragstart="dgStart(event,'${k}')" ondragend="dgEnd()"`:''} ondragover="dgOver(event,'${f.id}','${f.c}')" ondragleave="dgLeave(event)" ondrop="dgDrop(event,'${f.id}','${f.c}')"><div class="fl" onclick="${selMode?`selTog('${k}')`:`go('f/${f.id}')`}">${selMode?`<input type="checkbox" class="selbox" ${on?'checked':''} onclick="event.stopPropagation()" onchange="selTog('${k}')">`:''}<span>📁</span><h3>${E(f.name)}</h3></div><div class="fx">${f.own?'<span class="tag">Personal</span>':''}${rtag(f)}<span class="tag">${n} items</span>${selMode?'':`<button class="dots" onclick="toggleMenu('fo_${f.id}',event)" aria-label="Folder menu">⋮</button>`}</div>${mnu('fo_'+f.id,[['Open',`go('f/${f.id}')`],['Upload here',`openFab('upload','${f.id}')`],['Copy',`copyKey('${k}')`],['Duplicate',`dupKey('${k}')`],['Download (zip)',`dlKeys(['${k}'])`],['Info',`folderInfo('${f.id}')`],role=='admin'&&!f.own&&['Assign access…',`openAssign(['${k}'])`],ed&&['Rename',`renameFolder('${f.id}')`],ed&&['Move to…',`moveKeys(['${k}'])`],ed&&['Delete',`showConfirm('Delete folder','This also deletes everything inside it.',()=>delFo('${f.id}'))`,1]])}</div>`};
+return `<div class="card fr ${on?'selected':''} ${ACT==k?'active':''}" data-k="${k}" data-drop="${f.id}" onclick="cardClick(event,'${k}')" ondblclick="cardDbl(event,'${k}')" ${ed?`draggable="true" ondragstart="dgStart(event,'${k}')" ondragend="dgEnd()"`:''} ondragover="dgOver(event,'${f.id}','${f.c}')" ondragleave="dgLeave(event)" ondrop="dgDrop(event,'${f.id}','${f.c}')"><div class="fl">${selMode?`<input type="checkbox" class="selbox" ${on?'checked':''} onclick="event.stopPropagation()" onchange="selTog('${k}')">`:''}<span>📁</span><h3 class="nm">${E(f.name)}</h3></div><div class="thm"><span class="ico">📁</span></div><div class="fx">${f.own?'<span class="tag">Personal</span>':''}${rtag(f)}<span class="tag">${n} items</span>${selMode?'':`<button class="dots" onclick="toggleMenu('fo_${f.id}',event)" aria-label="Folder menu">⋮</button>`}</div>${mnu('fo_'+f.id,[['Open',`go('f/${f.id}')`],['Upload here',`openFab('upload','${f.id}')`],['Copy',`copyKey('${k}')`],['Duplicate',`dupKey('${k}')`],['Download (zip)',`dlKeys(['${k}'])`],['Info',`folderInfo('${f.id}')`],role=='admin'&&!f.own&&['Assign access…',`openAssign(['${k}'])`],ed&&['Rename',`renameFolder('${f.id}')`],ed&&['Move to…',`moveKeys(['${k}'])`],ed&&['Delete',`showConfirm('Delete folder','This also deletes everything inside it.',()=>delFo('${f.id}'))`,1]])}</div>`};
 const fileCard=m=>{const k='m:'+m.id,ed=canMat(m),on=SEL.has(k);
-return `<div class="card fr ${on?'selected':''}" data-k="${k}" ${ed?`draggable="true" ondragstart="dgStart(event,'${k}')" ondragend="dgEnd()"`:''}><div class="fl" onclick="${selMode?`selTog('${k}')`:`openM('${m.id}')`}">${selMode?`<input type="checkbox" class="selbox" ${on?'checked':''} onclick="event.stopPropagation()" onchange="selTog('${k}')">`:''}${tag(m.type)}<h3>${E(m.title)}</h3></div><div class="fx">${m.own?'<span class="tag">Personal</span>':''}${rtag(m)}<a class="star" onclick="bm('${m.id}')">${P.bm.includes(m.id)?'★':'☆'}</a>${selMode?'':`<button class="dots" onclick="toggleMenu('m_${m.id}',event)" aria-label="File menu">⋮</button>`}</div>${m.desc?`<p class="mu sm fd">${E(m.desc)}</p>`:''}${mnu('m_'+m.id,[['Open',`openM('${m.id}')`],['Copy',`copyKey('${k}')`],['Duplicate',`dupKey('${k}')`],['Download',`dlKeys(['${k}'])`],['Info',`fileInfo('${m.id}')`],role=='admin'&&!m.own&&['Assign access…',`openAssign(['${k}'])`],ed&&['Rename',`renameMaterial('${m.id}')`],ed&&['Move to…',`moveKeys(['${k}'])`],ed&&['Delete',`showConfirm('Delete file','Delete this file permanently?',()=>delM('${m.id}'))`,1]])}</div>`};
-const ftools=(dest,comp)=>`<button class="btn ${selMode?'p':''}" onclick="${selMode?'selOff()':'selOn()'}">☑ ${selMode?'Selecting':'Select'}</button>${CB&&CB.keys.length?`<button class="btn" onclick="pasteHere('${dest}','${comp}')">📋 Paste (${CB.keys.length})</button>`:''}<button class="btn" onclick="openFab('upload','${dest}')">↑ Upload</button><button class="btn" onclick="openFab('folder','${dest}')">＋ Folder</button>${dd('fsort',SORTS,FSORT,"FSORT=v;route()")}<button class="btn" onclick="toggleFolderView()">${folderView=='grid'?'List ☰':'Grid ▦'}</button>`;
-const selReset=()=>{if(selFor!==location.hash){selMode=false;SEL.clear();selFor=location.hash}};
-const listOf=(fo,it)=>{const a=sortBy(fo,FSORT,x=>x.name,x=>x.ts),b=sortBy(it,FSORT,x=>x.title,x=>x.ts);VIS=[...a.map(x=>'f:'+x.id),...b.map(x=>'m:'+x.id)];return a.map(folderCard).join('')+b.map(fileCard).join('')};
+return `<div class="card fr ${on?'selected':''} ${ACT==k?'active':''}" data-k="${k}" onclick="cardClick(event,'${k}')" ondblclick="cardDbl(event,'${k}')" ${ed?`draggable="true" ondragstart="dgStart(event,'${k}')" ondragend="dgEnd()"`:''}><div class="fl">${selMode?`<input type="checkbox" class="selbox" ${on?'checked':''} onclick="event.stopPropagation()" onchange="selTog('${k}')">`:''}${tag(m.type)}<h3 class="nm">${E(m.title)}</h3></div><div class="thm" data-id="${m.id}">${thPh(m)}</div><div class="fx">${m.own?'<span class="tag">Personal</span>':''}${rtag(m)}<a class="star" onclick="bm('${m.id}')">${P.bm.includes(m.id)?'★':'☆'}</a>${selMode?'':`<button class="dots" onclick="toggleMenu('m_${m.id}',event)" aria-label="File menu">⋮</button>`}</div>${m.desc?`<p class="mu sm fd">${E(m.desc)}</p>`:''}${mnu('m_'+m.id,[['Open',`openM('${m.id}')`],['Copy',`copyKey('${k}')`],['Duplicate',`dupKey('${k}')`],['Download',`dlKeys(['${k}'])`],['Info',`fileInfo('${m.id}')`],role=='admin'&&!m.own&&['Assign access…',`openAssign(['${k}'])`],ed&&['Rename',`renameMaterial('${m.id}')`],ed&&['Move to…',`moveKeys(['${k}'])`],ed&&['Delete',`showConfirm('Delete file','Delete this file permanently?',()=>delM('${m.id}'))`,1]])}</div>`};
+const ftools=(dest,comp)=>`<button class="btn ${selMode?'p':''}" onclick="${selMode?'selOff()':'selOn()'}">☑ ${selMode?'Selecting':'Select'}</button>${CB&&CB.keys.length?`<button class="btn" onclick="pasteHere('${dest}','${comp}')">📋 Paste (${CB.keys.length})</button>`:''}<button class="btn" onclick="openFab('upload','${dest}')">↑ Upload</button><button class="btn" onclick="openFab('folder','${dest}')">＋ Folder</button>${dd('fsort',SORTS,FOSORT,"FOSORT=v;route()")}<button class="btn" onclick="toggleFolderView()">${folderView=='grid'?'List ☰':'Grid ▦'}</button>`;
+const selReset=()=>{if(selFor!==location.hash){selMode=false;SEL.clear();ACT='';ANCH='';selFor=location.hash}};
+const listOf=(fo,it)=>{const a=sortBy(fo,FOSORT,x=>x.name,x=>x.ts),b=sortBy(it,FOSORT,x=>x.title,x=>x.ts);VIS=[...a.map(x=>'f:'+x.id),...b.map(x=>'m:'+x.id)];return a.map(folderCard).join('')+b.map(fileCard).join('')};
 
 V.c=c=>{if(!C.includes(c))return V.dash();selReset();const s=stat(x=>x.c==c),fo=D.FO.filter(f=>f.c==c&&!f.parent);
 return hd(c,CD[c])+`<div class="w sec stack"><div class="card art"><h3>Quiz</h3><p class="mu">${s.n} questions available in ${c}. Pick one subject, several topics, or everything.</p><button class="btn p" onclick="go('quiz/${c}')">Take a ${c} quiz</button>${bars(s)}</div>
@@ -592,7 +711,8 @@ V.quiz=a=>{const c=C.includes(a)?a:'';return hd(c?c+' Quiz':'Quiz',c?'Questions 
 /* ===== HISTORY ===== */
 let HV=null,HI=0,HW=0;
 /* a card face: text on the left, picture (if any) on the right. fitCards() shrinks the text so everything fits. */
-const face=(t,img)=>`<div class="fcont ${img?'':'noimg'}"><div class="ftxt">${t}</div>${img?`<div class="fimgw"><img src="${img}" alt="" draggable="false"></div>`:''}</div>`;
+const face=(t,img)=>{const has=String(t||'').replace(/<[^>]*>/g,'').trim().length>0,im=img?`<div class="fimgw"><img src="${img}" alt="" draggable="false"></div>`:'';
+return `<div class="fcont ${img?(has?'both':'imgonly'):'noimg'}">${has||!img?`<div class="ftxt">${t}</div>`:''}${im}</div>`};
 const flip=(f,b,sw,n)=>`<div class="fcw"><div class="fc" data-sw="${sw||''}" data-n="${n||0}"><div class="fi"><div class="ff">${f}</div><div class="fb">${b}</div></div></div></div>`;
 function replay(h){const l=h.it.map(i=>({i,q:allQ().find(x=>x.id==i.id)})).filter(x=>x.q&&(!HW||!x.i.ok)),
 bk=`<div class="row" style="margin:0 0 12px"><button class="btn" onclick="HV=null;route()">← History</button><label class="sm"><input type="checkbox" ${HW?'checked':''} onchange="HW=this.checked?1:0;HI=0;route()"> Wrong answers only</label><button class="btn ntb" onclick="toggleNotes()">📝 Notes</button></div>`;
@@ -622,14 +742,16 @@ return bar+flip(c.fh,c.bh,'study',d.length)+`<p class="mu sm" style="text-align:
 /* card editor (front and back text + a figure on each side) */
 function openCardEd(id,off){const x=id?D.F.find(c=>c.id==id):null,e=x||{c:'',f:'',b:'',img:'',fimg:''};
 openMdl({title:(x?'Edit':'New')+' card'+(off?' (official)':''),wide:1,okText:'Save',body:`<div class="field"><label>Component</label>${dd('ceC',C,e.c||FF.c||C[0])}</div><div class="field"><label>Front text / title</label><textarea id="ceF">${E(e.f)}</textarea></div>${imgField('ceFI','Front image (optional)',e.fimg)}<div class="field"><label>Back text / answer</label><textarea id="ceB">${E(e.b)}</textarea></div>${imgField('ceBI','Back image, such as a formula (optional)',e.img)}`,onOk:()=>saveCard(x,off)})}
-async function saveCard(x,off){const f=v('ceF').trim(),b=v('ceB').trim();if(!f){toast('Add text for the front');return false}
-const bf=await imgBlob($('#ceFI').files[0]),bb=await imgBlob($('#ceBI').files[0]),
+async function saveCard(x,off){const f=v('ceF').trim(),b=v('ceB').trim();const rmF=!!($('#ceFIR')&&$('#ceFIR').checked),rmB=!!($('#ceBIR')&&$('#ceBIR').checked);
+const bf=await imgBlob($('#ceFI').files[0]),bb=await imgBlob($('#ceBI').files[0]);
+if(!f&&!bf&&(rmF||!(x&&x.fip))){toast('Add front text or a front image');return false}
+if(!b&&!bb&&(rmB||!(x&&x.ip))){toast('Add back text or a back image');return false}
+const
 fp=bf?await putImg(bf,off):($('#ceFIR')&&$('#ceFIR').checked?'':(x?x.fip:'')),bp=bb?await putImg(bb,off):($('#ceBIR')&&$('#ceBIR').checked?'':(x?x.ip:''));
-if(!b&&!bp){toast('Add back text or a back image');return false}
 const row={component:v('ceC'),front:f,back:b,front_image_path:fp||null,image_path:bp||null},
 r=x?await sb.from('flashcards').update(row).eq('id',x.id).select().single():await sb.from('flashcards').insert({...row,owner_id:off?null:ME.id}).select().single();
-if(r.error){toast(r.error.message);return false}
-const su={};su[fp]=await sUrl(fp);su[bp]=await sUrl(bp);const n=mapF(r.data,su),i=D.F.findIndex(z=>z.id==n.id);i<0?D.F.push(n):D.F[i]=n;toast('Card saved');route()}
+if(r.error){rmStore('flashcard-images',[bf&&fp,bb&&bp]);toast(r.error.message);return false}
+const su={};su[fp]=await sUrl(fp);su[bp]=await sUrl(bp);const n=mapF(r.data,su),i=D.F.findIndex(z=>z.id==n.id);i<0?D.F.push(n):D.F[i]=n;toast('Card saved');route();if(x)rmImgs([x.fip!==n.fip&&x.fip,x.ip!==n.ip&&x.ip])}
 async function dupCard(id){const x=D.F.find(c=>c.id==id);if(!x)return;const r=await sb.from('flashcards').insert({component:x.c,front:x.f+' (copy)',back:x.b,front_image_path:x.fip||null,image_path:x.ip||null,owner_id:x.own?ME.id:null}).select().single();if(r.error)return toast(r.error.message);D.F.push(mapF(r.data,{[x.ip]:x.img,[x.fip]:x.fimg}));toast('Card duplicated');route()}
 function mine(){const l=sortBy(D.F.filter(x=>x.own),FSORT,x=>x.f,x=>x.ts);
 return `<div class="row" style="justify-content:space-between;margin:0 0 14px"><button class="btn p" onclick="openCardEd(null,0)">＋ New card</button>${dd('msort',SORTS,FSORT,"FSORT=v;route()")}</div><div class="g">${l.map(x=>`<div class="card fr"><div class="fl" onclick="openCardEd('${x.id}',0)"><h3>${E(x.f)}</h3></div><div class="fx"><span class="tag">${x.c}</span>${x.img||x.fimg?'<span class="tag">image</span>':''}<button class="dots" onclick="toggleMenu('c_${x.id}',event)" aria-label="Card menu">⋮</button></div>${mnu('c_'+x.id,[['Edit',`openCardEd('${x.id}',0)`],['Duplicate',`dupCard('${x.id}')`],['Delete',`showConfirm('Delete card','Delete this card?',()=>del('F','${x.id}'))`,1]])}</div>`).join('')||empty('You have no personal cards yet.')}</div>`}
@@ -660,8 +782,8 @@ const bq=await imgBlob($('#qeQI').files[0]),be=await imgBlob($('#qeEI').files[0]
 row.question_image=bq?await putImg(bq,off):($('#qeQIR')&&$('#qeQIR').checked?null:(x&&x.qp)||null);
 row.explanation_image=be?await putImg(be,off):($('#qeEIR')&&$('#qeEIR').checked?null:(x&&x.ep)||null);
 const r=x?await sb.from('questions').update(row).eq('id',x.id).select().single():await sb.from('questions').insert({...row,owner_id:off?null:ME.id}).select().single();
-if(r.error){toast(r.error.message);return false}
-const n=dbq(r.data);n.qi=await sUrl(n.qp);n.ei=await sUrl(n.ep);const arr=off?OQ:D.MQ,i=arr.findIndex(z=>z.id==n.id);i<0?arr.push(n):arr[i]=n;toast('Question saved');route()}
+if(r.error){rmStore('flashcard-images',[bq&&row.question_image,be&&row.explanation_image]);toast(r.error.message);return false}
+const n=dbq(r.data);n.qi=await sUrl(n.qp);n.ei=await sUrl(n.ep);const arr=off?OQ:D.MQ,i=arr.findIndex(z=>z.id==n.id);i<0?arr.push(n):arr[i]=n;toast('Question saved');route();if(x)rmImgs([x.qp!==n.qp&&x.qp,x.ep!==n.ep&&x.ep])}
 function prevQ(id){const x=fq(id);if(!x)return;openMdl({title:'Question preview',wide:1,noCancel:1,okText:'Close',body:`<p class="qt">${E(x.q)}</p>${fig(x.qi)}${x.o.map((o,j)=>`<div class="opt ${j==x.a?'ok':''}">${'ABCD'[j]}. ${E(o)}</div>`).join('')}<div class="exp">${E(x.e||'No explanation.')}${fig(x.ei)}</div>`})}
 async function dupQ(id){const x=fq(id);if(!x)return;const r=await sb.from('questions').insert({component:x.c,subject:x.s,topic:x.t,question:x.q,choice_a:x.o[0],choice_b:x.o[1],choice_c:x.o[2],choice_d:x.o[3],correct_answer:'ABCD'[x.a],explanation:x.e,difficulty:x.d,source:x.src||null,verification_status:x.st||null,published:true,question_image:x.qp||null,explanation_image:x.ep||null,owner_id:x.own?ME.id:null}).select().single();
 if(r.error)return toast(r.error.message);const n=dbq(r.data);n.qi=x.qi;n.ei=x.ei;(x.own?D.MQ:OQ).push(n);toast('Question duplicated');route()}
@@ -693,14 +815,14 @@ function qSel(id){QSEL.has(id)?QSEL.delete(id):QSEL.add(id);route()}
 const qIds=()=>[...QSEL].filter(id=>OQ.some(x=>x.id==id));
 async function qBulk(a){const ids=qIds();if(!ids.length)return toast('Select questions first');
 const chunks=async fn=>{for(let i=0;i<ids.length;i+=50){const r=await fn(ids.slice(i,i+50));if(r.error)throw r.error}};
-if(a=='del')return showConfirm('Delete questions','Delete '+ids.length+' question(s) permanently?',async()=>{await chunks(c=>sb.from('questions').delete().in('id',c));OQ=OQ.filter(x=>!ids.includes(x.id));QSEL.clear();toast('Deleted');route()});
+if(a=='del')return showConfirm('Delete questions','Delete '+ids.length+' question(s) permanently?',async()=>{const pp=OQ.filter(x=>ids.includes(x.id)).flatMap(x=>[x.qp,x.ep]);await chunks(c=>sb.from('questions').delete().in('id',c));OQ=OQ.filter(x=>!ids.includes(x.id));QSEL.clear();toast('Deleted');route();rmImgs(pp)});
 if(a=='mv')return openMdl({title:'Move '+ids.length+' question(s)',okText:'Move',body:`<div class="g2"><div class="field"><label>Component</label>${dd('bmC',[['','Keep as is'],...C],'')}</div><div class="field"><label>Subject</label><input id="bmS" placeholder="Keep as is"></div><div class="field"><label>Topic</label><input id="bmT" placeholder="Keep as is"></div></div>`,
 onOk:async()=>{const p={},c=v('bmC'),s=v('bmS').trim(),t=v('bmT').trim();if(c)p.component=c;if(s)p.subject=s;if(t)p.topic=t;if(!Object.keys(p).length){toast('Choose something to change');return false}
 await chunks(k=>sb.from('questions').update(p).in('id',k));OQ.forEach(x=>{if(ids.includes(x.id)){if(c)x.c=c;if(s)x.s=s;if(t)x.t=t}});toast('Moved');route()}});
 const m={pub:[{published:true},{pub:1}],hide:[{published:false},{pub:0}],ver:[{verification_status:'Verified'},{st:'Verified'}],nr:[{verification_status:'Needs Review'},{st:'Needs Review'}]}[a];
 await chunks(k=>sb.from('questions').update(m[0]).in('id',k));OQ.forEach(x=>{if(ids.includes(x.id))Object.assign(x,m[1])});toast('Updated '+ids.length+' question(s)');route()}
 const aqRow=x=>{const on=QSEL.has(x.id);return `<div class="card fr ${on?'selected':''}"><label class="fl"><input type="checkbox" class="selbox" ${on?'checked':''} onchange="qSel('${x.id}')"><span class="qtx"><b>${x.n?'#'+x.n+' · ':''}</b>${E(x.q.slice(0,120))}${x.q.length>120?'…':''}</span></label><div class="fx"><span class="tag">${x.c}</span><span class="tag">${E(x.s)}</span>${x.pub?'':'<span class="tag">Hidden</span>'}${isNR(x)?'<span class="tag">Needs review</span>':''}${x.qi||x.ei?'<span class="tag">figure</span>':''}<button class="dots" onclick="toggleMenu('aq_${x.id}',event)" aria-label="Question menu">⋮</button></div>${mnu('aq_'+x.id,[['Edit',`openQEd('${x.id}',1)`],['Preview',`prevQ('${x.id}')`],['Duplicate',`dupQ('${x.id}')`],[x.pub?'Hide from students':'Publish',`setQ('${x.id}',{published:${!x.pub}},{pub:${x.pub?0:1}})`],[isNR(x)?'Mark as verified':'Mark as needs review',`setQ('${x.id}',{verification_status:'${isNR(x)?'Verified':'Needs Review'}'},{st:'${isNR(x)?'Verified':'Needs Review'}'})`],['Delete',`showConfirm('Delete question','Delete this question permanently?',()=>qDel('${x.id}'))`,1]])}</div>`};
-async function qDel(id){const r=await sb.from('questions').delete().eq('id',id);if(r.error)return toast(r.error.message);OQ=OQ.filter(x=>x.id!=id);QSEL.delete(id);route()}
+async function qDel(id){const it=OQ.find(x=>x.id==id),pp=it?[it.qp,it.ep]:[];const r=await sb.from('questions').delete().eq('id',id);if(r.error)return toast(r.error.message);OQ=OQ.filter(x=>x.id!=id);QSEL.delete(id);route();rmImgs(pp)}
 const pager=(n,pg,fn)=>n>PER?`<div class="pgn"><button class="btn" ${pg?'':'disabled'} onclick="${fn}(-1)">← Prev</button><span class="mu sm">${pg*PER+1}–${Math.min(n,(pg+1)*PER)} of ${n}</span><button class="btn" ${(pg+1)*PER<n?'':'disabled'} onclick="${fn}(1)">Next →</button></div>`:'';
 function aqPage(d){AQ.pg=Math.max(0,AQ.pg+d);route()}
 function aqQ(){const l=aqList(),pg=Math.min(AQ.pg,Math.max(0,Math.ceil(l.length/PER)-1)),rows=l.slice(pg*PER,(pg+1)*PER),nr=OQ.filter(isNR).length;AQ.pg=pg;
@@ -712,7 +834,7 @@ ${QSEL.size?`<div class="selbar"><b>${QSEL.size} selected</b><a class="lk sm" on
 const acList=()=>sortBy(D.F.filter(x=>!x.own&&(!AC.c||x.c==AC.c)&&(!AC.q||(x.f+' '+x.b).toLowerCase().includes(AC.q.toLowerCase()))),AC.so,x=>x.f,x=>x.ts);
 function cSel(id){CSEL.has(id)?CSEL.delete(id):CSEL.add(id);route()}
 async function cBulk(a){const ids=[...CSEL].filter(id=>D.F.some(x=>x.id==id));if(!ids.length)return toast('Select cards first');
-if(a=='del')return showConfirm('Delete cards','Delete '+ids.length+' card(s)?',async()=>{const r=await sb.from('flashcards').delete().in('id',ids);if(r.error)throw r.error;D.F=D.F.filter(x=>!ids.includes(x.id));CSEL.clear();toast('Deleted');route()});
+if(a=='del')return showConfirm('Delete cards','Delete '+ids.length+' card(s)?',async()=>{const pp=D.F.filter(x=>ids.includes(x.id)).flatMap(x=>[x.ip,x.fip]);const r=await sb.from('flashcards').delete().in('id',ids);if(r.error)throw r.error;D.F=D.F.filter(x=>!ids.includes(x.id));CSEL.clear();toast('Deleted');route();rmImgs(pp)});
 const p=a=='pub';const r=await sb.from('flashcards').update({published:p}).in('id',ids);if(r.error)return toast(r.error.message);D.F.forEach(x=>{if(ids.includes(x.id))x.pub=p});toast('Updated');route()}
 async function pub(id){const x=D.F.find(x=>x.id==id),r=await sb.from('flashcards').update({published:!x.pub}).eq('id',id);if(r.error)return toast(r.error.message);x.pub=!x.pub;route()}
 function aqCards(){const l=acList();return `<div class="row" style="margin:0 0 12px;justify-content:space-between"><button class="btn p" onclick="openCardEd(null,1)">＋ New official card</button><div class="row" style="margin:0">${dd('acC',[['','All components'],...C],AC.c,"AC.c=v;route()")}<input id="acq" placeholder="Search…" value="${E(AC.q)}" oninput="AC.q=this.value;route();const i=$('#acq');i.focus();i.setSelectionRange(99,99)">${dd('acO',SORTS,AC.so,"AC.so=v;route()")}</div></div>
@@ -720,7 +842,7 @@ ${CSEL.size?`<div class="selbar"><b>${CSEL.size} selected</b><a class="lk sm" on
 <div class="stack" style="margin-top:12px">${l.map(x=>{const on=CSEL.has(x.id);return `<div class="card fr ${on?'selected':''}"><label class="fl"><input type="checkbox" class="selbox" ${on?'checked':''} onchange="cSel('${x.id}')"><span class="qtx">${E(x.f.slice(0,100))}</span></label><div class="fx"><span class="tag">${x.c}</span>${x.pub?'':'<span class="tag">Hidden</span>'}${x.img||x.fimg?'<span class="tag">figure</span>':''}<button class="dots" onclick="toggleMenu('ac_${x.id}',event)" aria-label="Card menu">⋮</button></div>${mnu('ac_'+x.id,[['Edit',`openCardEd('${x.id}',1)`],['Duplicate',`dupCard('${x.id}')`],[x.pub?'Hide':'Publish',`pub('${x.id}')`],['Delete',`showConfirm('Delete card','Delete this card?',()=>del('F','${x.id}'))`,1]])}</div>`}).join('')||empty('No official cards yet.')}</div>`}
 
 const AD={
-o:()=>`<div class="g">${[['Users',D.U.length],['Official questions',OQ.length],['Folders',D.FO.length],['Folder items',D.M.length],['Official flashcards',D.F.filter(x=>!x.own).length]].map(([n,x])=>`<div class="card art stat"><b>${x}</b><span class="mu sm">${n}</span></div>`).join('')}</div>`,
+o:()=>`<div class="g">${[['Users',D.U.length],['Official questions',OQ.length],['Folders',D.FO.length],['Folder items',D.M.length],['Official flashcards',D.F.filter(x=>!x.own).length]].map(([n,x])=>`<div class="card art stat"><b>${x}</b><span class="mu sm">${n}</span></div>`).join('')}</div><div class="card stack" style="margin-top:16px"><h3>Storage clean-up</h3><p class="mu sm">Finds files in Supabase storage that no folder item, flashcard or question uses any more (left over from earlier deletions) and removes them. Run storage_cleanup.sql in Supabase once before using this.</p><button class="btn" onclick="cleanOrphans()">Find and delete orphaned files</button></div>`,
 u:()=>{const l=sortBy(D.U.filter(u=>!AUS.q||(u.display_name||'').toLowerCase().includes(AUS.q.toLowerCase())),AUS.so,u=>u.display_name||'',u=>T0(u.created_at));
 return `<div class="row" style="margin:0 0 12px"><input id="aus" placeholder="Search users…" value="${E(AUS.q)}" oninput="AUS.q=this.value;route();const i=$('#aus');i.focus();i.setSelectionRange(99,99)">${dd('auo',SORTS,AUS.so,"AUS.so=v;route()")}</div><table><tr><th>Name</th><th>Role</th><th>Joined</th></tr>${l.map(u=>`<tr><td>${E(u.display_name||'')}</td><td>${u.role}</td><td class="mu sm">${new Date(u.created_at).toLocaleDateString()}</td></tr>`).join('')}</table><p class="mu sm">To change someone's role, edit the profiles table in Supabase (Table Editor).</p>`},
 f:aqCards,q:aqQ,fl:aqFiles};
@@ -731,14 +853,20 @@ let fitT;
 function fitCards(){document.querySelectorAll('.fc .ftxt').forEach(el=>{const box=el.closest('.fcont');let s=innerWidth<=600?14:19,n=0;el.style.fontSize=s+'px';
 while(s>8&&n++<45&&(el.scrollHeight>box.clientHeight+1||el.scrollHeight>el.clientHeight+1||el.scrollWidth>el.clientWidth+1)){s-=.5;el.style.fontSize=s+'px'}})}
 addEventListener('resize',()=>{clearTimeout(fitT);fitT=setTimeout(fitCards,150)});
-let SW=null;
+let SW=null,PTRS=new Set(),PINCH=0;
+const zoomed=()=>!!(window.visualViewport&&visualViewport.scale>1.02);
+if(window.visualViewport)visualViewport.addEventListener('resize',()=>document.documentElement.classList.toggle('zoomed',zoomed()));
 function swNext(c){const k=c.dataset.sw;if(k=='study')nav2(1);else if(k=='replay'){HI=(HI+1)%(+c.dataset.n||1);route()}}
-document.addEventListener('pointerdown',e=>{const c=e.target.closest&&e.target.closest('.fc');if(!c||(e.button&&e.button>0))return;SW={c,x:e.clientX,y:e.clientY,dx:0,dy:0,t:Date.now(),d:0,id:e.pointerId}});
-document.addEventListener('pointermove',e=>{if(!SW)return;SW.dx=e.clientX-SW.x;SW.dy=e.clientY-SW.y;
-if(!SW.d&&Math.hypot(SW.dx,SW.dy)>10){SW.d=1;SW.c.classList.add('drag');try{SW.c.setPointerCapture(SW.id)}catch(_){}}
+function swCancel(){if(!SW)return;const c=SW.c;SW=null;c.classList.remove('drag');c.style.transition='transform .2s ease-out';c.style.transform='';setTimeout(()=>{c.style.transition=''},220)}
+document.addEventListener('pointerdown',e=>{PTRS.add(e.pointerId);if(PTRS.size>1){PINCH=1;swCancel();return}PINCH=0;
+const c=e.target.closest&&e.target.closest('.fc');if(!c||(e.button&&e.button>0)||zoomed())return;SW={c,x:e.clientX,y:e.clientY,dx:0,dy:0,t:Date.now(),d:0,id:e.pointerId,pt:e.pointerType}});
+document.addEventListener('pointermove',e=>{if(!SW||PINCH||PTRS.size>1||e.pointerId!==SW.id)return;SW.dx=e.clientX-SW.x;SW.dy=e.clientY-SW.y;
+const th=SW.pt=='mouse'?10:28;
+if(!SW.d&&Math.hypot(SW.dx,SW.dy)>th){if(SW.pt!='mouse'&&Math.abs(SW.dx)<Math.abs(SW.dy)*1.4){swCancel();return}SW.d=1;SW.c.classList.add('drag');try{SW.c.setPointerCapture(SW.id)}catch(_){}}
 if(SW.d)SW.c.style.transform=`translate(${SW.dx}px,${SW.dy}px) rotate(${SW.dx/20}deg)`});
-function swEnd(e){if(!SW)return;const s=SW,c=s.c,dist=Math.hypot(s.dx,s.dy),sp=dist/(Date.now()-s.t+1);SW=null;
-if(!s.d){if(e.type=='pointerup')c.classList.toggle('on');return}
+function swEnd(e){PTRS.delete(e.pointerId);if(!SW||e.pointerId!==SW.id)return;if(e.type=='pointercancel'||PINCH){swCancel();return}
+const s=SW,c=s.c,dist=Math.hypot(s.dx,s.dy),sp=dist/(Date.now()-s.t+1);SW=null;
+if(!s.d){if(e.type=='pointerup'&&!zoomed())c.classList.toggle('on');return}
 c.classList.remove('drag');
 if(dist>90||(sp>.6&&dist>40)){const f=innerWidth*1.2/Math.max(dist,1);c.style.transition='transform .26s ease-in,opacity .26s';c.style.transform=`translate(${s.dx*f}px,${s.dy*f}px) rotate(${s.dx/8}deg)`;c.style.opacity=0;setTimeout(()=>swNext(c),230)}
 else{c.style.transition='transform .2s ease-out';c.style.transform='';setTimeout(()=>{c.style.transition=''},220)}}
@@ -817,14 +945,18 @@ r=await sb.from('access_grants').delete().eq(col,it.id);if(r.error){toast(r.erro
 if(mode=='sel'){r=await sb.from('access_grants').insert(ids.map(u=>({user_id:u,[col]:it.id})));if(r.error){toast(r.error.message);return false}}
 D.AG=(D.AG||[]).filter(g=>g[col]!=it.id);if(mode=='sel')ids.forEach(u=>D.AG.push({user_id:u,folder_id:k[0]=='f'?it.id:null,material_id:k[0]=='m'?it.id:null}));it.rs=mode=='sel'}
 toast('Access updated');FSELA.clear();route()}
-let AF={c:'',q:'',so:'az'},FSELA=new Set();
-function afItems(){const q=AF.q.toLowerCase(),fo=D.FO.filter(f=>!f.own&&(!AF.c||f.c==AF.c)&&(!q||fpath(f).toLowerCase().includes(q))).map(f=>({k:'f:'+f.id,it:f,name:fpath(f),kind:'Folder',ts:f.ts})),
-ml=D.M.filter(m=>{const f=D.FO.find(x=>x.id==m.fo);return !m.own&&f&&(!AF.c||f.c==AF.c)&&(!q||(fpath(f)+' '+m.title).toLowerCase().includes(q))}).map(m=>({k:'m:'+m.id,it:m,name:fpath(D.FO.find(x=>x.id==m.fo))+' › '+m.title,kind:m.type,ts:m.ts}));
+let AF={c:'',q:'',so:'old',fo:'',ty:''},FSELA=new Set();
+const afComp=id=>(D.FO.find(x=>x.id==id)||{}).c;
+function afItems(){const q=AF.q.toLowerCase(),scope=AF.fo?new Set(dsc(AF.fo)):null,ty=AF.ty,
+fo=ty&&ty!='_f'?[]:D.FO.filter(f=>!f.own&&(!AF.c||f.c==AF.c)&&(!scope||scope.has(f.id))&&(!q||fpath(f).toLowerCase().includes(q))).map(f=>({k:'f:'+f.id,it:f,name:fpath(f),kind:'Folder',ts:f.ts})),
+ml=ty=='_f'?[]:D.M.filter(m=>{const f=D.FO.find(x=>x.id==m.fo);return !m.own&&f&&(!AF.c||f.c==AF.c)&&(!scope||scope.has(m.fo))&&(!ty||(m.type||'').toUpperCase()==ty)&&(!q||(fpath(f)+' '+m.title).toLowerCase().includes(q))}).map(m=>({k:'m:'+m.id,it:m,name:fpath(D.FO.find(x=>x.id==m.fo))+' › '+m.title,kind:m.type,ts:m.ts}));
 return sortBy([...fo,...ml],AF.so,x=>x.name,x=>x.ts)}
+const afFolders=()=>[['','All folders'],...D.FO.filter(f=>!f.own&&(!AF.c||f.c==AF.c)).map(f=>[f.id,fpath(f)]).sort((a,b)=>cmp(a[1],b[1]))],
+afTypes=()=>[['','All file types'],['_f','Folders only'],...[...new Set(D.M.filter(m=>!m.own&&m.type&&(!AF.c||afComp(m.fo)==AF.c)&&(!AF.fo||dsc(AF.fo).includes(m.fo))).map(m=>m.type.toUpperCase()))].sort(cmp).map(t=>[t,t])];
 function afSel(k){FSELA.has(k)?FSELA.delete(k):FSELA.add(k);route()}
 function aqFiles(){const l=afItems();
 return `<p class="mu sm" style="margin:0 0 12px">Official folders and files. Use the ⋮ menu to choose who can see an item: everyone (default) or only selected users. Upload and organize items from the component pages.</p>
-<div class="bar">${dd('afC',[['','All components'],...C],AF.c,"AF.c=v;route()")}${dd('afO',SORTS,AF.so,"AF.so=v;route()")}<input id="afq" placeholder="Search…" value="${E(AF.q)}" oninput="AF.q=this.value;route();const i=$('#afq');i.focus();i.setSelectionRange(99,99)"></div>
+<div class="bar">${dd('afC',[['','All components'],...C],AF.c,"AF.c=v;AF.fo='';AF.ty='';route()")}${dd('afF',afFolders(),AF.fo,"AF.fo=v;AF.ty='';route()")}${dd('afT',afTypes(),AF.ty,"AF.ty=v;route()")}${dd('afO',SORTS,AF.so,"AF.so=v;route()")}<input id="afq" placeholder="Search…" value="${E(AF.q)}" oninput="AF.q=this.value;route();const i=$('#afq');i.focus();i.setSelectionRange(99,99)"></div>
 ${FSELA.size?`<div class="selbar"><b>${FSELA.size} selected</b><a class="lk sm" onclick="afItems().forEach(x=>FSELA.add(x.k));route()">Select all ${l.length}</a><a class="lk sm" onclick="FSELA.clear();route()">Clear</a><span class="sp"></span><button class="btn p" onclick="openAssign([...FSELA])">Assign access…</button></div>`:''}
 <div class="stack" style="margin-top:12px">${l.map(x=>{const on=FSELA.has(x.k);return `<div class="card fr ${on?'selected':''}"><label class="fl"><input type="checkbox" class="selbox" ${on?'checked':''} onchange="afSel('${x.k}')"><span class="qtx">${x.k[0]=='f'?'📁':'📄'} ${E(x.name)}</span></label><div class="fx">${x.k[0]=='m'?tag(x.kind):''}<span class="tag">${x.it.rs?'Selected users ('+agUsers(x.k).length+')':'Everyone'}</span><button class="dots" onclick="toggleMenu('af_${x.k}',event)" aria-label="Menu">⋮</button></div>${mnu('af_'+x.k,[['Open',x.k[0]=='f'?`go('f/${x.it.id}')`:`openM('${x.it.id}')`],['Assign access…',`openAssign(['${x.k}'])`]])}</div>`}).join('')||empty('No official folders or files yet.')}</div>`}
 /* shown on a student's dashboard: items an admin assigned to them */
@@ -856,7 +988,7 @@ if(n!='cards')NT.f='';const ap=$('#app');ap.innerHTML=V[n](a);if(nv){ap.classNam
 $('#tb').innerHTML=tbar();$('#dr').innerHTML=ME?drawer(n,a):'';syncTheme();fitCards();renderNotes(n);$('#bg').style.display=ME?'':'none';
 renderFab();
 renderCustomConfirm();
-renderFileViewer();
+renderFileViewer();hydrateThumbs();
 if(n=='quiz'&&QZ&&!QZ.done){cnt();if(QZ.end)tick()}else smry()}
 addEventListener('hashchange',()=>{nv=1;scrollTo(0,0);route()});
 addEventListener('keydown',e=>{if(e.key=='Enter'&&location.hash=='#/auth'&&e.target.tagName=='INPUT')doAuth()});
