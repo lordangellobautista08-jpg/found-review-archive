@@ -1045,7 +1045,7 @@ V.home=()=>`<section class="hero art"><div class="w"><p class="eyebrow">Civil En
 <div class="w sec"><h2>Exam Components</h2><div class="g">${C.map(c=>`<div class="card art" onclick="go('c/${c}')"><h3>${c}</h3><p class="mu">${CD[c]}</p><p class="mu sm">${ME?allQ().filter(x=>x.c==c).length+' questions':'Log in to start'}</p></div>`).join('')}</div></div>`;
 
 V.dash=()=>{const a=stat(()=>1),h=P.h.slice(0,4),op=P.op||{},top5=D.M.filter(m=>op[m.id]).sort((x,y)=>op[y.id]-op[x.id]).slice(0,5);
-return hd('Welcome, '+E(PR&&PR.display_name||'Student')+'. '+stGreet(),'Your progress across all components.').replace('class="ph art"','class="ph art wl"')+`<div class="w sec stack">
+return hd('Welcome, '+E(PR&&PR.display_name||'Student')+'. <span id="stGr">'+stGreet()+'</span>','Your progress across all components.').replace('class="ph art"','class="ph art wl"')+`<div class="w sec stack"><div id="stWxN"></div>
 <div class="dgrid"><div class="card stCard" id="stDash">${stDashHtml()}</div><div class="stack"><div class="card stMob" id="stMobBox">${stMobHtml(stLoad())}</div><div class="card art stack"><h3>Quiz</h3><p class="mu">Draws from all ${a.n} questions across MSTC, HPGE and PSAD. You can also start a quiz inside each component.</p><button class="btn p" onclick="go('quiz')">Start a quiz</button></div>${qkCard()}</div></div>
 <div class="g">${C.map(c=>`<div class="card art" onclick="go('c/${c}')"><h3>${c}</h3>${bars(stat(x=>x.c==c))}</div>`).join('')}</div>
 <p class="mu sm">Accuracy = correct answers ÷ answers given. Mastery = questions you last answered correctly ÷ all questions.</p>
@@ -1802,8 +1802,19 @@ if(a){if(a.pa){const lim=stPl(a)*1000,used=a.pt+(n-a.pa);if(used>=lim){const rt=
 if(stPhase(s)!=stPh)stRender()}
 setInterval(stTick,1000);document.addEventListener('visibilitychange',stTick);
 
-/* greeting from the device's own time zone; 12:00 to 12:59 is lunch time */
-function stGreet(){let h=+new Intl.DateTimeFormat('en-US',{timeZone:TZ,hour:'numeric',hour12:false}).format(Date.now())%24;
+/* greeting from the device's time zone and, when location is allowed, the weather (Open-Meteo, free, no key). Only the weather code is cached, never your coordinates. */
+let WX=null,WXB=0;try{WX=JSON.parse(localStorage.getItem('wx')||'null')}catch(e){}
+/* location is only asked after the person taps Enable on a short explainer note; "No thanks" is remembered */
+function stWxFetch(){if(WXB)return;WXB=1;navigator.geolocation.getCurrentPosition(p=>fetch('https://api.open-meteo.com/v1/forecast?latitude='+p.coords.latitude.toFixed(2)+'&longitude='+p.coords.longitude.toFixed(2)+'&current=weather_code').then(r=>r.json()).then(j=>{WX={ts:Date.now(),c:j.current.weather_code};try{localStorage.setItem('wx',JSON.stringify(WX))}catch(e){}const g=$('#stGr');if(g)g.textContent=stGreet()}).catch(()=>{}).finally(()=>{WXB=0}),()=>{WXB=0},{timeout:10000,maximumAge:36e5})}
+function stWxNote(){if(localStorage.getItem('wxNo'))return;const el=$('#stWxN');if(!el||el.innerHTML)return;
+el.innerHTML=`<div class="card sm" style="display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap"><span>🌦️ Allow your location to get a weather-aware greeting (like a rainy-day note). It's only used to check the weather and is never saved.</span><span class="row" style="margin:0"><button class="btn p" onclick="stWxOn()">Enable</button><a class="lk sm mu" onclick="stWxNo()">No thanks</a></span></div>`}
+function stWxOn(){const el=$('#stWxN');if(el)el.innerHTML='';stWxFetch()}
+function stWxNo(){try{localStorage.setItem('wxNo','1')}catch(e){}const el=$('#stWxN');if(el)el.innerHTML=''}
+function stWxGet(){if(WXB||!navigator.geolocation||(WX&&Date.now()-WX.ts<18e5))return;const f=st=>{if(st=='granted')stWxFetch();else if(st=='prompt')stWxNote()};
+try{navigator.permissions.query({name:'geolocation'}).then(r=>f(r.state),()=>f('prompt'))}catch(e){f('prompt')}}
+function stGreet(){stWxGet();const h=+new Intl.DateTimeFormat('en-US',{timeZone:TZ,hour:'numeric',hour12:false}).format(Date.now())%24,c=WX&&Date.now()-WX.ts<108e5?WX.c:-1;
+if(c>=95)return 'Stormy out there, perfect time to lock in! ⛈️';
+if((c>=51&&c<=67)||(c>=80&&c<=82))return 'What a rainy '+(h>=18||h<5?'night':'day')+' to study! 🌧️';
 return h==12?'Happy Lunch Time! 🍱':h>=5&&h<12?'Good morning! ☀️':h>=13&&h<18?'Good afternoon! 🌤️':h>=18&&h<22?'Good evening! 🌙':'Burning the midnight oil! 🌌'}
 /* session: runs on page load, login, logout and password-reset links */
 sb.auth.onAuthStateChange((ev,s)=>setTimeout(async()=>{
