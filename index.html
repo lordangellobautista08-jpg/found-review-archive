@@ -303,9 +303,12 @@ body.dg .fr[data-drop],body.dg .ph a.lk{transition:transform .12s,box-shadow .12
 @keyframes dpop{50%{transform:scale(1.09)}}
 .ph a.lk.dropt{padding:4px 8px;border-radius:var(--r)}
 /* ===== drop and paste zones, access list ===== */
-.dz{border:1.5px dashed var(--bd);border-radius:var(--r);padding:10px;text-align:center;font-size:.85rem;color:var(--mu)}
+.dz{border:2px dashed var(--bd);border-radius:var(--r);padding:28px 16px;min-height:132px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center;font-size:.95rem;color:var(--mu)}
+.dz .dzn{font-size:1rem}
+#fabFiles,#fabDir{display:block;width:100%;min-height:120px;padding:34px 12px;border:2px dashed var(--bd);border-radius:var(--r);background:var(--bg2);text-align:center;cursor:pointer}
+#fabFiles:hover,#fabDir:hover{border-color:var(--teal)}
 .dz.over{border-color:var(--teal);background:var(--soft)}
-.dz input{margin-top:6px}
+.dz input{margin-top:6px;max-width:100%}
 .aglist{max-height:260px;overflow:auto;margin-top:8px;border:1px solid var(--bd);border-radius:var(--r)}
 
 /* ===== FOLDER GRID: rounded squares, name in the top 1/5, thumbnail below ===== */
@@ -317,7 +320,7 @@ body.dg .fr[data-drop],body.dg .ph a.lk{transition:transform .12s,box-shadow .12
 .g.grid>.fr .fl>.tag,.g.grid>.fr .fl>span{display:none}
 .g.grid>.fr .fl h3{font-size:.85rem;display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .g.grid>.fr .selbox{margin-right:0}
-.thm{display:none}
+.fr .thm{display:none}
 /* night/light toggle button shares the .thm class with folder thumbnails, keep it visible */
 #thm.btn.thm{display:inline-block;position:static;width:auto;height:auto}
 .g.grid>.fr .thm{position:absolute;left:0;right:0;top:20%;bottom:0;border-radius:0 0 17px 17px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:var(--bg2)}
@@ -559,6 +562,77 @@ body.ntdrag .notes:not(.pinned) .ned,body.ntdrag .notes:not(.pinned) .ntb{displa
 #tb{display:flex;align-items:center;gap:12px}
 .btn.lo{padding:5px 12px;font-size:.85rem;white-space:nowrap}
 @media(max-width:700px){.btn.lo{display:none}}
+
+/* ===== ANNOUNCEMENT: What's New button, popup, admin editor, icon bank ===== */
+.btn.wn{background:#7C3AED;border-color:#6D28D9;color:#fff;display:inline-flex;align-items:center;gap:6px}
+.btn.wn:hover{background:#6D28D9;border-color:#5B21B6}
+.btn.wn .ic{margin:0}
+.btn.wn .dot{width:9px;height:9px;border-radius:50%;background:#ff5a5f;box-shadow:0 0 0 2px #fff6;flex:none}
+.ann-ov{position:fixed;inset:0;z-index:75;background:rgba(12,0,24,.58);display:flex;align-items:center;justify-content:center;padding:14px;animation:annIn .16s ease-out}
+@keyframes annIn{from{opacity:0}to{opacity:1}}
+.ann-card{--ac:var(--aq);--act:var(--onaq);--acl:var(--teal);position:relative;width:min(580px,100%);max-height:min(90vh,100%);display:flex;flex-direction:column;background:var(--card);color:var(--tx);border:1px solid var(--bd);border-top:4px solid var(--acl);border-radius:16px;box-shadow:0 24px 70px #0007;overflow:hidden}
+.ann-card.sz-sm{width:min(440px,100%)}.ann-card.sz-lg{width:min(780px,100%)}
+.acc-purple{--ac:#7C3AED;--act:#fff;--acl:#7C3AED}.acc-pink{--ac:#DB2777;--act:#fff;--acl:#DB2777}.acc-orange{--ac:#EA580C;--act:#fff;--acl:#EA580C}
+.acc-blue{--ac:#2563EB;--act:#fff;--acl:#2563EB}.acc-green{--ac:#16A34A;--act:#fff;--acl:#16A34A}.acc-red{--ac:#DC2626;--act:#fff;--acl:#DC2626}
+.ann-x{position:absolute;top:10px;right:10px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border:0;border-radius:50%;background:transparent;color:var(--tx);cursor:pointer;padding:0;z-index:2}
+.ann-x:hover{background:rgba(127,127,127,.22)}.ann-x .ic{width:18px;height:18px;margin:0;vertical-align:0}
+.ann-top{display:flex;align-items:center;gap:12px;padding:16px 56px 4px 20px}
+.ann-ic{width:42px;height:42px;border-radius:12px;background:var(--ac);color:var(--act);display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex:none}
+.ann-ic .ic{width:22px;height:22px;margin:0;vertical-align:0}
+.ann-tag{font-weight:700;color:var(--ink);line-height:1.2}
+.ann-prev{margin:8px 20px 0;padding:5px 10px;border-radius:8px;background:var(--soft);font-size:.8rem;color:var(--mu)}
+.ann-card .tabs{padding:0 14px;margin:10px 0 0;flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;flex:none}
+.ann-card .tabs a{cursor:pointer}.ann-card .tabs a.on{border-color:var(--acl)}
+.ann-scroll{padding:14px 20px 8px;overflow:auto;flex:1 1 auto;min-height:90px}
+.ann-scroll h2{margin:0 0 10px;font-size:1.4rem;line-height:1.25;color:var(--ink);word-break:break-word}
+.ann-ft{padding:12px 20px 18px;text-align:center;border-top:1px solid var(--bd);flex:none}
+.ann-card .btn.p{background:var(--ac);border-color:var(--ac);color:var(--act);padding:9px 26px}
+.ann-card .btn.p:hover{filter:brightness(.93)}
+/* rich text shared by the editor and the popup */
+.ann-rt{line-height:1.55;word-break:break-word}
+.ann-rt ul{list-style:disc outside;margin:6px 0 6px 22px;padding:0}.ann-rt ol{list-style:decimal outside;margin:6px 0 6px 22px;padding:0}
+.ann-rt h3{margin:10px 0 4px;font-size:1.08rem;color:var(--ink)}
+.ann-rt a{color:var(--teal);text-decoration:underline}
+.ann-rt>div{min-height:1.4em}
+.ann-rt>div[data-cb]{position:relative;padding-left:24px}
+.ann-rt>div[data-cb]:before{content:'';position:absolute;left:3px;top:.28em;width:14px;height:14px;border:1.5px solid var(--teal);border-radius:3px;background:var(--card)}
+.ann-rt>div[data-cb="1"]:before{background:var(--teal)}
+.ann-rt>div[data-cb="1"]:after{content:'';position:absolute;left:8px;top:.38em;width:4px;height:8px;border:solid var(--card);border-width:0 2px 2px 0;transform:rotate(45deg)}
+.aic{display:inline-flex;align-items:center;vertical-align:-.2em;color:var(--teal)}.aic .ic{width:1.2em;height:1.2em;margin:0;vertical-align:0}
+.abdg{display:inline-block;padding:1px 9px;border-radius:99px;font-size:.7rem;font-weight:800;letter-spacing:.04em;color:#fff;background:#0E9F8E;vertical-align:.08em;white-space:nowrap}
+.abdg[data-b=update]{background:#6D28D9}.abdg[data-b=fix]{background:#D97706}.abdg[data-b=improve]{background:#0891B2}.abdg[data-b=beta]{background:#DB2777}
+.abdg[data-b=soon]{background:#475569}.abdg[data-b=tip]{background:#2563EB}.abdg[data-b=important]{background:#DC2626}.abdg[data-b=removed]{background:#78716C}
+/* admin editor */
+.an-inrow{display:flex;gap:8px}.an-inrow input{flex:1;min-width:0}
+.an-l{display:block;font-size:.88rem;font-weight:600;margin:0 0 5px}
+.an-edw{border:1px solid var(--bd);border-radius:var(--r);background:var(--card);overflow:hidden}.an-edw:focus-within{border-color:var(--teal)}
+.an-edw .ntb{flex-wrap:wrap;background:var(--bg2)}.an-edw .ntb button{font-weight:700;font-size:.85rem;width:30px}
+.an-ed{min-height:130px;max-height:420px;overflow:auto;padding:10px 12px;outline:none;position:relative}
+.an-ed:empty:before{content:attr(data-ph);color:var(--mu);pointer-events:none}
+.an-sec{border:1px solid var(--bd);border-radius:var(--r);padding:14px;background:var(--bg2)}
+.an-sech{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+.an-swr{display:flex;justify-content:space-between;align-items:center;gap:16px;padding:11px 0;border-bottom:1px solid var(--bd);cursor:pointer}
+.an-swr>span:first-child{display:flex;flex-direction:column;gap:2px;min-width:0}.an-swr.off{opacity:.5;cursor:not-allowed}
+.an-sw{position:relative;width:46px;height:26px;flex:none}
+.an-sw input{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;border:0;opacity:0;cursor:pointer;z-index:1}
+.an-sw i{position:absolute;inset:0;border-radius:99px;background:var(--bd);transition:background .15s}
+.an-sw i:before{content:'';position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 3px #0005}
+.an-sw input:checked+i{background:var(--teal)}.an-sw input:checked+i:before{transform:translateX(20px)}
+.an-swatch{display:flex;gap:8px;flex-wrap:wrap}
+.an-swatch button{width:30px;height:30px;border-radius:50%;border:2px solid transparent;cursor:pointer;padding:0;box-shadow:inset 0 0 0 2px var(--card)}
+.an-swatch button.on{border-color:var(--ink)}
+.an-chip{display:inline-block;padding:3px 12px;border-radius:99px;font-size:.8rem;font-weight:700;background:var(--soft);color:var(--ink)}
+.an-chip.live{background:#16A34A;color:#fff}.an-chip.off{background:#78716C;color:#fff}
+/* icon bank */
+.emo{position:fixed;z-index:80;width:344px;max-width:calc(100vw - 12px);background:var(--card);border:1px solid var(--teal);border-radius:12px;box-shadow:0 14px 44px #0006;display:flex;flex-direction:column;overflow:hidden}
+.emo-h{display:flex;gap:6px;padding:8px;border-bottom:1px solid var(--bd)}.emo-h input{flex:1;min-width:0;padding:6px 9px}
+.emo-t{display:flex;gap:4px;padding:6px 8px 0}.emo-t button{border:0;background:transparent;color:var(--tx);padding:5px 10px;border-bottom:2px solid transparent;cursor:pointer;font-size:.85rem}.emo-t button.on{border-color:var(--teal);font-weight:700;color:var(--ink)}
+.emo-c{display:flex;gap:2px;padding:4px 8px;overflow-x:auto;border-bottom:1px solid var(--bd)}.emo-c button{border:0;background:transparent;border-radius:6px;font-size:1.05rem;padding:3px 6px;cursor:pointer;opacity:.6}.emo-c button.on{opacity:1;background:var(--soft)}
+.emo-n{padding:6px 10px 0;font-size:.75rem;color:var(--mu);font-weight:600}
+.emo-g{display:grid;grid-template-columns:repeat(8,1fr);gap:2px;overflow:auto;max-height:250px;padding:6px 8px 10px}
+.emo-g button{height:38px;font-size:1.35rem;border:0;background:transparent;border-radius:8px;cursor:pointer;color:var(--tx);display:flex;align-items:center;justify-content:center;padding:0}
+.emo-g button:hover{background:var(--soft)}.emo-g .ic{width:21px;height:21px;margin:0;vertical-align:0}
+.emo-g.bd{grid-template-columns:repeat(2,1fr)}.emo-g.bd button{height:36px}
 </style>
 </head>
 <body>
@@ -1039,6 +1113,7 @@ const at=g(8),an=at.length?(await pg('quiz_answers',q=>q.in('attempt_id',at.map(
 P.h=at.map(a=>({id:a.id,ts:T0(a.created_at),sc:a.scope||'',n:a.total,k:a.correct,secs:a.seconds||0,notes:a.notes||'',it:an.filter(x=>x.attempt_id==a.id).sort((x,y)=>x.position-y.position).map(x=>({id:x.question_id,ch:x.chosen,ok:+x.is_correct}))}));
 D.U=[];D.SS=[];if(role=='admin'){const u=await sb.from('profiles').select('*');D.U=u.data||[];const ss=await sb.from('study_state').select('user_id,data');D.SS=ss.error?[]:(ss.data||[])}
 {const rs=await sb.from('restrictions').select('*');D.RS=rs.error?[]:(rs.data||[]);if(rs.error)console.warn('Restrictions table not ready:',rs.error.message);RSE=null}
+await annLoad();
 await qkPull();await stPull();fcLoad()}catch(err){console.error(err);toast('Database connection error. Check the console (F12).')}}
 
 /* delete helper (confirmation is shown by the caller's popup) */
@@ -1046,11 +1121,11 @@ async function del(k,id){const r=await sb.from(TB[k]).delete().eq('id',id);if(r.
 
 /* ===== VIEWS ===== */
 const V={};
-V.home=()=>`<section class="hero art"><div class="w"><p class="eyebrow">Civil Engineering Board Exam</p><h1>Your CE review archive: notes, questions and quizzes in one place.</h1><p class="lead">Lecture notes, questionnaires and solutions, plus quizzes, flashcards and progress tracking for MSTC, HPGE and PSAD.</p><button class="btn p" onclick="go(ME?'dash':'auth')">Get started</button></div></section>
+V.home=()=>`<section class="hero art"><div class="w"><p class="eyebrow">Civil Engineering Board Exam</p><h1>Your CE review archive: notes, questions and quizzes in one place.</h1><p class="lead">Lecture notes, questionnaires and solutions, plus quizzes, flashcards and progress tracking for MSTC, HPGE and PSAD.</p><div class="row" style="margin:0"><button class="btn p" onclick="go(ME?'dash':'auth')">Get started</button>${annBtn('home')}</div></div></section>
 <div class="w sec"><h2>Exam Components</h2><div class="g">${C.map(c=>`<div class="card art" onclick="go('c/${c}')"><h3>${c}</h3><p class="mu">${CD[c]}</p><p class="mu sm">${ME?allQ().filter(x=>x.c==c).length+' questions':'Log in to start'}</p></div>`).join('')}</div></div>`;
 
 V.dash=()=>{const a=stat(()=>1),h=P.h.slice(0,4),op=P.op||{},top5=D.M.filter(m=>op[m.id]).sort((x,y)=>op[y.id]-op[x.id]).slice(0,5);
-return hd('Welcome, '+E(PR&&PR.display_name||'Student')+'. <span id="stGr">'+stGreet()+'</span>','Your progress across all components.').replace('class="ph art"','class="ph art wl"')+`<div class="w sec stack"><div id="stWxN"></div>
+return hd('Welcome, '+E(PR&&PR.display_name||'Student')+'. <span id="stGr">'+stGreet()+'</span>','Your progress across all components.').replace('class="ph art"','class="ph art wl"').replace('Your progress across all components.</p>','Your progress across all components.</p>'+annBtn('dash'))+`<div class="w sec stack"><div id="stWxN"></div>
 <div class="dgrid"><div class="card stCard" id="stDash">${stDashHtml()}</div><div class="stack"><div class="card stMob" id="stMobBox">${stMobHtml(stLoad())}</div><div class="card art stack"><h3>Quiz</h3><p class="mu">Draws from all ${a.n} questions across MSTC, HPGE and PSAD. You can also start a quiz inside each component.</p><button class="btn p" onclick="go('quiz')">Start a quiz</button></div>${qkCard()}</div></div>
 <div class="g">${C.map(c=>`<div class="card art" onclick="go('c/${c}')"><h3>${c}</h3>${bars(stat(x=>x.c==c))}</div>`).join('')}</div>
 <p class="mu sm">Accuracy = correct answers ÷ answers given. Mastery = questions you last answered correctly ÷ all questions.</p>
@@ -1363,8 +1438,8 @@ const AD={
 o:()=>`<div class="g">${[['Users',D.U.length],['Official questions',OQ.length],['Folders',D.FO.length],['Folder items',D.M.length],['Official flashcards',D.F.filter(x=>!x.own).length]].map(([n,x])=>`<div class="card art stat"><b>${x}</b><span class="mu sm">${n}</span></div>`).join('')}</div><div class="card stack" style="margin-top:16px"><h3>QuickiZ</h3><p class="mu sm">Lets everyone who already finished today's QuickiZ play it again. Streaks are kept and no extra day is added.</p><button class="btn" onclick="showConfirm('Reset today\\'s QuickiZ','Everyone who finished today can play again. Streaks stay.',qkAdminReset)">Reset today's QuickiZ for everyone</button></div>`,
 u:()=>{const l=sortBy(D.U.filter(u=>!AUS.q||((u.display_name||'')+' '+(u.email||'')).toLowerCase().includes(AUS.q.toLowerCase())),AUS.so,u=>u.display_name||'',u=>T0(u.created_at));
 return `<div class="row" style="margin:0 0 12px"><input id="aus" placeholder="Search users…" value="${E(AUS.q)}" oninput="AUS.q=this.value;route();const i=$('#aus');i.focus();i.setSelectionRange(99,99)">${dd('auo',SORTS,AUS.so,"AUS.so=v;route()")}</div><p class="sm mu" style="margin:0 0 8px">${stUsSum()}</p><div style="overflow-x:auto"><table><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Joined</th><th></th></tr>${l.map(u=>`<tr><td>${E(u.display_name||'')}</td><td class="sm">${E(u.email||'—')}</td><td>${u.role}</td><td class="sm stUc">${stUsCell(u)}</td><td class="mu sm">${new Date(u.created_at).toLocaleDateString()}</td><td>${u.id==ME.id?'<span class="mu sm">You</span>':`<button class="btn" onclick="admRole('${u.id}','${u.role=='admin'?'student':'admin'}')">${u.role=='admin'?'Remove admin':'Make admin'}</button>`}</td></tr>`).join('')}</table></div><p class="mu sm">Role changes apply the next time that person logs in.</p>`},
-f:aqCards,q:aqQ,fl:aqFiles,r:aqRestr};
-V.admin=()=>hd('Admin Dashboard','Manage official content. Security is enforced by the database rules (RLS).')+`<div class="w sec"><div class="tabs">${[['o','Overview'],['u','Users'],['fl','Files'],['f','Official cards'],['q','Questions'],['r','Restrictions']].map(([k,n])=>`<a class="${AT==k?'on':''}" onclick="AT='${k}';route()">${n}</a>`).join('')}</div>${AD[AT]()}</div>`;
+f:aqCards,q:aqQ,fl:aqFiles,r:aqRestr,an:annAdmin};
+V.admin=()=>hd('Admin Dashboard','Manage official content. Security is enforced by the database rules (RLS).')+`<div class="w sec"><div class="tabs">${[['o','Overview'],['u','Users'],['fl','Files'],['f','Official cards'],['q','Questions'],['r','Restrictions'],['an','Announcement']].map(([k,n])=>`<a class="${AT==k?'on':''}" onclick="AT='${k}';route()">${n}</a>`).join('')}</div>${AD[AT]()}</div>`;
 
 /* ===== FLASHCARDS: fit text into the card, swipe, keyboard ===== */
 let fitT;
@@ -1883,6 +1958,598 @@ function stGreet(){stWxGet();const h=+new Intl.DateTimeFormat('en-US',{timeZone:
 if(c>=95)return 'Stormy out there, perfect time to lock in! '+ico('cloudLightning')+'';
 if((c>=51&&c<=67)||(c>=80&&c<=82))return 'What a rainy '+(h>=18||h<5?'night':'day')+' to study! '+ico('cloudRain')+'';
 return h==12?'Happy Lunch Time! '+ico('utensils')+'':h>=5&&h<12?'Good morning! '+ico('sun')+'':h>=13&&h<18?'Good afternoon! '+ico('sun')+'':h>=18&&h<22?'Good evening! '+ico('moon')+'':'Burning the midnight oil! '+ico('moon')+''}
+
+/* ===== ANNOUNCEMENT / WHAT'S NEW =====
+ Run announcements.sql once. Admin writes it under Admin > Announcement; everyone reads it from the What's New buttons and the popup. */
+const ANI={star:['star favorite','<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>'],
+heart:['heart love','<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>'],
+check:['check done tick','<path d="M20 6 9 17l-5-5"/>'],
+checkc:['check circle done ok','<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>'],
+xc:['cross circle error no','<circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/>'],
+warn:['warning alert caution triangle','<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>'],
+info:['info information','<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>'],
+help:['help question','<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>'],
+bell:['bell notification alert','<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>'],
+mega:['megaphone announce','<path d="m3 11 18-5v12L3 14v-3z"/><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>'],
+spark:['sparkle new magic whats new','<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 16v4M17 18h4"/>'],
+zap:['zap lightning fast power','<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>'],
+flame:['flame fire hot streak','<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/>'],
+bulb:['lightbulb idea tip','<path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>'],
+gift:['gift present reward','<rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13"/><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"/><path d="M7.5 8a2.5 2.5 0 0 1 0-5A4.8 8 0 0 1 12 8a4.8 8 0 0 1 4.5-5 2.5 2.5 0 0 1 0 5"/>'],
+trophy:['trophy winner achievement','<path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/>'],
+award:['award medal badge','<circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>'],
+target:['target goal aim','<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>'],
+flag:['flag milestone','<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/>'],
+book:['book study reviewer','<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/>'],
+cap:['graduation cap exam board','<path d="M22 10 12 5 2 10l10 5 10-5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>'],
+pencil:['pencil edit write','<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/>'],
+calc:['calculator compute','<rect x="4" y="2" width="16" height="20" rx="2"/><path d="M8 6h8"/><path d="M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/>'],
+bars:['chart bars statistics','<path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/>'],
+trend:['trend progress growth','<polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>'],
+activity:['activity pulse','<path d="M22 12h-4l-3 9L9 3l-3 9H2"/>'],
+timer:['timer stopwatch','<path d="M10 2h4"/><path d="M12 14l3-3"/><circle cx="12" cy="14" r="8"/>'],
+clock:['clock time','<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'],
+cal:['calendar date schedule','<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/>'],
+search:['search find','<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>'],
+sliders:['settings sliders options','<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>'],
+wrench:['wrench tool fix','<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>'],
+code:['code developer','<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>'],
+refresh:['refresh update sync','<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/>'],
+arrow:['arrow right next','<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>'],
+dl:['download save','<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><path d="M12 15V3"/>'],
+link:['link url','<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>'],
+copy:['copy duplicate','<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>'],
+trash:['trash delete bin','<path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>'],
+lock:['lock secure private','<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>'],
+shield:['shield safe protect','<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>'],
+eye:['eye view show','<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>'],
+user:['user person profile','<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>'],
+users:['users people group','<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>'],
+home:['home house','<path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>'],
+list:['list items','<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>'],
+grid:['grid layout cards','<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>'],
+bookmark:['bookmark save later','<path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/>'],
+thumb:['thumbs up like good','<path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/>'],
+msg:['message chat comment','<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>'],
+mail:['mail email','<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 7L2 7"/>'],
+phone:['phone mobile','<rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 18h.01"/>'],
+monitor:['monitor desktop pc','<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/>'],
+globe:['globe web online','<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>'],
+pin2:['map pin location','<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/>']};
+Object.keys(ANI).forEach(k=>{if(!ICP[k])ICP[k]=ANI[k][1]});
+const ICN={pin:'pin',folder:'folder',file:'file document',note:'note',moon:'moon night dark',sun:'sun day light',clip:'clip attach',bold:'bold',italic:'italic',box:'checkbox',image:'image picture photo',x:'close cross',upload:'upload',plus:'plus add'};Object.keys(ANI).forEach(k=>ICN[k]=ANI[k][0]);
+const ICHIDE=['unpin','sel','zin','zout','restore'];
+const ABD={new:'NEW',update:'UPDATED',fix:'FIXED',improve:'IMPROVED',beta:'BETA',soon:'COMING SOON',tip:'TIP',important:'IMPORTANT',removed:'REMOVED'};
+const EMOD=[['Updates','📢',`📢 announce megaphone loudspeaker
+📣 cheer megaphone
+🔔 bell notification
+🔕 mute bell off
+🆕 new
+✨ sparkles new shiny
+🎉 party celebrate tada
+🎊 confetti celebrate
+🚀 rocket launch release
+🛠️ tools fix build
+🔧 wrench fix
+⚙️ gear settings
+🧩 puzzle feature
+🔄 refresh update sync
+🔁 repeat loop
+⬆️ up arrow upgrade
+⬇️ down arrow
+📌 pin
+📍 location pin
+📝 memo note write
+🗓️ calendar spiral
+📅 calendar date
+⏰ alarm clock
+⏳ hourglass loading
+⌛ hourglass time
+🔥 fire hot popular
+💡 idea bulb tip
+🧠 brain smart
+⚡ lightning fast
+🌟 glowing star
+⭐ star favorite
+🏆 trophy winner
+🎁 gift present
+🧪 test beta experiment
+🔒 lock private
+🔓 unlock open
+🛡️ shield secure
+✅ check done
+❌ cross wrong
+⚠️ warning caution
+❗ exclamation important
+❓ question help
+ℹ️ info
+🔍 search find
+🔎 search zoom
+📈 chart up growth
+📉 chart down
+📊 bar chart stats
+🆗 ok
+🆙 up level
+🆓 free
+🔜 soon
+🔙 back
+🔚 end
+🔛 on
+🔝 top`],
+['Site features','📁',`📁 folder
+📂 open folder
+🗂️ index dividers folders
+📄 file document page
+📃 page curl document
+📑 bookmark tabs pages
+🗒️ notepad notes
+📚 books library reviewer
+📖 open book read
+📕 red book
+📗 green book
+📘 blue book
+📙 orange book
+📓 notebook
+📒 ledger
+🔖 bookmark
+🏷️ label tag
+🧾 receipt
+📋 clipboard
+📎 paperclip attach
+🖇️ linked clips
+✏️ pencil edit
+🖊️ pen
+🖍️ crayon highlight
+🔤 letters abc
+🧮 abacus calculator
+🗃️ card file box
+🗄️ cabinet files
+🖼️ picture image
+🌙 moon dark mode night
+☀️ sun light mode day
+🔦 flashlight
+💾 floppy save
+📥 inbox download
+📤 outbox upload
+📨 incoming envelope
+📧 email
+🔗 link
+🖥️ desktop computer
+💻 laptop
+📱 phone mobile
+⌨️ keyboard
+🖱️ mouse
+🃏 joker flashcard card
+🎴 flower cards flashcards
+🧷 safety pin
+👁️ eye view
+🔐 locked key
+🔑 key
+👆 tap up
+👉 tap right
+✋ stop hand`],
+['Study & exam','🎓',`🎓 graduation cap board exam
+📝 exam test paper
+✍️ writing hand
+🎯 target goal bullseye
+🏁 finish flag
+🥇 gold medal first
+🥈 silver medal second
+🥉 bronze medal third
+🏅 medal
+🎖️ military medal
+⏱️ stopwatch
+⏲️ timer
+🧐 monocle inspect
+🤓 nerd study
+📐 triangle ruler
+📏 ruler
+🔢 numbers input
+➕ plus add
+➖ minus
+✖️ multiply
+➗ divide
+🟰 equals
+♾️ infinity
+🧑‍🎓 student
+🧑‍🏫 teacher
+🏫 school
+🎒 backpack
+🧑‍💻 coding
+📋 checklist
+📆 calendar tear off
+🕘 nine o clock
+💯 hundred perfect
+👍 thumbs up
+💪 strong flex
+🙌 raised hands
+👏 clap
+🤝 handshake
+🙏 pray thanks please`],
+['Math & symbols','∑',`∑ sum sigma
+√ square root
+π pi
+∞ infinity
+≈ approx
+≠ not equal
+≤ less equal
+≥ greater equal
+± plus minus
+° degree
+² squared
+³ cubed
+½ half
+¼ quarter
+¾ three quarters
+Δ delta
+θ theta
+λ lambda
+μ mu micro
+σ sigma stress
+φ phi
+ω omega
+∫ integral
+∂ partial
+→ arrow right
+← arrow left
+↑ arrow up
+↓ arrow down
+↔ both ways
+⇒ implies
+⇔ equivalent
+× times
+÷ divide
+∴ therefore
+∵ because
+‰ per mille
+µ micro
+Ω ohm
+α alpha
+β beta
+γ gamma
+ε epsilon
+ρ rho
+τ tau
+ν nu`],
+['Engineering','🏗️',`🏗️ construction crane
+🏢 building office
+🏠 house
+🌉 bridge
+🏛️ classical building
+🛠️ tools
+🔩 nut bolt
+⚙️ gear
+🧰 toolbox
+📐 triangle ruler drafting
+📏 ruler
+🧱 brick
+🪨 rock soil
+🌊 wave water hydraulics
+💧 droplet water
+🌋 volcano
+🌍 earth geodesy
+⛽ fuel
+🔌 plug electrical
+💡 bulb light
+🔋 battery
+⚡ electric power
+🧲 magnet
+🧪 test tube
+🔬 microscope
+🔭 telescope
+🚰 faucet water supply
+🚦 traffic light transport
+🛣️ highway road
+🚧 construction barrier
+🏔️ mountain survey
+🌡️ thermometer
+⛏️ pick mining
+🪜 ladder
+🦺 safety vest
+👷 construction worker
+🚜 tractor
+🚛 truck
+🏭 factory
+🗺️ map survey
+🧭 compass`],
+['Status & marks','✅',`✅ check green
+☑️ ballot check
+✔️ heavy check
+❌ cross red
+✖️ x mark
+❎ cross button
+⚠️ warning
+🚫 prohibited
+⛔ no entry
+🔴 red circle
+🟠 orange circle
+🟡 yellow circle
+🟢 green circle
+🔵 blue circle
+🟣 purple circle
+⚫ black circle
+⚪ white circle
+🟥 red square
+🟧 orange square
+🟨 yellow square
+🟩 green square
+🟦 blue square
+🟪 purple square
+⬛ black square
+⬜ white square
+❤️ red heart
+🧡 orange heart
+💛 yellow heart
+💚 green heart
+💙 blue heart
+💜 purple heart
+🖤 black heart
+🤍 white heart
+💯 hundred
+‼️ double exclamation
+⁉️ exclamation question
+❗ exclamation
+❓ question`],
+['Arrows & shapes','➡️',`➡️ right
+⬅️ left
+⬆️ up
+⬇️ down
+↗️ up right
+↘️ down right
+↙️ down left
+↖️ up left
+↔️ left right
+↕️ up down
+↩️ return left
+↪️ return right
+⤴️ curve up
+⤵️ curve down
+🔄 counterclockwise
+🔃 clockwise
+🔁 repeat
+🔂 repeat one
+▶️ play
+⏸️ pause
+⏹️ stop
+⏺️ record
+⏭️ next track
+⏮️ previous track
+✳️ asterisk
+❇️ sparkle
+➰ loop
+〰️ wavy dash
+©️ copyright
+®️ registered
+™️ trademark
+#️⃣ hash
+🔺 red triangle up
+🔻 red triangle down
+🔸 small orange diamond
+🔹 small blue diamond
+🔶 large orange diamond
+🔷 large blue diamond
+🔘 radio button
+💠 diamond dot
+▪️ small black square
+▫️ small white square`],
+['Smileys & hands','😊',`😀 grin
+😃 smile
+😄 happy
+😁 beam
+😅 sweat smile
+😂 laugh tears
+🙂 slight smile
+😉 wink
+😊 blush
+😍 heart eyes
+🤩 star struck
+😎 cool sunglasses
+🤔 thinking
+😮 surprised
+😢 sad cry
+😭 sobbing
+😴 sleepy
+🤯 mind blown
+🥹 touched
+😇 angel
+🥳 party face
+🙈 see no evil
+🫡 salute
+😺 cat smile
+👋 wave hello
+🤚 raised hand
+🖐️ hand fingers
+👌 ok hand
+✌️ victory peace
+🤞 fingers crossed
+🤟 love you
+👈 point left
+👇 point down
+🫶 heart hands
+👤 person silhouette
+👥 people
+🌈 rainbow
+☕ coffee
+🍀 clover luck
+🌸 blossom
+🌞 sun face
+🌙 crescent moon
+🎈 balloon
+🎶 music
+🔊 speaker loud`],
+['Time & weather','⏰',`⏰ alarm clock
+⏱️ stopwatch
+⏲️ timer clock
+⌛ hourglass done
+⏳ hourglass flowing
+🕐 one o clock
+🕒 three o clock
+🕕 six o clock
+🕘 nine o clock
+🕛 twelve o clock
+📅 calendar
+📆 tear off calendar
+🗓️ spiral calendar
+☀️ sun
+🌤️ sun behind small cloud
+⛅ partly sunny
+☁️ cloud
+🌧️ rain
+⛈️ thunder storm
+🌩️ lightning cloud
+❄️ snow
+🌈 rainbow
+🌊 wave
+🔥 fire
+💧 droplet
+🌱 seedling
+🌳 tree
+🌍 earth
+🌙 moon
+⭐ star`]];
+const EMOALL=EMOD.map(([c,ic,t])=>[c,ic,t.trim().split('\n').map(l=>{const i=l.indexOf(' ');return[l.slice(0,i),l.slice(i+1)]})]);
+const ANS0={popup_auto:true,popup_every:false,popup_login:true,home_btn:true,dash_btn:true,x_btn:true,x_counts:false,show_date:true,confirm_label:"I've read this",tag_text:"What's New",accent:'teal',size:'md',icon:'spark',expires_at:'',tab_main:''};
+const ANC={teal:'#3CC7B5',purple:'#7C3AED',pink:'#DB2777',orange:'#EA580C',blue:'#2563EB',green:'#16A34A',red:'#DC2626'};
+let ANN=null,ANNR=new Set(),ANN_OK=true,ANN_AUTO=0,ANN_VIEW=null,ANN_TAB=0,ANF=null,EMO={tab:'emoji',cat:0,q:'',t:null,mode:'insert'};
+const annNorm=r=>({version:r.version||1,header:r.header||'',body:r.body||'',sections:(Array.isArray(r.sections)?r.sections:[]).map(x=>({label:x.label||'',heading:x.heading||'',body:x.body||''})),enabled:!!r.enabled,published_at:r.published_at,updated_at:r.updated_at,s:{...ANS0,...(r.settings||{})}});
+async function annLoad(){try{const r=await sb.from('announcement').select('*').eq('id',1).maybeSingle();if(r.error){ANN_OK=false;ANN=null;console.warn('Announcement table not ready (run announcements.sql):',r.error.message)}else{ANN_OK=true;ANN=r.data?annNorm(r.data):null}}catch(e){ANN=null}
+if(ME){try{const r=await sb.from('announcement_reads').select('version').eq('user_id',ME.id);if(!r.error)(r.data||[]).forEach(x=>ANNR.add(x.version))}catch(e){}}}
+/* safe rich text: only simple formatting, checklists, icons and badges survive */
+function annClean(html){const t=document.createElement('template');t.innerHTML=String(html||'');const out=document.createElement('div');
+const map={B:'b',STRONG:'b',I:'i',EM:'i',U:'u',S:'s',STRIKE:'s',DEL:'s',P:'div',DIV:'div',UL:'ul',OL:'ol',LI:'li',H1:'h3',H2:'h3',H3:'h3',H4:'h3',BR:'br',A:'a'};
+const walk=(src,dst)=>{src.childNodes.forEach(n=>{if(n.nodeType==3){dst.appendChild(document.createTextNode(n.nodeValue));return}if(n.nodeType!=1)return;const tg=n.tagName;
+if(tg=='SPAN'){if(n.classList.contains('aic')&&ICP[n.dataset.i]){const s=document.createElement('span');s.className='aic';s.dataset.i=n.dataset.i;dst.appendChild(s);return}
+if(n.classList.contains('abdg')&&ABD[n.dataset.b]){const s=document.createElement('span');s.className='abdg';s.dataset.b=n.dataset.b;s.textContent=ABD[n.dataset.b];dst.appendChild(s);return}walk(n,dst);return}
+const k=map[tg];if(!k){if(/^(SCRIPT|STYLE|IFRAME|OBJECT|EMBED|TEMPLATE|NOSCRIPT|SVG|CANVAS)$/.test(tg))return;walk(n,dst);return}
+const e=document.createElement(k);if(k=='br'){dst.appendChild(e);return}
+if(k=='div'&&n.dataset&&(n.dataset.cb=='0'||n.dataset.cb=='1'))e.dataset.cb=n.dataset.cb;
+if(k=='a'){const h=n.getAttribute('href')||'';if(/^(https?:|mailto:)/i.test(h)){e.setAttribute('href',h);e.setAttribute('target','_blank');e.setAttribute('rel','noopener noreferrer')}}
+walk(n,e);dst.appendChild(e)})};walk(t.content,out);return out.innerHTML}
+function annHtml(html,edit){const d=document.createElement('div');d.innerHTML=annClean(html);d.querySelectorAll('.aic').forEach(s=>{s.innerHTML=ico(s.dataset.i);if(edit)s.contentEditable='false'});d.querySelectorAll('.abdg').forEach(s=>{if(edit)s.contentEditable='false'});return d.innerHTML}
+const annTxt=html=>{const d=document.createElement('div');d.innerHTML=annClean(html);return d.textContent.trim()||(d.querySelector('.aic,.abdg')?'•':'')};
+const annExpired=a=>!!(a&&a.s.expires_at&&new Date(a.s.expires_at+'T23:59:59')<new Date());
+const annAvail=()=>!!(ANN&&ANN.enabled&&!annExpired(ANN)&&(ANN.header.trim()||annTxt(ANN.body)));
+function annReadSet(){const s=new Set(ANNR);try{JSON.parse(localStorage.getItem('annr_'+(ME?ME.id:'0'))||'[]').forEach(v=>s.add(v))}catch(_){}return s}
+const annUnread=()=>!!ANN&&!annReadSet().has(ANN.version);
+function annBtn(where){if(!annAvail()||!ANN.s[where+'_btn'])return'';const b=`<button class="btn wn" onclick="annOpen()">${ico('spark')}What's New?${annUnread()?'<span class="dot" title="New"></span>':''}</button>`;return where=='dash'?`<div style="margin-top:12px">${b}</div>`:b}
+function annMark(v){ANNR.add(v);try{const k='annr_'+(ME?ME.id:'0'),a=JSON.parse(localStorage.getItem(k)||'[]');if(!a.includes(v)){a.push(v);localStorage.setItem(k,JSON.stringify(a.slice(-50)))}}catch(_){}
+if(ME)sb.from('announcement_reads').upsert({user_id:ME.id,version:v},{onConflict:'user_id,version',ignoreDuplicates:true}).then(r=>{if(r.error)console.warn('Could not save the read mark:',r.error.message)});
+document.querySelectorAll('.wn .dot').forEach(x=>x.remove())}
+const annIconHtml=v=>v?(ICP[v]?ico(v):E(v)):'';
+function annSecs(d){const a=[{label:d.s.tab_main,heading:d.header,body:d.body,main:1},...d.sections].filter(x=>(x.heading||'').trim()||annTxt(x.body));return a}
+function annOpen(data,preview){const d=data||ANN;if(!d)return;ANN_VIEW={d,preview:!!preview};ANN_TAB=0;annDraw();document.body.style.overflow='hidden'}
+function annDraw(){let r=$('#annRoot');if(!r){r=document.createElement('div');r.id='annRoot';document.body.appendChild(r)}
+const{d,preview}=ANN_VIEW,s=d.s,secs=annSecs(d);if(!secs.length)secs.push({heading:'',body:'',main:1});ANN_TAB=Math.min(ANN_TAB,secs.length-1);const cur=secs[ANN_TAB],ic=annIconHtml(s.icon);
+const lab=(x,i)=>E((x.label||'').trim()||(x.main?"What's new":(x.heading||'').trim().slice(0,26)||'Section '+(i+1)));
+r.innerHTML=`<div class="ann-ov" onclick="annBackdrop(event)"><div class="ann-card acc-${E(s.accent)} sz-${E(s.size)}" role="dialog" aria-modal="true" aria-label="Announcement">${s.x_btn?`<button class="ann-x" onclick="annClose()" aria-label="Close" title="Close">${ico('x')}</button>`:''}
+<div class="ann-top">${ic?`<div class="ann-ic">${ic}</div>`:''}<div><div class="ann-tag">${E(s.tag_text||"What's New")}</div>${s.show_date&&d.published_at?`<div class="mu sm">${E(new Date(d.published_at).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'}))}</div>`:''}</div></div>
+${preview?'<div class="ann-prev">Preview only: nothing is saved or marked as read.</div>':''}
+${secs.length>1?`<div class="tabs">${secs.map((x,i)=>`<a class="${i==ANN_TAB?'on':''}" onclick="annTab(${i})">${lab(x,i)}</a>`).join('')}</div>`:''}
+<div class="ann-scroll"><h2>${E(cur.heading||'')}</h2><div class="ann-rt">${annHtml(cur.body)}</div></div>
+<div class="ann-ft"><button class="btn p" onclick="annConfirm()">${E(s.confirm_label||"I've read this")}</button></div></div></div>`;
+const sc=r.querySelector('.ann-scroll');if(sc)sc.scrollTop=0;if(!r.dataset.f){r.dataset.f=1;setTimeout(()=>{const b=r.querySelector('.ann-ft .btn');b&&b.focus()},30)}}
+function annTab(i){ANN_TAB=i;const k=ANN_VIEW,r=$('#annRoot');annDraw()}
+function annClose(silent){const r=$('#annRoot');if(r){r.innerHTML='';delete r.dataset.f}document.body.style.overflow='';
+if(!silent&&ANN_VIEW&&!ANN_VIEW.preview&&ANN_VIEW.d.s.x_counts)annMark(ANN_VIEW.d.version);ANN_VIEW=null}
+function annConfirm(){if(ANN_VIEW&&!ANN_VIEW.preview)annMark(ANN_VIEW.d.version);annClose(1)}
+function annBackdrop(e){if(e.target===e.currentTarget&&ANN_VIEW&&ANN_VIEW.d.s.x_btn)annClose()}
+addEventListener('keydown',e=>{if(e.key=='Escape'&&EMO.open){emoClose();return}if(e.key=='Escape'&&ANN_VIEW&&ANN_VIEW.d.s.x_btn){e.preventDefault();annClose()}});
+/* pops up on the dashboard: every refresh, or only until the person confirms; plus once for anyone who has not seen the latest post */
+function annAfterRoute(){if(!ME||!QL||ANN_AUTO||MD||ANN_VIEW)return;const n=(location.hash.slice(2)||'home').split('/')[0];if(n!='dash')return;ANN_AUTO=1;if(!annAvail())return;
+const s=ANN.s,un=annUnread();if((s.popup_auto&&(s.popup_every||un))||(s.popup_login&&un))setTimeout(()=>{if(!ANN_VIEW&&!MD&&annAvail())annOpen()},400)}
+/* ----- admin: Announcement tab ----- */
+function annFormInit(){const a=ANN||{header:'',body:'',sections:[],enabled:false,s:{...ANS0}};ANF=JSON.parse(JSON.stringify({header:a.header,body:a.body,sections:a.sections,enabled:a.enabled,s:{...ANS0,...a.s}}))}
+const annSw=(k,l,d,dis)=>`<label class="an-swr ${dis?'off':''}"><span><b>${l}</b><span class="mu sm">${d}</span></span><span class="an-sw"><input type="checkbox" ${(k=='enabled'?ANF.enabled:ANF.s[k])?'checked':''} ${dis?'disabled':''} onchange="annSet('${k}',this.checked)"><i></i></span></label>`;
+function annSet(k,v){if(k=='enabled')ANF.enabled=v;else ANF.s[k]=v;route()}
+const annTb=`<button type="button" title="Bold (Ctrl+B)" onclick="annCmd(this,'bold')">${ico('bold')}</button><button type="button" title="Italic (Ctrl+I)" onclick="annCmd(this,'italic')">${ico('italic')}</button><button type="button" title="Underline (Ctrl+U)" onclick="annCmd(this,'underline')"><u>U</u></button><button type="button" title="Strikethrough" onclick="annCmd(this,'strikeThrough')"><s>S</s></button><button type="button" title="Heading" onclick="annCmd(this,'h')">H</button><button type="button" title="Bulleted list (or type - and a space)" onclick="annCmd(this,'insertUnorderedList')">${ico('list')}</button><button type="button" title="Numbered list (or type 1. and a space)" onclick="annCmd(this,'insertOrderedList')">1.</button><button type="button" title="Checklist (or type [] and a space)" onclick="annCmd(this,'cb')">${ico('box')}</button><button type="button" title="Link" onclick="annCmd(this,'link')">${ico('link')}</button><button type="button" title="Clear formatting" onclick="annCmd(this,'clear')">Tx</button><span class="sp"></span><button type="button" class="an-emobtn" title="Icons, emoji and badges" onclick="emoOpen(this,'insert')">😊</button>`;
+const annEd=(sec,html,ph)=>`<div class="an-edw"><div class="ntb" onmousedown="event.preventDefault()">${annTb}</div><div class="an-ed ann-rt" contenteditable="true" spellcheck="true" data-sec="${sec}" data-ph="${E(ph)}" oninput="annEdInput(this)" onkeydown="annKeyEd(event,this)" onclick="annEdClick(event,this)" onblur="annSaveRng(this)" onpaste="event.preventDefault();document.execCommand('insertText',false,(event.clipboardData||window.clipboardData).getData('text/plain'))">${annHtml(html,1)}</div></div>`;
+const annIn=(id,val,ph,oi)=>`<div class="an-inrow"><input id="${id}" value="${E(val)}" placeholder="${E(ph)}" oninput="${oi}"><button type="button" class="btn an-emobtn" title="Emoji" onclick="emoOpen(this,'insert')">😊</button></div>`;
+function annEdInput(ed){const v=annClean(ed.innerHTML),k=ed.dataset.sec;if(k=='-1')ANF.body=v;else if(ANF.sections[+k])ANF.sections[+k].body=v}
+function annSaveRng(ed){const s=getSelection();if(s.rangeCount&&ed.contains(s.anchorNode))ed._r=s.getRangeAt(0).cloneRange()}
+function annRestore(ed){if(ed._r){const s=getSelection();s.removeAllRanges();s.addRange(ed._r)}}
+function annLineOf(ed,n){while(n&&n.parentNode!==ed)n=n.parentNode;return n&&n.parentNode===ed?n:null}
+function annWrap(ed){const blk=/^(DIV|UL|OL|H3|P)$/;let run=[];const flush=()=>{if(!run.length)return;const d=document.createElement('div');ed.insertBefore(d,run[0]);run.forEach(x=>d.appendChild(x));run=[]};[...ed.childNodes].forEach(n=>{if(n.nodeType==1&&blk.test(n.tagName))flush();else run.push(n)});flush()}
+function annCb(ed){ed.focus();annWrap(ed);if(!ed.firstChild){ed.innerHTML='<div><br></div>'}const s=getSelection();let a,b;if(s.rangeCount&&ed.contains(s.anchorNode)){const r=s.getRangeAt(0);a=annLineOf(ed,r.startContainer);b=annLineOf(ed,r.endContainer)}else{a=b=ed.lastElementChild}
+const ls=[];for(let n=a;n;n=n.nextElementSibling){if(/^(DIV)$/.test(n.tagName))ls.push(n);if(n===b)break}if(!ls.length)return;const on=ls.every(l=>l.dataset.cb!=null);ls.forEach(l=>{if(on)delete l.dataset.cb;else if(l.dataset.cb==null)l.dataset.cb='0'});annEdInput(ed)}
+function annCmd(btn,c){const ed=btn.closest('.an-edw').querySelector('.an-ed');ed.focus();annRestore(ed);
+if(c=='cb')return annCb(ed);
+if(c=='h'){const cur=(document.queryCommandValue('formatBlock')||'').toLowerCase();document.execCommand('formatBlock',false,cur=='h3'?'div':'h3')}
+else if(c=='link'){const u=prompt('Link address (https://…)');if(!u)return;if(!/^(https?:|mailto:)/i.test(u))return toast('Links must start with https://');document.execCommand('createLink',false,u)}
+else if(c=='clear'){document.execCommand('removeFormat');ed.querySelectorAll('[data-cb]').forEach(x=>delete x.dataset.cb)}
+else document.execCommand(c);annEdInput(ed)}
+function annEdClick(e,ed){const t=e.target;if(t.parentNode===ed&&t.dataset&&t.dataset.cb!=null&&e.clientX-t.getBoundingClientRect().left<24){t.dataset.cb=t.dataset.cb=='1'?'0':'1';annEdInput(ed);e.preventDefault()}}
+function annKeyEd(e,ed){if(e.key!=' '||e.ctrlKey||e.metaKey)return;const s=getSelection();if(!s.rangeCount||!s.isCollapsed)return;const n=s.anchorNode;if(!n||n.nodeType!=3||n.previousSibling)return;
+const t=n.nodeValue.slice(0,s.anchorOffset);if(!/^(-|\*|\[\]|1\.)$/.test(t))return;e.preventDefault();n.nodeValue=n.nodeValue.slice(s.anchorOffset);const r=document.createRange();r.setStart(n,0);r.collapse(true);s.removeAllRanges();s.addRange(r);
+if(t=='[]')annCb(ed);else{document.execCommand(t=='1.'?'insertOrderedList':'insertUnorderedList');annEdInput(ed)}}
+function annSecAdd(){if(ANF.sections.length>=8)return toast('Up to 8 extra sections');ANF.sections.push({label:'',heading:'',body:''});route()}
+function annSecDel(i){ANF.sections.splice(i,1);route()}
+function annSecMove(i,d){const j=i+d;if(j<0||j>=ANF.sections.length)return;[ANF.sections[i],ANF.sections[j]]=[ANF.sections[j],ANF.sections[i]];route()}
+function annPreview(){annOpen({version:0,header:ANF.header,body:ANF.body,sections:ANF.sections,s:ANF.s,published_at:(ANN&&ANN.published_at)||new Date().toISOString()},1)}
+async function annSave(pub){const f=ANF;if(f.enabled&&!f.header.trim()&&!annTxt(f.body))return toast('Add a header or some body text first');
+const row={id:1,header:f.header,body:annClean(f.body),sections:f.sections.map(x=>({label:x.label,heading:x.heading,body:annClean(x.body)})),enabled:!!f.enabled,settings:f.s,version:(ANN?ANN.version:1)+(pub&&ANN?1:0),updated_at:new Date().toISOString()};
+if(pub||!ANN)row.published_at=new Date().toISOString();
+const r=await sb.from('announcement').upsert(row,{onConflict:'id'}).select().single();
+if(r.error)return toast(/relation|schema cache|does not exist/i.test(r.error.message)?'Run announcements.sql once in Supabase first.':r.error.message);
+ANN=annNorm(r.data);ANN_OK=true;ANN_AUTO=0;annFormInit();toast(pub?'Published as new. Everyone will see it again.':'Saved');route()}
+async function annReadCount(){const el=$('#annRead');if(!el||!ANN)return;try{const r=await sb.from('announcement_reads').select('user_id',{count:'exact',head:true}).eq('version',ANN.version);if(!r.error&&$('#annRead'))$('#annRead').textContent='Confirmed by '+(r.count||0)+' of '+D.U.length+' users'}catch(_){}}
+function annAdmin(){if(!ANF)annFormInit();const f=ANF,s=f.s,live=ANN&&ANN.enabled&&!annExpired(ANN),chip=!ANN?'<span class="an-chip off">Not posted yet</span>':annExpired(ANN)?'<span class="an-chip off">Expired</span>':ANN.enabled?`<span class="an-chip live">Live · version ${ANN.version}</span>`:'<span class="an-chip off">Hidden</span>';
+setTimeout(annReadCount,0);
+return `<div class="row" style="justify-content:space-between;margin:0 0 14px"><div><h2 style="margin:0">Announcement</h2><p class="mu sm" style="margin:2px 0 0">The What's New popup for your students, also shown from the homepage.</p></div><div class="row" style="margin:0">${chip}<span class="mu sm" id="annRead"></span></div></div>
+${ANN_OK?'':'<div class="card" style="margin-bottom:14px;border-color:#d97706"><b>Setup needed.</b> <span class="mu sm">Run announcements.sql once in the Supabase SQL editor, then reload this page.</span></div>'}
+<div class="card stack"><h3>Text</h3>
+<div><label class="an-l">Header</label>${annIn('annH',f.header,'e.g. 🎉 New: flashcards by subject','ANF.header=this.value')}</div>
+<div><label class="an-l">Tab name <span class="mu sm">(only used when you add more sections)</span></label><input value="${E(s.tab_main)}" placeholder="What's new" oninput="ANF.s.tab_main=this.value" style="width:100%"></div>
+<div><label class="an-l">Body</label>${annEd(-1,f.body,'Write the announcement. Use the toolbar, or type - then space for a bullet list, [] then space for a checklist.')}</div></div>
+${f.sections.map((x,i)=>`<div class="an-sec" style="margin-top:14px"><div class="an-sech"><b>Section ${i+2}</b><span class="row" style="margin:0;gap:4px"><button class="btn" title="Move up" onclick="annSecMove(${i},-1)" ${i?'':'disabled'}>↑</button><button class="btn" title="Move down" onclick="annSecMove(${i},1)" ${i<f.sections.length-1?'':'disabled'}>↓</button><button class="btn" title="Remove section" onclick="annSecDel(${i})">${ico('x')}Remove</button></span></div>
+<div class="stack"><div><label class="an-l">Tab name</label><input value="${E(x.label)}" placeholder="Shown on the tab (defaults to the heading)" oninput="ANF.sections[${i}].label=this.value" style="width:100%"></div>
+<div><label class="an-l">Header</label>${annIn('annSH'+i,x.heading,'Section header','ANF.sections['+i+'].heading=this.value')}</div>
+<div><label class="an-l">Body</label>${annEd(i,x.body,'Section body')}</div></div></div>`).join('')}
+<div class="row"><button class="btn" onclick="annSecAdd()">${ico('plus')}Add section</button><span class="mu sm">Each extra section becomes a tab in the popup, like the admin tabs.</span></div>
+<div class="card" style="margin-top:14px"><h3>Settings</h3>
+${annSw('enabled','Show announcement','Master switch. Off hides the popup and both What\'s New buttons for everyone.')}
+${annSw('popup_auto','Pop up on the student dashboard','Opens by itself when the dashboard loads. Off means people only see it from the What\'s New buttons.')}
+${annSw('popup_every','Pop up on every refresh of the dashboard','On: every time the dashboard page loads. Off: only once, until the student presses the confirm button.',!s.popup_auto)}
+${annSw('popup_login','Show on each person\'s first login after posting','Catches students who were logged out when you posted, even if the automatic popup above is off.')}
+${annSw('home_btn','What\'s New? button on the homepage','Next to Get started.')}
+${annSw('dash_btn','What\'s New? button on the dashboard','Under the progress label.')}
+${annSw('x_btn','Show the ✕ close button','Off forces the confirm button to be pressed (Esc and clicking outside stop closing it too).')}
+${annSw('x_counts','Closing with ✕ counts as read','Off: closing with ✕ leaves it unread, so it can pop up again.',!s.x_btn)}
+${annSw('show_date','Show the posted date','')}
+<div class="stack" style="margin-top:14px">
+<div><label class="an-l">Confirm button text</label><input value="${E(s.confirm_label)}" oninput="ANF.s.confirm_label=this.value" style="width:100%"></div>
+<div><label class="an-l">Label at the top of the popup</label><input value="${E(s.tag_text)}" oninput="ANF.s.tag_text=this.value" style="width:100%"></div>
+<div><label class="an-l">Header icon</label><div class="row" style="margin:0"><button type="button" class="btn an-emobtn" onclick="emoOpen(this,'icon')">${annIconHtml(s.icon)||'None'} &nbsp;Change</button>${s.icon?`<button class="btn" onclick="ANF.s.icon='';route()">Remove</button>`:''}</div></div>
+<div><label class="an-l">Accent color</label><div class="an-swatch">${Object.entries(ANC).map(([k,h])=>`<button type="button" title="${k}" class="${s.accent==k?'on':''}" style="background:${h}" onclick="ANF.s.accent='${k}';route()"></button>`).join('')}</div></div>
+<div><label class="an-l">Popup size</label><select onchange="ANF.s.size=this.value">${[['sm','Compact'],['md','Standard'],['lg','Wide']].map(([k,n])=>`<option value="${k}" ${s.size==k?'selected':''}>${n}</option>`).join('')}</select></div>
+<div><label class="an-l">Hide automatically after <span class="mu sm">(optional)</span></label><input type="date" value="${E(s.expires_at)}" onchange="ANF.s.expires_at=this.value"></div></div></div>
+<div class="row" style="margin-top:16px"><button class="btn p" onclick="annSave(0)">Save changes</button><button class="btn" onclick="annSave(1)" title="Everyone sees it again, even people who already confirmed">Publish as new</button><button class="btn" onclick="annPreview()">Preview</button></div>
+<p class="mu sm">Save changes keeps the same version, so people who already confirmed won't see it again. Publish as new shows it to everyone once more.</p>`}
+/* ----- icon bank: site icons, emoji and badges ----- */
+function emoClose(){const p=$('#emoPick');if(p)p.remove();EMO.open=0}
+function emoOpen(btn,mode){if(EMO.open&&EMO.btn===btn){emoClose();return}EMO.mode=mode;EMO.btn=btn;EMO.q='';
+EMO.t=mode=='icon'?null:(btn.closest('.an-edw')?btn.closest('.an-edw').querySelector('.an-ed'):btn.closest('.an-inrow').querySelector('input'));
+if(EMO.t&&EMO.t.classList.contains('an-ed')){annSaveRng(EMO.t)}
+if(mode=='icon'&&EMO.tab=='badges')EMO.tab='icons';EMO.open=1;emoDraw(1)}
+function emoDraw(place){let p=$('#emoPick');if(!p){p=document.createElement('div');p.id='emoPick';p.className='emo';p.setAttribute('onmousedown',"if(!event.target.closest('input'))event.preventDefault()");p.setAttribute('onclick','event.stopPropagation()');document.body.appendChild(p)}
+const q=EMO.q.trim().toLowerCase(),tabs=[['icons','Icons'],['emoji','Emoji']].concat(EMO.mode=='icon'?[]:[['badges','Badges']]);let body='',cats='',note='';
+if(EMO.tab=='icons'){const ks=Object.keys(ICP).filter(k=>!ICHIDE.includes(k)&&(!q||k.includes(q)||(ICN[k]||'').includes(q)));body=`<div class="emo-g">${ks.map(k=>`<button type="button" title="${E((ICN[k]||k).split(' ')[0])}" onclick="emoPick('i','${k}')">${ico(k)}</button>`).join('')||'<p class="mu sm" style="grid-column:1/-1;padding:10px">Nothing found.</p>'}</div>`;note='Site-style line icons (work in the body text)'}
+else if(EMO.tab=='badges'){body=`<div class="emo-g bd">${Object.entries(ABD).map(([k,l])=>`<button type="button" onclick="emoPick('b','${k}')"><span class="abdg" data-b="${k}">${l}</span></button>`).join('')}</div>`;note='Colored labels for the body text'}
+else{const list=q?EMOALL.flatMap(c=>c[2]).filter(([e,k])=>k.toLowerCase().includes(q)||e==q):(EMOALL[EMO.cat]||EMOALL[0])[2];
+if(!q)cats=`<div class="emo-c">${EMOALL.map((c,i)=>`<button type="button" class="${i==EMO.cat?'on':''}" title="${E(c[0])}" onclick="EMO.cat=${i};emoDraw()">${c[1]}</button>`).join('')}</div>`;
+body=`<div class="emo-g">${list.map(([e,k])=>`<button type="button" title="${E(k)}" onclick="emoPick('e','${e}')">${e}</button>`).join('')||'<p class="mu sm" style="grid-column:1/-1;padding:10px">Nothing found.</p>'}</div>`;note=q?'Search results':(EMOALL[EMO.cat]||EMOALL[0])[0]}
+p.innerHTML=`<div class="emo-h"><input placeholder="Search icons, emoji, badges…" value="${E(EMO.q)}" oninput="EMO.q=this.value;emoDraw();const i=document.querySelector('#emoPick input');i.focus();i.setSelectionRange(99,99)"><button type="button" class="vbt x" onclick="emoClose()" title="Close">${ico('x')}</button></div><div class="emo-t">${tabs.map(([k,n])=>`<button type="button" class="${EMO.tab==k?'on':''}" onclick="EMO.tab='${k}';EMO.q='';emoDraw()">${n}</button>`).join('')}</div>${cats}<div class="emo-n">${E(note)}</div>${body}`;
+if(place&&EMO.btn){const r=EMO.btn.getBoundingClientRect(),w=Math.min(344,innerWidth-12);p.style.left=Math.max(6,Math.min(r.left,innerWidth-w-6))+'px';const h=p.offsetHeight||380;p.style.top=(r.bottom+6+h>innerHeight&&r.top-h-6>0?r.top-h-6:Math.max(6,Math.min(r.bottom+6,innerHeight-h-6)))+'px'}}
+function emoPick(kind,val){
+if(EMO.mode=='icon'){ANF.s.icon=val;emoClose();route();return}
+const t=EMO.t;if(!t||!document.contains(t))return toast('Click into a field first');
+if(t.tagName=='INPUT'){if(kind!='e')return toast('Icons and badges work in the body text. Pick an emoji for this field.');const a=t.selectionStart==null?t.value.length:t.selectionStart,b=t.selectionEnd==null?a:t.selectionEnd;t.setRangeText(val,a,b,'end');t.focus();t.dispatchEvent(new Event('input'));return}
+t.focus();annRestore(t);
+if(kind=='e')document.execCommand('insertText',false,val);
+else if(kind=='i')document.execCommand('insertHTML',false,`<span class="aic" data-i="${val}" contenteditable="false">${ico(val)}</span>&nbsp;`);
+else document.execCommand('insertHTML',false,`<span class="abdg" data-b="${val}" contenteditable="false">${ABD[val]}</span>&nbsp;`);
+annEdInput(t);annSaveRng(t)}
+document.addEventListener('click',e=>{if(EMO.open&&!e.target.closest('.emo,.an-emobtn'))emoClose()});
+
 /* session: runs on page load, login, logout and password-reset links */
 sb.auth.onAuthStateChange((ev,s)=>setTimeout(async()=>{
 if(ev=='PASSWORD_RECOVERY')AU.mode='newpw';
@@ -1890,11 +2557,11 @@ const u=s&&s.user||null;
 /* Coming back to the tab makes Supabase re-send SIGNED_IN / TOKEN_REFRESHED for the same user. Nothing changed, so do not redraw the page. */
 if(u&&ME&&CU==u.id&&ev!='PASSWORD_RECOVERY'&&ev!='USER_UPDATED'){ME=u;return}
 ME=u;
-if(!ME){if(PCH){try{sb.removeChannel(PCH)}catch(e){}PCH=null}ONL={};CU=null;D={FO:[],M:[],F:[],MQ:[],U:[]};P={h:[],q:{},fc:{},bm:[],op:{}};OQ=[];PR=null;role='student';QZ=null;QL=1;VWS=[];ntReset();renderFileViewer();
+if(!ME){if(PCH){try{sb.removeChannel(PCH)}catch(e){}PCH=null}ONL={};CU=null;D={FO:[],M:[],F:[],MQ:[],U:[]};P={h:[],q:{},fc:{},bm:[],op:{}};OQ=[];PR=null;role='student';QZ=null;QL=1;VWS=[];ntReset();renderFileViewer();ANN_AUTO=0;ANNR=new Set();annClose(1);
 if(ev=='SIGNED_OUT'){const own=USER_OUT;USER_OUT=0;go('home');if(!own)toast('You were signed out (session ended or you signed out on another device or tab). Please sign in again.')}else route();return}
-if(ME.id!=CU){CU=ME.id;ntReset();QL=0;route();await load();QL=1}
+if(ME.id!=CU){CU=ME.id;ntReset();ANN_AUTO=0;ANNR=new Set();QL=0;route();await load();QL=1}
 if(AU.mode=='newpw')go('auth');else if(location.hash=='#/auth')go('dash');else route()},0));
-route=(f=>function(){f();placeCtx()})(route);syncTheme();route();
+route=(f=>function(){f();placeCtx();annAfterRoute()})(route);syncTheme();annLoad().then(()=>{if(!ME&&QL&&(location.hash.slice(2)||'home').split('/')[0]=='home')route()});route();
 /* PWA: lets the app install on PC and phones and open its shell offline */
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('SW:',e)));
 </script>
