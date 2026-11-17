@@ -584,7 +584,7 @@ body.ntdrag .notes:not(.pinned) .ned,body.ntdrag .notes:not(.pinned) .ntb{displa
 .ann-card .tabs{padding:0 14px;margin:10px 0 0;flex-wrap:nowrap;overflow-x:auto;white-space:nowrap;flex:none}
 .ann-card .tabs a{cursor:pointer}.ann-card .tabs a.on{border-color:var(--acl)}
 .ann-scroll{padding:14px 20px 8px;overflow:auto;flex:1 1 auto;min-height:90px}
-.ann-scroll h2{margin:0 0 10px;font-size:1.4rem;line-height:1.25;color:var(--ink);word-break:break-word}
+.ann-scroll h2{white-space:pre-wrap;margin:0 0 10px;font-size:1.4rem;line-height:1.25;color:var(--ink);word-break:break-word}
 .ann-ft{padding:12px 20px 18px;text-align:center;border-top:1px solid var(--bd);flex:none}
 .ann-card .btn.p{background:var(--ac);border-color:var(--ac);color:var(--act);padding:9px 26px}
 .ann-card .btn.p:hover{filter:brightness(.93)}
@@ -604,10 +604,12 @@ body.ntdrag .notes:not(.pinned) .ned,body.ntdrag .notes:not(.pinned) .ntb{displa
 .abdg[data-b=soon]{background:#475569}.abdg[data-b=tip]{background:#2563EB}.abdg[data-b=important]{background:#DC2626}.abdg[data-b=removed]{background:#78716C}
 /* admin editor */
 .an-inrow{display:flex;gap:8px}.an-inrow input{flex:1;min-width:0}
+.an-inrow textarea{flex:1;min-width:0;min-height:42px;line-height:1.4;resize:vertical;overflow:hidden}
+.an-inrow .btn{align-self:flex-start}
 .an-l{display:block;font-size:.88rem;font-weight:600;margin:0 0 5px}
 .an-edw{border:1px solid var(--bd);border-radius:var(--r);background:var(--card);overflow:hidden}.an-edw:focus-within{border-color:var(--teal)}
 .an-edw .ntb{flex-wrap:wrap;background:var(--bg2)}.an-edw .ntb button{font-weight:700;font-size:.85rem;width:30px}
-.an-ed{min-height:130px;max-height:420px;overflow:auto;padding:10px 12px;outline:none;position:relative}
+.an-ed{min-height:130px;max-height:75vh;resize:vertical;overflow:auto;padding:10px 12px;outline:none;position:relative}
 .an-ed:empty:before{content:attr(data-ph);color:var(--mu);pointer-events:none}
 .an-sec{border:1px solid var(--bd);border-radius:var(--r);padding:14px;background:var(--bg2)}
 .an-sech{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
@@ -2463,7 +2465,8 @@ const annSw=(k,l,d,dis)=>`<label class="an-swr ${dis?'off':''}"><span><b>${l}</b
 function annSet(k,v){if(k=='enabled')ANF.enabled=v;else ANF.s[k]=v;route()}
 const annTb=`<button type="button" title="Bold (Ctrl+B)" onclick="annCmd(this,'bold')">${ico('bold')}</button><button type="button" title="Italic (Ctrl+I)" onclick="annCmd(this,'italic')">${ico('italic')}</button><button type="button" title="Underline (Ctrl+U)" onclick="annCmd(this,'underline')"><u>U</u></button><button type="button" title="Strikethrough" onclick="annCmd(this,'strikeThrough')"><s>S</s></button><button type="button" title="Heading" onclick="annCmd(this,'h')">H</button><button type="button" title="Bulleted list (or type - and a space)" onclick="annCmd(this,'insertUnorderedList')">${ico('list')}</button><button type="button" title="Numbered list (or type 1. and a space)" onclick="annCmd(this,'insertOrderedList')">1.</button><button type="button" title="Checklist (or type [] and a space)" onclick="annCmd(this,'cb')">${ico('box')}</button><button type="button" title="Link" onclick="annCmd(this,'link')">${ico('link')}</button><button type="button" title="Clear formatting" onclick="annCmd(this,'clear')">Tx</button><span class="sp"></span><button type="button" class="an-emobtn" title="Icons, emoji and badges" onclick="emoOpen(this,'insert')">😊</button>`;
 const annEd=(sec,html,ph)=>`<div class="an-edw"><div class="ntb" onmousedown="event.preventDefault()">${annTb}</div><div class="an-ed ann-rt" contenteditable="true" spellcheck="true" data-sec="${sec}" data-ph="${E(ph)}" oninput="annEdInput(this)" onkeydown="annKeyEd(event,this)" onclick="annEdClick(event,this)" onblur="annSaveRng(this)" onpaste="event.preventDefault();document.execCommand('insertText',false,(event.clipboardData||window.clipboardData).getData('text/plain'))">${annHtml(html,1)}</div></div>`;
-const annIn=(id,val,ph,oi)=>`<div class="an-inrow"><input id="${id}" value="${E(val)}" placeholder="${E(ph)}" oninput="${oi}"><button type="button" class="btn an-emobtn" title="Emoji" onclick="emoOpen(this,'insert')">😊</button></div>`;
+const annIn=(id,val,ph,oi)=>`<div class="an-inrow"><textarea id="${id}" class="an-ta" rows="1" placeholder="${E(ph)}" oninput="annGrow(this);${oi}">${E(val)}</textarea><button type="button" class="btn an-emobtn" title="Emoji" onclick="emoOpen(this,'insert')">😊</button></div>`;
+function annGrow(el){el.style.height='auto';el.style.height=(el.scrollHeight+2)+'px'}
 function annEdInput(ed){const v=annClean(ed.innerHTML),k=ed.dataset.sec;if(k=='-1')ANF.body=v;else if(ANF.sections[+k])ANF.sections[+k].body=v}
 function annSaveRng(ed){const s=getSelection();if(s.rangeCount&&ed.contains(s.anchorNode))ed._r=s.getRangeAt(0).cloneRange()}
 function annRestore(ed){if(ed._r){const s=getSelection();s.removeAllRanges();s.addRange(ed._r)}}
@@ -2493,7 +2496,7 @@ if(r.error)return toast(/relation|schema cache|does not exist/i.test(r.error.mes
 ANN=annNorm(r.data);ANN_OK=true;ANN_AUTO=0;annFormInit();toast(pub?'Published as new. Everyone will see it again.':'Saved');route()}
 async function annReadCount(){const el=$('#annRead');if(!el||!ANN)return;try{const r=await sb.from('announcement_reads').select('user_id',{count:'exact',head:true}).eq('version',ANN.version);if(!r.error&&$('#annRead'))$('#annRead').textContent='Confirmed by '+(r.count||0)+' of '+D.U.length+' users'}catch(_){}}
 function annAdmin(){if(!ANF)annFormInit();const f=ANF,s=f.s,live=ANN&&ANN.enabled&&!annExpired(ANN),chip=!ANN?'<span class="an-chip off">Not posted yet</span>':annExpired(ANN)?'<span class="an-chip off">Expired</span>':ANN.enabled?`<span class="an-chip live">Live · version ${ANN.version}</span>`:'<span class="an-chip off">Hidden</span>';
-setTimeout(annReadCount,0);
+setTimeout(annReadCount,0);setTimeout(()=>document.querySelectorAll('.an-ta').forEach(annGrow),0);
 return `<div class="row" style="justify-content:space-between;margin:0 0 14px"><div><h2 style="margin:0">Announcement</h2><p class="mu sm" style="margin:2px 0 0">The What's New popup for your students, also shown from the homepage.</p></div><div class="row" style="margin:0">${chip}<span class="mu sm" id="annRead"></span></div></div>
 ${ANN_OK?'':'<div class="card" style="margin-bottom:14px;border-color:#d97706"><b>Setup needed.</b> <span class="mu sm">Run announcements.sql once in the Supabase SQL editor, then reload this page.</span></div>'}
 <div class="card stack"><h3>Text</h3>
@@ -2527,7 +2530,7 @@ ${annSw('show_date','Show the posted date','')}
 /* ----- icon bank: site icons, emoji and badges ----- */
 function emoClose(){const p=$('#emoPick');if(p)p.remove();EMO.open=0}
 function emoOpen(btn,mode){if(EMO.open&&EMO.btn===btn){emoClose();return}EMO.mode=mode;EMO.btn=btn;EMO.q='';
-EMO.t=mode=='icon'?null:(btn.closest('.an-edw')?btn.closest('.an-edw').querySelector('.an-ed'):btn.closest('.an-inrow').querySelector('input'));
+EMO.t=mode=='icon'?null:(btn.closest('.an-edw')?btn.closest('.an-edw').querySelector('.an-ed'):btn.closest('.an-inrow').querySelector('input,textarea'));
 if(EMO.t&&EMO.t.classList.contains('an-ed')){annSaveRng(EMO.t)}
 if(mode=='icon'&&EMO.tab=='badges')EMO.tab='icons';EMO.open=1;emoDraw(1)}
 function emoDraw(place){let p=$('#emoPick');if(!p){p=document.createElement('div');p.id='emoPick';p.className='emo';p.setAttribute('onmousedown',"if(!event.target.closest('input'))event.preventDefault()");p.setAttribute('onclick','event.stopPropagation()');document.body.appendChild(p)}
@@ -2542,7 +2545,7 @@ if(place&&EMO.btn){const r=EMO.btn.getBoundingClientRect(),w=Math.min(344,innerW
 function emoPick(kind,val){
 if(EMO.mode=='icon'){ANF.s.icon=val;emoClose();route();return}
 const t=EMO.t;if(!t||!document.contains(t))return toast('Click into a field first');
-if(t.tagName=='INPUT'){if(kind!='e')return toast('Icons and badges work in the body text. Pick an emoji for this field.');const a=t.selectionStart==null?t.value.length:t.selectionStart,b=t.selectionEnd==null?a:t.selectionEnd;t.setRangeText(val,a,b,'end');t.focus();t.dispatchEvent(new Event('input'));return}
+if(t.tagName=='INPUT'||t.tagName=='TEXTAREA'){if(kind!='e')return toast('Icons and badges work in the body text. Pick an emoji for this field.');const a=t.selectionStart==null?t.value.length:t.selectionStart,b=t.selectionEnd==null?a:t.selectionEnd;t.setRangeText(val,a,b,'end');t.focus();t.dispatchEvent(new Event('input'));return}
 t.focus();annRestore(t);
 if(kind=='e')document.execCommand('insertText',false,val);
 else if(kind=='i')document.execCommand('insertHTML',false,`<span class="aic" data-i="${val}" contenteditable="false">${ico(val)}</span>&nbsp;`);
