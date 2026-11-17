@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Oswald:wght@600;700&family=Righteous&display=swap" rel="stylesheet">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Found / CE Review Archive</title>
@@ -393,11 +394,64 @@ body.sbo #fabRoot{right:344px}
 .sbt{width:100%;font-size:.88rem;border-collapse:collapse;margin:0}
 .sbt td{padding:6px 0;vertical-align:top;border-bottom:1px solid var(--bd);word-break:break-word}
 .sbt td:first-child{color:var(--mu);width:92px;padding-right:8px}
+
+/* ===== STUDY TRACKER (streak palette is deliberately warm orange so it stands out from the teal/purple theme) ===== */
+.stCard{display:flex;flex-direction:column;gap:12px}
+.stBig{font-size:clamp(2.6rem,7vw,4rem);font-weight:800;line-height:1.05;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.stRow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.stRow .custom-dropdown{min-width:140px}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.sd{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;border:2px dashed var(--bd);filter:grayscale(1);opacity:.4;font-size:15px}
+.sd.on{border:2px solid #FF8A00;background:linear-gradient(145deg,#FFD23F,#FF5A00);filter:none;opacity:1;box-shadow:0 0 10px #FF8A0088;animation:stPop .4s}
+.sd.nx{opacity:.85;border:2px solid #FF8A00;animation:stPulse 1.6s infinite}
+@keyframes stPop{from{transform:scale(.4)}}@keyframes stPulse{50%{box-shadow:0 0 0 5px #FF8A0033}}
+.stDots{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.stSh{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:space-between}
+.stM{color:#FF6A00;font-weight:700}
+.stBrk{background:#FF4D0014;border:1px solid #FF6A00;border-radius:var(--r);padding:10px 12px}
+.stWarn{background:#FF4D0014;border:1px solid #FF6A00;border-radius:var(--r);padding:8px 10px}
+.stH summary{cursor:pointer}.stHi{border-top:1px solid var(--bd);padding:8px 0}.stHi p{margin:0}
+.stTiny{display:flex;justify-content:space-between;align-items:baseline;gap:8px;font-size:1.05rem}
+.stRem{font-size:2rem;font-weight:800;line-height:1.1;color:var(--ink);font-variant-numeric:tabular-nums;margin:2px 0 8px}
+.stLab{font-weight:600;color:var(--teal);margin-top:10px}
+#stRail:not(.on){display:none}
+.stFull>*+*{margin-top:8px}
+.stMob{display:none}
+@media(min-width:701px){.stack>.stMob+*{margin-top:0}}
+@media(max-width:700px){.stMob{display:block}.stCard{display:none}}
+@media(min-width:900px){#stRail.on{position:fixed;top:56px;left:0;bottom:0;width:224px;z-index:6;overflow:auto;padding:12px;background:var(--card);border-right:1px solid var(--bd)}
+body.stp main,body.stp footer{margin-left:224px}.stMin{display:none}}
+@media(max-width:899px){#stRail.on{position:fixed;left:8px;bottom:44px;z-index:16;max-width:min(92vw,320px)}
+#stRail .stFull{display:none;background:var(--card);border:1px solid var(--teal);border-radius:var(--r);padding:12px;box-shadow:0 6px 22px #0003;max-height:70vh;overflow:auto;margin-bottom:6px}
+#stRail.open .stFull{display:block}
+.stMin{display:inline-flex;gap:8px;align-items:center;background:var(--card);border:1px solid #FF8A00;border-radius:99px;padding:6px 14px;box-shadow:0 4px 14px #0003;cursor:pointer;font-weight:700;color:var(--ink)}}
+body.dro #stRail{display:none!important}
+.stDr{margin-top:18px;border-top:1px solid var(--bd);padding-top:12px}.stDr .stFull{display:block}
+.stSum{font-size:.95rem}.stSr{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--bd)}
+.stSum ul{list-style:none;margin:12px 0 0}.stSum li{padding:4px 0}
+.stHero{text-align:center;position:relative}.stHero big{display:block;font-size:2.6rem;font-weight:800;color:var(--ink);margin:6px 0}
+.stConf{position:absolute;left:0;right:0;top:0;height:0;pointer-events:none}
+.stConf i{position:absolute;top:-10px;width:8px;height:12px;opacity:0;animation:stFall 2.4s ease-in forwards}
+@keyframes stFall{0%{opacity:1;transform:translateY(0) rotate(0)}100%{opacity:0;transform:translateY(360px) rotate(540deg)}}
+
+/* ===== v2: fonts, halves, mini, alert ===== */
+.lt{font-family:'Oswald','Barlow Condensed','Arial Narrow',Impact,sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.14em;color:var(--ink)}
+.fq{font-family:'Righteous','Trebuchet MS',system-ui,sans-serif;font-weight:400;letter-spacing:.03em}
+h3.fq{font-size:1.35rem}
+.stT{font-size:1rem;display:flex;align-items:center;gap:8px;border-left:4px solid #FF8A00;padding-left:10px}
+.stCard .stT{font-size:1.25rem}
+.sd.half{border:2px solid #FF8A00;filter:none;opacity:1;background:linear-gradient(90deg,#FF8A00 50%,transparent 50%);box-shadow:0 0 8px #FF8A0066}
+.seg button:disabled{opacity:.5;cursor:not-allowed}
+#stAl{position:fixed;inset:0;z-index:80;background:#000b;display:grid;place-items:center;padding:16px}
+.stAlc{background:var(--card);border:2px solid #FF8A00;border-radius:12px;padding:26px 24px;max-width:420px;width:100%;text-align:center;box-shadow:0 0 44px #FF8A0066;animation:stPop .3s}
+.stAlc h2{font-size:1.8rem;margin:4px 0 8px}.stAlc p{margin:8px 0}
+.stBell{font-size:2.6rem;display:inline-block;animation:stShake .7s infinite}
+@keyframes stShake{0%,100%{transform:rotate(0)}25%{transform:rotate(14deg)}75%{transform:rotate(-14deg)}}
 </style>
 </head>
 <body>
 <header><div class="w hi"><button class="btn" id="bg" onclick="dr(1)" aria-label="Menu">☰</button><a class="brand" onclick="go(ME ? 'dash' : 'home')">Found <i>/</i> CE Review Archive</a><button class="btn thm" id="thm" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Dark mode">🌙</button><div id="tb"></div></div></header>
-<div id="ov" onclick="dr(0)"></div><aside id="dr"></aside>
+<div id="ov" onclick="dr(0)"></div><aside id="dr"></aside><div id="stRail"></div>
 <main id="app"></main>
 <footer class="art"><div class="w">Found / CE Review Archive · Your progress and your own content are saved to your account</div></footer>
 <div id="toast"></div>
@@ -737,7 +791,7 @@ try{for(const[i,f]of keep.entries()){toast('Uploading '+(i+1)+' of '+keep.length
 fabDone();toast(keep.length+' file(s) uploaded'+(skip?', '+skip+' skipped':''));route()}
 const save=()=>{};
 function toast(t){const e=$('#toast');e.textContent=t;e.style.display='block';clearTimeout(toast.t);toast.t=setTimeout(()=>e.style.display='none',3200)}
-function dr(x){$('#dr').classList.toggle('on',!!x);$('#ov').classList.toggle('on',!!x)}
+function dr(x){document.body.classList.toggle('dro',!!x);$('#dr').classList.toggle('on',!!x);$('#ov').classList.toggle('on',!!x)}
 const tag=x=>`<span class="tag">${E(x)}</span>`,hd=(t,p)=>`<div class="ph art"><div class="w"><h1>${t}</h1><p class="mu">${p}</p></div></div>`,
 empty=t=>`<div class="card empty art"><p class="mu">${t}</p></div>`;
 const TB={M:'materials',F:'flashcards',MQ:'questions'};
@@ -801,7 +855,7 @@ V.home=()=>`<section class="hero art"><div class="w"><p class="eyebrow">Civil En
 
 V.dash=()=>{const a=stat(()=>1),h=P.h.slice(0,4),op=P.op||{},top5=D.M.filter(m=>op[m.id]).sort((x,y)=>op[y.id]-op[x.id]).slice(0,5);
 return hd('Welcome, '+E(PR&&PR.display_name||'Student'),'Your progress across all components.')+`<div class="w sec stack">
-<div class="dgrid"><div class="card dph"><p class="mu sm">Coming soon</p></div><div class="stack"><div class="card art stack"><h3>Quiz</h3><p class="mu">Draws from all ${a.n} questions across MSTC, HPGE and PSAD. You can also start a quiz inside each component.</p><button class="btn p" onclick="go('quiz')">Start a quiz</button></div>${qkCard()}</div></div>
+<div class="dgrid"><div class="card stCard" id="stDash">${stDashHtml()}</div><div class="stack"><div class="card stMob" id="stMobBox">${stStreak(stLoad())}</div><div class="card art stack"><h3>Quiz</h3><p class="mu">Draws from all ${a.n} questions across MSTC, HPGE and PSAD. You can also start a quiz inside each component.</p><button class="btn p" onclick="go('quiz')">Start a quiz</button></div>${qkCard()}</div></div>
 <div class="g">${C.map(c=>`<div class="card art" onclick="go('c/${c}')"><h3>${c}</h3>${bars(stat(x=>x.c==c))}</div>`).join('')}</div>
 <p class="mu sm">Accuracy = correct answers ÷ answers given. Mastery = questions you last answered correctly ÷ all questions.</p>
 <div class="card"><h3>Most opened files</h3>${top5.map(m=>`<div class="row" style="justify-content:space-between;margin:8px 0 0"><a class="lk" onclick="openM('${m.id}')">${tag(m.type)} ${E(m.title)}</a><span class="mu sm">${op[m.id]} ${op[m.id]==1?'open':'opens'}</span></div>`).join('')||'<p class="mu sm">Files you open will show up here.</p>'}</div>
@@ -867,13 +921,13 @@ function qkCard(){const{s,st}=qkState(),has=allQ().length>0,
 msg={new:'5 flashcards, 20 minutes. Starts with Algebra.',ok:'5 flashcards, 20 minutes. Keep your streak going!',done:'✓ Done for today. Come back tomorrow.',
 rev:`You missed a day. Revive your ${s.streak}-day streak with 1 question (10 minutes). Chances used: ${s.rev.tries} / 3.`,revdone:`Revive chance used today. Try again tomorrow. Chances used: ${s.rev.tries} / 3.`}[st],
 btn=st=='done'&&s.today&&s.today.date==ymd()?`<button class="btn p" onclick="qkStart('review')">View today's cards</button>`:st=='rev'?`<button class="btn p" onclick="qkStart('rev')" ${has?'':'disabled'}>Revive streak</button>`:`<button class="btn p" onclick="qkStart()" ${has&&(st=='new'||st=='ok')?'':'disabled'}>Start a QuickiZ</button>`;
-return `<div class="card art stack ${st=='done'?'':'qkoff'}"><h3>QuickiZ</h3>${qkLabel(s.streak)}${qkDots(s.streak)}${!s.streak&&s.lost?`<p class="mu sm">Your ${s.lost}-day streak ended. Start again at day 1.</p>`:''}<p class="mu">${msg}</p>${btn}</div>`}
+return `<div class="card art stack ${st=='done'?'':'qkoff'}"><h3 class="fq">QuickiZ</h3>${qkLabel(s.streak)}${qkDots(s.streak)}${!s.streak&&s.lost?`<p class="mu sm">Your ${s.lost}-day streak ended. Start again at day 1.</p>`:''}<p class="mu">${msg}</p>${btn}</div>`}
 function qkResult(){const S=QKS,r=S.res,back=`<div class="row"><button class="btn p" onclick="go('dash')">Back to dashboard</button></div>`;
 if(r.fail=='time'&&S.mode!='rev')return `<div class="card art stack"><h3>⏰ Time's up</h3><p class="mu">This QuickiZ didn't count. You can start a new one from the dashboard.</p>${back}</div>`;
 if(S.mode=='rev'){if(r.ok)return `<div class="card art stack"><h3>🔥 Streak revived!</h3><p>Your ${r.streak}-day streak is back. Do today's QuickiZ to add a day.</p>${back}</div>`;
 return `<div class="card art stack"><h3>${r.fail=='time'?"⏰ Time's up":'Not quite'}</h3>${r.out?`<p>All 3 revive chances are used. Your ${r.lost}-day streak ended. Start again at day 1.</p>`:`<p>Try again tomorrow. Chances used: ${r.tries} / 3.</p>`}${back}</div>`}
 return `<div class="card art stack"><h3>🎉 QuickiZ complete!</h3><p>Score: <b>${r.sc} / ${S.qs.length}</b></p><p class="lb">${r.rd?'Streak kept':'+1 day'} · Streak: ${r.streak} ${r.streak==1?'day':'days'}</p>${qkDots(r.streak)}${r.streak%7?`<p class="mu sm">Next milestone: ${(Math.floor(r.streak/7)+1)*7}-day streak</p>`:`<p class="lb">🏆 ${r.streak}-day streak!</p>`}${back}</div>`}
-V.quickiz=()=>{const S=QKS,h=hd('QuickiZ',S&&S.mode=='review'?'Your cards from today. Tap a card to flip it.':S&&S.mode=='rev'?'Revive your streak: answer 1 question in 10 minutes.':'5 flashcards, 20 minutes.');
+V.quickiz=()=>{const S=QKS,h=hd('<span class="fq">QuickiZ</span>',S&&S.mode=='review'?'Your cards from today. Tap a card to flip it.':S&&S.mode=='rev'?'Revive your streak: answer 1 question in 10 minutes.':'5 flashcards, 20 minutes.');
 if(!S)return h+`<div class="w sec"><div class="card stack"><p class="mu">No active QuickiZ.</p><div class="row"><button class="btn p" onclick="go('dash')">Back to dashboard</button></div></div></div>`;
 if(S.done)return h+`<div class="w sec">${qkResult()}</div>`;
 const q=S.qs[S.i],c=qcard(q),a=S.pick[S.i],last=S.i==S.qs.length-1,rv=S.mode=='review';
@@ -1246,7 +1300,7 @@ return it.length?`<div class="card"><h3>Shared with you</h3>${it.map(([t,x])=>`<
 /* ===== MENU, TOP BAR, LOGIN, ROUTER ===== */
 /* ===== MENU, TOP BAR, LOGIN, ROUTER ===== */
 const drawer=(n,a)=>{const cur=n=='f'?(D.FO.find(x=>x.id==a)||{}).c:a,lnk=(h,t,on)=>`<a${on?' class="on"':''} onclick="dr(0);${h}">${t}</a>`;
-return lnk("go('dash')",'Dashboard',n=='dash')+lnk("go('quiz')",'Quiz',n=='quiz')+lnk("go('hist')",'Quiz History',n=='hist')+`<p class="dl">Components</p>`+C.map(c=>lnk(`go('c/${c}')`,c,(n=='c'||n=='f')&&cur==c)).join('')+`<p class="dl">Study</p>`+lnk("FF={c:'',k:''};go('cards')",'Flashcards',n=='cards'&&FF.k!='img')+lnk("FF={c:'',k:'img'};go('cards')",'Formula Cards',n=='cards'&&FF.k=='img')+lnk("go('myq')",'My Questions',n=='myq')+(role=='admin'?`<p class="dl">Admin</p>`+lnk("go('admin')",'Admin Dashboard',n=='admin'):'')+`<p class="dl"></p>`+lnk("out()",'Log out',false)};
+return lnk("go('dash')",'Dashboard',n=='dash')+lnk("go('quiz')",'Quiz',n=='quiz')+lnk("go('hist')",'Quiz History',n=='hist')+`<p class="dl">Components</p>`+C.map(c=>lnk(`go('c/${c}')`,c,(n=='c'||n=='f')&&cur==c)).join('')+`<p class="dl">Study</p>`+lnk("FF={c:'',k:''};go('cards')",'Flashcards',n=='cards'&&FF.k!='img')+lnk("FF={c:'',k:'img'};go('cards')",'Formula Cards',n=='cards'&&FF.k=='img')+lnk("go('myq')",'My Questions',n=='myq')+(role=='admin'?`<p class="dl">Admin</p>`+lnk("go('admin')",'Admin Dashboard',n=='admin'):'')+`<p class="dl"></p>`+lnk("out()",'Log out',false)+'<div class="stDr"></div>'};
 const tbar=()=>ME?`<span class="sm mu" style="white-space:nowrap">${E(PR&&PR.display_name||'')} <span class="tag">${role}</span></span>`:`<button class="btn" onclick="AU.mode='in';AU.msg='';go('auth')">Log in</button> <button class="btn p" onclick="AU.mode='up';AU.msg='';go('auth')">Sign up</button>`;
 let USER_OUT=0;
 function out(){USER_OUT=1;sb.auth.signOut({scope:'local'})}
@@ -1272,9 +1326,89 @@ renderCustomConfirm();
 renderFileViewer();hydrateThumbs();renderSidebar();placeMenu();if(n=='admin')admMark();
 document.querySelectorAll('textarea.qn').forEach(agrow);
 if(n=='quiz'&&QZ&&!QZ.done){cnt();if(QZ.end)tick()}else smry();
-qkHook(n)}
+stRender();qkHook(n)}
 addEventListener('hashchange',()=>{nv=1;scrollTo(0,0);route()});
 addEventListener('keydown',e=>{if(e.key=='Enter'&&location.hash=='#/auth'&&e.target.tagName=='INPUT')doAuth()});
+/* ===== LOCK IN STUDY + MINI LOCK IN (Philippine time). Per-account state in localStorage as timestamps, so the clock keeps running through refresh and logout. ===== */
+const TZ='Asia/Manila',phF=(o,ms)=>new Intl.DateTimeFormat('en-PH',Object.assign({timeZone:TZ},o)).format(ms),
+tm=ms=>phF({hour:'numeric',minute:'2-digit'},ms).toUpperCase(),tms=ms=>phF({hour:'numeric',minute:'2-digit',second:'2-digit'},ms).toUpperCase(),
+phDay=(ms=Date.now())=>new Intl.DateTimeFormat('en-CA',{timeZone:TZ}).format(ms),
+tmd=ms=>tm(ms)+(phDay(ms)!=phDay()?' (tomorrow)':''),
+hms=s=>{s=Math.max(0,s);return String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor(s/60)%60).padStart(2,'0')+':'+String(s%60).padStart(2,'0')},
+dur=s=>{const m=Math.round(s/60);return m<60?m+' min':Math.floor(m/60)+' h'+(m%60?' '+m%60+' min':'')},
+fm=n=>{const w=Math.floor(n);return n%1?(w||'')+'½':''+n},
+FULL=[180,240,300,360,420,480],MINI=[30,45,60,75,90],gl=m=>m<60?m+' min':Math.floor(m/60)+' hr'+(m%60?' '+m%60+' min':'');
+let stPh='';
+const stLoad=()=>{let s={};try{s=JSON.parse(localStorage.getItem('st_'+ME.id)||'{}')}catch(e){}
+s=Object.assign({goal:0,gk:'',pm:'full',a:null,h:[],streak:0,last:'',dc:{},rv:{m:'',u:0}},s);
+if(!s.gk){s.gk='full';if(s.goal&&s.goal<=8)s.goal*=60}return s},
+stSave=s=>{try{localStorage.setItem('st_'+ME.id,JSON.stringify(s))}catch(e){}},
+stEl=(a,n=Date.now())=>Math.max(0,Math.floor((n-a.start-a.pt-(a.pa?n-a.pa:0))/1000)),
+stW=a=>a.w||600,
+stDer=s=>{const t=phDay(),gap=s.last?dayDiff(s.last,t):99,br=s.streak>0&&gap>=2;return{t,br,cur:br?0:s.streak,lost:br?s.streak:0,today:(s.dc[t]||0)>=1,fd:(s.dc[t]||0)>=1,rv:7-(s.rv.m==t.slice(0,7)?s.rv.u:0)}},
+stPhase=s=>{const a=s.a;if(!a)return'i';const r=a.g-stEl(a);return a.pa?'p':r<=0?'o':'r'},
+stExp=s=>{const a=s.a;return tmd(Date.now()+(a?Math.max(0,a.g-stEl(a)):s.goal*60)*1000)},
+stName=m=>`<div class="stT lt">${m=='mini'?'Mini Lock In':'Lock in Study'}</div>`,
+stBrk=d=>`<div class="stBrk sm">💔 Streak broken. You lost a ${fm(d.lost)}-day streak. Revive it, your choice how.<div class="stRow" style="margin-top:8px"><button class="btn p" ${d.rv<1?'disabled':''} onclick="stRevive()">🔥 Revive</button><span>${d.rv} of 7 revives left this month</span></div></div>`,
+stWarn=(o,w)=>`<p class="stWarn sm">⏰ Timer done! Declare your study ended: tap <b>End study</b> within <b data-st="grace">${mmss(Math.max(0,w-o))}</b> or this session won't count.</p>`,
+stLog=l=>`<p class="sm mu">${{start:'▶ Started',pause:'⏸ Paused',resume:'⏯ Resumed',end:'✔ Ended'}[l.t]} ${tm(l.ts)}${l.t=='pause'?' · after '+dur(l.m*60)+' of study':l.t=='resume'?' · paused for '+dur(l.m*60):''}</p>`;
+function stStreak(s){const d=stDer(s),n=d.cur,full=n>0&&n%7==0,c=full?7:n%7,nx=(Math.floor(n/7)+1)*7,nxi=Math.floor(c);
+return `<div class="stS"><div class="stSh"><b>🔥 ${fm(n)} day${n==1?'':'s'} streak</b>${full?`<span class="stM">🏆 ${fm(n)} days straight!</span>`:''}</div><div class="stDots">${[0,1,2,3,4,5,6].map(i=>{const f=Math.min(1,Math.max(0,c-i));return `<span class="sd${f>=1?' on':f>0?' half':i==nxi&&!d.today?' nx':''}">🔥</span>`}).join('')}</div><p class="sm mu">Next milestone: <b class="stM">${nx} days</b> · ${fm(nx-n)} to go</p></div>`}
+function stHist(s){const all=(s.a?[Object.assign({},s.a,{res:'live',secs:stEl(s.a)})]:[]).concat(s.h).slice(0,6);
+return `<details class="stH"><summary class="lb">Study history${all.length?' ('+all.length+')':''}</summary>${all.map(x=>`<div class="stHi"><p><b>${phF({month:'short',day:'numeric'},x.start)}</b> ${tm(x.start)}${x.end?' – '+tm(x.end):''} · ${dur(x.secs)} ${tag({done:'Completed',live:'In progress',stopped:'Stopped',early:'Ended early',expired:'Expired'}[x.res])}${x.mode=='revive'?' '+tag('Revive'):x.mode=='mini'?' '+tag('Mini'):''}</p>${x.log.map(stLog).join('')}</div>`).join('')||'<p class="mu sm">No sessions yet.</p>'}</details>`}
+function stDashHtml(){const s=stLoad(),d=stDer(s),a=s.a,run=!!a,pm=d.fd?'mini':s.pm,g=s.gk==pm?s.goal:0,w=a?stW(a):0,e=a?stEl(a):0,r=a?Math.max(0,a.g-e):0,ov=a?Math.max(0,e-a.g):0,l=a||s.h.find(x=>x.day==d.t),sd=l?tm(l.start):'--',ed=!a&&l&&l.end?tm(l.end):'--',
+nm=a?(a.mode=='mini'||a.mn?'mini':'full'):pm;
+return `${stName(nm)}<div><div class="stBig" data-st="clock">${tms(Date.now())}</div><p class="mu sm"><span data-st="date">${phF({weekday:'long',month:'long',day:'numeric'},Date.now())}</span> · Philippine Time</p></div>
+${stStreak(s)}${d.br&&!run?stBrk(d):''}
+<div class="seg" ${run?'style="pointer-events:none;opacity:.5"':''} style="align-self:flex-start"><button class="${pm=='full'?'on':''}" ${d.fd?'disabled':''} onclick="stMode('full')">Lock in Study${d.fd?' ✓':''}</button><button class="${pm=='mini'?'on':''}" onclick="stMode('mini')">Mini Lock In</button></div>
+<div class="stRow"><div ${run?'style="pointer-events:none;opacity:.5"':''}>${dd('stGoal',[['','Select timer']].concat((pm=='mini'?MINI:FULL).map(x=>[x,gl(x)])),g||'')}</div><button class="btn" ${run?'disabled':''} onclick="stSet()">Set</button>${g&&!run?`<span class="tag">Timer set: ${gl(g)}</span>`:''}</div>
+<p class="sm">Time left <b data-st="rem">${hms(run?r:g*60)}</b> · Expected end <b data-st="exp">${g||run?stExp(s):'--'}</b></p>
+<div class="stRow"><button class="btn p" ${g&&!run?'':'disabled'} onclick="stAsk()">▶ Start study</button><span class="sm mu">Started: <b>${sd}</b></span></div>
+<div class="stRow"><button class="btn p" ${run?'':'disabled'} onclick="stEnd()">■ End study</button><span class="sm mu">Ended: <b>${ed}</b></span></div>
+${run?`<p class="sm mu">End in the last ${w/60} min of the timer to earn streak credit. Ending earlier is allowed but only logs your time.</p>`:''}${ov?stWarn(ov,w):''}
+<div class="stRow"><button class="btn" ${run?'':'disabled'} onclick="stStop()">Stop</button><button class="btn" ${run||g?'':'disabled'} onclick="stReset()">Reset</button></div>${stHist(s)}`}
+function stPanel(mini){const s=stLoad(),d=stDer(s),a=s.a;if(!a&&!d.br)return'';
+const e=a?stEl(a):0,r=a?Math.max(0,a.g-e):0,ov=a?Math.max(0,e-a.g):0,rvm=a&&a.mode=='revive'&&!a.mn;
+let h=`<div class="stFull">${stName(a&&(a.mode=='mini'||a.mn)?'mini':'full')}<div class="stTiny"><span class="mu sm">PH time</span><b data-st="clock">${tms(Date.now())}</b></div>`;
+if(a)h+=`<div class="stLab">${ov?'⏰ Overtime':a.pa?'⏸ Paused':rvm?'🔥 Revive · straight':'📖 Studying'}</div><div class="stRem" data-st="rem">${hms(r)}</div>
+<button class="btn p" style="width:100%" ${ov||rvm?'disabled':''} onclick="stPause()">${a.pa?'▶ Resume study':'⏸ Pause study'}</button>
+<p class="sm mu">Expected end <b data-st="exp">${stExp(s)}</b></p><button class="btn" style="width:100%" onclick="stEnd()">✔ End study</button>${ov?stWarn(ov,stW(a)):''}`;
+h+=stStreak(s)+(!a?stBrk(d):'')+'</div>';
+return h+(mini?`<div class="stMin" onclick="$('#stRail').classList.toggle('open')">${a?`⏱ <span data-st="rem">${hms(r)}</span>`:'💔 Streak'}</div>`:'')}
+function stRender(){const r=$('#stRail');if(!r)return;const s=ME?stLoad():null,p=ME?stPanel(1):'';r.innerHTML=p;r.classList.toggle('on',!!p);document.body.classList.toggle('stp',!!p);
+const dr=document.querySelector('.stDr');if(dr)dr.innerHTML=ME?stPanel(0):'';const x=$('#stDash');if(x)x.innerHTML=ME?stDashHtml():'';const m=$('#stMobBox');if(m)m.innerHTML=ME?stStreak(s):'';stPh=ME?stPhase(s):''}
+function stMode(m){const s=stLoad();if(s.a||(m=='full'&&stDer(s).fd))return;s.pm=m;if(s.gk!=m)s.goal=0;stSave(s);stRender()}
+function stSet(){const g=+v('stGoal');if(!g)return toast('Pick a timer first');const s=stLoad(),pm=stDer(s).fd?'mini':s.pm;s.goal=g;s.gk=pm;stSave(s);stRender();toast('Timer set: '+gl(g))}
+function stAsk(mode,rm){const s=stLoad(),d=stDer(s),rv=mode=='revive',mn=!rv&&s.gk=='mini';if(s.a)return;if(rv&&(!d.br||d.rv<1))return toast('No revive available');const m=rv?(rm||240):s.goal;if(!m)return;
+const g=m*60,w=mn||rm?300:600,n=Date.now(),old=s.dc[d.t]||0,add=(mn||rm?Math.max(old,.5):1)-old,R=(a,b)=>`<div class="stSr"><span class="mu">${a}</span><b>${b}</b></div>`;
+openMdl({title:rv?(rm?'⚡ Revive with Mini Lock In':'🔥 Revive with a 4-hour study'):mn?'⚡ Mini Lock In':'🔒 Lock in Study',okText:rv?(rm?'Start mini revive':'Start 4-hour revive'):'Lock in',onOk:()=>stStart(mode,rm),body:`<div class="stSum">${R('Timer',rv&&!rm?'4 hours, straight':gl(m))}${R('Starts',tms(n)+' PHT')}${R('Expected end',tmd(n+g*1000))}${R('Streak credit',add>0?'+'+fm(add)+' day':'Already earned today')}<ul><li>⏱ Press <b>End study</b> in the last ${w/60} minutes to earn streak credit. Ending earlier is allowed (life happens) but only logs your time.</li><li>⏰ When the timer hits zero you get ${w/60} extra minutes to clock out with <b>End study</b>. Miss it and the session won't count.</li><li>🔁 Refreshing or logging out won't stop the clock.</li><li>${rv&&!rm?'⛔ Revive sessions can\'t be paused. It also counts as today\'s full study.':'⏸ You can pause anytime. The expected end moves while you\'re paused.'}</li></ul></div>`})}
+function stStart(mode,rm){const s=stLoad(),rv=mode=='revive';if(s.a)return;const n=Date.now(),mn=!rv&&s.gk=='mini';s.a={start:n,g:(rv?(rm||240):s.goal)*60,w:mn||rm?300:600,pt:0,pa:0,mn:rm?1:0,mode:rv?'revive':mn?'mini':'n',log:[{t:'start',ts:n}]};stSave(s);stRender();toast('Locked in. Good luck! 💪')}
+function stPause(){const s=stLoad(),a=s.a,n=Date.now();if(!a||(a.mode=='revive'&&!a.mn)||stEl(a)>=a.g)return;
+if(a.pa){a.log.push({t:'resume',ts:n,m:Math.round((n-a.pa)/60000)});a.pt+=n-a.pa;a.pa=0}else{a.log.push({t:'pause',ts:n,m:Math.floor(stEl(a)/60)});a.pa=n}stSave(s);stRender()}
+function stClose(s,res,secs){const a=s.a,n=Date.now();if(a.pa){a.log.push({t:'resume',ts:n,m:Math.round((n-a.pa)/60000)});a.pt+=n-a.pa;a.pa=0}
+a.log.push({t:'end',ts:n});s.h.unshift({start:a.start,end:n,g:a.g,secs,mode:a.mode,res,log:a.log,day:phDay(n)});s.h=s.h.slice(0,30);s.a=null;if(res=='done')s.goal=0}
+function stEnd(){const s=stLoad(),a=s.a;if(!a)return;const el=stEl(a);
+if(a.g-el>stW(a))return showConfirm('End study early?','Your '+dur(el)+' is saved in history, but it only counts toward your streak if you end within the last '+stW(a)/60+' minutes of the timer.',()=>{const s=stLoad();if(!s.a)return;stClose(s,'early',stEl(s.a));stSave(s);stRender();toast('Session ended early. Time logged.')});
+const d=stDer(s),rv=a.mode=='revive',mn=a.mode=='mini'||!!a.mn,g=a.g,old=s.dc[d.t]||0,nw=mn?Math.max(old,.5):1,add=nw-old;stClose(s,'done',g);
+s.streak=(d.br&&!rv?0:s.streak)+add;if(add>0)s.last=d.t;s.dc[d.t]=nw;s.dc=Object.fromEntries(Object.entries(s.dc).slice(-14));
+if(rv){const m=d.t.slice(0,7);if(s.rv.m!=m)s.rv={m,u:0};s.rv.u++}
+const tot=s.h.filter(x=>x.day==d.t&&x.res=='done').reduce((t,x)=>t+x.secs,0);stSave(s);stRender();
+openMdl({title:rv?'🔥 Streak revived!':mn?'⚡ Mini Lock In complete!':'🎉 Study complete!',noCancel:1,okText:'Awesome!',body:`<div class="stHero"><div class="stConf">${Array.from({length:28},(_,i)=>`<i style="left:${Math.random()*100}%;background:${['#FF8A00','#FFD23F','#FF4D00','#2F7F80','#9FD3D0'][i%5]};animation-delay:${Math.random()*.6}s"></i>`).join('')}</div><p class="mu">You studied</p><big>${dur(g)}</big><p>Total today: <b>${dur(tot)}</b></p><p class="stM" style="font-size:1.15rem;margin-top:10px">🔥 ${add>0?'+'+fm(add)+' day! ':'Already earned today. '}Streak: ${fm(s.streak)} day${s.streak==1?'':'s'}</p>${s.streak%7==0&&add>0?'<p class="stM">🏆 Week milestone reached!</p>':''}<p class="mu sm" style="margin-top:8px">Great work. Rest well and keep it going!</p></div>`})}
+function stRevive(){const d=stDer(stLoad());if(!d.br||d.rv<1)return toast('No revive available');
+openMdl({title:'🔥 Revive your streak',noCancel:1,okText:'Not now',body:`<p class="mu">Choose how to bring back your ${fm(d.lost)}-day streak. Each option uses 1 of your ${d.rv} revives left this month.</p><div class="stRow" style="flex-direction:column;align-items:stretch;margin-top:12px"><button class="btn p" onclick="closeMdl();stRevSimple()">⚡ Simple revive<br><span class="sm">Instant. No studying needed.</span></button><button class="btn" onclick="closeMdl();stAsk('revive')">⏱ Revive with 4-hour study<br><span class="sm">One straight 4 h session. Also counts as today's full study.</span></button><div class="stSm sm mu" style="margin-top:4px">Or revive with a Mini Lock In (earns ½ day, pausing allowed):</div><div class="stRow" style="flex-wrap:nowrap"><div style="flex:1">${dd('stRvM',MINI.map(x=>[x,gl(x)]),30)}</div><button class="btn p" onclick="stRvMini()">⚡ Revive with Mini</button></div></div>`})}
+function stRvMini(){const m=+v('stRvM')||30;closeMdl();stAsk('revive',m)}
+function stRevSimple(){const s=stLoad(),d=stDer(s);if(!d.br||d.rv<1||s.a)return;const m=d.t.slice(0,7);if(s.rv.m!=m)s.rv={m,u:0};s.rv.u++;s.last=phDay(Date.now()-864e5);stSave(s);stRender();toast('Streak revived! Study today to keep it going 🔥')}
+function stStop(){showConfirm('Stop this study session?','It is saved in your history as "Stopped" and earns no streak credit.',()=>{const s=stLoad();if(!s.a)return;stClose(s,'stopped',stEl(s.a));stSave(s);stRender();toast('Session stopped')})}
+function stReset(){const s=stLoad();if(!s.a){s.goal=0;stSave(s);stRender();return}
+showConfirm('Reset the timer?','Your running session is deleted (not saved in history) and the timer setting is cleared.',()=>{const s=stLoad();s.a=null;s.goal=0;stSave(s);stRender();toast('Timer reset')})}
+function stExpire(s){stClose(s,'expired',stEl(s.a));stSave(s);stRender();toast('Study was not clocked out in time, so it did not count.')}
+function stAlert(w){if($('#stAl'))return;const d=document.createElement('div');d.id='stAl';d.innerHTML=`<div class="stAlc"><div class="stBell">⏰</div><h2 class="lt">Time's up!</h2><p>Your study timer has run out. Tap <b>End study</b> to clock out so this session counts.</p><p class="mu sm">Time left to clock out: <b data-st="grace" style="color:#FF6A00;font-size:1.4rem">${mmss(w)}</b></p><button class="btn p" onclick="this.closest('#stAl').remove()">Close</button></div>`;document.body.appendChild(d)}
+function stTick(){if(!ME)return;const s=stLoad(),a=s.a,n=Date.now(),T=(k,x)=>document.querySelectorAll('[data-st="'+k+'"]').forEach(e=>e.textContent=x);
+T('clock',tms(n));T('date',phF({weekday:'long',month:'long',day:'numeric'},n));
+if(a){const e=stEl(a,n),w=stW(a);if(e-a.g>=w)return stExpire(s);if(e>=a.g&&!a.al){a.al=1;stSave(s);stAlert(w-(e-a.g))}T('rem',hms(a.g-e));T('grace',mmss(Math.max(0,w-Math.max(0,e-a.g))));T('exp',stExp(s))}else{T('exp',s.goal?stExp(s):'--');const x=$('#stAl');if(x)x.remove()}
+if(stPhase(s)!=stPh)stRender()}
+setInterval(stTick,1000);document.addEventListener('visibilitychange',stTick);
+
 /* session: runs on page load, login, logout and password-reset links */
 sb.auth.onAuthStateChange((ev,s)=>setTimeout(async()=>{
 if(ev=='PASSWORD_RECOVERY')AU.mode='newpw';
