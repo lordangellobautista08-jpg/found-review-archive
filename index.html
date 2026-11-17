@@ -830,7 +830,7 @@ function qkReset(s){s.lost=s.streak;s.streak=0;s.last='';s.seen={};s.rev={tries:
 function qkState(){const s=qkLoad(),t=ymd();let st='new';
 if(s.streak&&s.last){const d=dayDiff(s.last,t);
 if(d>4||(s.rev.tries>=3&&s.rev.lastTry!==t)){qkReset(s);qkSave(s)}
-else st=d<=0?'done':d==1?'ok':s.rev.lastTry===t?'revdone':'rev'}
+else st=d<=0?(s.redo===t?'ok':'done'):d==1?'ok':s.rev.lastTry===t?'revdone':'rev'}
 return{s,st}}
 function qkPick(s){const g=new Map();allQ().filter(x=>!qkTag(x)).forEach(x=>{const k=x.c+'|'+x.s+'|'+x.t;if(!g.has(k))g.set(k,{c:x.c,s:x.s,t:x.t,n:1e9,q:[]});const e=g.get(k);e.q.push(x);e.n=Math.min(e.n,x.n||1e9)});
 const flat=[...g.values()].sort((a,b)=>(/^algebra/i.test(a.s)?0:1)-(/^algebra/i.test(b.s)?0:1)||cmp(a.c,b.c)||cmp(a.s,b.s)||a.n-b.n||cmp(a.t,b.t))
@@ -844,10 +844,13 @@ if(mode=='review'){const t=s.today;if(st!='done'||!t||t.date!=ymd())return;const
 if(mode=='rev'){if(st!='rev')return;const q=qkRevPick(s);if(!q)return toast('No questions available yet');s.rev.tries++;s.rev.lastTry=ymd();s.rev.used.push(q.id);qkSave(s);QKS={mode,qs:[q],i:0,pick:[],end:Date.now()+6e5}}
 else{if(st!='new'&&st!='ok')return;const r=qkPick(s);if(!r.qs.length)return toast('No questions available yet');QKS={mode:'daily',qs:r.qs,i:0,pick:[],end:Date.now()+12e5,cyc:r.cyc}}
 go('quickiz')}
+async function qkAdminReset(){const r=await sb.rpc('quickiz_reset_today',{p_day:ymd()});
+if(r.error)return toast(/function|schema cache/i.test(r.error.message)?'Run the new part of quickiz_sync.sql in Supabase first.':r.error.message);
+await qkPull();toast('QuickiZ reset for '+r.data+' student(s). Streaks kept.');route()}
 function qkRevFail(why){const s=qkLoad(),tries=s.rev.tries,out=tries>=3;if(out)qkReset(s);qkSave(s);QKS.res={fail:why,tries,out,lost:s.lost}}
 function qkComplete(){const S=QKS,s=qkLoad();
 if(S.mode=='rev'){if(S.pick[0]==S.qs[0].a){s.last=ymd(-1);s.rev={tries:0,lastTry:'',used:[]};qkSave(s);S.res={ok:1,streak:s.streak}}else qkRevFail('wrong');return}
-const sc=S.qs.filter((q,i)=>S.pick[i]==q.a).length;if(S.cyc)s.seen={};S.qs.forEach(q=>s.seen[q.id]=1);const l=S.qs[S.qs.length-1];s.sub={c:l.c,s:l.s,t:l.t};s.today={date:ymd(),ids:S.qs.map(q=>q.id),pick:S.pick.slice()};s.streak++;s.last=ymd();s.lost=0;qkSave(s);S.res={ok:1,sc,streak:s.streak}}
+const sc=S.qs.filter((q,i)=>S.pick[i]==q.a).length;if(S.cyc)s.seen={};S.qs.forEach(q=>s.seen[q.id]=1);const l=S.qs[S.qs.length-1];s.sub={c:l.c,s:l.s,t:l.t};s.today={date:ymd(),ids:S.qs.map(q=>q.id),pick:S.pick.slice()};const rd=s.redo===ymd();if(rd)s.redo='';else s.streak++;s.last=ymd();s.lost=0;qkSave(s);S.res={ok:1,sc,streak:s.streak,rd}}
 function qkAns(j){const S=QKS,q=S&&S.qs[S.i];if(!q||S.res||S.pick[S.i]!=null||Date.now()>=S.end)return;S.pick[S.i]=j;
 document.querySelectorAll('.fch').forEach((b,n)=>{b.disabled=true;b.classList.toggle('ok',n==q.a);b.classList.toggle('no',n==j&&j!=q.a);b.classList.toggle('dim',n!=q.a&&n!=j);b.blur()});
 const el=document.querySelector('.fc[data-sw="qk"]');if(el)el.dataset.ans=1;
@@ -869,7 +872,7 @@ function qkResult(){const S=QKS,r=S.res,back=`<div class="row"><button class="bt
 if(r.fail=='time'&&S.mode!='rev')return `<div class="card art stack"><h3>⏰ Time's up</h3><p class="mu">This QuickiZ didn't count. You can start a new one from the dashboard.</p>${back}</div>`;
 if(S.mode=='rev'){if(r.ok)return `<div class="card art stack"><h3>🔥 Streak revived!</h3><p>Your ${r.streak}-day streak is back. Do today's QuickiZ to add a day.</p>${back}</div>`;
 return `<div class="card art stack"><h3>${r.fail=='time'?"⏰ Time's up":'Not quite'}</h3>${r.out?`<p>All 3 revive chances are used. Your ${r.lost}-day streak ended. Start again at day 1.</p>`:`<p>Try again tomorrow. Chances used: ${r.tries} / 3.</p>`}${back}</div>`}
-return `<div class="card art stack"><h3>🎉 QuickiZ complete!</h3><p>Score: <b>${r.sc} / ${S.qs.length}</b></p><p class="lb">+1 day · Streak: ${r.streak} ${r.streak==1?'day':'days'}</p>${qkDots(r.streak)}${r.streak%7?`<p class="mu sm">Next milestone: ${(Math.floor(r.streak/7)+1)*7}-day streak</p>`:`<p class="lb">🏆 ${r.streak}-day streak!</p>`}${back}</div>`}
+return `<div class="card art stack"><h3>🎉 QuickiZ complete!</h3><p>Score: <b>${r.sc} / ${S.qs.length}</b></p><p class="lb">${r.rd?'Streak kept':'+1 day'} · Streak: ${r.streak} ${r.streak==1?'day':'days'}</p>${qkDots(r.streak)}${r.streak%7?`<p class="mu sm">Next milestone: ${(Math.floor(r.streak/7)+1)*7}-day streak</p>`:`<p class="lb">🏆 ${r.streak}-day streak!</p>`}${back}</div>`}
 V.quickiz=()=>{const S=QKS,h=hd('QuickiZ',S&&S.mode=='review'?'Your cards from today. Tap a card to flip it.':S&&S.mode=='rev'?'Revive your streak: answer 1 question in 10 minutes.':'5 flashcards, 20 minutes.');
 if(!S)return h+`<div class="w sec"><div class="card stack"><p class="mu">No active QuickiZ.</p><div class="row"><button class="btn p" onclick="go('dash')">Back to dashboard</button></div></div></div>`;
 if(S.done)return h+`<div class="w sec">${qkResult()}</div>`;
@@ -1084,7 +1087,7 @@ ${CSEL.size?`<div class="selbar"><b>${CSEL.size} selected</b><a class="lk sm" on
 <div class="stack" style="margin-top:12px">${l.map(x=>{const on=CSEL.has(x.id);return `<div class="card fr ${on?'selected':''}" data-ak="${x.id}"><label class="fl"><input type="checkbox" class="selbox" ${on?'checked':''} onchange="cSel('${x.id}')"><span class="qtx">${E(x.f.slice(0,100))}</span></label><div class="fx"><span class="tag">${x.c}</span>${x.pub?'':'<span class="tag">Hidden</span>'}${x.img||x.fimg?'<span class="tag">figure</span>':''}<button class="dots" onclick="toggleMenu('ac_${x.id}',event)" aria-label="Card menu">⋮</button></div>${mnu('ac_'+x.id,[['Edit',`openCardEd('${x.id}',1)`],['Duplicate',`dupCard('${x.id}')`],[x.pub?'Hide':'Publish',`pub('${x.id}')`],['Delete',`showConfirm('Delete card','Delete this card?',()=>del('F','${x.id}'))`,1]])}</div>`}).join('')||empty('No official cards yet.')}</div>`}
 
 const AD={
-o:()=>`<div class="g">${[['Users',D.U.length],['Official questions',OQ.length],['Folders',D.FO.length],['Folder items',D.M.length],['Official flashcards',D.F.filter(x=>!x.own).length]].map(([n,x])=>`<div class="card art stat"><b>${x}</b><span class="mu sm">${n}</span></div>`).join('')}</div>`,
+o:()=>`<div class="g">${[['Users',D.U.length],['Official questions',OQ.length],['Folders',D.FO.length],['Folder items',D.M.length],['Official flashcards',D.F.filter(x=>!x.own).length]].map(([n,x])=>`<div class="card art stat"><b>${x}</b><span class="mu sm">${n}</span></div>`).join('')}</div><div class="card stack" style="margin-top:16px"><h3>QuickiZ</h3><p class="mu sm">Lets everyone who already finished today's QuickiZ play it again. Streaks are kept and no extra day is added.</p><button class="btn" onclick="showConfirm('Reset today\\'s QuickiZ','Everyone who finished today can play again. Streaks stay.',qkAdminReset)">Reset today's QuickiZ for everyone</button></div>`,
 u:()=>{const l=sortBy(D.U.filter(u=>!AUS.q||(u.display_name||'').toLowerCase().includes(AUS.q.toLowerCase())),AUS.so,u=>u.display_name||'',u=>T0(u.created_at));
 return `<div class="row" style="margin:0 0 12px"><input id="aus" placeholder="Search users…" value="${E(AUS.q)}" oninput="AUS.q=this.value;route();const i=$('#aus');i.focus();i.setSelectionRange(99,99)">${dd('auo',SORTS,AUS.so,"AUS.so=v;route()")}</div><table><tr><th>Name</th><th>Role</th><th>Joined</th></tr>${l.map(u=>`<tr><td>${E(u.display_name||'')}</td><td>${u.role}</td><td class="mu sm">${new Date(u.created_at).toLocaleDateString()}</td></tr>`).join('')}</table><p class="mu sm">To change someone's role, edit the profiles table in Supabase (Table Editor).</p>`},
 f:aqCards,q:aqQ,fl:aqFiles};
