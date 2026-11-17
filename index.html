@@ -1045,7 +1045,7 @@ V.home=()=>`<section class="hero art"><div class="w"><p class="eyebrow">Civil En
 <div class="w sec"><h2>Exam Components</h2><div class="g">${C.map(c=>`<div class="card art" onclick="go('c/${c}')"><h3>${c}</h3><p class="mu">${CD[c]}</p><p class="mu sm">${ME?allQ().filter(x=>x.c==c).length+' questions':'Log in to start'}</p></div>`).join('')}</div></div>`;
 
 V.dash=()=>{const a=stat(()=>1),h=P.h.slice(0,4),op=P.op||{},top5=D.M.filter(m=>op[m.id]).sort((x,y)=>op[y.id]-op[x.id]).slice(0,5);
-return hd('Welcome, '+E(PR&&PR.display_name||'Student'),'Your progress across all components.').replace('class="ph art"','class="ph art wl"')+`<div class="w sec stack">
+return hd('Welcome, '+E(PR&&PR.display_name||'Student')+'. '+stGreet(),'Your progress across all components.').replace('class="ph art"','class="ph art wl"')+`<div class="w sec stack">
 <div class="dgrid"><div class="card stCard" id="stDash">${stDashHtml()}</div><div class="stack"><div class="card stMob" id="stMobBox">${stMobHtml(stLoad())}</div><div class="card art stack"><h3>Quiz</h3><p class="mu">Draws from all ${a.n} questions across MSTC, HPGE and PSAD. You can also start a quiz inside each component.</p><button class="btn p" onclick="go('quiz')">Start a quiz</button></div>${qkCard()}</div></div>
 <div class="g">${C.map(c=>`<div class="card art" onclick="go('c/${c}')"><h3>${c}</h3>${bars(stat(x=>x.c==c))}</div>`).join('')}</div>
 <p class="mu sm">Accuracy = correct answers ÷ answers given. Mastery = questions you last answered correctly ÷ all questions.</p>
@@ -1802,6 +1802,9 @@ if(a){if(a.pa){const lim=stPl(a)*1000,used=a.pt+(n-a.pa);if(used>=lim){const rt=
 if(stPhase(s)!=stPh)stRender()}
 setInterval(stTick,1000);document.addEventListener('visibilitychange',stTick);
 
+/* greeting from the device's own time zone; 12:00 to 12:59 is lunch time */
+function stGreet(){let h=+new Intl.DateTimeFormat('en-US',{timeZone:TZ,hour:'numeric',hour12:false}).format(Date.now())%24;
+return h==12?'Happy Lunch Time! 🍱':h>=5&&h<12?'Good morning! ☀️':h>=13&&h<18?'Good afternoon! 🌤️':h>=18&&h<22?'Good evening! 🌙':'Burning the midnight oil! 🌌'}
 /* session: runs on page load, login, logout and password-reset links */
 sb.auth.onAuthStateChange((ev,s)=>setTimeout(async()=>{
 if(ev=='PASSWORD_RECOVERY')AU.mode='newpw';
