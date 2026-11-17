@@ -249,7 +249,7 @@ footer .w{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .fimgw img{max-width:100%;max-height:100%;object-fit:contain;border-radius:6px}
 .fopts{margin-top:8px;font-size:.85em;color:var(--mu)}
 @keyframes cardin{from{opacity:0;transform:scale(.94) translateY(12px)}}
-@media(max-width:600px){.fcw{width:min(82vw,330px);aspect-ratio:5/7}.ff,.fb{padding:14px}.fcont{gap:10px}}
+@media(max-width:600px){.fcw{width:min(78vw,300px);aspect-ratio:5/7}.ff,.fb{padding:14px}.fcont{gap:10px}}
 /* ===== NOTES PANEL: floating + movable + resizable on desktop, docked in the layout on phones ===== */
 .notes{position:fixed;right:14px;top:70px;width:240px;min-width:170px;max-width:calc(100vw - 8px);display:flex;flex-direction:column;overflow:hidden;background:var(--card);border:1px solid var(--teal);border-radius:var(--r);box-shadow:0 6px 22px #0003;z-index:12}
 .notes.mv{right:auto}
@@ -267,8 +267,6 @@ body.sbo .notes.dflt{right:334px}
 body.nto{padding-bottom:calc(var(--ftH,0px) + var(--ntH,0px))}
 body.nto #fabRoot{bottom:calc(var(--ftH,0px) + var(--ntH,0px) + 16px)}
 }
-@media(max-width:600px){body.nto .fcw{width:min(82vw,330px,max(150px,calc((100vh - 56px - var(--ftH,0px) - var(--ntH,0px) - 230px)*5/7)))}}
-@supports(height:100dvh){@media(max-width:600px){body.nto .fcw{width:min(82vw,330px,max(150px,calc((100dvh - 56px - var(--ftH,0px) - var(--ntH,0px) - 230px)*5/7)))}}}
 .notes textarea:focus{outline:none;background:var(--bg2)}
 .qn:focus{outline:none;border-color:var(--teal)}
 /* per-question notes in quizzes and history */
@@ -331,7 +329,7 @@ body.dg .fr[data-drop],body.dg .ph a.lk{transition:transform .12s,box-shadow .12
 .fch.ok{background:#2e9e6b;border-color:#2e9e6b;color:#fff}
 .fch.no{background:#d9534f;border-color:#d9534f;color:#fff}
 .fch.dim{opacity:.5}
-@media(max-width:600px){.fchoices{grid-template-columns:repeat(2,1fr)}.fch{padding:14px 0}}
+@media(max-width:600px){.fchoices{grid-template-columns:repeat(2,1fr);width:min(78vw,300px);gap:8px}.fch{padding:10px 0;font-size:1rem}}
 .fcont .fimgw{position:relative;flex:1 1 0;min-height:0;width:100%;align-self:stretch}
 .fcont .fimgw img{position:absolute;inset:0;width:100%;height:100%;max-width:none;max-height:none;object-fit:contain;border-radius:6px}
 .fcont.imgonly{justify-content:center}
@@ -458,12 +456,6 @@ if(n<paths.length){RMFAIL+=paths.length-n;console.warn('Storage removed '+n+' of
 async function rmImgs(paths){const used=new Set([...D.F.flatMap(x=>[x.ip,x.fip]),...OQ.flatMap(x=>[x.qp,x.ep]),...D.MQ.flatMap(x=>[x.qp,x.ep])].filter(Boolean));
 const gone=[...new Set((paths||[]).filter(Boolean))].filter(p=>!used.has(p));if(!gone.length)return;
 const n=await rmStore('flashcard-images',gone);if(n<gone.length)toast('Deleted, but '+(gone.length-n)+' stored image(s) were not removed from Supabase storage.')}
-async function cleanOrphans(){const r=await sb.rpc('orphaned_storage_objects');
-if(r.error)return toast(/function|schema cache/i.test(r.error.message)?'Run storage_cleanup.sql in the Supabase SQL editor first.':r.error.message);
-const rows=r.data||[];if(!rows.length)return toast('No orphaned files. Storage is clean.');
-showConfirm('Delete orphaned files','Found '+rows.length+' stored file(s) that nothing uses. Delete them from Supabase storage permanently?',async()=>{RMFAIL=0;let n=0;
-for(const b of ['review-materials','flashcard-images'])n+=await rmStore(b,rows.filter(x=>x.bucket==b).map(x=>x.path));
-toast('Removed '+n+' of '+rows.length+' orphaned file(s)'+(RMFAIL?'. Some were blocked: check the delete policies in storage_cleanup.sql.':''))})}
 function renameFolder(id){const f=D.FO.find(x=>x.id==id);if(!f)return;showPrompt('Rename folder','Folder name',f.name,async n=>{const r=await sb.from('folders').update({name:n}).eq('id',id);if(r.error)return toast(r.error.message);f.name=n;f.mod=Date.now();toast('Folder renamed');route()})}
 function renameMaterial(id){const m=D.M.find(x=>x.id==id);if(!m)return;showPrompt('Rename file','File name',m.title,async n=>{const r=await sb.from('materials').update({title:n}).eq('id',id);if(r.error)return toast(r.error.message);m.title=n;m.mod=Date.now();toast('File renamed');route()})}
 async function delFo(id,quiet){const f=D.FO.find(x=>x.id==id);if(!f)return;const ids=dsc(id),paths=D.M.filter(m=>ids.includes(m.fo)).map(m=>m.path).filter(Boolean);
@@ -1014,7 +1006,7 @@ ${CSEL.size?`<div class="selbar"><b>${CSEL.size} selected</b><a class="lk sm" on
 <div class="stack" style="margin-top:12px">${l.map(x=>{const on=CSEL.has(x.id);return `<div class="card fr ${on?'selected':''}" data-ak="${x.id}"><label class="fl"><input type="checkbox" class="selbox" ${on?'checked':''} onchange="cSel('${x.id}')"><span class="qtx">${E(x.f.slice(0,100))}</span></label><div class="fx"><span class="tag">${x.c}</span>${x.pub?'':'<span class="tag">Hidden</span>'}${x.img||x.fimg?'<span class="tag">figure</span>':''}<button class="dots" onclick="toggleMenu('ac_${x.id}',event)" aria-label="Card menu">⋮</button></div>${mnu('ac_'+x.id,[['Edit',`openCardEd('${x.id}',1)`],['Duplicate',`dupCard('${x.id}')`],[x.pub?'Hide':'Publish',`pub('${x.id}')`],['Delete',`showConfirm('Delete card','Delete this card?',()=>del('F','${x.id}'))`,1]])}</div>`}).join('')||empty('No official cards yet.')}</div>`}
 
 const AD={
-o:()=>`<div class="g">${[['Users',D.U.length],['Official questions',OQ.length],['Folders',D.FO.length],['Folder items',D.M.length],['Official flashcards',D.F.filter(x=>!x.own).length]].map(([n,x])=>`<div class="card art stat"><b>${x}</b><span class="mu sm">${n}</span></div>`).join('')}</div><div class="card stack" style="margin-top:16px"><h3>Storage clean-up</h3><p class="mu sm">Finds files in Supabase storage that no folder item, flashcard or question uses any more (left over from earlier deletions) and removes them. Run storage_cleanup.sql in Supabase once before using this.</p><button class="btn" onclick="cleanOrphans()">Find and delete orphaned files</button></div>`,
+o:()=>`<div class="g">${[['Users',D.U.length],['Official questions',OQ.length],['Folders',D.FO.length],['Folder items',D.M.length],['Official flashcards',D.F.filter(x=>!x.own).length]].map(([n,x])=>`<div class="card art stat"><b>${x}</b><span class="mu sm">${n}</span></div>`).join('')}</div>`,
 u:()=>{const l=sortBy(D.U.filter(u=>!AUS.q||(u.display_name||'').toLowerCase().includes(AUS.q.toLowerCase())),AUS.so,u=>u.display_name||'',u=>T0(u.created_at));
 return `<div class="row" style="margin:0 0 12px"><input id="aus" placeholder="Search users…" value="${E(AUS.q)}" oninput="AUS.q=this.value;route();const i=$('#aus');i.focus();i.setSelectionRange(99,99)">${dd('auo',SORTS,AUS.so,"AUS.so=v;route()")}</div><table><tr><th>Name</th><th>Role</th><th>Joined</th></tr>${l.map(u=>`<tr><td>${E(u.display_name||'')}</td><td>${u.role}</td><td class="mu sm">${new Date(u.created_at).toLocaleDateString()}</td></tr>`).join('')}</table><p class="mu sm">To change someone's role, edit the profiles table in Supabase (Table Editor).</p>`},
 f:aqCards,q:aqQ,fl:aqFiles};
@@ -1024,7 +1016,7 @@ V.admin=()=>hd('Admin Dashboard','Manage official content. Security is enforced 
 let fitT;
 function fitCards(){document.querySelectorAll('.fc .ftxt').forEach(el=>{const box=el.closest('.fcont');let s=innerWidth<=600?14:19,n=0;el.style.fontSize=s+'px';
 while(s>8&&n++<45&&(el.scrollHeight>box.clientHeight+1||el.scrollHeight>el.clientHeight+1||el.scrollWidth>el.clientWidth+1)){s-=.5;el.style.fontSize=s+'px'}})}
-addEventListener('resize',()=>{clearTimeout(fitT);fitT=setTimeout(fitCards,150)});
+let fitW=innerWidth;addEventListener('resize',()=>{if(innerWidth==fitW)return;fitW=innerWidth;clearTimeout(fitT);fitT=setTimeout(fitCards,150)});
 let SW=null,PTRS=new Set(),PINCH=0;
 const zoomed=()=>!!(window.visualViewport&&visualViewport.scale>1.02);
 if(window.visualViewport)visualViewport.addEventListener('resize',()=>document.documentElement.classList.toggle('zoomed',zoomed()));
