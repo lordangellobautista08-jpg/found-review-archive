@@ -280,7 +280,7 @@ body.dg .fr[data-drop],body.dg .ph a.lk{transition:transform .12s,box-shadow .12
 @media(max-width:600px){.g.grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}}
 .fr[data-k]{user-select:none;-webkit-user-select:none}
 .g.grid>.fr{aspect-ratio:1/1;padding:0;border-radius:18px;display:block;position:relative}
-.g.grid>.fr .fl{position:absolute;top:0;left:0;right:0;height:20%;padding:0 12px;gap:6px;border-bottom:1px solid var(--bd);align-items:center;background:transparent;border-radius:18px 18px 0 0;cursor:default}
+.g.grid>.fr .fl{position:absolute;top:0;left:0;right:0;height:20%;padding:0 40px 0 12px;gap:6px;border-bottom:1px solid var(--bd);align-items:center;background:transparent;border-radius:18px 18px 0 0;cursor:default}
 .g.grid>.fr .fl>.tag,.g.grid>.fr .fl>span{display:none}
 .g.grid>.fr .fl h3{font-size:.85rem;display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .g.grid>.fr .selbox{margin-right:0}
@@ -291,10 +291,11 @@ body.dg .fr[data-drop],body.dg .ph a.lk{transition:transform .12s,box-shadow .12
 .thm img.pdf{object-position:top center}
 .thm .ico{font-size:3.4rem;line-height:1}
 .thm .ext{font-weight:800;font-size:1.4rem;letter-spacing:.04em;color:var(--teal);border:2px solid var(--aq);border-radius:10px;padding:6px 12px;background:var(--card)}
-.g.grid>.fr .fx{position:absolute;left:6px;right:6px;bottom:6px;z-index:2;flex-wrap:wrap;justify-content:flex-end;gap:4px;pointer-events:none}
+.g.grid>.fr .fx{position:absolute;inset:0;z-index:2;display:flex;flex-wrap:wrap;align-content:flex-end;justify-content:flex-end;gap:4px;padding:6px;pointer-events:none}
 .g.grid>.fr .fx>*{pointer-events:auto}
 .g.grid>.fr .fx .tag,.g.grid>.fr .fx .star,.g.grid>.fr .fx .dots{background:var(--card);border-radius:99px}
 .g.grid>.fr .fx .star{padding:0 8px}
+.g.grid>.fr .fx .dots{position:absolute;top:0;right:4px;height:20%;display:flex;align-items:center;padding:0 8px;background:transparent;border-radius:0}
 .g.grid>.fr .fd{display:none}
 .g.grid>.fr .pop{top:calc(20% + 4px);bottom:auto;right:6px;max-height:60vh;overflow:auto}
 .fr.active{border-color:var(--teal);box-shadow:0 0 0 2px var(--aq)}
@@ -309,6 +310,25 @@ body.dg .fr[data-drop],body.dg .ph a.lk{transition:transform .12s,box-shadow .12
 .fcont.imgonly{justify-content:center}
 .fc{touch-action:pan-y pinch-zoom}
 .zoomed .fc{touch-action:auto}
+
+/* ===== FILE VIEWER: floating window, move by the title bar, resize from any edge ===== */
+#toast{z-index:60}
+.vwin{position:fixed;z-index:45;display:flex;flex-direction:column;background:var(--card);border:1px solid var(--teal);border-radius:12px;box-shadow:0 14px 44px #0007;min-width:280px;min-height:200px;overflow:hidden}
+.vwin .vh{cursor:move;padding:8px 12px;margin:0;border-bottom:1px solid var(--bd);background:var(--soft);touch-action:none;user-select:none;-webkit-user-select:none}
+.vwin.max .vh{cursor:default}
+.vwin .vb{flex:1;min-height:0;margin:0;border-radius:0}
+.vwin .vb object,.vwin .vb img{display:block}
+.vwin.moving .vb{pointer-events:none}
+.vrs{position:absolute;z-index:3;touch-action:none}
+.vwin.max .vrs{display:none}
+.vrs[data-d=n]{top:0;left:14px;right:14px;height:6px;cursor:ns-resize}
+.vrs[data-d=s]{bottom:0;left:14px;right:14px;height:6px;cursor:ns-resize}
+.vrs[data-d=e]{right:0;top:14px;bottom:14px;width:6px;cursor:ew-resize}
+.vrs[data-d=w]{left:0;top:14px;bottom:14px;width:6px;cursor:ew-resize}
+.vrs[data-d=ne]{top:0;right:0;width:14px;height:14px;cursor:nesw-resize}
+.vrs[data-d=nw]{top:0;left:0;width:14px;height:14px;cursor:nwse-resize}
+.vrs[data-d=se]{bottom:0;right:0;width:16px;height:16px;cursor:nwse-resize}
+.vrs[data-d=sw]{bottom:0;left:0;width:14px;height:14px;cursor:nesw-resize}
 </style>
 </head>
 <body>
@@ -512,6 +532,25 @@ function hydrateThumbs(){const els=document.querySelectorAll('.g.grid .thm[data-
 if(!thIO)thIO=new IntersectionObserver(es=>es.forEach(en=>{if(en.isIntersecting){thIO.unobserve(en.target);thWant(en.target.dataset.id)}}),{rootMargin:'250px'});
 els.forEach(el=>{const id=el.dataset.id;if(TH[id])thPaint(id);else if(TH[id]===undefined)thIO.observe(el)})}
 
+
+/* ===== ADMIN LISTS: keyboard selection (Files, Official cards, Questions) =====
+ Up/Down move, Shift+Up/Down extend the selection, Space toggles, Ctrl/Cmd+A selects all in the list, Esc clears */
+let AACT='',AANCH='';
+const admSet=()=>({fl:FSELA,f:CSEL,q:QSEL})[AT];
+const admRows=()=>[...document.querySelectorAll('.fr[data-ak]')];
+function admMark(scroll){document.querySelectorAll('.fr.active').forEach(x=>x.classList.remove('active'));const el=admRows().find(x=>x.dataset.ak==AACT);if(el){el.classList.add('active');if(scroll)el.scrollIntoView({block:'nearest'})}}
+addEventListener('keydown',e=>{if(MD||viewerFile||e.defaultPrevented||!ME||role!='admin')return;const t=e.target;
+if(t&&(/INPUT|TEXTAREA|SELECT/.test(t.tagName)||t.isContentEditable))return;
+if(location.hash.slice(2).split('/')[0]!='admin')return;const S=admSet();if(!S)return;
+const ids=admRows().map(x=>x.dataset.ak),mod=e.ctrlKey||e.metaKey,key=e.key;if(!ids.length)return;
+if(mod&&key.toLowerCase()=='a'){e.preventDefault();(AT=='fl'?afItems().map(x=>x.k):AT=='f'?acList().map(x=>x.id):aqList().map(x=>x.id)).forEach(k=>S.add(k));route();return}
+if(key=='ArrowUp'||key=='ArrowDown'||key=='Home'||key=='End'){if(mod)return;e.preventDefault();let i=ids.indexOf(AACT);
+if(key=='Home')i=0;else if(key=='End')i=ids.length-1;else i=i<0?0:Math.max(0,Math.min(ids.length-1,i+(key=='ArrowDown'?1:-1)));const k=ids[i];
+if(e.shiftKey){const a=ids.indexOf(AANCH||AACT||k),lo=Math.min(a<0?i:a,i),hi=Math.max(a<0?i:a,i);if(!AANCH)AANCH=a<0?k:ids[a];S.clear();ids.slice(lo,hi+1).forEach(x=>S.add(x));AACT=k;route();admMark(true)}
+else{AACT=k;AANCH=k;admMark(true)}return}
+if(key==' '&&!/BUTTON|A/.test(t.tagName)){if(!AACT)return;e.preventDefault();S.has(AACT)?S.delete(AACT):S.add(AACT);AANCH=AACT;route();return}
+if(key=='Escape'&&(S.size||AACT)){S.clear();AACT='';AANCH='';route()}});
+
 /* ===== DOWNLOAD (one file as is, several items as a zip) ===== */
 const fname=m=>m.title+'.'+m.type.toLowerCase();
 function saveBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},4000)}
@@ -530,11 +569,31 @@ const blob=await zip.generateAsync({type:'blob'}),one=its.length==1?its[0][1].na
 async function openM(id){const m=D.M.find(x=>x.id==id);if(!m||!m.path)return toast('File not found');
 const r=await sb.storage.from('review-materials').createSignedUrl(m.path,3600);if(r.error)return toast(r.error.message);
 P.op=P.op||{};P.op[id]=(P.op[id]||0)+1;sb.from('material_opens').upsert({user_id:ME.id,material_id:id,opens:P.op[id],last_opened:new Date().toISOString()}).then(x=>x.error&&console.warn(x.error.message));
-const e=m.type.toLowerCase(),url=r.data.signedUrl;if(['pdf','jpg','jpeg','png','webp'].includes(e)){viewerFile={title:m.title,url,type:e};route()}else window.open(url,'_blank','noopener')}
-function closeViewer(){viewerFile=null;route()}
+const e=m.type.toLowerCase(),url=r.data.signedUrl;if(['pdf','jpg','jpeg','png','webp'].includes(e)){viewerFile={vid:id+'_'+Date.now(),title:m.title,url,type:e};renderFileViewer()}else window.open(url,'_blank','noopener')}
+function closeViewer(){viewerFile=null;renderFileViewer()}
+let VW={x:0,y:0,w:0,h:0,max:0};try{const s=JSON.parse(localStorage.getItem('vw')||'null');if(s&&s.w)VW={...VW,...s,max:0}}catch(_){}
+const vwSave=()=>{try{localStorage.setItem('vw',JSON.stringify({x:VW.x,y:VW.y,w:VW.w,h:VW.h}))}catch(_){}};
+function vwInit(){const m=innerWidth<700;if(!VW.w||m){VW.w=m?innerWidth-12:Math.min(960,innerWidth-60);VW.h=m?innerHeight-12:Math.round(innerHeight*.86);VW.x=Math.round((innerWidth-VW.w)/2);VW.y=Math.round((innerHeight-VW.h)/2)}vwClamp()}
+function vwClamp(){VW.w=Math.max(280,Math.min(VW.w,innerWidth));VW.h=Math.max(200,Math.min(VW.h,innerHeight));VW.x=Math.min(Math.max(VW.x,120-VW.w),innerWidth-120);VW.y=Math.min(Math.max(VW.y,0),innerHeight-44)}
+function vwApply(){const w=document.querySelector('#fileViewerRoot .vwin');if(!w)return;const g=VW.max?{x:0,y:0,w:innerWidth,h:innerHeight}:VW;w.style.left=g.x+'px';w.style.top=g.y+'px';w.style.width=g.w+'px';w.style.height=g.h+'px';w.classList.toggle('max',!!VW.max);const b=w.querySelector('.vmax');if(b)b.textContent=VW.max?'❐':'☐'}
+function vwMax(){VW.max=VW.max?0:1;vwApply()}
+function vwDown(e,dir){if(e.button>0||VW.max||(!dir&&e.target.closest('button,a')))return;const w=document.querySelector('#fileViewerRoot .vwin'),el=e.currentTarget;if(!w)return;e.preventDefault();
+const s={x:e.clientX,y:e.clientY,g:{...VW}};w.classList.add('moving');try{el.setPointerCapture(e.pointerId)}catch(_){}
+const mv=ev=>{const dx=ev.clientX-s.x,dy=ev.clientY-s.y;
+if(!dir){VW.x=s.g.x+dx;VW.y=s.g.y+dy}
+else{let{x,y,w:W,h:H}=s.g;if(dir.includes('e'))W=s.g.w+dx;if(dir.includes('s'))H=s.g.h+dy;if(dir.includes('w')){W=s.g.w-dx;x=s.g.x+dx}if(dir.includes('n')){H=s.g.h-dy;y=s.g.y+dy}
+if(W<280){if(dir.includes('w'))x-=280-W;W=280}if(H<200){if(dir.includes('n'))y-=200-H;H=200}VW.x=x;VW.y=y;VW.w=W;VW.h=H}
+vwClamp();vwApply()};
+const up=()=>{el.removeEventListener('pointermove',mv);el.removeEventListener('pointerup',up);el.removeEventListener('pointercancel',up);w.classList.remove('moving');vwSave()};
+el.addEventListener('pointermove',mv);el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up)}
+addEventListener('resize',()=>{if(viewerFile){vwClamp();vwApply()}});
+addEventListener('keydown',e=>{if(e.key=='Escape'&&viewerFile&&!MD)closeViewer()});
+/* The viewer is drawn once per opened file. Later page redraws leave it alone, so the file keeps its zoom and scroll position. */
 function renderFileViewer(){let r=$('#fileViewerRoot');if(!r){r=document.createElement('div');r.id='fileViewerRoot';document.body.appendChild(r)}
-if(!viewerFile){r.innerHTML='';return}const pdf=viewerFile.type==='pdf';
-r.innerHTML=`<div class="fm-backdrop" onclick="closeViewer()"><div class="fm-card viewer" onclick="event.stopPropagation()"><div class="vh"><h2>${E(viewerFile.title)}</h2><div class="row" style="margin:0"><a href="${viewerFile.url}" target="_blank" rel="noopener" class="btn">Download</a><button class="btn" onclick="closeViewer()">✕ Close</button></div></div><div class="vb">${pdf?`<object data="${viewerFile.url}" type="application/pdf" style="width:100%;height:100%"><div style="padding:30px;text-align:center"><p style="margin-bottom:12px">This browser can't show the PDF here.</p><a href="${viewerFile.url}" target="_blank" rel="noopener" class="btn p">Open PDF in a new tab</a></div></object>`:`<img src="${viewerFile.url}" alt="">`}</div></div></div>`}
+if(!viewerFile){r.innerHTML='';r.dataset.vid='';return}
+if(r.dataset.vid===viewerFile.vid&&r.firstChild)return;
+r.dataset.vid=viewerFile.vid;vwInit();const pdf=viewerFile.type==='pdf';
+r.innerHTML=`<div class="vwin"><div class="vh" onpointerdown="vwDown(event,'')" ondblclick="if(!event.target.closest('button,a'))vwMax()"><h2>${E(viewerFile.title)}</h2><div class="row" style="margin:0"><a href="${viewerFile.url}" target="_blank" rel="noopener" class="btn">Download</a><button class="btn vmax" onclick="vwMax()" title="Maximize / restore">☐</button><button class="btn" onclick="closeViewer()">✕ Close</button></div></div><div class="vb">${pdf?`<object data="${viewerFile.url}" type="application/pdf" style="width:100%;height:100%"><div style="padding:30px;text-align:center"><p style="margin-bottom:12px">This browser can't show the PDF here.</p><a href="${viewerFile.url}" target="_blank" rel="noopener" class="btn p">Open PDF in a new tab</a></div></object>`:`<img src="${viewerFile.url}" alt="">`}</div>${['n','s','e','w','ne','nw','se','sw'].map(d=>`<i class="vrs" data-d="${d}" onpointerdown="vwDown(event,'${d}')"></i>`).join('')}</div>`;vwApply()}
 
 /* ===== CREATE FOLDER / UPLOAD FILES / UPLOAD A FOLDER ===== */
 function openFab(mode,dest){activeMenu=null;const p=location.hash.slice(2).split('/'),f=dest?D.FO.find(x=>x.id==dest):(dest===undefined&&p[0]=='f')?D.FO.find(x=>x.id==p[1]):null;
@@ -821,7 +880,7 @@ onOk:async()=>{const p={},c=v('bmC'),s=v('bmS').trim(),t=v('bmT').trim();if(c)p.
 await chunks(k=>sb.from('questions').update(p).in('id',k));OQ.forEach(x=>{if(ids.includes(x.id)){if(c)x.c=c;if(s)x.s=s;if(t)x.t=t}});toast('Moved');route()}});
 const m={pub:[{published:true},{pub:1}],hide:[{published:false},{pub:0}],ver:[{verification_status:'Verified'},{st:'Verified'}],nr:[{verification_status:'Needs Review'},{st:'Needs Review'}]}[a];
 await chunks(k=>sb.from('questions').update(m[0]).in('id',k));OQ.forEach(x=>{if(ids.includes(x.id))Object.assign(x,m[1])});toast('Updated '+ids.length+' question(s)');route()}
-const aqRow=x=>{const on=QSEL.has(x.id);return `<div class="card fr ${on?'selected':''}"><label class="fl"><input type="checkbox" class="selbox" ${on?'checked':''} onchange="qSel('${x.id}')"><span class="qtx"><b>${x.n?'#'+x.n+' · ':''}</b>${E(x.q.slice(0,120))}${x.q.length>120?'…':''}</span></label><div class="fx"><span class="tag">${x.c}</span><span class="tag">${E(x.s)}</span>${x.pub?'':'<span class="tag">Hidden</span>'}${isNR(x)?'<span class="tag">Needs review</span>':''}${x.qi||x.ei?'<span class="tag">figure</span>':''}<button class="dots" onclick="toggleMenu('aq_${x.id}',event)" aria-label="Question menu">⋮</button></div>${mnu('aq_'+x.id,[['Edit',`openQEd('${x.id}',1)`],['Preview',`prevQ('${x.id}')`],['Duplicate',`dupQ('${x.id}')`],[x.pub?'Hide from students':'Publish',`setQ('${x.id}',{published:${!x.pub}},{pub:${x.pub?0:1}})`],[isNR(x)?'Mark as verified':'Mark as needs review',`setQ('${x.id}',{verification_status:'${isNR(x)?'Verified':'Needs Review'}'},{st:'${isNR(x)?'Verified':'Needs Review'}'})`],['Delete',`showConfirm('Delete question','Delete this question permanently?',()=>qDel('${x.id}'))`,1]])}</div>`};
+const aqRow=x=>{const on=QSEL.has(x.id);return `<div class="card fr ${on?'selected':''}" data-ak="${x.id}"><label class="fl"><input type="checkbox" class="selbox" ${on?'checked':''} onchange="qSel('${x.id}')"><span class="qtx"><b>${x.n?'#'+x.n+' · ':''}</b>${E(x.q.slice(0,120))}${x.q.length>120?'…':''}</span></label><div class="fx"><span class="tag">${x.c}</span><span class="tag">${E(x.s)}</span>${x.pub?'':'<span class="tag">Hidden</span>'}${isNR(x)?'<span class="tag">Needs review</span>':''}${x.qi||x.ei?'<span class="tag">figure</span>':''}<button class="dots" onclick="toggleMenu('aq_${x.id}',event)" aria-label="Question menu">⋮</button></div>${mnu('aq_'+x.id,[['Edit',`openQEd('${x.id}',1)`],['Preview',`prevQ('${x.id}')`],['Duplicate',`dupQ('${x.id}')`],[x.pub?'Hide from students':'Publish',`setQ('${x.id}',{published:${!x.pub}},{pub:${x.pub?0:1}})`],[isNR(x)?'Mark as verified':'Mark as needs review',`setQ('${x.id}',{verification_status:'${isNR(x)?'Verified':'Needs Review'}'},{st:'${isNR(x)?'Verified':'Needs Review'}'})`],['Delete',`showConfirm('Delete question','Delete this question permanently?',()=>qDel('${x.id}'))`,1]])}</div>`};
 async function qDel(id){const it=OQ.find(x=>x.id==id),pp=it?[it.qp,it.ep]:[];const r=await sb.from('questions').delete().eq('id',id);if(r.error)return toast(r.error.message);OQ=OQ.filter(x=>x.id!=id);QSEL.delete(id);route();rmImgs(pp)}
 const pager=(n,pg,fn)=>n>PER?`<div class="pgn"><button class="btn" ${pg?'':'disabled'} onclick="${fn}(-1)">← Prev</button><span class="mu sm">${pg*PER+1}–${Math.min(n,(pg+1)*PER)} of ${n}</span><button class="btn" ${(pg+1)*PER<n?'':'disabled'} onclick="${fn}(1)">Next →</button></div>`:'';
 function aqPage(d){AQ.pg=Math.max(0,AQ.pg+d);route()}
@@ -839,7 +898,7 @@ const p=a=='pub';const r=await sb.from('flashcards').update({published:p}).in('i
 async function pub(id){const x=D.F.find(x=>x.id==id),r=await sb.from('flashcards').update({published:!x.pub}).eq('id',id);if(r.error)return toast(r.error.message);x.pub=!x.pub;route()}
 function aqCards(){const l=acList();return `<div class="row" style="margin:0 0 12px;justify-content:space-between"><button class="btn p" onclick="openCardEd(null,1)">＋ New official card</button><div class="row" style="margin:0">${dd('acC',[['','All components'],...C],AC.c,"AC.c=v;route()")}<input id="acq" placeholder="Search…" value="${E(AC.q)}" oninput="AC.q=this.value;route();const i=$('#acq');i.focus();i.setSelectionRange(99,99)">${dd('acO',SORTS,AC.so,"AC.so=v;route()")}</div></div>
 ${CSEL.size?`<div class="selbar"><b>${CSEL.size} selected</b><a class="lk sm" onclick="acList().forEach(x=>CSEL.add(x.id));route()">Select all ${l.length}</a><a class="lk sm" onclick="CSEL.clear();route()">Clear</a><span class="sp"></span><button class="btn" onclick="cBulk('pub')">Publish</button><button class="btn" onclick="cBulk('hide')">Hide</button><button class="btn" onclick="cBulk('del')">Delete</button></div>`:''}
-<div class="stack" style="margin-top:12px">${l.map(x=>{const on=CSEL.has(x.id);return `<div class="card fr ${on?'selected':''}"><label class="fl"><input type="checkbox" class="selbox" ${on?'checked':''} onchange="cSel('${x.id}')"><span class="qtx">${E(x.f.slice(0,100))}</span></label><div class="fx"><span class="tag">${x.c}</span>${x.pub?'':'<span class="tag">Hidden</span>'}${x.img||x.fimg?'<span class="tag">figure</span>':''}<button class="dots" onclick="toggleMenu('ac_${x.id}',event)" aria-label="Card menu">⋮</button></div>${mnu('ac_'+x.id,[['Edit',`openCardEd('${x.id}',1)`],['Duplicate',`dupCard('${x.id}')`],[x.pub?'Hide':'Publish',`pub('${x.id}')`],['Delete',`showConfirm('Delete card','Delete this card?',()=>del('F','${x.id}'))`,1]])}</div>`}).join('')||empty('No official cards yet.')}</div>`}
+<div class="stack" style="margin-top:12px">${l.map(x=>{const on=CSEL.has(x.id);return `<div class="card fr ${on?'selected':''}" data-ak="${x.id}"><label class="fl"><input type="checkbox" class="selbox" ${on?'checked':''} onchange="cSel('${x.id}')"><span class="qtx">${E(x.f.slice(0,100))}</span></label><div class="fx"><span class="tag">${x.c}</span>${x.pub?'':'<span class="tag">Hidden</span>'}${x.img||x.fimg?'<span class="tag">figure</span>':''}<button class="dots" onclick="toggleMenu('ac_${x.id}',event)" aria-label="Card menu">⋮</button></div>${mnu('ac_'+x.id,[['Edit',`openCardEd('${x.id}',1)`],['Duplicate',`dupCard('${x.id}')`],[x.pub?'Hide':'Publish',`pub('${x.id}')`],['Delete',`showConfirm('Delete card','Delete this card?',()=>del('F','${x.id}'))`,1]])}</div>`}).join('')||empty('No official cards yet.')}</div>`}
 
 const AD={
 o:()=>`<div class="g">${[['Users',D.U.length],['Official questions',OQ.length],['Folders',D.FO.length],['Folder items',D.M.length],['Official flashcards',D.F.filter(x=>!x.own).length]].map(([n,x])=>`<div class="card art stat"><b>${x}</b><span class="mu sm">${n}</span></div>`).join('')}</div><div class="card stack" style="margin-top:16px"><h3>Storage clean-up</h3><p class="mu sm">Finds files in Supabase storage that no folder item, flashcard or question uses any more (left over from earlier deletions) and removes them. Run storage_cleanup.sql in Supabase once before using this.</p><button class="btn" onclick="cleanOrphans()">Find and delete orphaned files</button></div>`,
@@ -958,7 +1017,7 @@ function aqFiles(){const l=afItems();
 return `<p class="mu sm" style="margin:0 0 12px">Official folders and files. Use the ⋮ menu to choose who can see an item: everyone (default) or only selected users. Upload and organize items from the component pages.</p>
 <div class="bar">${dd('afC',[['','All components'],...C],AF.c,"AF.c=v;AF.fo='';AF.ty='';route()")}${dd('afF',afFolders(),AF.fo,"AF.fo=v;AF.ty='';route()")}${dd('afT',afTypes(),AF.ty,"AF.ty=v;route()")}${dd('afO',SORTS,AF.so,"AF.so=v;route()")}<input id="afq" placeholder="Search…" value="${E(AF.q)}" oninput="AF.q=this.value;route();const i=$('#afq');i.focus();i.setSelectionRange(99,99)"></div>
 ${FSELA.size?`<div class="selbar"><b>${FSELA.size} selected</b><a class="lk sm" onclick="afItems().forEach(x=>FSELA.add(x.k));route()">Select all ${l.length}</a><a class="lk sm" onclick="FSELA.clear();route()">Clear</a><span class="sp"></span><button class="btn p" onclick="openAssign([...FSELA])">Assign access…</button></div>`:''}
-<div class="stack" style="margin-top:12px">${l.map(x=>{const on=FSELA.has(x.k);return `<div class="card fr ${on?'selected':''}"><label class="fl"><input type="checkbox" class="selbox" ${on?'checked':''} onchange="afSel('${x.k}')"><span class="qtx">${x.k[0]=='f'?'📁':'📄'} ${E(x.name)}</span></label><div class="fx">${x.k[0]=='m'?tag(x.kind):''}<span class="tag">${x.it.rs?'Selected users ('+agUsers(x.k).length+')':'Everyone'}</span><button class="dots" onclick="toggleMenu('af_${x.k}',event)" aria-label="Menu">⋮</button></div>${mnu('af_'+x.k,[['Open',x.k[0]=='f'?`go('f/${x.it.id}')`:`openM('${x.it.id}')`],['Assign access…',`openAssign(['${x.k}'])`]])}</div>`}).join('')||empty('No official folders or files yet.')}</div>`}
+<div class="stack" style="margin-top:12px">${l.map(x=>{const on=FSELA.has(x.k);return `<div class="card fr ${on?'selected':''}" data-ak="${x.k}"><label class="fl"><input type="checkbox" class="selbox" ${on?'checked':''} onchange="afSel('${x.k}')"><span class="qtx">${x.k[0]=='f'?'📁':'📄'} ${E(x.name)}</span></label><div class="fx">${x.k[0]=='m'?tag(x.kind):''}<span class="tag">${x.it.rs?'Selected users ('+agUsers(x.k).length+')':'Everyone'}</span><button class="dots" onclick="toggleMenu('af_${x.k}',event)" aria-label="Menu">⋮</button></div>${mnu('af_'+x.k,[['Open',x.k[0]=='f'?`go('f/${x.it.id}')`:`openM('${x.it.id}')`],['Assign access…',`openAssign(['${x.k}'])`]])}</div>`}).join('')||empty('No official folders or files yet.')}</div>`}
 /* shown on a student's dashboard: items an admin assigned to them */
 function sharedCard(){const mine=(D.AG||[]).filter(g=>g.user_id==ME.id),it=[...mine.filter(g=>g.folder_id).map(g=>D.FO.find(f=>f.id==g.folder_id)).filter(Boolean).map(f=>['f',f]),...mine.filter(g=>g.material_id).map(g=>D.M.find(m=>m.id==g.material_id)).filter(Boolean).map(m=>['m',m])];
 return it.length?`<div class="card"><h3>Shared with you</h3>${it.map(([t,x])=>`<div class="row" style="margin:8px 0 0"><a class="lk" onclick="${t=='f'?`go('f/${x.id}')`:`openM('${x.id}')`}">${t=='f'?'📁 '+E(x.name):tag(x.type)+' '+E(x.title)}</a></div>`).join('')}</div>`:''}
@@ -968,7 +1027,8 @@ return it.length?`<div class="card"><h3>Shared with you</h3>${it.map(([t,x])=>`<
 const drawer=(n,a)=>{const cur=n=='f'?(D.FO.find(x=>x.id==a)||{}).c:a,lnk=(h,t,on)=>`<a${on?' class="on"':''} onclick="dr(0);${h}">${t}</a>`;
 return lnk("go('dash')",'Dashboard',n=='dash')+lnk("go('quiz')",'Quiz',n=='quiz')+lnk("go('hist')",'Quiz History',n=='hist')+`<p class="dl">Components</p>`+C.map(c=>lnk(`go('c/${c}')`,c,(n=='c'||n=='f')&&cur==c)).join('')+`<p class="dl">Study</p>`+lnk("FF={c:'',k:''};go('cards')",'Flashcards',n=='cards'&&FF.k!='img')+lnk("FF={c:'',k:'img'};go('cards')",'Formula Cards',n=='cards'&&FF.k=='img')+lnk("go('myq')",'My Questions',n=='myq')+(role=='admin'?`<p class="dl">Admin</p>`+lnk("go('admin')",'Admin Dashboard',n=='admin'):'')+`<p class="dl"></p>`+lnk("out()",'Log out',false)};
 const tbar=()=>ME?`<span class="sm mu" style="white-space:nowrap">${E(PR&&PR.display_name||'')} <span class="tag">${role}</span></span>`:`<button class="btn" onclick="AU.mode='in';AU.msg='';go('auth')">Log in</button> <button class="btn p" onclick="AU.mode='up';AU.msg='';go('auth')">Sign up</button>`;
-function out(){sb.auth.signOut()}
+let USER_OUT=0;
+function out(){USER_OUT=1;sb.auth.signOut({scope:'local'})}
 V.auth=()=>{const m=AU.mode,T={in:'Log in',up:'Create account',reset:'Reset password',newpw:'Set a new password'};
 return hd(T[m],m=='newpw'?'Choose a new password for your account.':'Sign in to save your progress and keep it on every device.')+`<div class="w sec"><div class="card art stack" style="max-width:440px;margin:auto">${AU.msg?`<div class="exp">${E(AU.msg)}</div>`:''}${m=='up'?'<input id="an" placeholder="Display name" style="width:100%">':''}${m=='newpw'?'':'<input id="ae" type="email" placeholder="Email" autocomplete="email" style="width:100%">'}${m=='reset'?'':`<input id="ap" type="password" placeholder="${m=='newpw'?'New password':'Password'}" autocomplete="${m=='in'?'current-password':'new-password'}" style="width:100%">`}<button class="btn p" onclick="doAuth()">${T[m]}</button><p class="sm">${m=='in'?`<a class="lk" onclick="AU.mode='up';AU.msg='';route()">Create an account</a> · <a class="lk" onclick="AU.mode='reset';AU.msg='';route()">Forgot password?</a>`:m=='newpw'?'':`<a class="lk" onclick="AU.mode='in';AU.msg='';route()">Back to log in</a>`}</p></div></div>`};
 async function doAuth(){const m=AU.mode,e=m=='newpw'?'':v('ae').trim(),p=m=='reset'?'':v('ap');let r;
@@ -988,15 +1048,19 @@ if(n!='cards')NT.f='';const ap=$('#app');ap.innerHTML=V[n](a);if(nv){ap.classNam
 $('#tb').innerHTML=tbar();$('#dr').innerHTML=ME?drawer(n,a):'';syncTheme();fitCards();renderNotes(n);$('#bg').style.display=ME?'':'none';
 renderFab();
 renderCustomConfirm();
-renderFileViewer();hydrateThumbs();
+renderFileViewer();hydrateThumbs();if(n=='admin')admMark();
 if(n=='quiz'&&QZ&&!QZ.done){cnt();if(QZ.end)tick()}else smry()}
 addEventListener('hashchange',()=>{nv=1;scrollTo(0,0);route()});
 addEventListener('keydown',e=>{if(e.key=='Enter'&&location.hash=='#/auth'&&e.target.tagName=='INPUT')doAuth()});
 /* session: runs on page load, login, logout and password-reset links */
 sb.auth.onAuthStateChange((ev,s)=>setTimeout(async()=>{
 if(ev=='PASSWORD_RECOVERY')AU.mode='newpw';
-ME=s&&s.user||null;
-if(!ME){CU=null;D={FO:[],M:[],F:[],MQ:[],U:[]};P={h:[],q:{},fc:{},bm:[],op:{}};OQ=[];PR=null;role='student';QZ=null;QL=1;if(ev=='SIGNED_OUT')go('home');else route();return}
+const u=s&&s.user||null;
+/* Coming back to the tab makes Supabase re-send SIGNED_IN / TOKEN_REFRESHED for the same user. Nothing changed, so do not redraw the page. */
+if(u&&ME&&CU==u.id&&ev!='PASSWORD_RECOVERY'&&ev!='USER_UPDATED'){ME=u;return}
+ME=u;
+if(!ME){CU=null;D={FO:[],M:[],F:[],MQ:[],U:[]};P={h:[],q:{},fc:{},bm:[],op:{}};OQ=[];PR=null;role='student';QZ=null;QL=1;viewerFile=null;renderFileViewer();
+if(ev=='SIGNED_OUT'){const own=USER_OUT;USER_OUT=0;go('home');if(!own)toast('You were signed out (session ended or you signed out on another device or tab). Please sign in again.')}else route();return}
 if(ME.id!=CU){CU=ME.id;QL=0;route();await load();QL=1}
 if(AU.mode=='newpw')go('auth');else if(location.hash=='#/auth')go('dash');else route()},0));
 route();
