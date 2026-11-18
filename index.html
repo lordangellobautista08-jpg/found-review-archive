@@ -736,6 +736,8 @@ body.nto .cbtn{bottom:calc(var(--ftH,0px) + var(--ntH,0px) + 16px + 64px)}body.n
 .stLive{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:600;color:var(--mu);padding:3px 10px;border:1px solid var(--bd);border-radius:99px;background:var(--bg2);align-self:flex-start;margin:2px 0 6px}
 .stLive i{width:8px;height:8px;border-radius:50%;background:var(--mu);flex:none}
 .stLive.on{color:var(--ink);border-color:#2ecc7188}.stLive.on i{background:#2ecc71;animation:stPulse 1.6s infinite}
+.stLive.pz{color:var(--ink);border-color:#f59e0b88}.stLive.pz i{background:#f59e0b;animation:none}
+.stMob .stLive{margin:2px 0 8px}
 @keyframes stPulse{0%{box-shadow:0 0 0 0 #2ecc7199}70%{box-shadow:0 0 0 7px #2ecc7100}100%{box-shadow:0 0 0 0 #2ecc7100}}
 .vwin .vb{overscroll-behavior:contain}.vb.zm{display:block}.vb.zm img{display:block;margin:0 auto}
 /* phones have nothing to pin to, so the pin drop zones never show */
@@ -1997,10 +1999,11 @@ stWarn=(o,w)=>`<p class="stWarn sm">${ico('bell')}Timer done! Declare your study
 stXN=(o)=>`<p class="stWarn sm">${ico('check')}2-hour minimum reached. Tap <b>End study</b> now, or keep going: +½ streak day for every extra full hour. Bonus so far: <b data-st="xb">${fm(.5*Math.floor(o/3600))}</b> day</p>`,
 stOv=(a,o,w)=>a.x?stXN(o):stWarn(o,w),
 stLog=l=>`<p class="sm mu">${{start:''+ico('play')+'Started',pause:''+ico('pause')+'Paused',resume:''+ico('play')+'Resumed',end:''+ico('check')+'Ended'}[l.t]} ${tm(l.ts)}${l.t=='pause'?' · after '+dur(l.m*60)+' of study':l.t=='resume'?' · paused for '+dur(l.m*60):''}</p>`;
+const stPill=a=>`<div class="stLive ${a?(a.pa?'pz':'on'):''}"><i></i>${a?(a.pa?'Session paused':'Session ongoing'):'No ongoing session'}</div>`;
 /* phone version of the Lock in card: title, live clock, then the streak */
 function stMobHtml(s){const d=stDer(s),a=s.a,nm=a?(a.mode=='mini'||a.mn?'mini':'full'):(d.fd?'mini':s.pm);
 const hide=rsBlocked('ms');/* streak hidden by the admin: only the clock stays */
-return `${hide?'':stName(nm)}<div class="stMc" data-st="clock">${tms(Date.now())}</div><p class="mu sm" style="margin:0"><span data-st="date">${phF({weekday:'long',month:'long',day:'numeric'},Date.now())}</span> · ${tzn()}</p>${hide?'':stStreak(s)+stRestBtn(s)}`}
+return `${hide?'':stName(nm)+stPill(a)}<div class="stMc" data-st="clock">${tms(Date.now())}</div><p class="mu sm" style="margin:0"><span data-st="date">${phF({weekday:'long',month:'long',day:'numeric'},Date.now())}</span> · ${tzn()}</p>${hide?'':stStreak(s)+stRestBtn(s)}`}
 function stStreak(s){const d=stDer(s),n=d.cur,full=n>0&&n%7==0,c=full?7:n%7,nx=(Math.floor(n/7)+1)*7,nxi=Math.floor(c);
 return `<div class="stS"><div class="stSh"><b>${ico('flame')}${fm(n)} day${n==1?'':'s'} streak</b>${full?`<span class="stM">${ico('trophy')}${fm(n)} days straight!</span>`:''}</div><div class="stDots">${[0,1,2,3,4,5,6].map(i=>{const f=Math.min(1,Math.max(0,c-i));return `<span class="sd${f>=1?' on':f>0?' half':i==nxi&&!d.today?' nx':''}">${ico('flame')}</span>`}).join('')}</div><p class="sm mu">Next milestone: <b class="stM">${nx} days</b> · ${fm(nx-n)} to go</p></div>`}
 const stDelOk=(s,x)=>x.res!='live'&&x.day==phDay()&&(!x.sn||s.h.find(y=>y.sn&&y.day==x.day)===x);
@@ -2015,7 +2018,7 @@ openMdl({title:'Study history',noCancel:1,okText:'Close',body:`<div class="stHl"
 const stHist=s=>`<button class="btn" onclick="stHistOpen()">${ico('history')}Study history${s.h.length+(s.a?1:0)?' ('+(s.h.length+(s.a?1:0))+')':''}</button>`;
 function stDashHtml(){const s=stLoad(),d=stDer(s),a=s.a,run=!!a,pm=d.fd?'mini':s.pm,g=s.gk==pm?s.goal:0,w=a?stW(a):0,e=a?stEl(a):0,r=a?Math.max(0,a.g-e):0,ov=a?Math.max(0,e-a.g):0,l=a||s.h.find(x=>x.day==d.t),sd=l?tm(l.start):'--',ed=!a&&l&&l.end?tm(l.end):'--',
 nm=a?(a.mode=='mini'||a.mn?'mini':'full'):pm;
-return `${stName(nm)}<div class="stLive ${run?'on':''}"><i></i>${run?(a.pa?'Session paused':'Session ongoing'):'No ongoing session'}</div><div class="stTop"><div><div class="stBig" data-st="clock">${tms(Date.now())}</div><p class="mu sm"><span data-st="date">${phF({weekday:'long',month:'long',day:'numeric'},Date.now())}</span> · ${tzn()}</p></div>${stStreak(s)}</div>
+return `${stName(nm)}${stPill(a)}<div class="stTop"><div><div class="stBig" data-st="clock">${tms(Date.now())}</div><p class="mu sm"><span data-st="date">${phF({weekday:'long',month:'long',day:'numeric'},Date.now())}</span> · ${tzn()}</p></div>${stStreak(s)}</div>
 ${d.br&&!run?stBrk(d):''}${d.rest?'<p class="stRst sm">'+ico('moon')+'Rest day today. Your streak is safe.</p>':''}
 <div class="stCols"><div class="stL">
 <div class="seg" ${run?'style="pointer-events:none;opacity:.5"':''} style="align-self:flex-start"><button class="${pm=='full'?'on':''}" ${d.fd?'disabled':''} onclick="stMode('full')">Lock in Study${d.fd?' '+ico('check')+'':''}</button><button class="${pm=='mini'?'on':''}" onclick="stMode('mini')">Mini Lock In</button></div>
@@ -3122,13 +3125,27 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&ME&&NF.ld
 const PV={};
 const pvFallback=v=>`<object data="${v.url}${rsBlocked('dl')?'#toolbar=0&navpanes=0':''}" type="application/pdf" style="width:100%;height:100%"><div style="padding:30px;text-align:center"><p style="margin-bottom:12px">This browser can't show the PDF here.</p>${rsBlocked('dl')?'':`<a href="${v.url}" target="_blank" rel="noopener" class="btn p">Open PDF in a new tab</a>`}</div></object>`;
 function pvFree(g){if(g._t){try{g._t.cancel()}catch(e){}g._t=null}const c=g.querySelector('canvas');if(c){c.width=c.height=0;c.remove()}g.dataset.r='';g.classList.remove('ok')}
-async function pvPage(s,n){const g=s.host.querySelector('.pvg[data-n="'+n+'"]');if(!g||!s.w||g.dataset.r===s.rk)return;const rk=s.rk;g.dataset.r=rk;
-try{const pg=await s.pdf.getPage(n);if(g.dataset.r!==rk||!s.host.isConnected)return;const b=pg.getViewport({scale:1}),dpr=Math.min(window.devicePixelRatio||1,2),vp=pg.getViewport({scale:s.w/b.width*dpr});g.dataset.ar=b.height/b.width;g.style.height=Math.round(s.w*b.height/b.width)+'px';
-let c=g.querySelector('canvas');if(g._t){try{g._t.cancel()}catch(e){}}if(!c){c=document.createElement('canvas');if(s.nd)c.oncontextmenu=()=>false;g.appendChild(c)}c.width=vp.width;c.height=vp.height;
-const t=pg.render({canvasContext:c.getContext('2d',{alpha:false}),viewport:vp});g._t=t;await t.promise;g.classList.add('ok')}catch(e){if(!(e&&e.name=='RenderingCancelledException')&&g.dataset.r===rk)g.dataset.r=''}}
+/* canvas budget: very large canvases (zoomed pages on a sharp screen) used up graphics memory and the page went black */
+const pvCap=()=>matchMedia('(pointer:coarse)').matches||innerWidth<700?5e6:1.2e7,pvDim=()=>matchMedia('(pointer:coarse)').matches?4096:8192;
+async function pvPage(s,n){const g=s.host.querySelector('.pvg[data-n="'+n+'"]');if(!g||!s.w||g.dataset.r===s.rk)return;const rk=s.rk;g.dataset.r=rk;let nc=null;
+try{const pg=await s.pdf.getPage(n);if(g.dataset.r!==rk||!s.host.isConnected)return;const b=pg.getViewport({scale:1}),dpr=Math.min(window.devicePixelRatio||1,2),lim=pvDim();
+let k=Math.min(s.w/b.width*dpr,lim/b.width,lim/b.height);const px=b.width*k*b.height*k;if(px>pvCap())k*=Math.sqrt(pvCap()/px);const vp=pg.getViewport({scale:k});
+g.dataset.ar=b.height/b.width;g.style.height=Math.round(s.w*b.height/b.width)+'px';
+if(g._t){try{g._t.cancel()}catch(e){}g._t=null}
+/* draw on a hidden canvas and swap when finished: the old picture stays visible (just scaled) so nothing flashes black */
+nc=document.createElement('canvas');if(s.nd)nc.oncontextmenu=()=>false;nc.width=Math.max(1,Math.floor(vp.width));nc.height=Math.max(1,Math.floor(vp.height));
+const cx=nc.getContext('2d');if(!cx)throw new Error('canvas');cx.fillStyle='#fff';cx.fillRect(0,0,nc.width,nc.height);
+const t=pg.render({canvasContext:cx,viewport:vp});g._t=t;await t.promise;
+if(g.dataset.r!==rk||!s.host.isConnected){nc.width=nc.height=0;return}
+const old=g.querySelector('canvas');g.appendChild(nc);if(old){old.width=old.height=0;old.remove()}g._t=null;g.classList.add('ok');nc=null}
+catch(e){if(nc){nc.width=nc.height=0}if(!(e&&e.name=='RenderingCancelledException')&&g.dataset.r===rk)g.dataset.r=''}}
 function pvInd(s){const top=s.el.scrollTop+s.el.clientHeight*.35,gs=s.host.children;let cur=1;for(let i=0;i<gs.length;i++){if(gs[i].offsetTop>top)break;cur=i+1}const t=document.querySelector('.vwin[data-vid="'+s.vid+'"] .pvn');if(t)t.textContent=cur+' / '+s.n}
 function pvLay(s){const cw=s.el.clientWidth;if(!cw)return;const w=Math.max(160,Math.round((cw-16)*s.z)),k=String(w);if(k===s.rk)return;const f=s.el.scrollHeight?s.el.scrollTop/s.el.scrollHeight:0;s.rk=k;s.w=w;
-s.host.querySelectorAll('.pvg').forEach(g=>{g.style.width=w+'px';g.style.height=Math.round(w*(+g.dataset.ar||s.ar))+'px';pvFree(g)});s.el.scrollTop=f*s.el.scrollHeight;s.vis.forEach(n=>pvPage(s,n));pvInd(s)}
+const later=[];s.host.querySelectorAll('.pvg').forEach(g=>{g.style.width=w+'px';g.style.height=Math.round(w*(+g.dataset.ar||s.ar))+'px';const n=+g.dataset.n;
+if(s.vis.has(n)&&g.querySelector('canvas')){if(g._t){try{g._t.cancel()}catch(e){}g._t=null}g.dataset.r='';later.push(n)}else pvFree(g)});
+s.el.scrollTop=f*s.el.scrollHeight;s.vis.forEach(n=>{if(!later.includes(n))pvPage(s,n)});
+/* visible pages keep their old picture (scaled) while zooming; the sharp redraw happens once the zoom settles */
+clearTimeout(s.rzt);if(later.length)s.rzt=setTimeout(()=>{if(!s.dead)s.vis.forEach(n=>pvPage(s,n))},170);pvInd(s)}
 /* ctrl + scroll (or a pinch on the trackpad) zooms the FILE, not the site. A two-finger scroll pans it. */
 function pvZoomF(vid,f){const s=PV[vid];if(!s)return;const b=s.zq||s.z,z=Math.min(3,Math.max(.6,+(b*f).toFixed(3)));if(z===b)return;s.zq=z;if(s.zr)return;
 s.zr=requestAnimationFrame(()=>{s.zr=0;const el=s.el,fx=el.scrollWidth>el.clientWidth?(el.scrollLeft+el.clientWidth/2)/el.scrollWidth:.5;s.z=s.zq;s.zq=0;s.rk='';pvLay(s);el.scrollLeft=Math.max(0,fx*el.scrollWidth-el.clientWidth/2)})}
