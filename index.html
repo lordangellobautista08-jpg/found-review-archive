@@ -2481,7 +2481,9 @@ const annIn=(id,val,ph,oi)=>`<div class="an-inrow"><textarea id="${id}" class="a
 function annGrow(el){el.style.height='auto';el.style.height=(el.scrollHeight+2)+'px'}
 function annEdInput(ed){const v=annClean(ed.innerHTML),k=ed.dataset.sec;if(k=='-1')ANF.body=v;else if(ANF.sections[+k])ANF.sections[+k].body=v}
 function annSaveRng(ed){const s=getSelection();if(s.rangeCount&&ed.contains(s.anchorNode))ed._r=s.getRangeAt(0).cloneRange()}
-function annRestore(ed){if(ed._r){const s=getSelection();s.removeAllRanges();s.addRange(ed._r)}}
+function annRestore(ed){const s=getSelection();if(s.rangeCount&&ed.contains(s.anchorNode))return;if(ed._r&&ed.contains(ed._r.startContainer)){s.removeAllRanges();s.addRange(ed._r)}}
+/* keep the last selection of the active editor up to date, so a toolbar tap always formats what is selected */
+document.addEventListener('selectionchange',()=>{const e=document.activeElement;if(e&&e.classList&&(e.classList.contains('an-ed')||e.id=='ned'))annSaveRng(e)});
 function annLineOf(ed,n){while(n&&n.parentNode!==ed)n=n.parentNode;return n&&n.parentNode===ed?n:null}
 function annWrap(ed){const blk=/^(DIV|UL|OL|H3|P)$/;let run=[];const flush=()=>{if(!run.length)return;const d=document.createElement('div');ed.insertBefore(d,run[0]);run.forEach(x=>d.appendChild(x));run=[]};[...ed.childNodes].forEach(n=>{if(n.nodeType==1&&blk.test(n.tagName))flush();else run.push(n)});flush()}
 function annCb(ed){ed.focus();annWrap(ed);if(!ed.firstChild){ed.innerHTML='<div><br></div>'}const s=getSelection();let a,b;if(s.rangeCount&&ed.contains(s.anchorNode)){const r=s.getRangeAt(0);a=annLineOf(ed,r.startContainer);b=annLineOf(ed,r.endContainer)}else{a=b=ed.lastElementChild}
@@ -2489,7 +2491,7 @@ const ls=[];for(let n=a;n;n=n.nextElementSibling){if(/^(DIV)$/.test(n.tagName))l
 function annCmd(btn,c){const ed=btn.closest('.an-edw').querySelector('.an-ed');ed.focus();annRestore(ed);
 if(c=='cb')return annCb(ed);
 if(c=='h'){const cur=(document.queryCommandValue('formatBlock')||'').toLowerCase();document.execCommand('formatBlock',false,cur=='h3'?'div':'h3')}
-else if(c=='link'){const u=prompt('Link address (https://…)');if(!u)return;if(!/^(https?:|mailto:)/i.test(u))return toast('Links must start with https://');document.execCommand('createLink',false,u)}
+else if(c=='link'){const g=getSelection(),r0=g.rangeCount?g.getRangeAt(0).cloneRange():null,u=prompt('Link address (https://…)');if(!u)return;if(!/^(https?:|mailto:)/i.test(u))return toast('Links must start with https://');ed.focus();if(r0){g.removeAllRanges();g.addRange(r0)}document.execCommand('createLink',false,u)}
 else if(c=='clear'){document.execCommand('removeFormat');ed.querySelectorAll('[data-cb]').forEach(x=>delete x.dataset.cb)}
 else document.execCommand(c);annEdInput(ed)}
 function annEdClick(e,ed){const t=e.target;if(t.parentNode===ed&&t.dataset&&t.dataset.cb!=null&&e.clientX-t.getBoundingClientRect().left<24){t.dataset.cb=t.dataset.cb=='1'?'0':'1';annEdInput(ed);e.preventDefault()}}
