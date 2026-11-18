@@ -636,6 +636,11 @@ body.ntdrag .notes:not(.pinned) .ned,body.ntdrag .notes:not(.pinned) .ntb{displa
 .emo-g button{height:38px;font-size:1.35rem;border:0;background:transparent;border-radius:8px;cursor:pointer;color:var(--tx);display:flex;align-items:center;justify-content:center;padding:0}
 .emo-g button:hover{background:var(--soft)}.emo-g .ic{width:21px;height:21px;margin:0;vertical-align:0}
 .emo-g.bd{grid-template-columns:repeat(2,1fr)}.emo-g.bd button{height:36px}
+/* ===== UPDATE BANNER ===== */
+#updBar{position:fixed;top:66px;left:50%;transform:translateX(-50%);z-index:90;display:flex;align-items:center;gap:10px;max-width:calc(100vw - 24px);padding:9px 10px 9px 18px;border-radius:99px;background:#2a0b45;color:#fff;box-shadow:0 8px 28px #0006;font-size:.9rem;animation:updin .35s ease-out}
+#updBar button{border:0;border-radius:99px;padding:6px 14px;font:inherit;font-weight:600;cursor:pointer;white-space:nowrap}
+#updBar .ub1{background:#9FD3D0;color:#24003D}#updBar .ub2{background:transparent;color:#fff;opacity:.8}
+@keyframes updin{from{opacity:0;transform:translate(-50%,-10px)}}
 </style>
 </head>
 <body>
@@ -2648,6 +2653,13 @@ if(AU.mode=='newpw')go('auth');else if(location.hash=='#/auth')go('dash');else r
 route=(f=>function(){f();placeCtx();annAfterRoute()})(route);syncTheme();annLoad().then(()=>{if(!ME&&QL&&(location.hash.slice(2)||'home').split('/')[0]=='home')route()});route();
 /* PWA: lets the app install on PC and phones and open its shell offline */
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('SW:',e)));
+/* ===== UPDATE BANNER: every few minutes (and when you come back to the tab) the page asks the server whether index.html changed since this page loaded; if so it offers a Refresh ===== */
+(()=>{if(!/^https?:$/.test(location.protocol))return;
+const U=location.href.split('#')[0].split('?')[0]+'?upd=1';let base=null,asked=null,busy=0;
+const sig=async()=>{const r=await fetch(U,{cache:'no-cache'});if(!r.ok)return null;const h=r.headers.get('etag')||r.headers.get('last-modified');if(h)return h;const t=await r.text();let x=0;for(let i=0;i<t.length;i++)x=(x*31+t.charCodeAt(i))|0;return t.length+':'+x};
+function show(s){asked=s;if(document.getElementById('updBar'))return;const d=document.createElement('div');d.id='updBar';d.setAttribute('role','status');d.innerHTML='<span>A new version is available.</span><button class="ub1" onclick="location.reload()">Refresh</button><button class="ub2" onclick="this.parentNode.remove()">Later</button>';document.body.appendChild(d)}
+async function chk(first){if(busy||(document.hidden&&!first))return;busy=1;try{const s=await sig();if(!s)return;if(base===null)base=s;else if(s!==base&&s!==asked)show(s)}catch(e){}finally{busy=0}}
+chk(1);setInterval(chk,5*60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)chk()});addEventListener('online',()=>chk())})();
 </script>
 </body>
 </html>
