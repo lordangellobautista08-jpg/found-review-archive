@@ -641,6 +641,73 @@ body.ntdrag .notes:not(.pinned) .ned,body.ntdrag .notes:not(.pinned) .ntb{displa
 #updBar button{border:0;border-radius:99px;padding:6px 14px;font:inherit;font-weight:600;cursor:pointer;white-space:nowrap}
 #updBar .ub1{background:#9FD3D0;color:#24003D}#updBar .ub2{background:transparent;color:#fff;opacity:.8}
 @keyframes updin{from{opacity:0;transform:translate(-50%,-10px)}}
+/* ===== CHAT ===== */
+#chatRoot{--cr:48px;--hw:0px}
+body.sbo #chatRoot{--cr:344px}
+.cb{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 5px;border-radius:99px;background:#e0245e;color:#fff;font-size:.68rem;font-style:normal;font-weight:700;display:flex;align-items:center;justify-content:center;line-height:1;box-sizing:border-box}
+.ctabs .cb,.cls .cb{position:static;margin-left:6px}
+.cbtn{position:fixed;right:calc(var(--cr) + 6px);bottom:146px;width:52px;height:52px;border-radius:50%;border:1.5px solid var(--bd);background:var(--card);color:var(--teal);box-shadow:0 6px 20px #0004;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:41;transition:transform .15s;padding:0}
+.cbtn:hover{transform:scale(1.08)}.cbtn .ic{width:24px;height:24px;margin:0}
+body.nofab .cbtn{bottom:74px}
+.cav{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;color:#fff;font-weight:700;position:relative;flex:none;user-select:none;-webkit-user-select:none;line-height:1}
+.cav.chn{background:var(--teal);color:var(--onfab)}.cav.adm{background:var(--ink);color:var(--card)}.cav .ic{width:55%;height:55%;margin:0}
+.cdot{position:absolute;right:-2px;bottom:-2px;width:28%;min-width:9px;height:28%;min-height:9px;border-radius:50%;border:2px solid var(--card);background:#2ecc71;box-sizing:content-box}
+.cdot.lockin{background:#f59e0b}
+.cpan{position:fixed;right:var(--cr);bottom:206px;width:340px;max-height:min(540px,calc(100vh - 250px));background:var(--card);border:1px solid var(--bd);border-radius:14px;box-shadow:0 12px 40px #0004;z-index:42;display:flex;flex-direction:column;overflow:hidden}
+body.nofab .cpan{bottom:134px}
+.chh{display:flex;align-items:center;gap:8px;justify-content:space-between;padding:10px 10px 6px 14px;font-size:1.05rem}
+.ctabs{display:flex;gap:4px;padding:0 10px 6px;border-bottom:1px solid var(--bd)}
+.ctabs a{flex:1;text-align:center;padding:7px 4px;border-radius:8px;cursor:pointer;font-size:.88rem;color:var(--mu);font-weight:600;display:flex;justify-content:center;align-items:center}
+.ctabs a.on{background:var(--soft);color:var(--teal)}
+.csr{padding:8px 10px 0}.csr input{width:100%;border-radius:99px;padding:7px 14px}
+.cll{overflow-y:auto;padding:6px;min-height:110px;flex:1}
+.cli{display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px;cursor:pointer}.cli:hover{background:var(--soft)}
+.clm{flex:1;min-width:0}.clm b{display:block;font-size:.92rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.clm span{display:block;font-size:.8rem;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.clm span.u{color:var(--tx);font-weight:700}
+.cls{display:flex;flex-direction:column;align-items:flex-end;gap:4px;font-size:.7rem;color:var(--mu);position:relative}
+.chl{font-size:.74rem;color:var(--mu);text-transform:uppercase;letter-spacing:.05em;padding:10px 8px 4px}.chl a{cursor:pointer;color:var(--teal);text-transform:none;letter-spacing:0;font-size:.82rem}
+.cempty{padding:20px 12px;text-align:center;color:var(--mu);font-size:.88rem;margin:0}
+.cft{margin:0;padding:6px 12px 10px;font-size:.72rem;color:var(--mu);text-align:center}
+.cset{padding:6px 14px 16px;display:flex;flex-direction:column;gap:10px}.cgrp{display:flex;flex-direction:column;gap:2px}
+.cwb{border:0;background:transparent;color:var(--tx);width:30px;height:30px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;flex:none}
+.cwb:hover{background:var(--soft)}.cwb .ic{width:16px;height:16px;margin:0}.cwb.send{color:var(--teal)}
+.cw{position:fixed;bottom:0;right:calc(var(--cr) + 78px + var(--hw) + var(--ci)*340px);width:328px;height:min(440px,calc(100vh - 80px));background:var(--card);border:1px solid var(--bd);border-bottom:0;border-radius:12px 12px 0 0;box-shadow:0 -4px 24px #0003;z-index:41;display:flex;flex-direction:column;overflow:hidden}
+.cwh{display:flex;align-items:center;gap:8px;padding:8px 6px 8px 10px;border-bottom:1px solid var(--bd);background:var(--bg2)}
+.cwt{flex:1;min-width:0}.cwt b{display:block;font-size:.92rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cwt small{display:block;color:var(--mu);font-size:.72rem;min-height:1em}
+.cwm{flex:1;min-height:0;overflow-y:auto;padding:10px 10px 4px;display:flex;flex-direction:column}
+.cmr{display:flex;gap:6px;align-items:flex-end;margin-top:3px}.cmr.me{justify-content:flex-end}
+.cmv{width:28px;flex:none}.cmc{display:flex;flex-direction:column;max-width:78%;min-width:0}.cmr.me .cmc{align-items:flex-end}
+.cnm{color:var(--mu);font-size:.7rem;margin:4px 0 1px 8px}
+.cmbw{display:flex;align-items:center;gap:2px}.cmr.me .cmbw{flex-direction:row-reverse}
+.cmb{padding:7px 12px;border-radius:17px;background:var(--soft);color:var(--tx);font-size:.9rem;line-height:1.38;word-break:break-word;overflow-wrap:anywhere}
+.cmr.me .cmb{background:var(--teal);color:var(--onfab)}.cmb a{color:inherit;text-decoration:underline}
+.cmb.pend{opacity:.6}.cmb.bad{background:#d9534f;color:#fff;cursor:pointer}
+.cmm{opacity:0;border:0;background:transparent;color:var(--mu);width:24px;height:24px;border-radius:50%;cursor:pointer;padding:0;display:inline-flex;align-items:center;justify-content:center}
+.cmm .ic{width:14px;height:14px;margin:0}.cmbw:hover .cmm{opacity:1}
+@media(hover:none){.cmm{opacity:.55}}
+.cat{display:flex;align-items:center;gap:6px;margin-top:5px;padding:6px 8px;border-radius:9px;background:#0002;cursor:pointer;color:inherit;max-width:100%}
+.cat b{font-weight:600;font-size:.8rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.cat .ic{flex:none}
+.csep{text-align:center;font-size:.68rem;color:var(--mu);margin:10px 0 4px}.cnote{text-align:center;font-size:.72rem;color:var(--mu);margin:4px 0 8px}
+.cmore{align-self:center;border:0;background:transparent;color:var(--teal);cursor:pointer;font-size:.8rem;padding:4px 8px}
+.cseen{display:flex;justify-content:flex-end;gap:2px;margin:2px 4px 0}.cst{align-self:flex-end;font-size:.68rem;color:var(--mu);margin:2px 4px 0}
+.cwf{border-top:1px solid var(--bd);padding:8px}.cwf.off{text-align:center;color:var(--mu);font-size:.82rem;padding:12px}.cwf.off a{color:var(--teal);cursor:pointer;font-weight:600}
+.cwr{display:flex;align-items:flex-end;gap:4px}
+.cwi{flex:1;resize:none;border:1px solid var(--bd);border-radius:18px;padding:7px 12px;font:inherit;font-size:.9rem;max-height:110px;min-height:34px;height:34px;background:var(--bg2);color:var(--tx);line-height:1.35;outline:none}
+.cwi:focus{border-color:var(--teal)}
+.cwa{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:6px}
+.cch{display:inline-flex;align-items:center;gap:4px;padding:3px 4px 3px 8px;border-radius:99px;background:var(--soft);font-size:.78rem}
+.cch b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:130px}.cch a{cursor:pointer;display:inline-flex}.cch .ic{width:13px;height:13px;margin:0}
+.chd{position:fixed;right:calc(var(--cr) + 78px);bottom:calc(14px + var(--hi)*58px);z-index:41;cursor:pointer;filter:drop-shadow(0 3px 8px #0005)}
+.chx{position:absolute;top:-6px;left:-6px;width:18px;height:18px;border-radius:50%;background:var(--card);color:var(--tx);display:none;align-items:center;justify-content:center;border:1px solid var(--bd)}
+.chd:hover .chx{display:flex}.chx .ic{width:10px;height:10px;margin:0}.chd .cb{top:-3px;right:-3px}
+.cpop{position:fixed;z-index:43;background:var(--card);border:1px solid var(--bd);border-radius:10px;box-shadow:0 8px 28px #0004;padding:5px 0;min-width:170px}
+.cpop a{display:block;padding:8px 14px;font-size:.88rem;cursor:pointer;color:var(--tx)}.cpop a:hover{background:var(--soft)}.cpop a.dng{color:#d9534f}
+.rep{padding:10px 0;border-top:1px solid var(--bd);display:flex;flex-direction:column;gap:6px}.rep:first-of-type{border-top:0}
+.repm{margin:0;padding:8px 10px;background:var(--soft);border-radius:8px;font-size:.9rem;word-break:break-word}
+@media(max-width:700px){.cw{right:0!important;left:0;top:0;bottom:0;width:auto;height:auto;border-radius:0;border:0;z-index:55}.cw .cwh{padding-top:calc(8px + env(safe-area-inset-top,0px))}.cw .cwf{padding-bottom:calc(8px + env(safe-area-inset-bottom,0px))}.cw .cwb[title="Minimize"]{display:none}.chd{display:none}}
+@media(max-width:600px){#chatRoot{--cr:18px}.cbtn{width:46px;height:46px;right:calc(var(--cr) + 4px);bottom:82px}
+body.nto .cbtn{bottom:calc(var(--ftH,0px) + var(--ntH,0px) + 16px + 64px)}body.nofab .cbtn{bottom:22px}body.nofab.nto .cbtn{bottom:calc(var(--ftH,0px) + var(--ntH,0px) + 20px)}
+.cpan{left:8px;right:8px;width:auto;bottom:136px}body.nofab .cpan{bottom:80px}}
 </style>
 </head>
 <body>
@@ -1022,7 +1089,7 @@ VWS.forEach(vwApply);fvRender()}
 function vwAuto(top){const fl=VWS.filter(v=>!v.pin&&!v.min);if(!fl.length)return false;
 const list=top?[fl.reduce((a,b)=>b.z>a.z?b:a)]:fl;list.forEach(v=>{v.max=0;if(FVP())v.pin=1;else v.min=1});renderFileViewer();return true}
 document.addEventListener('pointerdown',e=>{if(!VWS.length||e.button>0||!e.target.closest)return;
-if(e.target.closest('.vwin,.notes,#stRail,#mdlRoot,#zmo,#toast,.pop,#fabRoot,#dr'))return;vwAuto(0)},true);
+if(e.target.closest('.vwin,.notes,#stRail,#mdlRoot,#zmo,#toast,.pop,#fabRoot,#dr,#chatRoot'))return;vwAuto(0)},true);
 addEventListener('keydown',e=>{if(e.key!='Escape'||e.defaultPrevented||MD||$('#zmo'))return;
 if(activeMenu){activeMenu=null;CTXP=null;route();return}if(vwAuto(1))e.preventDefault()});
 
@@ -1122,7 +1189,7 @@ P.h=at.map(a=>({id:a.id,ts:T0(a.created_at),sc:a.scope||'',n:a.total,k:a.correct
 D.U=[];D.SS=[];if(role=='admin'){const u=await sb.from('profiles').select('*');D.U=u.data||[];const ss=await sb.from('study_state').select('user_id,data');D.SS=ss.error?[]:(ss.data||[])}
 {const rs=await sb.from('restrictions').select('*');D.RS=rs.error?[]:(rs.data||[]);if(rs.error)console.warn('Restrictions table not ready:',rs.error.message);RSE=null}
 await annLoad();
-await qkPull();await stPull();fcLoad()}catch(err){console.error(err);toast('Database connection error. Check the console (F12).')}}
+await qkPull();await stPull();fcLoad();chInit()}catch(err){console.error(err);toast('Database connection error. Check the console (F12).')}}
 
 /* delete helper (confirmation is shown by the caller's popup) */
 async function del(k,id){const r=await sb.from(TB[k]).delete().eq('id',id);if(r.error)return toast(r.error.message);D[k]=D[k].filter(x=>x.id!=id);route()}
@@ -1446,8 +1513,8 @@ const AD={
 o:()=>`<div class="g">${[['Users',D.U.length],['Official questions',OQ.length],['Folders',D.FO.length],['Folder items',D.M.length],['Official flashcards',D.F.filter(x=>!x.own).length]].map(([n,x])=>`<div class="card art stat"><b>${x}</b><span class="mu sm">${n}</span></div>`).join('')}</div><div class="card stack" style="margin-top:16px"><h3>QuickiZ</h3><p class="mu sm">Lets everyone who already finished today's QuickiZ play it again. Streaks are kept and no extra day is added.</p><button class="btn" onclick="showConfirm('Reset today\\'s QuickiZ','Everyone who finished today can play again. Streaks stay.',qkAdminReset)">Reset today's QuickiZ for everyone</button></div>`,
 u:()=>{const l=sortBy(D.U.filter(u=>!AUS.q||((u.display_name||'')+' '+(u.email||'')).toLowerCase().includes(AUS.q.toLowerCase())),AUS.so,u=>u.display_name||'',u=>T0(u.created_at));
 return `<div class="row" style="margin:0 0 12px"><input id="aus" placeholder="Search users…" value="${E(AUS.q)}" oninput="AUS.q=this.value;route();const i=$('#aus');i.focus();i.setSelectionRange(99,99)">${dd('auo',SORTS,AUS.so,"AUS.so=v;route()")}</div><p class="sm mu" style="margin:0 0 8px">${stUsSum()}</p><div style="overflow-x:auto"><table><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Joined</th><th></th></tr>${l.map(u=>`<tr><td>${E(u.display_name||'')}</td><td class="sm">${E(u.email||'—')}</td><td>${u.role}</td><td class="sm stUc">${stUsCell(u)}</td><td class="mu sm">${new Date(u.created_at).toLocaleDateString()}</td><td>${u.id==ME.id?'<span class="mu sm">You</span>':`<button class="btn" onclick="admRole('${u.id}','${u.role=='admin'?'student':'admin'}')">${u.role=='admin'?'Remove admin':'Make admin'}</button>`}</td></tr>`).join('')}</table></div><p class="mu sm">Role changes apply the next time that person logs in.</p>`},
-f:aqCards,q:aqQ,fl:aqFiles,r:aqRestr,an:annAdmin};
-V.admin=()=>hd('Admin Dashboard','Manage official content. Security is enforced by the database rules (RLS).')+`<div class="w sec"><div class="tabs">${[['o','Overview'],['u','Users'],['fl','Files'],['f','Official cards'],['q','Questions'],['r','Restrictions'],['an','Announcement']].map(([k,n])=>`<a class="${AT==k?'on':''}" onclick="AT='${k}';route()">${n}</a>`).join('')}</div>${AD[AT]()}</div>`;
+f:aqCards,q:aqQ,fl:aqFiles,r:aqRestr,an:annAdmin,c:aqChat};
+V.admin=()=>hd('Admin Dashboard','Manage official content. Security is enforced by the database rules (RLS).')+`<div class="w sec"><div class="tabs">${[['o','Overview'],['u','Users'],['fl','Files'],['f','Official cards'],['q','Questions'],['r','Restrictions'],['an','Announcement'],['c','Chat']].map(([k,n])=>`<a class="${AT==k?'on':''}" onclick="AT='${k}';route()">${n}</a>`).join('')}</div>${AD[AT]()}</div>`;
 
 /* ===== FLASHCARDS: fit text into the card, swipe, keyboard ===== */
 let fitT;
@@ -1941,8 +2008,8 @@ setInterval(stTick,1000);document.addEventListener('visibilitychange',stTick);
 /* ===== ADMIN: who is online / in a Lock in session. Online = Supabase Presence (live, nothing stored). Offline sessions come from study_state (needs admin_users.sql). ===== */
 let PCH=null,ONL={},EMS='';
 function stPresInit(){if(PCH||!ME)return;PCH=sb.channel('online-users',{config:{presence:{key:ME.id}}});
-PCH.on('presence',{event:'sync'},()=>{ONL=PCH.presenceState();stAdminRefresh()}).subscribe(st=>{if(st=='SUBSCRIBED')stPresTrack()})}
-function stPresTrack(){if(!PCH||!ME)return;try{const a=stLoad().a;PCH.track({lock:a?{m:a.mode=='mini'||a.mn?'mini':a.mode=='revive'?'revive':'full',end:Date.now()+Math.max(0,a.g-stEl(a))*1000,p:a.pa?1:0}:null,t:Date.now()})}catch(e){}}
+PCH.on('presence',{event:'sync'},()=>{ONL=PCH.presenceState();stAdminRefresh();chPresSync()}).subscribe(st=>{if(st=='SUBSCRIBED')stPresTrack()})}
+function stPresTrack(){if(!PCH||!ME)return;try{const a=stLoad().a;PCH.track({lock:a?{m:a.mode=='mini'||a.mn?'mini':a.mode=='revive'?'revive':'full',end:Date.now()+Math.max(0,a.g-stEl(a))*1000,p:a.pa?1:0}:null,t:Date.now(),cs:chSt()})}catch(e){}}
 function stEmailSync(){if(PR&&ME.email&&PR.email!==ME.email&&EMS!=ME.id){EMS=ME.id;sb.from('profiles').update({email:ME.email}).eq('id',ME.id).then(r=>{if(!r.error)PR.email=ME.email})}}
 function stAdminRefresh(){if(role=='admin'&&location.hash.slice(2).split('/')[0]=='admin'&&AT=='u'&&!MD&&!(document.activeElement&&document.activeElement.tagName=='INPUT'))route()}
 const stUs=u=>{const m=ONL[u.id]||[],p=m.find(x=>x.lock)||m[0],ss=(D.SS||[]).find(x=>x.user_id==u.id),a=ss&&ss.data&&ss.data.a;let lock=null;
@@ -2646,10 +2713,206 @@ const u=s&&s.user||null;
 /* Coming back to the tab makes Supabase re-send SIGNED_IN / TOKEN_REFRESHED for the same user. Nothing changed, so do not redraw the page. */
 if(u&&ME&&CU==u.id&&ev!='PASSWORD_RECOVERY'&&ev!='USER_UPDATED'){ME=u;return}
 ME=u;
-if(!ME){if(PCH){try{sb.removeChannel(PCH)}catch(e){}PCH=null}ONL={};CU=null;D={FO:[],M:[],F:[],MQ:[],U:[]};P={h:[],q:{},fc:{},bm:[],op:{}};OQ=[];PR=null;role='student';QZ=null;QL=1;VWS=[];ntReset();renderFileViewer();ANN_AUTO=0;ANNR=new Set();annClose(1);
+if(!ME){if(PCH){try{sb.removeChannel(PCH)}catch(e){}PCH=null}ONL={};CU=null;D={FO:[],M:[],F:[],MQ:[],U:[]};P={h:[],q:{},fc:{},bm:[],op:{}};OQ=[];PR=null;role='student';QZ=null;QL=1;VWS=[];ntReset();renderFileViewer();chReset();ANN_AUTO=0;ANNR=new Set();annClose(1);
 if(ev=='SIGNED_OUT'){const own=USER_OUT;USER_OUT=0;go('home');if(!own)toast('You were signed out (session ended or you signed out on another device or tab). Please sign in again.')}else route();return}
 if(ME.id!=CU){CU=ME.id;ntReset();ANN_AUTO=0;ANNR=new Set();QL=0;route();await load();QL=1}
 if(AU.mode=='newpw')go('auth');else if(location.hash=='#/auth')go('dash');else route()},0));
+/* ===== CHAT: public channels, student DMs, student <-> admin threads (needs chat.sql) ===== */
+Object.assign(ICP,{chat:'<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>',send:'<path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>',minus:'<path d="M5 12h14"/>',more:'<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>',sliders:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',back:'<path d="m12 19-7-7 7-7M19 12H5"/>',clipf:'<path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/>',hash:'<path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"/>',shield:'<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>'});
+RESTR.push({k:'chat',t:'Chat',d:'The whole chat: public channels, direct messages and the admin thread. Restricted students do not see the chat button and cannot send messages.',on:'Chat off',off:'Chat on',who:'Chat turned off for'},
+{k:'dm',t:'Direct messages between students',d:'One-to-one chats with other students. Public channels and the admin thread keep working.',on:'DMs off',off:'DMs on',who:'Direct messages turned off for'});
+const CH={ok:null,err:'',init:0,users:{},tint:{},rooms:[],open:0,tab:'pub',set:0,q:'',mon:0,wins:[],msgs:{},old:{},reads:{},draft:{},focus:null,prefs:{show:true,lock:'show'},blk:{mine:new Set(),by:new Set()},mute:null,sub:null,poll:null,rt:0,st:'',stT:null,mod:null,timers:{}};
+const chRoot=()=>{let r=document.getElementById('chatRoot');if(!r){r=document.createElement('div');r.id='chatRoot';document.body.appendChild(r)}return r};
+const chNm=id=>{const u=CH.users[id];return u?u.name:'User'};
+const chIni=n=>{const m=(n||'').match(/\p{L}/u);return m?m[0].toUpperCase():((n||'?').trim().slice(0,1).toUpperCase()||'?')};
+/* people who share an initial get different tints (same family, shifted hue and lightness) */
+function chIndex(){CH.tint={};const g={};Object.keys(CH.users).sort().forEach(id=>{const i=chIni(CH.users[id].name);(g[i]=g[i]||[]).push(id)});
+Object.keys(g).forEach(i=>{const base=(i.codePointAt(0)*47)%360;g[i].forEach((id,k)=>{CH.tint[id]=`hsl(${(base+k*41)%360} ${[58,62,52,66][k%4]}% ${[44,34,54,40][k%4]}%)`})})}
+function chAv(uid,sz,dot){sz=sz||36;const st=dot===false?'':chPres(uid);return `<span class="cav" style="width:${sz}px;height:${sz}px;font-size:${Math.round(sz*.46)}px;background:${CH.tint[uid]||'hsl(200 40% 40%)'}">${E(chIni(chNm(uid)))}${st?`<i class="cdot ${st}"></i>`:''}</span>`}
+/* ---- active status ---- */
+function chSt(){if(!CH.prefs.show)return'hidden';let a=null;try{a=ME&&stLoad().a}catch(e){}if(a){if(CH.prefs.lock=='hide')return'hidden';if(CH.prefs.lock=='show')return'lockin'}return'active'}
+function chPres(uid){if(!ME||!CH.prefs.show||uid==ME.id)return'';const m=ONL[uid];if(!m||!m.length)return'';const s=(m[m.length-1].cs)||'active';return s=='hidden'?'':s}
+function chPresSync(){clearTimeout(CH.timers.p);CH.timers.p=setTimeout(()=>{if(CH.ok&&(CH.open||CH.wins.length))chRender()},400)}
+async function chPrefsLoad(){try{const l=JSON.parse(localStorage.getItem('chp_'+ME.id)||'null');if(l)CH.prefs=Object.assign(CH.prefs,l)}catch(e){}
+const r=await sb.from('chat_prefs').select('*').eq('user_id',ME.id).maybeSingle();if(r&&r.data){CH.prefs={show:r.data.show_active,lock:r.data.lock_mode};try{localStorage.setItem('chp_'+ME.id,JSON.stringify(CH.prefs))}catch(e){}}}
+function chPref(k,v){CH.prefs[k]=v;try{localStorage.setItem('chp_'+ME.id,JSON.stringify(CH.prefs))}catch(e){}
+sb.from('chat_prefs').upsert({user_id:ME.id,show_active:CH.prefs.show,lock_mode:CH.prefs.lock,updated_at:new Date().toISOString()}).then(r=>r.error&&console.warn('Chat prefs:',r.error.message));
+CH.st=chSt();stPresTrack();chRender()}
+/* ---- loading ---- */
+async function chInit(){if(!ME||CH.init)return;CH.init=1;
+try{const[u,o]=await Promise.all([sb.rpc('chat_users'),sb.rpc('chat_overview')]);
+if(u.error||o.error){CH.ok=false;CH.err=(u.error||o.error).message||'';chPos();chRender();return}
+CH.users={};(u.data||[]).forEach(x=>{CH.users[x.id]={name:x.display_name,role:x.role}});chIndex();chSetRooms(o.data||[]);
+await Promise.all([chPrefsLoad(),chBlocksLoad(),chMuteLoad()]);CH.ok=true;CH.st=chSt();stPresTrack();chSub();chPos();chRender();
+clearInterval(CH.poll);CH.poll=setInterval(()=>{const s=chSt();if(s!=CH.st){CH.st=s;stPresTrack()}if(!CH.rt)chRefresh()},5000)}
+catch(e){console.warn('Chat:',e);CH.ok=false;CH.err=e.message||''}}
+function chReset(){clearInterval(CH.poll);if(CH.sub){try{sb.removeChannel(CH.sub)}catch(e){}}Object.assign(CH,{ok:null,err:'',init:0,users:{},tint:{},rooms:[],open:0,tab:'pub',set:0,q:'',mon:0,wins:[],msgs:{},old:{},reads:{},draft:{},focus:null,sub:null,rt:0,mod:null,mute:null});CH.blk={mine:new Set(),by:new Set()};const r=document.getElementById('chatRoot');if(r)r.innerHTML=''}
+function chSetRooms(a){CH.rooms=a.map(x=>({id:x.room_id,kind:x.kind,key:x.key,name:x.name,p1:x.p1,p2:x.p2,mine:!!x.mine,lastId:x.last_id||0,body:x.last_body||'',att:!!x.last_att,sender:x.last_sender,at:x.last_at,del:!!x.last_deleted,unread:x.unread||0}))}
+async function chLoad(){const o=await sb.rpc('chat_overview');if(o.error)throw o.error;chSetRooms(o.data||[])}
+async function chBlocksLoad(){const r=await sb.from('chat_blocks').select('*');CH.blk={mine:new Set(),by:new Set()};((r&&r.data)||[]).forEach(x=>{if(x.blocker==ME.id)CH.blk.mine.add(x.blocked);else if(x.blocked==ME.id)CH.blk.by.add(x.blocker)})}
+async function chMuteLoad(){const r=await sb.from('chat_mutes').select('*').eq('user_id',ME.id).maybeSingle();CH.mute=(r&&r.data)||null}
+const chMuted=s=>!!(CH.mute&&CH.mute[s]&&(!CH.mute.until||new Date(CH.mute.until)>Date.now()));
+async function chRefresh(){if(!ME||!CH.ok)return;try{await chLoad();for(const w of CH.wins){const L=CH.msgs[w.k];if(L){const last=L.filter(x=>!x._p).slice(-1)[0],r=await sb.from('chat_messages').select('*').eq('room_id',w.k).gt('id',last?last.id:0).order('id');((r&&r.data)||[]).forEach(m=>{if(!L.some(x=>x.id==m.id))L.push(m)})}}
+chBadge();if(CH.open)chListPatch();CH.wins.forEach(w=>chPatch(w.k))}catch(e){}}
+function chSub(){if(CH.sub)return;CH.sub=sb.channel('chat-live').on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages'},p=>chOnMsg(p.new)).on('postgres_changes',{event:'UPDATE',schema:'public',table:'chat_messages'},p=>chOnUpd(p.new)).on('postgres_changes',{event:'*',schema:'public',table:'chat_reads'},p=>chOnRead(p.new)).subscribe(s=>{CH.rt=(s=='SUBSCRIBED')})}
+addEventListener('focus',()=>{if(CH.ok){chRefresh();CH.wins.forEach(w=>!w.min&&chRead(w.k))}});
+/* ---- rooms ---- */
+const chRoom=id=>CH.rooms.find(r=>r.id==id);
+const chOther=r=>r.kind=='dm'?(r.p1==ME.id?r.p2:r.p1):r.kind=='admin'&&role=='admin'?r.p1:null;
+const chTitle=r=>r.kind=='channel'?(r.name||r.key):r.kind=='dm'?(r.mine?chNm(chOther(r)):chNm(r.p1)+' & '+chNm(r.p2)):role=='admin'?chNm(r.p1):'Admins';
+function chRoomAv(r,sz){sz=sz||38;if(r.kind=='channel')return `<span class="cav chn" style="width:${sz}px;height:${sz}px">${ico('hash')}</span>`;
+if(r.kind=='admin'&&role!='admin')return `<span class="cav adm" style="width:${sz}px;height:${sz}px">${ico('shield')}</span>`;return chAv(r.kind=='dm'&&r.mine?chOther(r):r.p1,sz)}
+function chSubT(r){if(r.kind=='channel')return 'Public channel';if(!r.mine)return 'Read-only (admin view)';const o=chOther(r),p=o?chPres(o):'';if(r.kind=='admin'&&role!='admin')return 'Ask the reviewers anything';return p=='active'?'Active now':p=='lockin'?'Locked in':''}
+const chUn=f=>CH.rooms.filter(f).reduce((n,r)=>n+(r.mine?r.unread:0),0);
+const chBadgeN=()=>chUn(r=>r.kind!='channel');
+function chBadge(){const b=document.getElementById('chBtn');if(!b)return;const n=chBadgeN();let i=b.querySelector('.cb');if(n){if(!i){i=document.createElement('i');i.className='cb';b.appendChild(i)}i.textContent=n>9?'9+':n}else if(i)i.remove()}
+function chPos(){document.body.classList.toggle('nofab',!document.querySelector('#fabRoot .fab'))}
+renderFab=(f=>function(){f();chPos()})(renderFab);
+function chAgo(ts){if(!ts)return'';const t=+new Date(ts);return phDay(t)==phDay()?tm(t):phF({month:'short',day:'numeric'},t)}
+const chErr=e=>{const m=(e&&e.message)||String(e);return /row-level security|violates/i.test(m)?'You cannot send messages here right now (muted, blocked, or chat is turned off).':/too fast/i.test(m)?'You are sending messages too fast. Wait a moment.':m}
+/* ---- open / close ---- */
+function chCap(){const avail=innerWidth-110-(document.body.classList.contains('sbo')?320:0)-(document.body.classList.contains('stp')?224:0),cap=innerWidth<=700?1:Math.max(1,Math.min(3,Math.floor(avail/340))),v=CH.wins.filter(w=>!w.min);while(v.length>cap)v.shift().min=1}
+async function chOpen(k){const r=chRoom(k);if(!r)return;let w=CH.wins.find(x=>x.k==k);if(w){CH.wins=CH.wins.filter(x=>x!==w);w.min=0}else w={k,min:0,att:[]};CH.wins.push(w);
+CH.open=0;CH.set=0;chCap();CH.focus=k;chRender();
+try{if(!CH.msgs[k])await chMsgsLoad(k);await chReadsLoad(k)}catch(e){toast(chErr(e))}
+chRender();chRead(k)}
+async function chMsgsLoad(k,before){let q=sb.from('chat_messages').select('*').eq('room_id',k).order('id',{ascending:false}).limit(40);if(before)q=q.lt('id',before);const r=await q;if(r.error)throw r.error;const rows=(r.data||[]).reverse(),cur=CH.msgs[k]||[];
+if(before){CH.msgs[k]=rows.concat(cur)}else{CH.msgs[k]=rows.concat(cur.filter(x=>x._p))}CH.old[k]=rows.length>=40}
+async function chReadsLoad(k){const r=await sb.from('chat_reads').select('user_id,last_id').eq('room_id',k);const o={};((r&&r.data)||[]).forEach(x=>{o[x.user_id]=x.last_id});CH.reads[k]=o}
+async function chOlder(k){const L=CH.msgs[k];if(!L||!L.length)return;const m=document.querySelector('.cw[data-k="'+k+'"] .cwm'),h=m?m.scrollHeight:0;try{await chMsgsLoad(k,L[0].id)}catch(e){return toast(chErr(e))}chPatch(k,0);const n=document.querySelector('.cw[data-k="'+k+'"] .cwm');if(n)n.scrollTop=n.scrollHeight-h}
+function chClose(e,k){e&&e.stopPropagation();CH.wins=CH.wins.filter(w=>w.k!=k);chRender()}
+function chMin(e,k){e&&e.stopPropagation();const w=CH.wins.find(x=>x.k==k);if(w)w.min=1;chRender()}
+function chHeadClick(e,k){}
+async function chOpenDM(uid){try{if(CH.users[uid]&&CH.users[uid].role=='admin')return chOpenAdmin();const r=await sb.rpc('chat_open_dm',{other:uid});if(r.error)throw r.error;await chLoad();CH.q='';chOpen(r.data)}catch(e){toast(chErr(e))}}
+async function chOpenAdmin(sid){try{const r=await sb.rpc('chat_open_admin',{student:sid||null});if(r.error)throw r.error;await chLoad();CH.q='';chOpen(r.data)}catch(e){toast(chErr(e))}}
+function chToggle(e){e.stopPropagation();CH.open=!CH.open;CH.set=0;CH.q='';chRender();if(CH.open)chRefresh()}
+document.addEventListener('click',e=>{if(CH.open&&!e.target.closest('.cpan,#chBtn')){CH.open=0;chRender()}if(!e.target.closest('#chPop,.cmm,.cwb'))chPopClose()});
+addEventListener('keydown',e=>{if(e.key=='Escape'&&CH.open&&!MD){CH.open=0;chRender()}});
+addEventListener('resize',()=>{if(CH.ok){chCap();chRender()}});
+/* ---- read / delivered ---- */
+function chRead(k){const r=chRoom(k);if(!r||!r.mine)return;r.unread=0;chBadge();if(CH.open)chListPatch();clearTimeout(CH.timers['r'+k]);CH.timers['r'+k]=setTimeout(()=>{sb.rpc('chat_mark_read',{rid:k,upto:r.lastId||0}).then(x=>x.error&&console.warn('Chat read:',x.error.message))},300)}
+function chDeliver(k){clearTimeout(CH.timers['d'+k]);CH.timers['d'+k]=setTimeout(()=>{sb.rpc('chat_mark_delivered',{rid:k}).then(x=>x.error&&console.warn('Chat delivered:',x.error.message))},250)}
+/* ---- live events ---- */
+function chOnMsg(m){if(!ME||!m)return;const r=chRoom(m.room_id);
+if(!r){/* a brand-new conversation: the server's overview already counts this message as unread, so do not add it twice */
+chLoad().then(()=>{const r2=chRoom(m.room_id);if(!r2)return;if(m.sender_id!=ME.id&&r2.mine&&r2.kind!='channel'){chDeliver(r2.id);if(!CH.open&&!document.hidden)toast(chNm(m.sender_id)+': '+(m.body||'sent a file').slice(0,60))}chBadge();if(CH.open)chListPatch();chHeads()}).catch(()=>{});return}chOnMsg2(r,m)}
+function chOnMsg2(r,m){const mine=m.sender_id==ME.id,L=CH.msgs[r.id];
+if(L){const ix=L.findIndex(x=>x.id==m.id);if(ix>=0)Object.assign(L[ix],m);else{const p=mine?L.findIndex(x=>x._p&&x.body==m.body):-1;if(p>=0)L[p]=m;else L.push(m)}}
+if(m.id>=r.lastId){r.lastId=m.id;r.body=m.body;r.att=!!(m.att&&m.att.length);r.sender=m.sender_id;r.at=m.created_at;r.del=m.deleted}
+const w=CH.wins.find(x=>x.k==r.id&&!x.min),vis=w&&!document.hidden;
+if(!mine&&r.mine){if(r.kind!='channel')chDeliver(r.id);if(vis)chRead(r.id);else{r.unread=Math.min(99,(r.unread||0)+1);if(r.kind!='channel'&&!CH.open&&!document.hidden)toast(chNm(m.sender_id)+': '+(m.body||'sent a file').slice(0,60))}}
+chBadge();if(CH.open)chListPatch();chPatch(r.id);chHeads()}
+function chOnUpd(m){if(!m)return;const L=CH.msgs[m.room_id];if(L){const x=L.find(y=>y.id==m.id);if(x)Object.assign(x,m)}const r=chRoom(m.room_id);if(r&&r.lastId==m.id){r.body=m.body;r.del=m.deleted;r.att=!!(m.att&&m.att.length)}if(CH.open)chListPatch();chPatch(m.room_id)}
+function chOnRead(row){if(!row||!row.room_id)return;(CH.reads[row.room_id]=CH.reads[row.room_id]||{})[row.user_id]=row.last_id;chPatch(row.room_id)}
+/* ---- send ---- */
+function chCan(r){if(!r.mine)return{ok:0,why:'Read-only view for admins.'};
+if(r.kind=='channel')return chMuted('pub')?{ok:0,why:'You are muted in public chat.'}:{ok:1};
+if(r.kind=='dm'){if(rsBlocked('dm'))return{ok:0,why:'Direct messages are turned off for your account.'};if(chMuted('dm'))return{ok:0,why:'You are muted in direct messages.'};const o=chOther(r);if(CH.blk.mine.has(o))return{ok:0,why:'You blocked '+chNm(o)+'.',unb:o};if(CH.blk.by.has(o))return{ok:0,why:'You cannot reply to this conversation.'}}
+return{ok:1}}
+async function chSend(k){const r=chRoom(k),w=CH.wins.find(x=>x.k==k);if(!r||!w||!chCan(r).ok)return;const ta=document.querySelector('.cw[data-k="'+k+'"] .cwi'),body=(ta?ta.value:CH.draft[k]||'').trim(),att=w.att||[];if(!body&&!att.length)return;
+if(body.length>2000)return toast('That message is too long (2000 characters max).');
+const tmp={id:-Date.now(),room_id:k,sender_id:ME.id,body,att:att.length?att:null,created_at:new Date().toISOString(),_p:1};(CH.msgs[k]=CH.msgs[k]||[]).push(tmp);CH.draft[k]='';w.att=[];if(ta){ta.value='';ta.style.height=''}chRender();chPatch(k,1);
+const x=await sb.from('chat_messages').insert({room_id:k,body,att:att.length?att:null}).select().single();
+if(x.error){tmp._p=0;tmp._f=1;chPatch(k);toast(chErr(x.error));return}
+const L=CH.msgs[k],dup=L.findIndex(y=>y.id==x.data.id);if(dup>=0&&L[dup]!==tmp){L.splice(L.indexOf(tmp),1)}else{L[L.indexOf(tmp)]=x.data}
+if(x.data.id>=r.lastId){r.lastId=x.data.id;r.body=x.data.body;r.att=!!att.length;r.sender=ME.id;r.at=x.data.created_at;r.del=false}
+if(r.kind!='channel')chRead(k);chPatch(k,1);if(CH.open)chListPatch()}
+async function chRetry(k,id){const L=CH.msgs[k]||[],i=L.findIndex(x=>x.id==id);if(i<0)return;const m=L[i];L.splice(i,1);const w=CH.wins.find(x=>x.k==k);if(w)w.att=m.att||[];CH.draft[k]=m.body;chRender();chSend(k)}
+function chInput(ta,k){CH.draft[k]=ta.value;ta.style.height='';ta.style.height=Math.min(ta.scrollHeight,110)+'px'}
+function chKey(e,k){if(e.key=='Enter'&&!e.shiftKey&&!e.isComposing){e.preventDefault();chSend(k)}}
+/* ---- attachments: files that already live on the site ---- */
+function chPick(k){const l=D.M.filter(m=>m.path);if(!l.length)return toast('No uploaded files yet.');
+const rows=sortBy(l,'az',m=>m.title,m=>m.ts).map(m=>{const f=D.FO.find(x=>x.id==m.fo);return `<label class="msi" data-t="${E((m.title+' '+(f?fpath(f):'')).toLowerCase())}"><input type="checkbox" class="chk" value="${m.id}">${tag(m.type)}<span class="qtx">${E(m.title)}<span class="mu sm"> ${E(f?fpath(f):'')}</span></span></label>`}).join('');
+openMdl({title:'Attach files',wide:1,okText:'Attach',body:`<p class="mu sm">Only files already uploaded to this site. The other person needs access to a file to open it.</p><input placeholder="Search files…" oninput="agFind(this)" style="width:100%"><div class="aglist" style="max-height:340px">${rows}</div>`,
+onOk:()=>{const ids=[...document.querySelectorAll('#mdlRoot .chk:checked')].map(x=>x.value);if(!ids.length){toast('Pick at least one file');return false}const w=CH.wins.find(x=>x.k==k);if(!w)return;w.att=(w.att||[]);ids.forEach(id=>{const m=D.M.find(x=>x.id==id);if(m&&w.att.length<3&&!w.att.some(a=>a.id==id))w.att.push({id:m.id,title:m.title,type:m.type})});chRender()}})}
+function chUnatt(k,i){const w=CH.wins.find(x=>x.k==k);if(w){w.att.splice(i,1);chRender()}}
+function chAtt(id){if(!D.M.find(x=>x.id==id))return toast('You do not have access to that file.');openM(id)}
+/* ---- message actions ---- */
+function chPopClose(){const p=document.getElementById('chPop');if(p)p.remove()}
+function chPop(e,items){e.stopPropagation();chPopClose();const b=e.currentTarget.getBoundingClientRect(),p=document.createElement('div');p.id='chPop';p.className='cpop';p.innerHTML=items.filter(Boolean).map(([t,fn,d])=>`<a class="${d?'dng':''}" onclick="chPopClose();${fn}">${t}</a>`).join('');document.getElementById('chatRoot').appendChild(p);
+const w=p.offsetWidth,h=p.offsetHeight;let x=Math.min(innerWidth-w-8,Math.max(8,b.right-w)),y=b.bottom+4;if(y+h>innerHeight-8)y=Math.max(8,b.top-h-4);p.style.left=x+'px';p.style.top=y+'px'}
+function chMsgMenu(e,k,id){const m=(CH.msgs[k]||[]).find(x=>x.id==id);if(!m||m.deleted)return;const mine=m.sender_id==ME.id;
+chPop(e,[mine||role=='admin'?[mine?'Unsend':'Remove for everyone',`chDel(${id})`,1]:null,!mine?['Report',`chReportAsk(${id})`]:null,role=='admin'&&!mine?['Mute sender…',`chMuteAsk('${m.sender_id}')`]:null])}
+async function chDel(id){const r=await sb.rpc('chat_delete',{mid:id});if(r.error)toast(chErr(r.error))}
+function chWinMenu(e,k){const r=chRoom(k);if(!r)return;const o=chOther(r);
+chPop(e,[r.kind=='dm'&&r.mine&&o?(CH.blk.mine.has(o)?['Unblock '+E(chNm(o)),`chUnblock('${o}')`]:['Block '+E(chNm(o)),`chBlockAsk('${o}')`,1]):null,role=='admin'&&o?['Mute '+E(chNm(o))+'…',`chMuteAsk('${o}')`]:null,['Close chat',`chClose(null,'${k}')`]])}
+function chBlockAsk(u){showConfirm('Block '+chNm(u)+'?','They will not be able to message you and you cannot message them, until you unblock. Admins can still read past messages.',async()=>{const r=await sb.rpc('chat_block',{u});if(r.error)throw r.error;CH.blk.mine.add(u);chRender();toast(chNm(u)+' blocked')})}
+async function chUnblock(u){const r=await sb.rpc('chat_unblock',{u});if(r.error)return toast(chErr(r.error));CH.blk.mine.delete(u);chRender();toast(chNm(u)+' unblocked')}
+function chReportAsk(id){openMdl({title:'Report message',okText:'Send report',body:`<div class="field"><label>Reason</label>${dd('chRsn',['Spam','Harassment or bullying','Inappropriate content','Cheating or sharing answers','Other'],'Spam')}</div><div class="field"><label>Details (optional)</label><textarea id="chRn" maxlength="500" placeholder="Tell the admins what happened"></textarea></div>`,
+onOk:async()=>{const r=await sb.rpc('chat_report',{mid:id,why:v('chRsn'),extra:($('#chRn').value||'').trim()||null});if(r.error)throw r.error;toast('Report sent to the admins')}})}
+function chMuteAsk(u){openMdl({title:'Mute '+chNm(u),okText:'Mute',body:`<div class="field"><label class="msi"><input type="checkbox" id="chMp" checked><span>Public channels</span></label><label class="msi"><input type="checkbox" id="chMd"><span>Direct messages</span></label></div><div class="field"><label>For</label>${dd('chMt',[['1h','1 hour'],['1d','1 day'],['7d','7 days'],['inf','Until I unmute']],'1d')}</div><p class="mu sm">Muted students can still message the admins.</p>`,
+onOk:async()=>{const pub=$('#chMp').checked,dm=$('#chMd').checked;if(!pub&&!dm){toast('Pick public chat, direct messages, or both');return false}const t=v('chMt'),until=t=='inf'?null:new Date(Date.now()+({'1h':36e5,'1d':864e5,'7d':6048e5})[t]).toISOString();
+const r=await sb.from('chat_mutes').upsert({user_id:u,pub,dm,until,by:ME.id});if(r.error)throw r.error;CH.mod=null;toast(chNm(u)+' muted');if(location.hash=='#/admin')route()}})}
+/* ---- rendering ---- */
+const chLink=t=>E(t).replace(/\n/g,'<br>').replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
+function chSeers(k){const r=chRoom(k),rd=CH.reads[k]||{},o=[];Object.keys(rd).forEach(u=>{if(u==ME.id)return;if(r.kind=='admin'&&role!='admin'&&!(CH.users[u]&&CH.users[u].role=='admin'))return;o.push({u,last:rd[u]})});return o}
+function chMsgsHtml(k){const r=chRoom(k),L=CH.msgs[k]||[],me=ME.id;if(!r)return'';let h='';
+if(CH.old[k])h+=`<button class="cmore" onclick="chOlder('${k}')">Load earlier messages</button>`;
+h+=`<p class="cnote">${r.kind=='channel'?'Public channel. Everyone can read this.':!r.mine?'Read-only admin view.':'Admins can read this conversation.'}</p>`;
+const dm=r.kind!='channel'&&r.mine,mineIds=L.filter(m=>m.sender_id==me&&!m._f&&m.id>0).map(m=>m.id),heads={};
+if(dm){chSeers(k).forEach(s=>{const up=mineIds.filter(i=>i<=s.last).pop();if(up)(heads[up]=heads[up]||[]).push(s.u)})}
+const lastMine=[...L].reverse().find(m=>m.sender_id==me&&!m.deleted);let prev=null;
+L.forEach((m,i)=>{const t=+new Date(m.created_at),sep=!prev||t-(+new Date(prev.created_at))>18e5,mine=m.sender_id==me;
+if(sep)h+=`<div class="csep">${phDay(t)==phDay()?'':phF({month:'short',day:'numeric'},t)+' · '}${tm(t)}</div>`;
+const first=sep||prev.sender_id!=m.sender_id,nx=L[i+1],last=!nx||nx.sender_id!=m.sender_id||(+new Date(nx.created_at))-t>18e5;
+let body=m.deleted?'<i class="mu">Message removed</i>':(m.body?`<span>${chLink(m.body)}</span>`:'')+((m.att||[]).map(a=>`<a class="cat" onclick="chAtt('${a.id}')">${ico('file')}<b>${E(a.title)}</b></a>`).join(''));
+h+=`<div class="cmr ${mine?'me':''}">${!mine?`<div class="cmv">${last?chAv(m.sender_id,28,false):''}</div>`:''}<div class="cmc">${!mine&&first&&r.kind!='dm'?`<small class="cnm">${E(chNm(m.sender_id))}${CH.users[m.sender_id]&&CH.users[m.sender_id].role=='admin'?' · admin':''}</small>`:''}<div class="cmbw"><div class="cmb ${m._f?'bad':''} ${m._p?'pend':''}" ${m._f?`onclick="chRetry('${k}',${m.id})"`:''} title="${E(phF({dateStyle:'medium',timeStyle:'short'},t))}">${body}</div>${!m.deleted&&m.id>0?`<button class="cmm" aria-label="Message options" onclick="chMsgMenu(event,'${k}',${m.id})">${ico('more')}</button>`:''}</div></div></div>`;
+if(mine&&dm&&!m.deleted){const hd=heads[m.id];if(hd&&hd.length)h+=`<div class="cseen">${hd.slice(0,3).map(u=>chAv(u,14,false)).join('')}</div>`;
+else if(lastMine&&lastMine.id==m.id){h+=`<div class="cst">${m._f?'Not sent. Tap the message to retry.':m._p?'Sending…':m.delivered_at?'Delivered':'Sent'}</div>`}}
+prev=m});
+if(!L.length)h+=`<p class="cnote">${r.mine?'No messages yet. Say hi!':'No messages in this conversation.'}</p>`;return h}
+function chFootHtml(w,r){const c=chCan(r);if(!c.ok)return `<div class="cwf off">${E(c.why)}${c.unb?` <a onclick="chUnblock('${c.unb}')">Unblock</a>`:''}</div>`;
+return `<div class="cwf">${(w.att||[]).length?`<div class="cwa">${w.att.map((a,i)=>`<span class="cch">${ico('file')}<b>${E(a.title)}</b><a onclick="chUnatt('${w.k}',${i})" aria-label="Remove">${ico('x')}</a></span>`).join('')}</div>`:''}<div class="cwr"><button class="cwb" title="Attach a file from the site" onclick="chPick('${w.k}')">${ico('clipf')}</button><textarea class="cwi" rows="1" maxlength="2000" placeholder="Aa" oninput="chInput(this,'${w.k}')" onkeydown="chKey(event,'${w.k}')">${E(CH.draft[w.k]||'')}</textarea><button class="cwb send" title="Send" onclick="chSend('${w.k}')">${ico('send')}</button></div></div>`}
+function chWinHtml(w,i){const r=chRoom(w.k);if(!r)return'';const sub=chSubT(r);
+return `<div class="cw" data-k="${w.k}" style="--ci:${i}"><div class="cwh">${chRoomAv(r,32)}<div class="cwt"><b>${E(chTitle(r))}</b><small>${E(sub)}</small></div><button class="cwb" title="Options" onclick="chWinMenu(event,'${w.k}')">${ico('more')}</button><button class="cwb" title="Minimize" onclick="chMin(event,'${w.k}')">${ico('minus')}</button><button class="cwb" title="Close" onclick="chClose(event,'${w.k}')">${ico('x')}</button></div><div class="cwm" onscroll="this.dataset.b=(this.scrollHeight-this.scrollTop-this.clientHeight<40)?1:0">${chMsgsHtml(w.k)}</div>${chFootHtml(w,r)}</div>`}
+function chHeads(){const r=document.getElementById('chatRoot');if(!r)return;r.querySelectorAll('.chd').forEach(h=>{const rm=chRoom(h.dataset.k),n=rm?rm.unread:0;let b=h.querySelector('.cb');if(n){if(!b){b=document.createElement('i');b.className='cb';h.appendChild(b)}b.textContent=n>9?'9+':n}else if(b)b.remove()})}
+function chPatch(k,force){const m=document.querySelector('.cw[data-k="'+k+'"] .cwm');if(!m)return;const atB=force||m.dataset.b!=='0',r=chRoom(k);m.innerHTML=chMsgsHtml(k);if(atB)m.scrollTop=m.scrollHeight;const s=document.querySelector('.cw[data-k="'+k+'"] .cwt small');if(s&&r)s.textContent=chSubT(r)}
+function chTabs(){const t=[['pub','Public',chUn(r=>r.kind=='channel')],['dm','DMs',chUn(r=>r.kind=='dm')],['adm','Admin',chUn(r=>r.kind=='admin')]];return `<div class="ctabs">${t.map(([k,n,u])=>`<a class="${CH.tab==k?'on':''}" onclick="CH.tab='${k}';CH.q='';chRender()">${n}${u?`<i class="cb">${u>9?'9+':u}</i>`:''}</a>`).join('')}</div>`}
+function chRow(r){const un=r.mine?r.unread:0,p=(r.sender==ME.id?'You: ':r.kind!='dm'&&r.sender?chNm(r.sender)+': ':'')+(r.del?'Message removed':r.body||(r.att?'Sent a file':''));
+return `<div class="cli" onclick="chOpen('${r.id}')">${chRoomAv(r)}<div class="clm"><b>${E(chTitle(r))}${!r.mine?' <span class="tag">read-only</span>':''}</b><span class="${un?'u':''}">${E(r.lastId?p:r.kind=='channel'?'No messages yet':'')}</span></div><div class="cls">${r.at?`<small>${chAgo(r.at)}</small>`:''}${un?`<i class="cb">${un>9?'9+':un}</i>`:''}</div></div>`}
+function chListHtml(){const me=ME.id,q=(CH.q||'').trim().toLowerCase(),byAt=(a,b)=>String(b.at||'').localeCompare(String(a.at||''));let h='';
+if(CH.tab=='pub'){const o=['general','MSTC','HPGE','PSAD'];h=CH.rooms.filter(r=>r.kind=='channel').sort((a,b)=>(o.indexOf(a.key)+1||9)-(o.indexOf(b.key)+1||9)).map(chRow).join('')||'<p class="cempty">No channels yet.</p>'}
+else if(CH.tab=='dm'){let l=CH.rooms.filter(r=>r.kind=='dm'&&r.mine&&(r.lastId||CH.wins.some(w=>w.k==r.id))).sort(byAt);if(q)l=l.filter(r=>chTitle(r).toLowerCase().includes(q));h=l.map(chRow).join('');
+if(rsBlocked('dm'))h='<p class="cempty">Direct messages are turned off for your account.</p>';
+else{const ppl=q?Object.keys(CH.users).filter(id=>id!=me&&CH.users[id].role!='admin'&&CH.users[id].name.toLowerCase().includes(q)&&!l.some(r=>chOther(r)==id)).slice(0,8):[];
+h+=ppl.length?`<div class="chl">People</div>`+ppl.map(id=>`<div class="cli" onclick="chOpenDM('${id}')">${chAv(id,38)}<div class="clm"><b>${E(chNm(id))}</b><span>Start a conversation</span></div></div>`).join(''):'';
+if(!h)h=`<p class="cempty">${q?'Nobody found.':'No direct messages yet. Search a name above to start one.'}</p>`}
+if(role=='admin'){const mon=CH.rooms.filter(r=>r.kind=='dm'&&!r.mine&&r.lastId).sort(byAt);if(mon.length)h+=`<div class="chl"><a onclick="CH.mon=!CH.mon;chRender()">${CH.mon?'Hide':'Show'} all student DMs (${mon.length})</a></div>`+(CH.mon?mon.filter(r=>!q||chTitle(r).toLowerCase().includes(q)).map(chRow).join(''):'')}}
+else{if(role=='admin'){let l=CH.rooms.filter(r=>r.kind=='admin'&&r.lastId).sort(byAt);if(q)l=l.filter(r=>chTitle(r).toLowerCase().includes(q));h=l.map(chRow).join('');
+const ppl=q?Object.keys(CH.users).filter(id=>CH.users[id].role!='admin'&&CH.users[id].name.toLowerCase().includes(q)&&!l.some(r=>r.p1==id)).slice(0,8):[];
+h+=ppl.length?`<div class="chl">Students</div>`+ppl.map(id=>`<div class="cli" onclick="chOpenAdmin('${id}')">${chAv(id,38)}<div class="clm"><b>${E(chNm(id))}</b><span>Message this student</span></div></div>`).join(''):'';if(!h)h=`<p class="cempty">${q?'Nobody found.':'No student messages yet. Search a name above to start one.'}</p>`}
+else{const r=CH.rooms.find(x=>x.kind=='admin');h=r?chRow(r):`<div class="cli" onclick="chOpenAdmin()"><span class="cav adm" style="width:38px;height:38px">${ico('shield')}</span><div class="clm"><b>Admins</b><span>Ask the reviewers anything</span></div></div>`}}
+return h}
+function chSetHtml(){const p=CH.prefs;return `<div class="chh"><button class="cwb" onclick="CH.set=0;chRender()" aria-label="Back">${ico('back')}</button><b>Active status</b></div><div class="cset"><label class="tgl"><input type="checkbox" ${p.show?'checked':''} onchange="chPref('show',this.checked)"><i></i><span>Show when I am active</span></label><p class="mu sm">When this is off you appear offline, and you also will not see who else is active.</p>
+<div class="cgrp"><b class="sm">During a Lock In session</b>${[['show','Show me as “Locked in”'],['hide','Hide my status (appear offline)'],['active','Keep showing “Active”']].map(([k,t])=>`<label class="msi"><input type="radio" name="chlm" ${p.lock==k?'checked':''} ${p.show?'':'disabled'} onchange="chPref('lock','${k}')"><span>${t}</span></label>`).join('')}</div><p class="mu sm">Right now you appear as: <b>${{active:'Active',lockin:'Locked in',hidden:'Offline'}[chSt()]}</b>.</p></div>`}
+function chPanelHtml(){if(CH.ok===false)return `<div class="cpan"><div class="chh"><b>Messages</b></div><div class="cset"><p>Chat is not set up yet.</p><p class="mu sm">Run <b>chat.sql</b> once in the Supabase SQL editor, then reload.</p>${CH.err?`<p class="mu sm">${E(CH.err)}</p>`:''}</div></div>`;
+if(CH.set)return `<div class="cpan">${chSetHtml()}</div>`;
+const showQ=CH.tab!='pub'&&!(CH.tab=='adm'&&role!='admin');
+return `<div class="cpan"><div class="chh"><b>Messages</b><button class="cwb" title="Active status" onclick="CH.set=1;chRender()">${ico('sliders')}</button></div>${chTabs()}${showQ?`<div class="csr"><input id="chQ" placeholder="${CH.tab=='adm'?'Search students':'Search people'}" value="${E(CH.q)}" oninput="CH.q=this.value;chListPatch()" autocomplete="off"></div>`:''}<div class="cll" id="chList">${chListHtml()}</div>${CH.tab=='dm'&&!rsBlocked('dm')?'<p class="cft">Admins can read direct messages.</p>':''}</div>`}
+function chListPatch(){const l=document.getElementById('chList');if(l)l.innerHTML=chListHtml();const t=document.querySelector('.cpan .ctabs');if(t)t.outerHTML=chTabs()}
+function chBtnHtml(){const n=chBadgeN();return `<button id="chBtn" class="cbtn" onclick="chToggle(event)" aria-label="Messages" title="Messages">${ico('chat')}${n?`<i class="cb">${n>9?'9+':n}</i>`:''}</button>`}
+function chRender(){const r=chRoot();if(!ME||CH.ok===null||rsBlocked('chat')||(CH.ok===false&&role!='admin')){r.innerHTML='';return}
+const sc={};r.querySelectorAll('.cw').forEach(w=>{const m=w.querySelector('.cwm');if(m)sc[w.dataset.k]=m.dataset.b!=='0'?-1:m.scrollTop});
+const ae=document.activeElement,fk=ae&&ae.classList&&ae.classList.contains('cwi')?ae.closest('.cw').dataset.k:null,fq=ae&&ae.id=='chQ';
+chCap();const vis=CH.wins.filter(w=>!w.min&&chRoom(w.k)),hd=CH.wins.filter(w=>w.min&&chRoom(w.k));
+r.style.setProperty('--hw',hd.length&&innerWidth>700?'62px':'0px');
+r.innerHTML=chBtnHtml()+(CH.open?chPanelHtml():'')+vis.slice().reverse().map((w,i)=>chWinHtml(w,i)).join('')+(innerWidth>700?hd.map((w,i)=>{const rm=chRoom(w.k),n=rm.unread;return `<div class="chd" data-k="${w.k}" style="--hi:${i}" title="${E(chTitle(rm))}" onclick="chOpen('${w.k}')">${chRoomAv(rm,44)}<a class="chx" onclick="chClose(event,'${w.k}')" aria-label="Close">${ico('x')}</a>${n?`<i class="cb">${n>9?'9+':n}</i>`:''}</div>`}).join(''):'');
+r.querySelectorAll('.cw').forEach(w=>{const m=w.querySelector('.cwm'),k=w.dataset.k;if(m){m.dataset.b=sc[k]===undefined||sc[k]===-1?1:0;m.scrollTop=sc[k]===undefined||sc[k]===-1?m.scrollHeight:sc[k]}const t=w.querySelector('.cwi');if(t&&CH.draft[k])t.style.height=Math.min(t.scrollHeight,110)+'px'});
+const want=fk||CH.focus;if(want){const t=r.querySelector('.cw[data-k="'+want+'"] .cwi');if(t&&!('ontouchstart' in window&&!fk)){t.focus();const n=t.value.length;try{t.setSelectionRange(n,n)}catch(e){}}CH.focus=null}
+if(fq){const q=document.getElementById('chQ');if(q){q.focus();const n=q.value.length;q.setSelectionRange(n,n)}}}
+/* ---- admin dashboard: reports, mutes ---- */
+async function chModLoad(){const[a,b]=await Promise.all([sb.from('chat_reports').select('*').eq('resolved',false).order('id',{ascending:false}).limit(50),sb.from('chat_mutes').select('*')]);CH.mod={reps:(a&&a.data)||[],mutes:(b&&b.data)||[]};if(location.hash=='#/admin'&&AT=='c')route()}
+function aqChat(){if(CH.ok===false)return `<div class="card"><p>Chat is not set up yet.</p><p class="mu sm">Run <b>chat.sql</b> once in the Supabase SQL editor, then reload this page.</p>${CH.err?`<p class="mu sm">${E(CH.err)}</p>`:''}</div>`;
+if(!CH.mod){if(CH.ok)chModLoad();return '<p class="mu">Loading…</p>'}
+const st=Object.keys(CH.users).filter(id=>CH.users[id].role!='admin').sort((a,b)=>chNm(a).localeCompare(chNm(b))),act=CH.mod.mutes.filter(m=>!m.until||new Date(m.until)>Date.now());
+return `<div class="stack"><div class="card stack"><h3>Reports</h3>${CH.mod.reps.length?CH.mod.reps.map(x=>`<div class="rep"><div class="sm"><b>${E(x.reason)}</b> · ${E(chNm(x.reporter))} reported ${E(chNm(x.reported))} · ${E(phF({dateStyle:'medium',timeStyle:'short'},+new Date(x.created_at)))}</div>${x.note?`<p class="mu sm">“${E(x.note)}”</p>`:''}<p class="repm">${x.snapshot?E(x.snapshot):'<i class="mu">(no text)</i>'}</p><div class="row" style="margin:0">${x.message_id?`<button class="btn" onclick="chModDel(${x.message_id},${x.id})">Remove message</button>`:''}${x.reported?`<button class="btn" onclick="chMuteAsk('${x.reported}')">Mute user…</button>`:''}<button class="btn" onclick="chModResolve(${x.id})">Dismiss</button></div></div>`).join(''):'<p class="mu sm">No open reports.</p>'}</div>
+<div class="card stack"><h3>Muted students</h3>${act.length?act.map(m=>`<div class="row" style="justify-content:space-between;margin:0"><span>${E(chNm(m.user_id))} <span class="mu sm">· ${[m.pub?'public chat':'',m.dm?'direct messages':''].filter(Boolean).join(' + ')} · ${m.until?'until '+E(phF({dateStyle:'medium',timeStyle:'short'},+new Date(m.until))):'until unmuted'}</span></span><button class="btn" onclick="chUnmute('${m.user_id}')">Unmute</button></div>`).join(''):'<p class="mu sm">Nobody is muted.</p>'}
+<div class="field" style="margin-top:8px"><label class="lb sm">Mute a student</label>${dd('chmU',[['','Choose a student'],...st.map(id=>[id,chNm(id)])],'')}</div><div class="row" style="margin:0"><button class="btn p" onclick="const u=v('chmU');u?chMuteAsk(u):toast('Choose a student first')">Mute…</button></div></div>
+<p class="mu sm">Admins can read every conversation, including student DMs, from the chat panel (DMs tab → Show all student DMs). Students are told this in the chat.</p></div>`}
+async function chModDel(mid,rid){await sb.rpc('chat_delete',{mid});await sb.from('chat_reports').update({resolved:true}).eq('id',rid);CH.mod=null;route();toast('Message removed')}
+async function chModResolve(id){await sb.from('chat_reports').update({resolved:true}).eq('id',id);CH.mod=null;route()}
+async function chUnmute(u){const r=await sb.from('chat_mutes').delete().eq('user_id',u);if(r.error)return toast(r.error.message);CH.mod=null;route();toast('Unmuted')}
+
 route=(f=>function(){f();placeCtx();annAfterRoute()})(route);syncTheme();annLoad().then(()=>{if(!ME&&QL&&(location.hash.slice(2)||'home').split('/')[0]=='home')route()});route();
 /* PWA: lets the app install on PC and phones and open its shell offline */
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('SW:',e)));
