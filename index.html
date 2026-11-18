@@ -779,6 +779,41 @@ body.nto{padding-bottom:calc(var(--ftH,0px) + var(--ntH,0px) + 8px)}
 #updBar span{flex:1 1 100%;line-height:1.35}
 #updBar button{flex:1 1 0;padding:8px 12px;font-size:.85rem}
 }
+
+/* ===== notifications: entries, dismiss, See all ===== */
+.nfe{position:relative;overflow:hidden;max-height:90px;touch-action:pan-y;transition:max-height .24s ease,padding .24s ease,margin .24s ease,opacity .2s,background .12s}
+.nfe .clm{min-width:0}
+.nfe.nfin{animation:nfIn .34s cubic-bezier(.2,.9,.3,1.25) backwards}
+@keyframes nfIn{from{opacity:0;transform:translateY(16px) scale(.95)}to{opacity:1;transform:none}}
+.nfe.nfsw{transition:none}
+.nfe.nfo{--dir:1;transform:translateX(calc(115% * var(--dir))) rotate(calc(5deg * var(--dir)));opacity:0;transition:transform .3s cubic-bezier(.5,-.35,.9,.45),opacity .3s ease .05s,background .1s;background:rgba(46,204,113,.18);pointer-events:none}
+.nfe.nfo .nfi{background:#2ecc71;color:#fff;transform:scale(1.18);transition:transform .15s,background .15s}
+.nfe.nfc{max-height:0;padding-top:0;padding-bottom:0;margin:0;border:0}
+.nfx{flex:none;width:28px;height:28px;border-radius:50%;border:0;background:transparent;color:var(--mu);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;transition:transform .18s cubic-bezier(.3,1.6,.5,1),background .12s,color .12s}
+.nfx .ic{width:15px;height:15px;margin:0}
+.nfx:hover{background:var(--soft);color:var(--ink)}
+.nfx:active{transform:scale(.8)}
+.nfx.pop{animation:nfxPop .3s ease both}
+@keyframes nfxPop{0%{transform:scale(1)}40%{transform:scale(1.5) rotate(90deg);background:rgba(46,204,113,.3);color:#1fa65a}100%{transform:scale(.6)}}
+.nfp{position:absolute;width:7px;height:7px;border-radius:50%;pointer-events:none;z-index:6;animation:nfp .6s cubic-bezier(.1,.7,.3,1) forwards}
+@keyframes nfp{from{transform:translate(-50%,-50%) scale(1);opacity:1}to{transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(.2);opacity:0}}
+.cb.bump{animation:nfBump .45s cubic-bezier(.3,1.7,.5,1)}
+@keyframes nfBump{0%{transform:scale(1)}40%{transform:scale(1.55)}100%{transform:scale(1)}}
+.cll.nfall{max-height:min(55vh,400px)}
+.nff{padding:8px 10px;border-top:1px solid var(--bd);flex:none}.nff .btn{width:100%}
+.nfok{display:flex;flex-direction:column;align-items:center;gap:6px;padding:22px 10px;color:var(--mu)}
+.nfok span{width:46px;height:46px;border-radius:50%;background:#2ecc71;color:#fff;display:flex;align-items:center;justify-content:center;animation:nfOk .5s cubic-bezier(.3,1.7,.5,1) both;box-shadow:0 0 0 0 rgba(46,204,113,.5)}
+.nfok span .ic{width:24px;height:24px;margin:0}
+.nfok p{margin:0}
+@keyframes nfOk{0%{transform:scale(0) rotate(-40deg);box-shadow:0 0 0 0 rgba(46,204,113,.5)}60%{transform:scale(1.15) rotate(6deg)}100%{transform:scale(1);box-shadow:0 0 0 16px rgba(46,204,113,0)}}
+@media(prefers-reduced-motion:reduce){.nfe,.nfe.nfo,.nfe.nfin,.nfx,.nfok span{animation-duration:.01s!important;transition-duration:.01s!important}}
+.nfm{position:fixed;z-index:95;min-width:176px;background:var(--card);border:1px solid var(--bd);border-radius:12px;box-shadow:0 12px 34px #0005;padding:5px;animation:nfmIn .16s cubic-bezier(.2,.9,.3,1.3);transform-origin:top right}
+@keyframes nfmIn{from{opacity:0;transform:scale(.88) translateY(-4px)}to{opacity:1;transform:none}}
+.nfm button{display:flex;align-items:center;gap:9px;width:100%;padding:9px 11px;border:0;background:transparent;color:var(--tx);border-radius:8px;cursor:pointer;font:inherit;font-size:.9rem;text-align:left}
+.nfm button:hover{background:var(--soft)}.nfm button.dn{color:#e5484d}.nfm button.dn:hover{background:rgba(229,72,77,.14)}
+.nfm .ic{width:16px;height:16px;margin:0}.nfm .nfd{width:9px;height:9px;margin:0 3.5px;border-radius:50%;background:var(--teal);flex:none}
+.nfe.nfu{animation:nfU .55s ease}
+@keyframes nfU{0%{background:rgba(60,199,181,.35)}100%{background:transparent}}
 </style>
 </head>
 <body>
@@ -3112,23 +3147,67 @@ try{const s=stLoad(),d=stDer(s);if(d.br&&!dis['rl'+day])L.push({id:'rl',ic:'flam
 else if(!d.br&&d.cur>0&&!d.today&&!d.rest&&!dis['rl'+day])L.push({id:'rl',ic:'flame',h:'Keep your Lock In streak',s:'Study today to keep your '+fm(d.cur)+'-day streak',tt:'Study today to keep your streak',at:0,go:()=>go('dash'),dis:()=>ntfDismiss('rl'+day)})}catch(e){}
 try{const q=qkState();if(q.s.streak>0&&q.st=='ok'&&!dis['rq'+day])L.push({id:'rq',ic:'flame',h:'Keep your QuickiZ streak',s:'Do today’s QuickiZ to keep your '+q.s.streak+'-day streak',tt:'Do today’s QuickiZ',at:0,go:()=>go('quickiz'),dis:()=>ntfDismiss('rq'+day)});
 else if(q.st=='rev'&&!dis['rq'+day])L.push({id:'rq',ic:'flame',h:'QuickiZ streak missed',s:'Tap to revive it',tt:'QuickiZ streak missed',at:0,go:()=>go('quickiz'),dis:()=>ntfDismiss('rq'+day)})}catch(e){}
-return L.sort((a,b)=>b.at-a.at)}
-function ntfRender(){let r=document.getElementById('ntfRoot');if(!r){r=document.createElement('div');r.id='ntfRoot';document.body.appendChild(r)}
+const hid=ntfDismissed();return L.filter(x=>!hid['d:'+ntfKey(x)]).sort((a,b)=>b.at-a.at)}
+function ntfRender(){if(NF.anim>0){NF.dirty=1;return}let r=document.getElementById('ntfRoot');if(!r){r=document.createElement('div');r.id='ntfRoot';document.body.appendChild(r)}
 if(!ME){r.innerHTML='';ntfTitle([]);return}if(!NF.ld){NF.ld=1;ntfLoad()}
-const L=NF.last=ntfList(),U=L.filter(x=>!ntfIsRead(x)),n=U.length;
-r.innerHTML=`<button id="ntBtn" class="cbtn nb" onclick="ntfToggle(event)" aria-label="Notifications" title="Notifications">${ico('bell')}${n?`<i class="cb">${n>9?'9+':n}</i>`:''}</button>${NF.open?`<div class="cpan npan"><div class="chh"><b>Notifications</b>${L.some(x=>x.dis)?`<button class="btn" style="padding:4px 10px" onclick="ntfClear()">Clear</button>`:''}</div><div class="cll">${L.length?L.map((x,i)=>`<div class="cli nfe${ntfIsRead(x)?' rd':''}" onclick="ntfAct(${i})"><span class="nfi">${ico(x.ic)}</span><div class="clm"><b>${E(x.h)}</b><span>${E(x.s)}</span></div>${x.btn?`<button class="btn p" style="padding:4px 10px">${x.btn}</button>`:x.dis?`<button class="cwb" title="Dismiss" onclick="ntfDis(event,${i})">${ico('x')}</button>`:''}</div>`).join(''):'<p class="cempty">You are all caught up.</p>'}</div></div>`:''}`;
+const L=NF.last=ntfList(),U=L.filter(x=>!ntfIsRead(x)),n=U.length,bump=NF.pn!=null&&n<NF.pn,osc=(document.querySelector('.npan .cll')||{}).scrollTop||0;NF.pn=n;
+r.innerHTML=`<button id="ntBtn" class="cbtn nb" onclick="ntfToggle(event)" aria-label="Notifications" title="Notifications">${ico('bell')}${n?`<i class="cb${bump?' bump':''}">${n>9?'9+':n}</i>`:''}</button>${NF.open?ntfPanelHtml(L):''}`;
+const nl=document.querySelector('.npan .cll');if(nl&&osc)nl.scrollTop=osc;
 ntfTitle(U);ntfDesk(L)}
 const ntfSoft=()=>{clearTimeout(NF.t);NF.t=setTimeout(ntfRender,150)};
-function ntfToggle(e){e.stopPropagation();NF.open=!NF.open;CH.open=0;chRender();ntfRender()}
-function ntfAct(i){const x=NF.last[i];if(!x)return;ntfMarkRead(x);NF.open=0;ntfRender();if(x.go)x.go()}
-function ntfDis(e,i){e.stopPropagation();const x=NF.last[i];if(x&&x.dis)x.dis();ntfSoft()}
-function ntfClear(){NF.last.forEach(x=>x.dis&&x.dis());ntfSoft()}
+function ntfToggle(e){e.stopPropagation();ntfMenuClose();NF.open=!NF.open;if(NF.open){NF.all=0;NF.fresh=1}CH.open=0;chRender();ntfRender()}
+function ntfAct(i){if(Date.now()-(NF.swc||0)<450)return;ntfMenuClose();const x=NF.last[i];if(!x)return;ntfMarkRead(x);NF.open=0;ntfRender();if(x.go)x.go()}
+/* ---- notification panel: last 3 entries, See all, juicy dismiss (button, swipe on phones, Clear all) ---- */
+const ntfHide=x=>{ntfDismiss('d:'+ntfKey(x));if(x.dis){try{x.dis()}catch(e){}}};
+function ntfPanelHtml(L){const vis=NF.all?L:L.slice(0,3),fresh=NF.fresh,sh=NF.shown||new Set(),keys=[];
+const rows=vis.map((x,i)=>{const k=ntfKey(x);keys.push(k);const nw=fresh||!sh.has(k);
+return `<div class="cli nfe${ntfIsRead(x)?' rd':''}${nw?' nfin':''}" data-k="${E(k)}" style="${nw?'animation-delay:'+(fresh?i*55:0)+'ms':''}" onclick="ntfAct(${i})"><span class="nfi">${ico(x.ic)}</span><div class="clm"><b>${E(x.h)}</b><span>${E(x.s)}</span></div>${x.btn?`<button class="btn p" style="padding:4px 10px">${x.btn}</button>`:''}<button class="nfx" title="More" aria-label="More options" aria-haspopup="menu" onclick="ntfMenu(event,${i})">${NFDOTS}</button></div>`}).join('');
+NF.shown=new Set(keys);NF.fresh=0;
+return `<div class="cpan npan"><div class="chh"><b>Notifications</b>${L.length?`<button class="btn" style="padding:4px 10px" onclick="ntfClear()">Clear all</button>`:''}</div><div class="cll${NF.all?' nfall':''}">${L.length?rows:`<div class="nfok"><span>${ico('check')}</span><p>You are all caught up.</p></div>`}</div>${L.length>3?`<div class="nff"><button class="btn" onclick="ntfAll()">${NF.all?'Show less':'See all ('+L.length+')'}</button></div>`:''}</div>`}
+function ntfAll(){NF.all=!NF.all;ntfRender()}
+function ntfBadgeNow(){const U=ntfList().filter(x=>!ntfIsRead(x)),n=U.length,b=document.querySelector('#ntBtn .cb');NF.pn=n;
+if(b){if(!n)b.remove();else{b.textContent=n>9?'9+':n;b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump')}}ntfTitle(U)}
+function ntfBurst(btn){const pan=document.querySelector('.npan');if(!pan||!btn)return;const pr=pan.getBoundingClientRect(),br=btn.getBoundingClientRect(),cx=br.left+br.width/2-pr.left,cy=br.top+br.height/2-pr.top,cols=['#2ecc71','#f59e0b','#7c3aed','#ff5a5f','#3cc7b5'];
+for(let i=0;i<9;i++){const p=document.createElement('i');p.className='nfp';const a=Math.PI*2*i/9+Math.random()*.5,d=22+Math.random()*28;p.style.cssText=`left:${cx}px;top:${cy}px;background:${cols[i%5]};--dx:${Math.cos(a)*d}px;--dy:${Math.sin(a)*d}px`;pan.appendChild(p);setTimeout(()=>p.remove(),640)}}
+function ntfOut(el,x,dir){if(!el||el.classList.contains('nfo'))return;ntfHide(x);ntfBadgeNow();try{navigator.vibrate&&navigator.vibrate(12)}catch(_){}
+NF.anim=(NF.anim||0)+1;el.style.setProperty('--dir',dir||1);el.style.transform='';el.style.opacity='';el.classList.remove('nfsw');el.classList.add('nfo');
+setTimeout(()=>el.classList.add('nfc'),210);setTimeout(()=>{NF.anim=Math.max(0,NF.anim-1);if(!NF.anim)ntfRender()},480)}
+const NFDOTS='<svg class="ic" viewBox="0 0 24 24" style="fill:currentColor;stroke:none"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>';
+const ntfMarkUnread=x=>{const m=ntfReadMap();delete m[ntfKey(x)];try{localStorage.setItem(ntfRK(),JSON.stringify(m))}catch(e){}ntfPushSoft()};
+const ntfByKey=k=>NF.last.find(x=>ntfKey(x)===k),ntfEl=k=>[...document.querySelectorAll('.npan .nfe')].find(e=>e.dataset.k===k);
+function ntfMenuClose(){const m=document.getElementById('nfMenu');if(m)m.remove()}
+function ntfMenu(e,i){e.stopPropagation();const x=NF.last[i],b=e.currentTarget;if(!x)return;const old=document.getElementById('nfMenu');if(old){const same=old.dataset.i==i;old.remove();if(same)return}
+const k=ntfKey(x),rd=ntfIsRead(x),m=document.createElement('div');m.id='nfMenu';m.className='nfm';m.dataset.i=i;m.dataset.k=k;m.setAttribute('role','menu');
+m.innerHTML=`<button role="menuitem" onclick="ntfMenuAct('${rd?'unread':'read'}')">${rd?'<i class="nfd"></i>Mark as unread':ico('check')+'Mark as read'}</button><button role="menuitem" class="dn" onclick="ntfMenuAct('dismiss')">${ico('trash')}Dismiss</button>`;
+document.body.appendChild(m);const r=b.getBoundingClientRect(),w=m.offsetWidth,h=m.offsetHeight;
+m.style.left=Math.max(8,Math.min(r.right-w,innerWidth-w-8))+'px';m.style.top=(r.bottom+6+h>innerHeight-8?Math.max(8,r.top-h-6):r.bottom+6)+'px'}
+function ntfMenuAct(act){const m=document.getElementById('nfMenu');if(!m)return;const k=m.dataset.k,x=ntfByKey(k),el=ntfEl(k);ntfMenuClose();if(!x||!el)return;
+if(act=='dismiss'){const b=el.querySelector('.nfx');if(b){b.classList.add('pop');ntfBurst(b)}ntfOut(el,x,1);return}
+if(act=='unread'){ntfMarkUnread(x);el.classList.remove('rd')}else{ntfMarkRead(x);el.classList.add('rd')}
+el.classList.remove('nfu');void el.offsetWidth;el.classList.add('nfu');try{navigator.vibrate&&navigator.vibrate(8)}catch(_){}ntfBadgeNow()}
+document.addEventListener('click',e=>{if(!e.target.closest('#nfMenu,.nfx'))ntfMenuClose()});
+addEventListener('keydown',e=>{if(e.key=='Escape'&&document.getElementById('nfMenu')){ntfMenuClose();e.stopImmediatePropagation()}},true);
+function ntfClear(){ntfMenuClose();if(!NF.last.length)return;const els=[...document.querySelectorAll('.npan .nfe')];NF.last.forEach(ntfHide);ntfBadgeNow();if(!els.length){ntfRender();return}
+NF.anim=(NF.anim||0)+1;try{navigator.vibrate&&navigator.vibrate([10,30,10])}catch(_){}
+els.forEach((el,i)=>setTimeout(()=>{el.style.setProperty('--dir',i%2?-1:1);el.classList.add('nfo');setTimeout(()=>el.classList.add('nfc'),200)},i*70));
+setTimeout(()=>{NF.anim=Math.max(0,NF.anim-1);NF.all=0;if(!NF.anim)ntfRender()},els.length*70+520)}
+/* swipe a notification sideways to dismiss it (touch) */
+let NSW=null;
+document.addEventListener('pointerdown',e=>{if(e.pointerType!='touch')return;const el=e.target.closest&&e.target.closest('.nfe');if(!el||e.target.closest('.nfx,button'))return;NSW={el,x:e.clientX,y:e.clientY,dx:0,id:e.pointerId,m:0}});
+document.addEventListener('pointermove',e=>{if(!NSW||e.pointerId!==NSW.id)return;const dx=e.clientX-NSW.x,dy=e.clientY-NSW.y;
+if(!NSW.m&&Math.abs(dx)>10&&Math.abs(dx)>Math.abs(dy)*1.4){NSW.m=1;NSW.el.classList.add('nfsw')}
+if(NSW.m){NSW.dx=dx;NSW.el.style.transform=`translateX(${dx}px) rotate(${dx/40}deg)`;NSW.el.style.opacity=String(Math.max(.25,1-Math.abs(dx)/260))}else if(Math.abs(dy)>12)NSW=null});
+const ntfSwEnd=e=>{if(!NSW||e.pointerId!==NSW.id)return;const w=NSW;NSW=null;if(!w.m)return;NF.swc=Date.now();
+if(e.type=='pointerup'&&Math.abs(w.dx)>90){const i=[...w.el.parentNode.children].indexOf(w.el),x=NF.last[i];if(x){ntfOut(w.el,x,w.dx<0?-1:1);return}}
+w.el.classList.remove('nfsw');w.el.style.transition='transform .22s cubic-bezier(.2,.9,.3,1.4),opacity .22s';w.el.style.transform='';w.el.style.opacity='';setTimeout(()=>{w.el.style.transition=''},240)};
+document.addEventListener('pointerup',ntfSwEnd);document.addEventListener('pointercancel',ntfSwEnd);
+
 /* tab title: "(2) Found / CE Review Archive", swapping the first part for the newest alerts */
 function ntfTitle(L){const n=L.length,tl=L.map(x=>x.tt).slice(0,3),sig=n+'|'+tl.join('|');if(sig===NF.sig&&(NF.ti||(!n&&document.title===BASE_T)))return;NF.sig=sig;clearInterval(NF.ti);NF.ti=null;
 const first=BASE_T.split(' / ')[0],rest=BASE_T.slice(first.length);if(!n){document.title=BASE_T;return}
 let i=0;const set=()=>{const k=i%(tl.length*2),a=k%2==0?first:tl[(k-1)/2];document.title='('+n+') '+String(a).slice(0,50)+rest;i++};set();NF.ti=setInterval(set,2500)}
 function ntfDesk(L){if(NF.init&&document.hidden&&CH.prefs.bn&&window.Notification&&Notification.permission=='granted')L.forEach(x=>{if(x.dk&&!NF.seen.has(x.id)){try{new Notification(x.h,{body:x.s,tag:String(x.id).replace(/:.*/,'')})}catch(e){}}});NF.seen=new Set(L.filter(x=>x.dk).map(x=>x.id));NF.init=1}
-document.addEventListener('click',e=>{if(NF.open&&!e.target.closest('.npan,#ntBtn')){NF.open=0;ntfRender()}});
+document.addEventListener('click',e=>{if(NF.open&&!e.target.closest('.npan,#ntBtn,#nfMenu')){NF.open=0;ntfMenuClose();ntfRender()}});
 addEventListener('keydown',e=>{if(e.key=='Escape'&&NF.open&&!MD){NF.open=0;ntfRender()}});
 chBadge=(f=>function(){f();ntfSoft()})(chBadge);
 setInterval(()=>{if(ME){chBadge();ntfPull();ntfSoft();chSeenBeat();chSeenPull()}},60000);
