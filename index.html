@@ -653,6 +653,7 @@ body.nofab .cbtn{bottom:74px}
 .cav.chn{background:var(--teal);color:var(--onfab)}.cav.adm{background:var(--ink);color:var(--card)}.cav .ic{width:55%;height:55%;margin:0}
 .cdot{position:absolute;right:-2px;bottom:-2px;width:28%;min-width:9px;height:28%;min-height:9px;border-radius:50%;border:2px solid var(--card);background:#2ecc71;box-sizing:content-box}
 .cdot.lockin{background:#f59e0b}
+.cseen{position:absolute;right:-7px;bottom:-6px;min-width:22px;height:15px;line-height:15px;padding:0 5px;border-radius:99px;background:#1fa65a;color:#fff;font-size:.62rem;font-weight:700;font-style:normal;text-align:center;border:2px solid var(--card);box-sizing:content-box;white-space:nowrap}
 .cpan{position:fixed;right:var(--cr);bottom:206px;width:340px;max-height:min(540px,calc(100vh - 250px));background:var(--card);border:1px solid var(--bd);border-radius:14px;box-shadow:0 12px 40px #0004;z-index:42;display:flex;flex-direction:column;overflow:hidden}
 body.nofab .cpan{bottom:134px}
 .chh{display:flex;align-items:center;gap:8px;justify-content:space-between;padding:10px 10px 6px 14px;font-size:1.05rem}
@@ -2080,7 +2081,7 @@ setInterval(stTick,1000);document.addEventListener('visibilitychange',stTick);
 let PCH=null,ONL={},EMS='';
 function stPresInit(){if(PCH||!ME)return;PCH=sb.channel('online-users',{config:{presence:{key:ME.id}}});
 PCH.on('presence',{event:'sync'},()=>{ONL=PCH.presenceState();stAdminRefresh();chPresSync()}).subscribe(st=>{if(st=='SUBSCRIBED')stPresTrack()})}
-function stPresTrack(){if(!PCH||!ME)return;try{const a=stLoad().a;PCH.track({lock:a?{m:a.mode=='mini'||a.mn?'mini':a.mode=='revive'?'revive':'full',end:Date.now()+Math.max(0,a.g-stEl(a))*1000,p:a.pa?1:0}:null,t:Date.now(),cs:chSt()})}catch(e){}}
+function stPresTrack(){if(!PCH||!ME)return;try{const a=stLoad().a;PCH.track({lock:a?{m:a.mode=='mini'||a.mn?'mini':a.mode=='revive'?'revive':'full',end:Date.now()+Math.max(0,a.g-stEl(a))*1000,p:a.pa?1:0}:null,t:Date.now(),cs:chSt()})}catch(e){}try{chSeenBeat(1)}catch(e){}}
 function stEmailSync(){if(PR&&ME.email&&PR.email!==ME.email&&EMS!=ME.id){EMS=ME.id;sb.from('profiles').update({email:ME.email}).eq('id',ME.id).then(r=>{if(!r.error)PR.email=ME.email})}}
 function stAdminRefresh(){if(role=='admin'&&location.hash.slice(2).split('/')[0]=='admin'&&AT=='u'&&!MD&&!(document.activeElement&&document.activeElement.tagName=='INPUT'))route()}
 const stUs=u=>{const m=ONL[u.id]||[],p=m.find(x=>x.lock)||m[0],ss=(D.SS||[]).find(x=>x.user_id==u.id),a=ss&&ss.data&&ss.data.a;let lock=null;
@@ -2792,18 +2793,29 @@ if(AU.mode=='newpw')go('auth');else if(location.hash=='#/auth')go('dash');else r
 Object.assign(ICP,{chat:'<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>',send:'<path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>',minus:'<path d="M5 12h14"/>',more:'<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>',sliders:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',back:'<path d="m12 19-7-7 7-7M19 12H5"/>',clipf:'<path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/>',hash:'<path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"/>',shield:'<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>'});
 RESTR.push({k:'chat',t:'Chat',d:'The whole chat: public channels, direct messages and the admin thread. Restricted students do not see the chat button and cannot send messages.',on:'Chat off',off:'Chat on',who:'Chat turned off for'},
 {k:'dm',t:'Direct messages between students',d:'One-to-one chats with other students. Public channels and the admin thread keep working.',on:'DMs off',off:'DMs on',who:'Direct messages turned off for'});
-const CH={ok:null,err:'',init:0,users:{},tint:{},rooms:[],open:0,tab:'pub',set:0,q:'',mon:0,wins:[],msgs:{},old:{},reads:{},draft:{},focus:null,prefs:{show:true,lock:'show',mlock:0,bn:0},rp:{},blk:{mine:new Set(),by:new Set()},mute:null,sub:null,poll:null,rt:0,st:'',stT:null,mod:null,timers:{}};
+const CH={ok:null,err:'',init:0,users:{},tint:{},rooms:[],open:0,tab:'pub',set:0,q:'',mon:0,wins:[],msgs:{},old:{},reads:{},draft:{},focus:null,prefs:{show:true,lock:'show',mlock:0,bn:0},rp:{},blk:{mine:new Set(),by:new Set()},mute:null,sub:null,poll:null,rt:0,st:'',stT:null,mod:null,timers:{},seen:{},seenT:0,seenClr:0,seenOK:true};
 const chRoot=()=>{let r=document.getElementById('chatRoot');if(!r){r=document.createElement('div');r.id='chatRoot';document.body.appendChild(r)}return r};
 const chNm=id=>{const u=CH.users[id];return u?u.name:'User'};
 const chIni=n=>{const m=(n||'').match(/\p{L}/u);return m?m[0].toUpperCase():((n||'?').trim().slice(0,1).toUpperCase()||'?')};
 /* people who share an initial get different tints (same family, shifted hue and lightness) */
 function chIndex(){CH.tint={};const g={};Object.keys(CH.users).sort().forEach(id=>{const i=chIni(CH.users[id].name);(g[i]=g[i]||[]).push(id)});
 Object.keys(g).forEach(i=>{const base=(i.codePointAt(0)*47)%360;g[i].forEach((id,k)=>{CH.tint[id]=`hsl(${(base+k*41)%360} ${[58,62,52,66][k%4]}% ${[44,34,54,40][k%4]}%)`})})}
-function chAv(uid,sz,dot){sz=sz||36;const st=dot===false?'':chPres(uid);return `<span class="cav" style="width:${sz}px;height:${sz}px;font-size:${Math.round(sz*.46)}px;background:${CH.tint[uid]||'hsl(200 40% 40%)'}">${E(chIni(chNm(uid)))}${st?`<i class="cdot ${st}"></i>`:''}</span>`}
+function chAv(uid,sz,dot){sz=sz||36;const st=dot===false?'':chPres(uid);return `<span class="cav" style="width:${sz}px;height:${sz}px;font-size:${Math.round(sz*.46)}px;background:${CH.tint[uid]||'hsl(200 40% 40%)'}">${E(chIni(chNm(uid)))}${st?`<i class="cdot ${st}"></i>`:''}${!st&&dot!==false&&sz>=36?chSeenBadge(uid):''}</span>`}
 /* ---- active status ---- */
 function chSt(){if(!CH.prefs.show)return'hidden';let a=null;try{a=ME&&stLoad().a}catch(e){}if(a){if(CH.prefs.lock=='hide')return'hidden';if(CH.prefs.lock=='show')return'lockin'}return'active'}
 function chPres(uid){if(!ME||!CH.prefs.show||uid==ME.id)return'';const m=ONL[uid];if(!m||!m.length)return'';const s=(m[m.length-1].cs)||'active';return s=='hidden'?'':s}
 function chPresSync(){clearTimeout(CH.timers.p);CH.timers.p=setTimeout(()=>{if(CH.ok&&(CH.open||CH.wins.length))chRender()},400)}
+/* ---- last active ("4m", "Active 4 minutes ago"): needs chat_seen.sql; nothing is stored for people who hide their active status ---- */
+const chSeenShort=ms=>{const m=Math.max(1,Math.floor(ms/6e4));if(m<60)return m+'m';const h=Math.floor(m/60);if(h<24)return h+'h';const d=Math.floor(h/24);return d<7?d+'d':Math.floor(d/7)+'w'};
+const chSeenLong=u=>{const ms=chSeenMs(u);if(ms==null)return'';const m=Math.floor(ms/6e4);if(m<1)return'Active just now';if(m<60)return'Active '+m+(m==1?' minute':' minutes')+' ago';const h=Math.floor(m/60);if(h<24)return'Active '+h+(h==1?' hour':' hours')+' ago';const d=Math.floor(h/24);return'Active '+d+(d==1?' day':' days')+' ago'};
+function chSeenMs(uid){if(!ME||!CH.prefs.show||uid==ME.id||!CH.seenOK)return null;const m=ONL[uid];if(m&&m.length)return null;const t=CH.seen[uid];if(!t)return null;const ms=Date.now()-t;return ms>30*864e5?null:Math.max(0,ms)}
+const chSeenBadge=uid=>{const ms=chSeenMs(uid);return ms==null?'':`<i class="cseen" title="${E(chSeenLong(uid))}">${chSeenShort(ms)}</i>`};
+async function chSeenBeat(force){if(!ME||!CH.ok||!CH.seenOK)return;const now=Date.now();if(now-CH.seenT<(force?4000:25000))return;
+if(chSt()=='hidden'){if(CH.seenClr)return;CH.seenClr=1;CH.seenT=now;const r=await sb.from('chat_seen').upsert({user_id:ME.id,last_seen:null});if(r.error){CH.seenOK=false;console.warn('Last active is off (run chat_seen.sql):',r.error.message)}return}
+if(document.hidden&&!force)return;CH.seenClr=0;CH.seenT=now;const r=await sb.from('chat_seen').upsert({user_id:ME.id,last_seen:new Date(now).toISOString()});if(r.error){CH.seenOK=false;console.warn('Last active is off (run chat_seen.sql):',r.error.message)}}
+async function chSeenPull(){if(!ME||!CH.ok||!CH.seenOK)return;const r=await sb.from('chat_seen').select('user_id,last_seen');if(r.error){CH.seenOK=false;console.warn('Last active is off (run chat_seen.sql):',r.error.message);return}
+const m={};(r.data||[]).forEach(x=>{if(x.last_seen)m[x.user_id]=+new Date(x.last_seen)});CH.seen=m;if(CH.open||CH.wins.length)chPresSync()}
+document.addEventListener('visibilitychange',()=>{chSeenBeat(1);if(!document.hidden)chSeenPull()});addEventListener('pagehide',()=>chSeenBeat(1));
 async function chPrefsLoad(){try{const l=JSON.parse(localStorage.getItem('chp_'+ME.id)||'null');if(l)CH.prefs=Object.assign(CH.prefs,l)}catch(e){}
 const r=await sb.from('chat_prefs').select('*').eq('user_id',ME.id).maybeSingle();if(r&&r.data){CH.prefs=Object.assign(CH.prefs,{show:r.data.show_active,lock:r.data.lock_mode});try{localStorage.setItem('chp_'+ME.id,JSON.stringify(CH.prefs))}catch(e){}}}
 function chPref(k,v){CH.prefs[k]=v;try{localStorage.setItem('chp_'+ME.id,JSON.stringify(CH.prefs))}catch(e){}
@@ -2814,7 +2826,7 @@ async function chInit(){if(!ME||CH.init)return;CH.init=1;
 try{const[u,o]=await Promise.all([sb.rpc('chat_users'),sb.rpc('chat_overview')]);
 if(u.error||o.error){CH.ok=false;CH.err=(u.error||o.error).message||'';chPos();chRender();return}
 CH.users={};(u.data||[]).forEach(x=>{CH.users[x.id]={name:x.display_name,role:x.role}});chIndex();chSetRooms(o.data||[]);
-await Promise.all([chPrefsLoad(),chBlocksLoad(),chMuteLoad(),chRPLoad()]);CH.ok=true;CH.st=chSt();stPresTrack();chSub();chPos();chRender();pushResync();chPendOpen();
+await Promise.all([chPrefsLoad(),chBlocksLoad(),chMuteLoad(),chRPLoad()]);CH.ok=true;CH.st=chSt();stPresTrack();chSeenPull();chSub();chPos();chRender();pushResync();chPendOpen();
 clearInterval(CH.poll);CH.poll=setInterval(()=>{const s=chSt();if(s!=CH.st){CH.st=s;stPresTrack()}if(!CH.rt)chRefresh()},5000)}
 catch(e){console.warn('Chat:',e);CH.ok=false;CH.err=e.message||''}}
 function chReset(){clearInterval(CH.poll);if(CH.sub){try{sb.removeChannel(CH.sub)}catch(e){}}Object.assign(CH,{ok:null,err:'',init:0,users:{},tint:{},rooms:[],open:0,tab:'pub',set:0,q:'',mon:0,wins:[],msgs:{},old:{},reads:{},draft:{},focus:null,act:null,sub:null,rt:0,mod:null,mute:null,rp:{}});NF.ld=0;NF.pk={};NF.open=0;if(NF.sub){try{sb.removeChannel(NF.sub)}catch(e){}NF.sub=null}ntfSoft();CH.blk={mine:new Set(),by:new Set()};const r=document.getElementById('chatRoot');if(r)r.innerHTML=''}
@@ -2833,7 +2845,7 @@ const chOther=r=>r.kind=='dm'?(r.p1==ME.id?r.p2:r.p1):r.kind=='admin'&&role=='ad
 const chTitle=r=>r.kind=='channel'?(r.name||r.key):r.kind=='dm'?(r.mine?chNm(chOther(r)):chNm(r.p1)+' & '+chNm(r.p2)):role=='admin'?chNm(r.p1):'Admins';
 function chRoomAv(r,sz){sz=sz||38;if(r.kind=='channel')return `<span class="cav chn" style="width:${sz}px;height:${sz}px">${ico('hash')}</span>`;
 if(r.kind=='admin'&&role!='admin')return `<span class="cav adm" style="width:${sz}px;height:${sz}px">${ico('shield')}</span>`;return chAv(r.kind=='dm'&&r.mine?chOther(r):r.p1,sz)}
-function chSubT(r){if(r.kind=='channel')return 'Public channel';if(!r.mine)return 'Read-only (admin view)';const o=chOther(r),p=o?chPres(o):'';if(r.kind=='admin'&&role!='admin')return 'Ask the reviewers anything';return p=='active'?'Active now':p=='lockin'?'Locked in':''}
+function chSubT(r){if(r.kind=='channel')return 'Public channel';if(!r.mine)return 'Read-only (admin view)';const o=chOther(r),p=o?chPres(o):'';if(r.kind=='admin'&&role!='admin')return 'Ask the reviewers anything';return p=='active'?'Active now':p=='lockin'?'Locked in':(o?chSeenLong(o):'')}
 const chUn=f=>CH.rooms.filter(f).reduce((n,r)=>n+(r.mine?r.unread:0),0);
 const chBadgeN=()=>CH.rooms.filter(r=>chU(r)>0&&!chIgn(r)).length;
 function chBadge(){const b=document.getElementById('chBtn');if(!b)return;const n=chBadgeN();let i=b.querySelector('.cb');if(n){if(!i){i=document.createElement('i');i.className='cb';b.appendChild(i)}i.textContent=n>9?'9+':n}else if(i)i.remove()}
@@ -3119,7 +3131,7 @@ function ntfDesk(L){if(NF.init&&document.hidden&&CH.prefs.bn&&window.Notificatio
 document.addEventListener('click',e=>{if(NF.open&&!e.target.closest('.npan,#ntBtn')){NF.open=0;ntfRender()}});
 addEventListener('keydown',e=>{if(e.key=='Escape'&&NF.open&&!MD){NF.open=0;ntfRender()}});
 chBadge=(f=>function(){f();ntfSoft()})(chBadge);
-setInterval(()=>{if(ME){chBadge();ntfPull();ntfSoft()}},60000);
+setInterval(()=>{if(ME){chBadge();ntfPull();ntfSoft();chSeenBeat();chSeenPull()}},60000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&ME&&NF.ld)ntfPull()});
 /* ===== PDF viewer: pages are drawn on demand so scrolling stays smooth on PC and phones ===== */
 const PV={};
