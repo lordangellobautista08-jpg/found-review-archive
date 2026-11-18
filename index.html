@@ -728,6 +728,54 @@ body.nto .cbtn{bottom:calc(var(--ftH,0px) + var(--ntH,0px) + 16px + 64px)}body.n
 .cw.act{box-shadow:0 0 0 2px var(--teal),0 -4px 24px #0003}
 .cnrb{display:block;width:100%;border:0;border-top:1px solid #e0245e55;background:#e0245e14;color:var(--tx);font:inherit;font-size:.8rem;font-weight:600;padding:7px 10px;cursor:pointer;text-align:center}.cnrb:hover{background:#e0245e24}
 .cnew{display:flex;align-items:center;gap:8px;margin:10px 0 4px;color:#e0245e;font-size:.7rem;font-weight:700}.cnew:before,.cnew:after{content:"";flex:1;height:1px;background:#e0245e66}
+
+/* ===== Review 2: bell offset fix, unread look, ongoing-session label, viewer zoom ===== */
+/* the bell sits outside #chatRoot, so it never got the --cr right offset and landed at the far left */
+#ntfRoot{--cr:48px}body.sbo #ntfRoot{--cr:344px}
+.nfe.rd{opacity:.6}.nfe.rd .clm b{font-weight:500}
+.stLive{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:600;color:var(--mu);padding:3px 10px;border:1px solid var(--bd);border-radius:99px;background:var(--bg2);align-self:flex-start;margin:2px 0 6px}
+.stLive i{width:8px;height:8px;border-radius:50%;background:var(--mu);flex:none}
+.stLive.on{color:var(--ink);border-color:#2ecc7188}.stLive.on i{background:#2ecc71;animation:stPulse 1.6s infinite}
+@keyframes stPulse{0%{box-shadow:0 0 0 0 #2ecc7199}70%{box-shadow:0 0 0 7px #2ecc7100}100%{box-shadow:0 0 0 0 #2ecc7100}}
+.vwin .vb{overscroll-behavior:contain}.vb.zm{display:block}.vb.zm img{display:block;margin:0 auto}
+/* phones have nothing to pin to, so the pin drop zones never show */
+@media(max-width:899px){#ntDock,#fvDock,#ntZone,#fvZone{display:none!important}#stRail.peek:not(.on){display:none!important}}
+@keyframes updinm{from{opacity:0;transform:translateY(-8px)}}
+/* ===== Review 2: phones. A little smaller, and room to breathe at the screen edges ===== */
+@media(max-width:600px){
+body{font-size:15px}
+.w{padding:0 18px}
+.ph{padding:20px 0}.ph h1{font-size:1.45rem}
+.sec{padding:20px 0 36px}.sec h2{font-size:1.2rem}
+h3{font-size:1.02rem}
+.card{padding:14px}
+.btn{padding:6px 11px;font-size:.82rem}
+.btn .ic{width:1em;height:1em;margin-right:3px}
+.row{gap:8px}
+.tag{font-size:.7rem;padding:1px 7px}.sm{font-size:.8rem}
+.custom-dropdown{min-width:0}.custom-select-trigger{padding:6px 10px;font-size:.82rem}
+input,select,textarea{font-size:16px}/* 16px stops iOS from zooming into fields */
+.fm-backdrop{padding:16px}.fm-card{padding:16px;max-height:86vh}.fm-card h2{font-size:1.1rem;margin-bottom:10px}
+.fm-actions{margin-top:14px}
+#fabRoot{right:20px;bottom:20px}.fab{width:50px;height:50px;font-size:2rem}
+#chatRoot,#ntfRoot{--cr:20px}
+.cbtn,.cbtn.nb{width:44px;height:44px}.cbtn .ic{width:21px;height:21px}
+.cpan,.npan{left:14px;right:14px}
+.cb{min-width:16px;height:16px;font-size:.62rem}
+.notes{left:8px!important;right:8px!important;border-width:1px;bottom:calc(var(--ftH,0px) + 4px)!important}
+body.nto{padding-bottom:calc(var(--ftH,0px) + var(--ntH,0px) + 8px)}
+#stRail.on{left:14px;bottom:14px}
+.stBig{font-size:clamp(2rem,10vw,2.6rem)}
+.stTop .stS{padding:8px 12px}
+.stL>.btn{padding:7px 12px}
+.stCols{gap:12px}
+.qkh{font-size:.85rem}
+.fch{font-size:1rem}
+/* update banner */
+#updBar{top:calc(62px + env(safe-area-inset-top,0px));left:14px;right:14px;transform:none;max-width:none;flex-wrap:wrap;gap:8px;padding:12px 14px;border-radius:16px;font-size:.85rem;animation:updinm .3s ease-out}
+#updBar span{flex:1 1 100%;line-height:1.35}
+#updBar button{flex:1 1 0;padding:8px 12px;font-size:.85rem}
+}
 </style>
 </head>
 <body>
@@ -1037,14 +1085,14 @@ const blob=await zip.generateAsync({type:'blob'}),one=its.length==1?its[0][1].na
 /* open a file: PDFs and images show inside the site, other types download in a new tab. Counts toward "most opened". */
 async function openM(id){const m=D.M.find(x=>x.id==id);if(!m||!m.path)return toast('File not found');
 const r=await sb.storage.from('review-materials').createSignedUrl(m.path,3600);if(r.error)return toast(r.error.message);
-P.op=P.op||{};P.op[id]=(P.op[id]||0)+1;sb.from('material_opens').upsert({user_id:ME.id,material_id:id,opens:P.op[id],last_opened:new Date().toISOString()}).then(x=>x.error&&console.warn(x.error.message));
+P.op=P.op||{};P.lo=P.lo||{};P.lo[id]=Date.now();P.op[id]=(P.op[id]||0)+1;sb.from('material_opens').upsert({user_id:ME.id,material_id:id,opens:P.op[id],last_opened:new Date().toISOString()}).then(x=>x.error&&console.warn(x.error.message));
 const e=m.type.toLowerCase(),url=r.data.signedUrl;if(['pdf','jpg','jpeg','png','webp'].includes(e)){vwOpen(m,url,e)}else window.open(url,'_blank','noopener')}
 const IC={min:'<svg viewBox="0 0 12 12"><path d="M2 6h8"/></svg>',max:'<svg viewBox="0 0 12 12"><rect x="2" y="2" width="8" height="8" rx="1"/></svg>',res:'<svg viewBox="0 0 12 12"><path d="M4 2h6v6M2 4h6v6H2z"/></svg>',x:'<svg viewBox="0 0 12 12"><path d="M2 2l8 8M10 2l-8 8"/></svg>',dl:'<svg viewBox="0 0 12 12"><path d="M6 1v6.5M3.2 5l2.8 2.8L8.8 5M2 10.5h8"/></svg>'};
 /* up to two file windows at once; each is drawn once and never touched by page redraws, so zoom and scroll stay put */
 let VWS=[];const VWD={w:0,h:0};try{const s=JSON.parse(localStorage.getItem('vw')||'null');if(s&&s.w){VWD.w=s.w;VWD.h=s.h}}catch(_){}
 const vwGet=id=>VWS.find(v=>v.vid==id),vwAW=()=>innerWidth-(SB_OPEN?320:0);
 function vwClamp(v){v.w=Math.max(280,Math.min(v.w,innerWidth));v.h=Math.max(200,Math.min(v.h,innerHeight));v.x=Math.min(Math.max(v.x,120-v.w),innerWidth-120);v.y=Math.min(Math.max(v.y,0),innerHeight-44)}
-function vwDefault(v,n){const m=innerWidth<700,AW=vwAW();v.w=m?innerWidth-12:Math.min(VWD.w||920,AW-vwL()-60);v.h=m?innerHeight-12:Math.min(VWD.h||Math.round(innerHeight*.84),innerHeight-40);v.x=m?6:vwL()+Math.round((AW-vwL()-v.w)/2)+n*34;v.y=m?6:Math.round((innerHeight-v.h)/2)+n*34;vwClamp(v)}
+function vwDefault(v,n){const m=innerWidth<700,AW=vwAW();v.w=m?innerWidth-20:Math.min(VWD.w||920,AW-vwL()-60);v.h=m?innerHeight-24:Math.min(VWD.h||Math.round(innerHeight*.84),innerHeight-40);v.x=m?10:vwL()+Math.round((AW-vwL()-v.w)/2)+n*34;v.y=m?12:Math.round((innerHeight-v.h)/2)+n*34;vwClamp(v)}
 const vwL=()=>document.body.classList.contains('stp')&&innerWidth>=900?224:0;
 /* at most two FLOATING windows; pinned files live in the sidebar and do not count */
 const vwFloat=()=>VWS.filter(x=>!x.pin);
@@ -1082,10 +1130,10 @@ el.style.left=g.x+'px';el.style.top=g.y+'px';el.style.width=g.w+'px';el.style.he
 el.classList.toggle('max',!!v.max&&!mn);el.classList.toggle('min',mn);
 const mx=el.querySelector('.vmx');if(mx){mx.innerHTML=v.max&&!mn?IC.res:IC.max;mx.title=mn?'Restore':v.max?'Restore down':'Maximize'}const mb=el.querySelector('.vmn');if(mb)mb.title=mn?'Restore':'Minimize'}
 function vwDown(e,id,dir){const v=vwGet(id);if(!v||e.button>0||v.max||(v.min&&dir)||(!dir&&e.target.closest('button,a')))return;const el=e.currentTarget,w=el.closest('.vwin');vwFocus(id);e.preventDefault();
-const s={x:e.clientX,y:e.clientY,g:{x:v.x,y:v.y,w:v.w,h:v.h}},b0=w.getBoundingClientRect(),can=!dir&&FVP();let moved=0,over=0;w.classList.add('moving');try{el.setPointerCapture(e.pointerId)}catch(_){}
+const s={x:e.clientX,y:e.clientY,g:{x:v.x,y:v.y,w:v.w,h:v.h}},b0=w.getBoundingClientRect(),can=!dir&&FVP(),off={x:e.clientX-v.x,y:Math.min(e.clientY-v.y,30)};let moved=0,over=0;w.classList.add('moving');try{el.setPointerCapture(e.pointerId)}catch(_){}
 const mv=ev=>{const dx=ev.clientX-s.x,dy=ev.clientY-s.y;
 if(can&&!moved&&Math.abs(dx)+Math.abs(dy)>4){moved=1;fvDragging=1;document.body.classList.add('fvdrag');w.classList.add('drg');ntRail()}
-if(!dir){if(v.min){w.style.left=(b0.left+dx)+'px';w.style.top=(b0.top+dy)+'px'}else{v.x=s.g.x+dx;v.y=s.g.y+dy}}
+if(!dir){if(v.min){w.style.left=(b0.left+dx)+'px';w.style.top=(b0.top+dy)+'px'}else if(moved&&can){const cx=Math.max(24,Math.min(236,off.x*260/Math.max(1,s.g.w)));v.x=ev.clientX-cx;v.y=ev.clientY-off.y}else{v.x=s.g.x+dx;v.y=s.g.y+dy}}
 else{let{x,y,w:W,h:H}=s.g;if(dir.includes('e'))W=s.g.w+dx;if(dir.includes('s'))H=s.g.h+dy;if(dir.includes('w')){W=s.g.w-dx;x=s.g.x+dx}if(dir.includes('n')){H=s.g.h-dy;y=s.g.y+dy}
 if(W<280){if(dir.includes('w'))x-=280-W;W=280}if(H<200){if(dir.includes('n'))y-=200-H;H=200}v.x=x;v.y=y;v.w=W;v.h=H}
 if(!v.min){vwClamp(v);vwApply(v)}
@@ -1095,11 +1143,11 @@ const ok=moved&&can&&ev.type=='pointerup'&&(fvHit(ev)||over);/* measure the dock
 if(moved){fvDragging=0;document.body.classList.remove('fvdrag');fvZoneOn(0);w.classList.remove('drg')}
 w.classList.remove('moving');
 if(ok){vwPin(id);return}
-if(moved){vwApply(v);ntRail()}
+if(moved){if(!dir&&!v.min&&can){v.x=ev.clientX-off.x;v.y=ev.clientY-off.y;vwClamp(v)}vwApply(v);ntRail()}
 if(!dir&&!v.min){VWD.w=v.w;VWD.h=v.h;try{localStorage.setItem('vw',JSON.stringify(VWD))}catch(_){}}else if(dir){VWD.w=v.w;VWD.h=v.h;try{localStorage.setItem('vw',JSON.stringify(VWD))}catch(_){}}};
 el.addEventListener('pointermove',mv);el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up)}
-addEventListener('resize',()=>{VWS.forEach(v=>{vwClamp(v);vwApply(v)});fvRender();renderSidebar()});
-const vwHtml=v=>{const pdf=v.type==='pdf',i=v.vid,nd=rsBlocked('dl');return `<div class="vwin" data-vid="${i}" onpointerdown="vwFocus('${i}')"><div class="vh" onpointerdown="vwDown(event,'${i}','')" ondblclick="if(!event.target.closest('button,a'))vwMax('${i}')"><h2>${E(v.title)}</h2><div class="vbs">${pdf?`<span class="pvn mu sm"></span><button class="vbt" title="Zoom out" onclick="pvZoom('${i}',-1)">${ico('minus')}</button><button class="vbt" title="Zoom in" onclick="pvZoom('${i}',1)">${ico('plus')}</button>`:''}${nd?'':`<a class="vbt vdl" href="${v.url}" target="_blank" rel="noopener" title="Download">${IC.dl}</a>`}<button class="vbt vpn" title="Pin to sidebar" onclick="vwPin('${i}')">${ico('pin')}</button><button class="vbt vmn" title="Minimize" onclick="vwMin('${i}')">${IC.min}</button><button class="vbt vmx" title="Maximize" onclick="vwMax('${i}')">${IC.max}</button><button class="vbt x" title="Close" onclick="closeViewer('${i}')">${IC.x}</button></div></div><div class="vb${pdf?' pdfv':''}">${pdf?`<div class="pvl">Loading PDF…</div><div class="pvp"></div>`:`<img src="${v.url}" alt="" decoding="async" draggable="false" onload="this.classList.add('ld')" onerror="this.classList.add('ld')" ${nd?'oncontextmenu="return false"':''}>`}</div>${['n','s','e','w','ne','nw','se','sw'].map(d=>`<i class="vrs" data-d="${d}" onpointerdown="vwDown(event,'${i}','${d}')"></i>`).join('')}</div>`};
+let vwW=innerWidth;addEventListener('resize',()=>{VWS.forEach(v=>{vwClamp(v);vwApply(v)});if(innerWidth!=vwW){vwW=innerWidth;fvRender();renderSidebar()}});
+const vwHtml=v=>{const pdf=v.type==='pdf',i=v.vid,nd=rsBlocked('dl');return `<div class="vwin" data-vid="${i}" onpointerdown="vwFocus('${i}')"><div class="vh" onpointerdown="vwDown(event,'${i}','')" ondblclick="if(!event.target.closest('button,a'))vwMax('${i}')"><h2>${E(v.title)}</h2><div class="vbs">${pdf?'<span class="pvn mu sm"></span>':''}<button class="vbt" title="Zoom out" onclick="vwZoom('${i}',-1)">${ico('minus')}</button><button class="vbt" title="Zoom in" onclick="vwZoom('${i}',1)">${ico('plus')}</button>${nd?'':`<a class="vbt vdl" href="${v.url}" target="_blank" rel="noopener" title="Download">${IC.dl}</a>`}<button class="vbt vpn" title="Pin to sidebar" onclick="vwPin('${i}')">${ico('pin')}</button><button class="vbt vmn" title="Minimize" onclick="vwMin('${i}')">${IC.min}</button><button class="vbt vmx" title="Maximize" onclick="vwMax('${i}')">${IC.max}</button><button class="vbt x" title="Close" onclick="closeViewer('${i}')">${IC.x}</button></div></div><div class="vb${pdf?' pdfv':''}">${pdf?`<div class="pvl">Loading PDF…</div><div class="pvp"></div>`:`<img src="${v.url}" alt="" decoding="async" draggable="false" onload="this.classList.add('ld')" onerror="this.classList.add('ld')" ${nd?'oncontextmenu="return false"':''}>`}</div>${['n','s','e','w','ne','nw','se','sw'].map(d=>`<i class="vrs" data-d="${d}" onpointerdown="vwDown(event,'${i}','${d}')"></i>`).join('')}</div>`};
 function renderFileViewer(){let r=$('#fileViewerRoot');if(!r){r=document.createElement('div');r.id='fileViewerRoot';document.body.appendChild(r)}
 [...r.children].forEach(c=>{if(!VWS.some(v=>v.vid==c.dataset.vid)){pvKill(c.dataset.vid);c.remove()}});
 VWS.forEach(v=>{if(!r.querySelector('.vwin[data-vid="'+v.vid+'"]'))r.insertAdjacentHTML('beforeend',vwHtml(v))});
@@ -1203,7 +1251,7 @@ Q.forEach(x=>{x.qi=su[x.qp]||'';x.ei=su[x.ep]||''});OQ=Q.filter(x=>!x.own);D.MQ=
 D.FO=g(2).map(mapFo);D.M=g(3).map(mapM);D.F=F.map(x=>mapF(x,su));
 P.fc={};g(5).forEach(x=>P.fc[x.flashcard_id]=x.status);P.bm=g(6).map(x=>x.material_id);
 P.q={};g(7).forEach(x=>P.q[x.question_id]=[x.correct_count,x.total_count,+x.last_correct]);
-P.op={};g(9).forEach(x=>P.op[x.material_id]=x.opens);D.AG=g(10);
+P.op={};P.lo={};g(9).forEach(x=>{P.op[x.material_id]=x.opens;P.lo[x.material_id]=x.last_opened?+new Date(x.last_opened):0});D.AG=g(10);
 const at=g(8),an=at.length?(await pg('quiz_answers',q=>q.in('attempt_id',at.map(x=>x.id)).order('id'))).data:[];
 P.h=at.map(a=>({id:a.id,ts:T0(a.created_at),sc:a.scope||'',n:a.total,k:a.correct,secs:a.seconds||0,notes:a.notes||'',it:an.filter(x=>x.attempt_id==a.id).sort((x,y)=>x.position-y.position).map(x=>({id:x.question_id,ch:x.chosen,ok:+x.is_correct}))}));
 D.U=[];D.SS=[];if(role=='admin'){const u=await sb.from('profiles').select('*');D.U=u.data||[];const ss=await sb.from('study_state').select('user_id,data');D.SS=ss.error?[]:(ss.data||[])}
@@ -1219,12 +1267,12 @@ const V={};
 V.home=()=>`<section class="hero art"><div class="w"><p class="eyebrow">Civil Engineering Board Exam</p><h1>Your CE review archive: notes, questions and quizzes in one place.</h1><p class="lead">Lecture notes, questionnaires and solutions, plus quizzes, flashcards and progress tracking for MSTC, HPGE and PSAD.</p><div class="row" style="margin:0"><button class="btn p" onclick="go(ME?'dash':'auth')">Get started</button>${annBtn('home')}</div></div></section>
 <div class="w sec"><h2>Exam Components</h2><div class="g">${C.map(c=>`<div class="card art" onclick="go('c/${c}')"><h3>${c}</h3><p class="mu">${CD[c]}</p><p class="mu sm">${ME?allQ().filter(x=>x.c==c).length+' questions':'Log in to start'}</p></div>`).join('')}</div></div>`;
 
-V.dash=()=>{const a=stat(()=>1),h=P.h.slice(0,4),op=P.op||{},top5=D.M.filter(m=>op[m.id]).sort((x,y)=>op[y.id]-op[x.id]).slice(0,5);
+V.dash=()=>{const a=stat(()=>1),h=P.h.slice(0,4),op=P.op||{},top5=D.M.filter(m=>op[m.id]).sort((x,y)=>(P.lo&&P.lo[y.id]||0)-(P.lo&&P.lo[x.id]||0)).slice(0,5);
 return hd('Welcome, '+E(PR&&PR.display_name||'Student')+'. <span id="stGr">'+stGreet()+'</span>','Your progress across all components.').replace('class="ph art"','class="ph art wl"').replace('Your progress across all components.</p>','Your progress across all components.</p>'+annBtn('dash'))+`<div class="w sec stack"><div id="stWxN"></div>
 <div class="dgrid"><div class="card stCard" id="stDash">${stDashHtml()}</div><div class="stack"><div class="card stMob" id="stMobBox">${stMobHtml(stLoad())}</div><div class="card art stack"><h3>Quiz</h3><p class="mu">Draws from all ${a.n} questions across MSTC, HPGE and PSAD. You can also start a quiz inside each component.</p><button class="btn p" onclick="go('quiz')">Start a quiz</button></div>${qkCard()}</div></div>
 <div class="g">${C.map(c=>`<div class="card art" onclick="go('c/${c}')"><h3>${c}</h3>${bars(stat(x=>x.c==c))}</div>`).join('')}</div>
 <p class="mu sm">Accuracy = correct answers ÷ answers given. Mastery = questions you last answered correctly ÷ all questions.</p>
-<div class="g"><div class="card"><h3>Most opened files</h3>${top5.map(m=>`<div class="row" style="justify-content:space-between;margin:8px 0 0"><a class="lk" onclick="openM('${m.id}')">${tag(m.type)} ${E(m.title)}</a><span class="mu sm">${op[m.id]} ${op[m.id]==1?'open':'opens'}</span></div>`).join('')||'<p class="mu sm">Files you open will show up here.</p>'}</div>${starCard()}</div>
+<div class="g"><div class="card"><h3>Recently opened files</h3>${top5.map(m=>`<div class="row" style="justify-content:space-between;margin:8px 0 0"><a class="lk" onclick="openM('${m.id}')">${tag(m.type)} ${E(m.title)}</a><span class="mu sm">${op[m.id]} ${op[m.id]==1?'open':'opens'}</span></div>`).join('')||'<p class="mu sm">Files you open will show up here.</p>'}</div>${starCard()}</div>
 ${sharedCard()}
 <div class="g"><div class="card"><h3>Recent quizzes</h3>${h.map(x=>`<p class="sm">${x.k}/${x.n} · ${E(x.sc)}</p>`).join('')||'<p class="mu sm">None yet.</p>'}<div class="row"><button class="btn" onclick="go('hist')">View history</button></div></div>
 <div class="card"><h3>Study</h3><div class="row"><button class="btn" onclick="go('cards')">Flashcards</button><button class="btn" onclick="FF={c:'',k:'img'};go('cards')">Formula cards</button></div></div></div></div>`};
@@ -1967,7 +2015,7 @@ openMdl({title:'Study history',noCancel:1,okText:'Close',body:`<div class="stHl"
 const stHist=s=>`<button class="btn" onclick="stHistOpen()">${ico('history')}Study history${s.h.length+(s.a?1:0)?' ('+(s.h.length+(s.a?1:0))+')':''}</button>`;
 function stDashHtml(){const s=stLoad(),d=stDer(s),a=s.a,run=!!a,pm=d.fd?'mini':s.pm,g=s.gk==pm?s.goal:0,w=a?stW(a):0,e=a?stEl(a):0,r=a?Math.max(0,a.g-e):0,ov=a?Math.max(0,e-a.g):0,l=a||s.h.find(x=>x.day==d.t),sd=l?tm(l.start):'--',ed=!a&&l&&l.end?tm(l.end):'--',
 nm=a?(a.mode=='mini'||a.mn?'mini':'full'):pm;
-return `${stName(nm)}<div class="stTop"><div><div class="stBig" data-st="clock">${tms(Date.now())}</div><p class="mu sm"><span data-st="date">${phF({weekday:'long',month:'long',day:'numeric'},Date.now())}</span> · ${tzn()}</p></div>${stStreak(s)}</div>
+return `${stName(nm)}<div class="stLive ${run?'on':''}"><i></i>${run?(a.pa?'Session paused':'Session ongoing'):'No ongoing session'}</div><div class="stTop"><div><div class="stBig" data-st="clock">${tms(Date.now())}</div><p class="mu sm"><span data-st="date">${phF({weekday:'long',month:'long',day:'numeric'},Date.now())}</span> · ${tzn()}</p></div>${stStreak(s)}</div>
 ${d.br&&!run?stBrk(d):''}${d.rest?'<p class="stRst sm">'+ico('moon')+'Rest day today. Your streak is safe.</p>':''}
 <div class="stCols"><div class="stL">
 <div class="seg" ${run?'style="pointer-events:none;opacity:.5"':''} style="align-self:flex-start"><button class="${pm=='full'?'on':''}" ${d.fd?'disabled':''} onclick="stMode('full')">Lock in Study${d.fd?' '+ico('check')+'':''}</button><button class="${pm=='mini'?'on':''}" onclick="stMode('mini')">Mini Lock In</button></div>
@@ -2808,7 +2856,8 @@ async function chOpenAdmin(sid){try{const r=await sb.rpc('chat_open_admin',{stud
 function chToggle(e){e.stopPropagation();NF.open=0;ntfRender();CH.open=!CH.open;CH.set=0;CH.q='';chRender();if(CH.open)chRefresh()}
 document.addEventListener('click',e=>{if(CH.open&&!e.target.closest('.cpan,#chBtn')){CH.open=0;chRender()}if(!e.target.closest('#chPop,.cmm,.cwb'))chPopClose()});
 addEventListener('keydown',e=>{if(e.key=='Escape'&&CH.open&&!MD){CH.open=0;chRender()}});
-addEventListener('resize',()=>{if(CH.ok){chCap();chRender()}});
+/* the phone keyboard opening only changes the height: rebuilding the chat then stole focus from the search box and looped */
+let chW=innerWidth;addEventListener('resize',()=>{if(innerWidth==chW)return;chW=innerWidth;if(CH.ok){chCap();chRender()}});
 /* ---- read / delivered ---- */
 function chRead(k){const r=chRoom(k);if(!r||!r.mine)return;r.unread=0;if(chRP(k).fu){chRP(k).fu=0;chRPSave(k)}chBadge();if(CH.open)chListPatch();clearTimeout(CH.timers['r'+k]);CH.timers['r'+k]=setTimeout(()=>{sb.rpc('chat_mark_read',{rid:k,upto:r.lastId||0}).then(x=>x.error&&console.warn('Chat read:',x.error.message))},300)}
 function chDeliver(k){clearTimeout(CH.timers['d'+k]);CH.timers['d'+k]=setTimeout(()=>{sb.rpc('chat_mark_delivered',{rid:k}).then(x=>x.error&&console.warn('Chat delivered:',x.error.message))},250)}
@@ -2912,8 +2961,8 @@ function chListHtml(){const me=ME.id,q=(CH.q||'').trim().toLowerCase(),byAt=(a,b
 if(CH.tab=='pub'){const o=['general','MSTC','HPGE','PSAD'];h=CH.rooms.filter(r=>r.kind=='channel').sort((a,b)=>(o.indexOf(a.key)+1||9)-(o.indexOf(b.key)+1||9)).map(chRow).join('')||'<p class="cempty">No channels yet.</p>'}
 else if(CH.tab=='dm'){let l=CH.rooms.filter(r=>r.kind=='dm'&&r.mine&&!chHid(r)&&(r.lastId||CH.wins.some(w=>w.k==r.id))).sort(byAt);if(q)l=l.filter(r=>chTitle(r).toLowerCase().includes(q));h=l.map(chRow).join('');
 if(rsBlocked('dm'))h='<p class="cempty">Direct messages are turned off for your account.</p>';
-else{const ppl=Object.keys(CH.users).filter(id=>id!=me&&CH.users[id].role!='admin'&&(!q||CH.users[id].name.toLowerCase().includes(q))&&!l.some(r=>chOther(r)==id)).sort((a,b)=>chNm(a).localeCompare(chNm(b))).slice(0,q?8:300);
-h+=ppl.length?`<div class="chl">People</div>`+ppl.map(id=>`<div class="cli" onclick="chOpenDM('${id}')">${chAv(id,38)}<div class="clm"><b>${E(chNm(id))}</b><span>Start a conversation</span></div></div>`).join(''):'';
+else{const ppl=Object.keys(CH.users).filter(id=>id!=me&&(role=='admin'?CH.users[id].role!='admin':true)&&(!q||CH.users[id].name.toLowerCase().includes(q))&&!l.some(r=>chOther(r)==id)).sort((a,b)=>(CH.users[b].role=='admin')-(CH.users[a].role=='admin')||chNm(a).localeCompare(chNm(b))).slice(0,q?8:300);
+h+=ppl.length?`<div class="chl">People</div>`+ppl.map(id=>`<div class="cli" onclick="chOpenDM('${id}')">${chAv(id,38)}<div class="clm"><b>${E(chNm(id))}${CH.users[id].role=='admin'?' <span class="tag">Admin</span>':''}</b><span>${CH.users[id].role=='admin'?'Message the admins':'Start a conversation'}</span></div></div>`).join(''):'';
 if(!h)h=`<p class="cempty">${q?'Nobody found.':'No direct messages yet. Search a name above to start one.'}</p>`}
 if(role=='admin'){const mon=CH.rooms.filter(r=>r.kind=='dm'&&!r.mine&&r.lastId).sort(byAt);if(mon.length)h+=`<div class="chl"><a onclick="CH.mon=!CH.mon;chRender()">${CH.mon?'Hide':'Show'} all student DMs (${mon.length})</a></div>`+(CH.mon?mon.filter(r=>!q||chTitle(r).toLowerCase().includes(q)).map(chRow).join(''):'')}}
 else{if(role=='admin'){let l=CH.rooms.filter(r=>r.kind=='admin'&&r.lastId&&!chHid(r)).sort(byAt);if(q)l=l.filter(r=>chTitle(r).toLowerCase().includes(q));h=l.map(chRow).join('');
@@ -2924,7 +2973,7 @@ return h}
 function chPanelHtml(){if(CH.ok===false)return `<div class="cpan"><div class="chh"><b>Messages</b></div><div class="cset"><p>Chat is not set up yet.</p><p class="mu sm">Run <b>chat.sql</b> once in the Supabase SQL editor, then reload.</p>${CH.err?`<p class="mu sm">${E(CH.err)}</p>`:''}</div></div>`;
 if(CH.set)return `<div class="cpan">${chSetHtml()}</div>`;
 const showQ=CH.tab!='pub'&&!(CH.tab=='adm'&&role!='admin');
-return `<div class="cpan"><div class="chh"><b>Messages</b><button class="cwb" title="Settings" onclick="CH.set=1;chRender()">${ico('sliders')}</button></div>${chTabs()}${showQ?`<div class="csr"><input id="chQ" placeholder="${CH.tab=='adm'?'Search students':'Search people'}" value="${E(CH.q)}" oninput="CH.q=this.value;chListPatch()" autocomplete="off"></div>`:''}<div class="cll" id="chList">${chListHtml()}</div>${CH.tab=='dm'&&!rsBlocked('dm')?'<p class="cft">Admins can read direct messages.</p>':''}</div>`}
+return `<div class="cpan"><div class="chh"><b>Messages</b><button class="cwb" title="Settings" onclick="CH.set=1;chRender()">${ico('sliders')}</button></div>${chTabs()}${showQ?`<div class="csr"><input id="chQ" placeholder="${CH.tab=='adm'?'Search students':'Search people'}" value="${E(CH.q)}" oninput="CH.q=this.value;clearTimeout(CH.qt);CH.qt=setTimeout(chListPatch,90)" autocomplete="off"></div>`:''}<div class="cll" id="chList">${chListHtml()}</div>${CH.tab=='dm'&&!rsBlocked('dm')?'<p class="cft">Admins can read direct messages.</p>':''}</div>`}
 function chListPatch(){const l=document.getElementById('chList');if(l)l.innerHTML=chListHtml();const t=document.querySelector('.cpan .ctabs');if(t)t.outerHTML=chTabs()}
 function chBtnHtml(){const n=chBadgeN();return `<button id="chBtn" class="cbtn" onclick="chToggle(event)" aria-label="Messages" title="Messages">${ico('chat')}${n?`<i class="cb">${n>9?'9+':n}</i>`:''}</button>`}
 function chRender(){const r=chRoot();if(!ME||CH.ok===null||rsBlocked('chat')||(CH.ok===false&&role!='admin')){r.innerHTML='';return}
@@ -2995,7 +3044,7 @@ return `<div class="chh"><button class="cwb" onclick="CH.set=0;chRender()" aria-
 <div class="cgrp"><b class="sm">Muted users and chats</b>${mu.length?mu.map(r=>{const g=CH.rp[r.id].ig;return `<div class="crow"><span>${E(chTitle(r))}<small class="mu"> · ${g=='inf'?'until you unmute':'until '+E(phF({dateStyle:'medium',timeStyle:'short'},g))}</small></span><button class="btn" onclick="chIgnOff('${r.id}')">Unmute</button></div>`}).join(''):'<p class="mu sm">Nobody is muted. Use the ⋯ menu on a chat to ignore it.</p>'}</div>
 <div class="cgrp"><b class="sm">Blocked users</b>${bl.length?bl.map(u=>`<div class="crow"><span>${E(chNm(u))}</span><button class="btn" onclick="chUnblock('${u}')">Unblock</button></div>`).join(''):'<p class="mu sm">Nobody is blocked.</p>'}</div></div>`}
 /* ===== PUSH NOTIFICATIONS (work with the site closed): needs push_setup.sql, the chat-push function and a VAPID key. See PUSH_SETUP.md ===== */
-const PUSH_KEY='BDhFc54eY-NCNjKGFLsT5-34-ZUIqlwqJna04cM7oOMQMH7eFcSqtHa2Rmhw61r6tHEtXFfcD-TB8kVDHq0-QVw'; /* paste your VAPID PUBLIC key here */
+const PUSH_KEY=''; /* paste your VAPID PUBLIC key here */
 const pushIOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform=='MacIntel'&&navigator.maxTouchPoints>1),
 pushStandalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true,
 pushOK=()=>!!PUSH_KEY&&window.isSecureContext&&'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window,
@@ -3018,9 +3067,23 @@ if('serviceWorker' in navigator)navigator.serviceWorker.addEventListener('messag
 const NF={open:0,pk:{},last:[],t:null,tl:[],ti:null,sig:'',seen:new Set(),init:0,ld:0,sub:null},BASE_T=(document.title||'Found / CE Review Archive').replace(/^\(\d+\)\s*/,'');
 const ntfIgn=u=>CH.rooms.some(r=>r.kind=='dm'&&r.mine&&chOther(r)==u&&chIgnR(r.id)),
 ntfDK=()=>'nfx_'+ME.id,ntfDismissed=()=>{try{return JSON.parse(localStorage.getItem(ntfDK())||'{}')}catch(e){return{}}},
-ntfDismiss=k=>{const d=ntfDismissed();d[k]=1;const ks=Object.keys(d);if(ks.length>300)delete d[ks[0]];try{localStorage.setItem(ntfDK(),JSON.stringify(d))}catch(e){}},
+ntfDismiss=k=>{const d=ntfDismissed();d[k]=1;const ks=Object.keys(d);if(ks.length>300)delete d[ks[0]];try{localStorage.setItem(ntfDK(),JSON.stringify(d))}catch(e){}ntfPushSoft()},
+ntfRK=()=>'nfr_'+ME.id,ntfReadMap=()=>{try{return JSON.parse(localStorage.getItem(ntfRK())||'{}')}catch(e){return{}}},
+/* a notification counts as read once it has been opened; new activity (a later message, poke or day) is unread again */
+ntfKey=x=>x.id+(x.id=='v'||!x.at?'|'+phDay():'@'+x.at),ntfIsRead=x=>!!ntfReadMap()[ntfKey(x)],
+ntfMarkRead=x=>{const m=ntfReadMap();m[ntfKey(x)]=1;const ks=Object.keys(m);if(ks.length>300)delete m[ks[0]];try{localStorage.setItem(ntfRK(),JSON.stringify(m))}catch(e){}ntfPushSoft()},
 ntfBase=()=>{const k='nfb_'+ME.id;let b=+localStorage.getItem(k)||0;if(!b){b=Date.now();try{localStorage.setItem(k,b)}catch(e){}}return b};
-async function ntfLoad(){NF.pk={};const r=await sb.from('chat_pokes').select('from_id,created_at').eq('to_id',ME.id).eq('seen',false).order('created_at',{ascending:false}).limit(200);
+/* ---- sync read / dismissed notifications and the new-file baseline across devices (needs notif_sync.sql; works on this device without it) ---- */
+let NFS=false,NFP=null;
+const ntfBlob=()=>({r:ntfReadMap(),x:ntfDismissed(),b:+localStorage.getItem('nfb_'+ME.id)||0}),
+ntfCap=o=>{const ks=Object.keys(o);ks.slice(0,Math.max(0,ks.length-300)).forEach(k=>delete o[k]);return o};
+function ntfPushSoft(){if(!NFS||!ME)return;clearTimeout(NFP);NFP=setTimeout(()=>sb.from('notif_state').upsert({user_id:ME.id,data:ntfBlob(),updated_at:new Date().toISOString()}).then(r=>r.error&&console.warn('Notification sync:',r.error.message)),800)}
+async function ntfPull(){if(!ME)return;try{const r=await sb.from('notif_state').select('data').eq('user_id',ME.id).maybeSingle();if(r.error){NFS=false;return}NFS=true;
+const rm=(r.data&&r.data.data)||{},lc=ntfBlob(),m={r:ntfCap(Object.assign({},rm.r,lc.r)),x:ntfCap(Object.assign({},rm.x,lc.x)),b:[rm.b,lc.b].filter(Boolean).sort((a,c)=>a-c)[0]||0},n=o=>Object.keys(o||{}).length;
+const gotNew=n(m.r)>n(lc.r)||n(m.x)>n(lc.x)||(m.b&&m.b!==lc.b);
+try{localStorage.setItem(ntfRK(),JSON.stringify(m.r));localStorage.setItem(ntfDK(),JSON.stringify(m.x));if(m.b)localStorage.setItem('nfb_'+ME.id,m.b)}catch(e){}
+if(n(m.r)>n(rm.r)||n(m.x)>n(rm.x)||(m.b&&m.b!==rm.b))ntfPushSoft();if(gotNew)ntfSoft()}catch(e){console.warn(e)}}
+async function ntfLoad(){ntfPull();NF.pk={};const r=await sb.from('chat_pokes').select('from_id,created_at').eq('to_id',ME.id).eq('seen',false).order('created_at',{ascending:false}).limit(200);
 if(r&&!r.error)(r.data||[]).forEach(x=>{const o=NF.pk[x.from_id]||(NF.pk[x.from_id]={n:0,at:x.created_at});o.n++});ntfSub();ntfSoft()}
 function ntfSub(){if(NF.sub||!ME)return;NF.sub=sb.channel('notif-live').on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_pokes',filter:'to_id=eq.'+ME.id},p=>{const x=p.new;if(!x||CH.blk.mine.has(x.from_id))return;
 const o=NF.pk[x.from_id]||(NF.pk[x.from_id]={n:0,at:x.created_at});o.n++;o.at=x.created_at;if(!document.hidden&&!ntfIgn(x.from_id))toast(chNm(x.from_id)+' poked you');ntfSoft()}).subscribe()}
@@ -3037,12 +3100,12 @@ else if(q.st=='rev'&&!dis['rq'+day])L.push({id:'rq',ic:'flame',h:'QuickiZ streak
 return L.sort((a,b)=>b.at-a.at)}
 function ntfRender(){let r=document.getElementById('ntfRoot');if(!r){r=document.createElement('div');r.id='ntfRoot';document.body.appendChild(r)}
 if(!ME){r.innerHTML='';ntfTitle([]);return}if(!NF.ld){NF.ld=1;ntfLoad()}
-const L=NF.last=ntfList(),n=L.length;
-r.innerHTML=`<button id="ntBtn" class="cbtn nb" onclick="ntfToggle(event)" aria-label="Notifications" title="Notifications">${ico('bell')}${n?`<i class="cb">${n>9?'9+':n}</i>`:''}</button>${NF.open?`<div class="cpan npan"><div class="chh"><b>Notifications</b>${L.some(x=>x.dis)?`<button class="btn" style="padding:4px 10px" onclick="ntfClear()">Clear</button>`:''}</div><div class="cll">${L.length?L.map((x,i)=>`<div class="cli nfe" onclick="ntfAct(${i})"><span class="nfi">${ico(x.ic)}</span><div class="clm"><b>${E(x.h)}</b><span>${E(x.s)}</span></div>${x.btn?`<button class="btn p" style="padding:4px 10px">${x.btn}</button>`:x.dis?`<button class="cwb" title="Dismiss" onclick="ntfDis(event,${i})">${ico('x')}</button>`:''}</div>`).join(''):'<p class="cempty">You are all caught up.</p>'}</div></div>`:''}`;
-ntfTitle(L.filter(x=>x.ic=='chat'||x.ic=='hand'));ntfDesk(L)}
+const L=NF.last=ntfList(),U=L.filter(x=>!ntfIsRead(x)),n=U.length;
+r.innerHTML=`<button id="ntBtn" class="cbtn nb" onclick="ntfToggle(event)" aria-label="Notifications" title="Notifications">${ico('bell')}${n?`<i class="cb">${n>9?'9+':n}</i>`:''}</button>${NF.open?`<div class="cpan npan"><div class="chh"><b>Notifications</b>${L.some(x=>x.dis)?`<button class="btn" style="padding:4px 10px" onclick="ntfClear()">Clear</button>`:''}</div><div class="cll">${L.length?L.map((x,i)=>`<div class="cli nfe${ntfIsRead(x)?' rd':''}" onclick="ntfAct(${i})"><span class="nfi">${ico(x.ic)}</span><div class="clm"><b>${E(x.h)}</b><span>${E(x.s)}</span></div>${x.btn?`<button class="btn p" style="padding:4px 10px">${x.btn}</button>`:x.dis?`<button class="cwb" title="Dismiss" onclick="ntfDis(event,${i})">${ico('x')}</button>`:''}</div>`).join(''):'<p class="cempty">You are all caught up.</p>'}</div></div>`:''}`;
+ntfTitle(U);ntfDesk(L)}
 const ntfSoft=()=>{clearTimeout(NF.t);NF.t=setTimeout(ntfRender,150)};
 function ntfToggle(e){e.stopPropagation();NF.open=!NF.open;CH.open=0;chRender();ntfRender()}
-function ntfAct(i){const x=NF.last[i];if(!x)return;NF.open=0;ntfRender();if(x.go)x.go()}
+function ntfAct(i){const x=NF.last[i];if(!x)return;ntfMarkRead(x);NF.open=0;ntfRender();if(x.go)x.go()}
 function ntfDis(e,i){e.stopPropagation();const x=NF.last[i];if(x&&x.dis)x.dis();ntfSoft()}
 function ntfClear(){NF.last.forEach(x=>x.dis&&x.dis());ntfSoft()}
 /* tab title: "(2) Found / CE Review Archive", swapping the first part for the newest alerts */
@@ -3053,7 +3116,8 @@ function ntfDesk(L){if(NF.init&&document.hidden&&CH.prefs.bn&&window.Notificatio
 document.addEventListener('click',e=>{if(NF.open&&!e.target.closest('.npan,#ntBtn')){NF.open=0;ntfRender()}});
 addEventListener('keydown',e=>{if(e.key=='Escape'&&NF.open&&!MD){NF.open=0;ntfRender()}});
 chBadge=(f=>function(){f();ntfSoft()})(chBadge);
-setInterval(()=>{if(ME){chBadge();ntfSoft()}},60000);
+setInterval(()=>{if(ME){chBadge();ntfPull();ntfSoft()}},60000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&ME&&NF.ld)ntfPull()});
 /* ===== PDF viewer: pages are drawn on demand so scrolling stays smooth on PC and phones ===== */
 const PV={};
 const pvFallback=v=>`<object data="${v.url}${rsBlocked('dl')?'#toolbar=0&navpanes=0':''}" type="application/pdf" style="width:100%;height:100%"><div style="padding:30px;text-align:center"><p style="margin-bottom:12px">This browser can't show the PDF here.</p>${rsBlocked('dl')?'':`<a href="${v.url}" target="_blank" rel="noopener" class="btn p">Open PDF in a new tab</a>`}</div></object>`;
@@ -3065,6 +3129,19 @@ const t=pg.render({canvasContext:c.getContext('2d',{alpha:false}),viewport:vp});
 function pvInd(s){const top=s.el.scrollTop+s.el.clientHeight*.35,gs=s.host.children;let cur=1;for(let i=0;i<gs.length;i++){if(gs[i].offsetTop>top)break;cur=i+1}const t=document.querySelector('.vwin[data-vid="'+s.vid+'"] .pvn');if(t)t.textContent=cur+' / '+s.n}
 function pvLay(s){const cw=s.el.clientWidth;if(!cw)return;const w=Math.max(160,Math.round((cw-16)*s.z)),k=String(w);if(k===s.rk)return;const f=s.el.scrollHeight?s.el.scrollTop/s.el.scrollHeight:0;s.rk=k;s.w=w;
 s.host.querySelectorAll('.pvg').forEach(g=>{g.style.width=w+'px';g.style.height=Math.round(w*(+g.dataset.ar||s.ar))+'px';pvFree(g)});s.el.scrollTop=f*s.el.scrollHeight;s.vis.forEach(n=>pvPage(s,n));pvInd(s)}
+/* ctrl + scroll (or a pinch on the trackpad) zooms the FILE, not the site. A two-finger scroll pans it. */
+function pvZoomF(vid,f){const s=PV[vid];if(!s)return;const b=s.zq||s.z,z=Math.min(3,Math.max(.6,+(b*f).toFixed(3)));if(z===b)return;s.zq=z;if(s.zr)return;
+s.zr=requestAnimationFrame(()=>{s.zr=0;const el=s.el,fx=el.scrollWidth>el.clientWidth?(el.scrollLeft+el.clientWidth/2)/el.scrollWidth:.5;s.z=s.zq;s.zq=0;s.rk='';pvLay(s);el.scrollLeft=Math.max(0,fx*el.scrollWidth-el.clientWidth/2)})}
+function vwImgZoom(v,f){const el=document.querySelector('.vwin[data-vid="'+v.vid+'"]'),vb=el&&el.querySelector('.vb'),im=vb&&vb.querySelector('img');if(!im||!im.naturalWidth)return;
+const z=Math.min(6,Math.max(1,+((v.iz||1)*f).toFixed(3)));if(z===(v.iz||1))return;
+const fx=vb.scrollWidth>vb.clientWidth?(vb.scrollLeft+vb.clientWidth/2)/vb.scrollWidth:.5,fy=vb.scrollHeight>vb.clientHeight?(vb.scrollTop+vb.clientHeight/2)/vb.scrollHeight:.5;
+v.iz=z;if(z<=1.001){v.iz=1;vb.classList.remove('zm');im.style.cssText='';return}
+const base=Math.min(1,vb.clientWidth/im.naturalWidth,vb.clientHeight/im.naturalHeight);vb.classList.add('zm');im.style.cssText='max-width:none;max-height:none;width:'+Math.round(im.naturalWidth*base*z)+'px;height:auto';
+vb.scrollLeft=Math.max(0,fx*vb.scrollWidth-vb.clientWidth/2);vb.scrollTop=Math.max(0,fy*vb.scrollHeight-vb.clientHeight/2)}
+function vwZoom(id,d){const v=vwGet(id);if(!v)return;if(v.type==='pdf')pvZoom(id,d);else vwImgZoom(v,d>0?1.25:.8)}
+document.addEventListener('wheel',e=>{if(!e.ctrlKey||!e.target.closest)return;const vb=e.target.closest('.vwin .vb');if(!vb)return;e.preventDefault();
+const w=vb.closest('.vwin'),v=vwGet(w.dataset.vid);if(!v||w.classList.contains('min'))return;const f=Math.min(1.25,Math.max(.8,Math.exp(-e.deltaY*(e.deltaMode?.05:.012))));
+if(v.type==='pdf')pvZoomF(v.vid,f);else vwImgZoom(v,f)},{passive:false});
 function pvZoom(vid,d){const s=PV[vid];if(!s)return;const z=Math.min(3,Math.max(.6,+(s.z*(d>0?1.25:.8)).toFixed(2)));if(z===s.z)return;s.z=z;s.rk='';pvLay(s)}
 function pvKill(vid){const s=PV[vid];if(!s)return;s.dead=1;try{s.io.disconnect();s.ro.disconnect()}catch(e){}try{s.pdf.destroy()}catch(e){}delete PV[vid]}
 async function pvInit(v){const el=document.querySelector('.vwin[data-vid="'+v.vid+'"] .vb');if(!el)return;const host=el.querySelector('.pvp'),ld=el.querySelector('.pvl');
