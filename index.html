@@ -1481,7 +1481,7 @@ function lineOf(n){const ed=NED();let x=n;while(x&&x.parentNode!==ed)x=x.parentN
 function ntSel(){const ed=NED(),s=getSelection();return ed&&s&&s.rangeCount&&ed.contains(s.anchorNode)?s:null}
 const textBefore=(line,s)=>{const r=document.createRange();r.selectNodeContents(line);r.setEnd(s.anchorNode,s.anchorOffset);return r.toString()};
 const caretTo=(n,o)=>{const s=getSelection();try{s.collapse(n,o)}catch(_){}};
-const emptyLine=l=>!!l&&!isAtt(l)&&!l.textContent&&!l.querySelector('img');
+const emptyLine=l=>!!l&&!isAtt(l)&&!l.textContent&&!l.querySelector('img,.aic');
 /* keep the editor made of one block per line, never starting or ending on a picture */
 function ntNorm(){const ed=NED();if(!ed)return;const s=getSelection(),an=s&&s.isCollapsed?s.anchorNode:null,ao=s?s.anchorOffset:0;let ch=0;
 [...ed.childNodes].forEach(n=>{if(n.nodeType==3){if(n.textContent.length){const d=document.createElement('div');n.replaceWith(d);d.appendChild(n);ch=1}else n.remove()}else if(n.nodeType==1&&!/^(DIV|P)$/.test(n.tagName)){const d=document.createElement('div');n.replaceWith(d);d.appendChild(n);ch=1}});
@@ -1489,7 +1489,7 @@ if(!ed.firstChild)ed.innerHTML='<div><br></div>';
 if(isAtt(ed.lastElementChild))ed.insertAdjacentHTML('beforeend','<div><br></div>');
 if(isAtt(ed.firstElementChild))ed.insertAdjacentHTML('afterbegin','<div><br></div>');
 if(ch&&an&&ed.contains(an))caretTo(an,ao)}
-function ntSync(){const ed=NED();if(!ed)return;ntNorm();ed.classList.toggle('emp',!ed.textContent.trim()&&!ed.querySelector('.nimg,.nfile,.nph,.aic,[data-cb]'));NT.h=ntExp(ed.innerHTML);ntStore();ntGrow()}
+function ntSync(){const ed=NED();if(!ed)return;ntNorm();ueMark(ed,ed._ty);ed._ty=0;ed.classList.toggle('emp',!ed.textContent.trim()&&!ed.querySelector('.nimg,.nfile,.nph,.aic,[data-cb]'));NT.h=ntExp(ed.innerHTML);ntStore();ntGrow()}
 /* Notes: remembered per account and synced through the notes_state table (run notes_state.sql once). Newest copy wins.
    On phones only the text shows: attached images/files become a small placeholder and are kept intact in the saved copy. */
 let ntQuiet=0,ntPT=null,NTOK=true,NTB=0;
@@ -1499,7 +1499,7 @@ function ntExp(h){if(!h||h.indexOf('nph')<0)return h;const d=new DOMParser().par
 function ntStore(){if(!ME||ntQuiet)return;try{const ed=NED(),k='nt_'+ME.id,v=(!NT.h||(ed&&ed.classList.contains('emp')))?'':NT.h;if(v===(localStorage.getItem(k)||''))return;v?localStorage.setItem(k,v):localStorage.removeItem(k);localStorage.setItem('ntts_'+ME.id,Date.now());ntPush()}catch(e){}}
 function ntPush(){if(!NTOK||!ME)return;clearTimeout(ntPT);const uid=ME.id;ntPT=setTimeout(()=>{if(!ME||ME.id!=uid)return;
 sb.from('notes_state').upsert({user_id:uid,html:localStorage.getItem('nt_'+uid)||'',updated_at:new Date(+localStorage.getItem('ntts_'+uid)||Date.now()).toISOString()}).then(r=>{if(r.error){NTOK=false;console.warn('Notes sync is off (run notes_state.sql):',r.error.message)}})},1200)}
-function ntApplyRemote(h,ts){const uid=ME.id,k='nt_'+uid;try{h?localStorage.setItem(k,h):localStorage.removeItem(k);localStorage.setItem('ntts_'+uid,ts)}catch(e){}NT.h=h;const ed=NED();if(!ed)return;ntQ();ed.innerHTML=ntView(h)||'<div><br></div>';ntSync();
+function ntApplyRemote(h,ts){const uid=ME.id,k='nt_'+uid;try{h?localStorage.setItem(k,h):localStorage.removeItem(k);localStorage.setItem('ntts_'+uid,ts)}catch(e){}NT.h=h;const ed=NED();if(!ed)return;ntQ();ed.innerHTML=ntView(h)||'<div><br></div>';ed._ue=null;ntSync();
 ed.querySelectorAll('.nimg[data-mid]').forEach(b=>{const id=b.dataset.mid;if(id)ntUrl(id).then(u=>{const im=b.querySelector('img');if(im&&im.getAttribute('src')!==u)im.src=u}).catch(()=>{})})}
 async function ntPull(){if(!ME||!NTOK||NTB)return;NTB=1;try{const uid=ME.id,r=await sb.from('notes_state').select('html,updated_at').eq('user_id',uid).maybeSingle();
 if(r.error){NTOK=false;console.warn('Notes sync is off (run notes_state.sql):',r.error.message);return}
@@ -1519,17 +1519,17 @@ async function ntUrl(id,force){const c=NTU[id];if(c&&!force&&Date.now()-c.t<45*6
 const r=await sb.storage.from('review-materials').createSignedUrl(m.path,3600);if(r.error)throw r.error;NTU[id]={u:r.data.signedUrl,t:Date.now()};return NTU[id].u}
 function ntSplit(line,s,o){const r=document.createRange();r.setStart(s.anchorNode,s.anchorOffset);r.setEnd(line,line.childNodes.length);const nl=document.createElement('div');nl.appendChild(r.extractContents());
 if(o.cb)nl.dataset.cb='0';let pn=null;if(o.prefix){pn=document.createTextNode(o.prefix);nl.insertBefore(pn,nl.firstChild)}
-if(!pn&&!nl.textContent&&!nl.querySelector('img'))nl.innerHTML='<br>';if(!line.textContent&&!line.querySelector('img'))line.innerHTML='<br>';
+if(!pn&&!nl.textContent&&!nl.querySelector('img,.aic'))nl.innerHTML='<br>';if(!line.textContent&&!line.querySelector('img,.aic'))line.innerHTML='<br>';
 line.after(nl);if(pn)caretTo(pn,pn.length);else caretTo(nl,0)}
 function ntKey(e){const s=ntSel();if(!s||e.isComposing)return;const line=lineOf(s.anchorNode);if(!line||isAtt(line))return;
-const txt=line.textContent,plain=!e.shiftKey&&!e.ctrlKey&&!e.metaKey&&!e.altKey;
+const txt=line.textContent,ic=!!line.querySelector('.aic'),plain=!e.shiftKey&&!e.ctrlKey&&!e.metaKey&&!e.altKey;
 if(e.key=='Enter'&&plain&&s.isCollapsed){const pre=textBefore(line,s);
-if(line.dataset.cb!=null){e.preventDefault();if(!txt.trim())delete line.dataset.cb;else ntSplit(line,s,{cb:1});ntSync();return}
-if(BULONLY.test(txt)&&pre===txt){e.preventDefault();line.innerHTML='<br>';caretTo(line,0);ntSync();return}
-const m=BUL.exec(txt);if(m&&!BULONLY.test(txt)&&pre.length>=m[0].length){e.preventDefault();ntSplit(line,s,{prefix:m[1]+m[2]+' '});ntSync();return}return}
+if(line.dataset.cb!=null){e.preventDefault();if(!txt.trim()&&!ic)delete line.dataset.cb;else ntSplit(line,s,{cb:1});ntSync();return}
+if(!ic&&BULONLY.test(txt)&&pre===txt){e.preventDefault();line.innerHTML='<br>';caretTo(line,0);ntSync();return}
+const m=ic?null:BUL.exec(txt);if(m&&!BULONLY.test(txt)&&pre.length>=m[0].length){e.preventDefault();ntSplit(line,s,{prefix:m[1]+m[2]+' '});ntSync();return}return}
 if(e.key=='Backspace'&&plain&&s.isCollapsed){const pre=textBefore(line,s);
 if(line.dataset.cb!=null&&pre===''){e.preventDefault();delete line.dataset.cb;ntSync();return}
-if(BULONLY.test(txt)&&pre===txt&&txt.length){e.preventDefault();line.innerHTML='<br>';caretTo(line,0);ntSync();return}}
+if(!ic&&BULONLY.test(txt)&&pre===txt&&txt.length){e.preventDefault();line.innerHTML='<br>';caretTo(line,0);ntSync();return}}
 if(e.key==' '&&plain&&s.isCollapsed&&line.dataset.cb==null&&/^\[\s?\]$/.test(textBefore(line,s))){e.preventDefault();const r=document.createRange();r.selectNodeContents(line);r.setEnd(s.anchorNode,s.anchorOffset);r.deleteContents();if(!line.firstChild)line.innerHTML='<br>';line.dataset.cb='0';caretTo(line,0);ntSync()}}
 function ntFmt(c){const ed=NED();if(!ed)return;ed.focus();document.execCommand(c);ntSync();ntTb()}
 function ntTb(){const s=ntSel();document.querySelectorAll('#nt .ntb [data-f]').forEach(b=>b.classList.toggle('on',!!s&&document.queryCommandState(b.dataset.f)))}
@@ -1576,7 +1576,7 @@ if(!keys.length)return toast('Folders cannot be added to notes. Drag a file inst
 function ntShot(f){return new Promise((ok,no)=>{const u=URL.createObjectURL(f),im=new Image();im.onload=()=>{const k=Math.min(1,1600/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(im.width*k));c.height=Math.max(1,Math.round(im.height*k));c.getContext('2d').drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);ok(c.toDataURL(f.type=='image/png'&&c.width*c.height<1.2e6?'image/png':'image/jpeg',.88))};im.onerror=()=>{URL.revokeObjectURL(u);no()};im.src=u})}
 async function ntPaste(e){e.stopPropagation();const cd=e.clipboardData;if(!cd)return;const imgs=[...(cd.files||[])].filter(f=>f.type.startsWith('image/'));
 if(imgs.length){e.preventDefault();if(rsBlocked('na'))return rsMsg();for(const f of imgs){try{ntPlaceBlock(ntImgBlock(await ntShot(f),'','Pasted screenshot'))}catch(_){toast('Could not paste that image')}}return}
-e.preventDefault();const t=cd.getData('text/plain');if(t)document.execCommand('insertText',false,t);ntSync()}
+if(emoPaste(e,NED()))return;e.preventDefault();const t=cd.getData('text/plain');if(t)document.execCommand('insertText',false,t);ntSync()}
 /* zoom viewer for pictures in the notes */
 let ZM=null;
 const zmApply=()=>{const im=$('#zmo img');if(im&&ZM)im.style.transform=`translate(${ZM.x}px,${ZM.y}px) scale(${ZM.s})`};
@@ -2480,10 +2480,10 @@ function annFormInit(){const a=ANN||{header:'',body:'',sections:[],enabled:false
 const annSw=(k,l,d,dis)=>`<label class="an-swr ${dis?'off':''}"><span><b>${l}</b><span class="mu sm">${d}</span></span><span class="an-sw"><input type="checkbox" ${(k=='enabled'?ANF.enabled:ANF.s[k])?'checked':''} ${dis?'disabled':''} onchange="annSet('${k}',this.checked)"><i></i></span></label>`;
 function annSet(k,v){if(k=='enabled')ANF.enabled=v;else ANF.s[k]=v;route()}
 const annTb=`<button type="button" title="Bold (Ctrl+B)" onclick="annCmd(this,'bold')">${ico('bold')}</button><button type="button" title="Italic (Ctrl+I)" onclick="annCmd(this,'italic')">${ico('italic')}</button><button type="button" title="Underline (Ctrl+U)" onclick="annCmd(this,'underline')"><u>U</u></button><button type="button" title="Strikethrough" onclick="annCmd(this,'strikeThrough')"><s>S</s></button><button type="button" title="Heading" onclick="annCmd(this,'h')">H</button><button type="button" title="Bulleted list (or type - and a space)" onclick="annCmd(this,'insertUnorderedList')">${ico('list')}</button><button type="button" title="Numbered list (or type 1. and a space)" onclick="annCmd(this,'insertOrderedList')">1.</button><button type="button" title="Checklist (or type [] and a space)" onclick="annCmd(this,'cb')">${ico('box')}</button><button type="button" title="Link" onclick="annCmd(this,'link')">${ico('link')}</button><button type="button" title="Clear formatting" onclick="annCmd(this,'clear')">Tx</button><span class="sp"></span><button type="button" class="an-emobtn" title="Icons, emoji and badges" onclick="emoOpen(this,'insert')">${ico('smile')}</button>`;
-const annEd=(sec,html,ph)=>`<div class="an-edw"><div class="ntb" onmousedown="event.preventDefault()">${annTb}</div><div class="an-ed ann-rt" contenteditable="true" spellcheck="true" data-sec="${sec}" data-ph="${E(ph)}" oninput="annEdInput(this)" onkeydown="annKeyEd(event,this)" onclick="annEdClick(event,this)" onblur="annSaveRng(this)" onpaste="event.preventDefault();document.execCommand('insertText',false,(event.clipboardData||window.clipboardData).getData('text/plain'))">${annHtml(html,1)}</div></div>`;
+const annEd=(sec,html,ph)=>`<div class="an-edw"><div class="ntb" onmousedown="event.preventDefault()">${annTb}</div><div class="an-ed ann-rt" contenteditable="true" spellcheck="true" data-sec="${sec}" data-ph="${E(ph)}" oninput="annEdInput(this)" onkeydown="annKeyEd(event,this)" onclick="annEdClick(event,this)" onblur="annSaveRng(this)" onpaste="annPaste(event,this)">${annHtml(html,1)}</div></div>`;
 const annIn=(id,val,ph,oi)=>`<div class="an-inrow"><textarea id="${id}" class="an-ta" rows="1" placeholder="${E(ph)}" oninput="annGrow(this);${oi}">${E(val)}</textarea><button type="button" class="btn an-emobtn" title="Emoji" onclick="emoOpen(this,'insert')">${ico('smile')}</button></div>`;
 function annGrow(el){el.style.height='auto';el.style.height=(el.scrollHeight+2)+'px'}
-function annEdInput(ed){const v=annClean(ed.innerHTML),k=ed.dataset.sec;if(k=='-1')ANF.body=v;else if(ANF.sections[+k])ANF.sections[+k].body=v}
+function annEdInput(ed){ueMark(ed,ed._ty);ed._ty=0;const v=annClean(ed.innerHTML),k=ed.dataset.sec;if(k=='-1')ANF.body=v;else if(ANF.sections[+k])ANF.sections[+k].body=v}
 function annSaveRng(ed){const s=getSelection();if(s.rangeCount&&ed.contains(s.anchorNode))ed._r=s.getRangeAt(0).cloneRange()}
 function annRestore(ed){const s=getSelection();if(s.rangeCount&&ed.contains(s.anchorNode))return;if(ed._r&&ed.contains(ed._r.startContainer)){s.removeAllRanges();s.addRange(ed._r)}}
 /* keep the last selection of the active editor up to date, so a toolbar tap always formats what is selected */
@@ -2492,16 +2492,38 @@ function annLineOf(ed,n){while(n&&n.parentNode!==ed)n=n.parentNode;return n&&n.p
 function annWrap(ed){const blk=/^(DIV|UL|OL|H3|P)$/;let run=[];const flush=()=>{if(!run.length)return;const d=document.createElement('div');ed.insertBefore(d,run[0]);run.forEach(x=>d.appendChild(x));run=[]};[...ed.childNodes].forEach(n=>{if(n.nodeType==1&&blk.test(n.tagName))flush();else run.push(n)});flush()}
 function annCb(ed){ed.focus();annWrap(ed);if(!ed.firstChild){ed.innerHTML='<div><br></div>'}const s=getSelection();let a,b;if(s.rangeCount&&ed.contains(s.anchorNode)){const r=s.getRangeAt(0);a=annLineOf(ed,r.startContainer);b=annLineOf(ed,r.endContainer)}else{a=b=ed.lastElementChild}
 const ls=[];for(let n=a;n;n=n.nextElementSibling){if(/^(DIV)$/.test(n.tagName))ls.push(n);if(n===b)break}if(!ls.length)return;const on=ls.every(l=>l.dataset.cb!=null);ls.forEach(l=>{if(on)delete l.dataset.cb;else if(l.dataset.cb==null)l.dataset.cb='0'});annEdInput(ed)}
+/* Bullet / numbered list and heading. The browser's own list command breaks lines that start with an icon (a non-editable
+   element): it deleted the line or left the icon behind. This version moves each line's nodes into <li>/<div>/<h3> itself. */
+function annBlock(ed,mode){ed.focus();annRestore(ed);annWrap(ed);if(!ed.firstChild)ed.innerHTML='<div><br></div>';
+const g=getSelection();if(!g.rangeCount||!ed.contains(g.anchorNode))return;const r=g.getRangeAt(0),sn=r.startContainer,so=r.startOffset,en=r.endContainer,eo=r.endOffset;
+const isLi=n=>n.nodeName=='LI'&&n.parentNode.parentNode===ed;
+const rec=[];[...ed.children].forEach(b=>{if(/^(UL|OL)$/.test(b.tagName))[...b.children].forEach(li=>rec.push({el:li,t:b.tagName,tag:'DIV',own:b}));else rec.push({el:b,t:'P',tag:b.tagName,cb:b.dataset.cb})});
+if(!rec.length)return;
+const at=(n,o)=>{if(n===ed)n=ed.children[Math.min(o,ed.children.length-1)];while(n&&n.parentNode!==ed&&!isLi(n))n=n.parentNode;return n};
+const idx=u=>rec.findIndex(x=>x.el===u||x.own===u);let i0=idx(at(sn,so)),i1=rec.length-1-[...rec].reverse().findIndex(x=>x.el===at(en,eo)||x.own===at(en,eo));
+if(i0<0||i1<0||i1>=rec.length)return;if(i0>i1)[i0,i1]=[i1,i0];
+if(!r.collapsed&&i1>i0){const z=document.createRange();z.setStart(rec[i1].el,0);z.collapse(true);if(r.compareBoundaryPoints(Range.END_TO_END,z)<=0)i1--}
+const sel=rec.slice(i0,i1+1),on=mode=='H3'?sel.every(x=>x.t=='P'&&x.tag=='H3'):sel.every(x=>x.t==mode);
+sel.forEach(x=>{x.cb=null;if(mode=='H3'){x.t='P';x.tag=on?'DIV':'H3'}else if(on){x.t='P';x.tag='DIV'}else x.t=mode});
+const out=[],map=new Map();let cur=null;
+rec.forEach(x=>{if(x.t=='P'){let el=x.el;if(!(el.nodeName==x.tag&&el.parentNode===ed)){el=document.createElement(x.tag);while(x.el.firstChild)el.appendChild(x.el.firstChild);map.set(x.el,el)}
+if(x.cb!=null)el.dataset.cb=x.cb;else delete el.dataset.cb;out.push(el);cur=null}
+else{let li=x.el;if(li.nodeName!='LI'){li=document.createElement('li');while(x.el.firstChild)li.appendChild(x.el.firstChild);map.set(x.el,li)}
+if(!cur||cur.tagName!=x.t){cur=document.createElement(x.t);out.push(cur)}cur.appendChild(li)}});
+ed.replaceChildren(...out);
+try{const n=document.createRange(),m=x=>map.get(x)||x;n.setStart(m(sn),so);n.setEnd(m(en),eo);g.removeAllRanges();g.addRange(n)}catch(e){}
+annEdInput(ed);annSaveRng(ed)}
 function annCmd(btn,c){const ed=btn.closest('.an-edw').querySelector('.an-ed');ed.focus();annRestore(ed);
 if(c=='cb')return annCb(ed);
-if(c=='h'){const cur=(document.queryCommandValue('formatBlock')||'').toLowerCase();document.execCommand('formatBlock',false,cur=='h3'?'div':'h3')}
-else if(c=='link'){const g=getSelection(),r0=g.rangeCount?g.getRangeAt(0).cloneRange():null,u=prompt('Link address (https://…)');if(!u)return;if(!/^(https?:|mailto:)/i.test(u))return toast('Links must start with https://');ed.focus();if(r0){g.removeAllRanges();g.addRange(r0)}document.execCommand('createLink',false,u)}
+if(c=='insertUnorderedList'||c=='insertOrderedList')return annBlock(ed,c=='insertUnorderedList'?'UL':'OL');
+if(c=='h')return annBlock(ed,'H3');
+if(c=='link'){const g=getSelection(),r0=g.rangeCount?g.getRangeAt(0).cloneRange():null,u=prompt('Link address (https://…)');if(!u)return;if(!/^(https?:|mailto:)/i.test(u))return toast('Links must start with https://');ed.focus();if(r0){g.removeAllRanges();g.addRange(r0)}document.execCommand('createLink',false,u)}
 else if(c=='clear'){document.execCommand('removeFormat');ed.querySelectorAll('[data-cb]').forEach(x=>delete x.dataset.cb)}
 else document.execCommand(c);annEdInput(ed)}
 function annEdClick(e,ed){const t=e.target;if(t.parentNode===ed&&t.dataset&&t.dataset.cb!=null&&e.clientX-t.getBoundingClientRect().left<24){t.dataset.cb=t.dataset.cb=='1'?'0':'1';annEdInput(ed);e.preventDefault()}}
 function annKeyEd(e,ed){if(e.key!=' '||e.ctrlKey||e.metaKey)return;const s=getSelection();if(!s.rangeCount||!s.isCollapsed)return;const n=s.anchorNode;if(!n||n.nodeType!=3||n.previousSibling)return;
 const t=n.nodeValue.slice(0,s.anchorOffset);if(!/^(-|\*|\[\]|1\.)$/.test(t))return;e.preventDefault();n.nodeValue=n.nodeValue.slice(s.anchorOffset);const r=document.createRange();r.setStart(n,0);r.collapse(true);s.removeAllRanges();s.addRange(r);
-if(t=='[]')annCb(ed);else{document.execCommand(t=='1.'?'insertOrderedList':'insertUnorderedList');annEdInput(ed)}}
+if(t=='[]')annCb(ed);else annBlock(ed,t=='1.'?'OL':'UL')}
 function annSecAdd(){if(ANF.sections.length>=8)return toast('Up to 8 extra sections');ANF.sections.push({label:'',heading:'',body:''});route()}
 function annSecDel(i){ANF.sections.splice(i,1);route()}
 function annSecMove(i,d){const j=i+d;if(j<0||j>=ANF.sections.length)return;[ANF.sections[i],ANF.sections[j]]=[ANF.sections[j],ANF.sections[i]];route()}
@@ -2545,6 +2567,40 @@ ${annSw('show_date','Show the posted date','')}
 <div><label class="an-l">Hide automatically after <span class="mu sm">(optional)</span></label><input type="date" value="${E(s.expires_at)}" onchange="ANF.s.expires_at=this.value"></div></div></div>
 <div class="row" style="margin-top:16px"><button class="btn p" onclick="annSave(0)">Save changes</button><button class="btn" onclick="annSave(1)" title="Everyone sees it again, even people who already confirmed">Publish as new</button><button class="btn" onclick="annPreview()">Preview</button></div>
 <p class="mu sm">Save changes keeps the same version, so people who already confirmed won't see it again. Publish as new shows it to everyone once more.</p>`}
+/* ===== UNDO / REDO for the rich editors (announcement sections and Notes) =====
+   The browser's own undo only knows its own edits, so icons, lists and checklists made by our code could not be undone (or
+   wrecked its history). Each editor now keeps its own snapshots: typing is grouped, every other change is one step. */
+const ueEd=n=>{const e=n&&(n.nodeType==1?n:n.parentElement);return e&&e.closest?e.closest('.an-ed,#ned'):null};
+/* positions are stored as if neighbouring text nodes were one (saving as HTML merges them), so they survive a restore */
+const ueIdx=(q,n)=>{let i=-1,pt=false;for(const c of q.childNodes){const t=c.nodeType==3;if(!(t&&pt))i++;pt=t;if(c===n)return i}return i},
+ueOff=(n,o)=>{if(n.nodeType==3){let x=o;for(let p=n.previousSibling;p&&p.nodeType==3;p=p.previousSibling)x+=p.length;return x}let i=0,pt=false;for(let k=0;k<o&&k<n.childNodes.length;k++){const t=n.childNodes[k].nodeType==3;if(!(t&&pt))i++;pt=t}return i};
+function uePath(ed,n){const p=[];while(n&&n!==ed){const q=n.parentNode;if(!q)return null;p.unshift(ueIdx(q,n));n=q}return n===ed?p:null}
+const ueNode=(ed,p)=>{let n=ed;for(const i of p)n=n&&n.childNodes[i];return n||null};
+function ueState(ed){const g=getSelection();let sel=null;if(g.rangeCount&&ed.contains(g.anchorNode)){const r=g.getRangeAt(0),a=uePath(ed,r.startContainer),b=uePath(ed,r.endContainer);if(a&&b)sel={a,ao:ueOff(r.startContainer,r.startOffset),b,bo:ueOff(r.endContainer,r.endOffset)}}return{h:ed.innerHTML,sel}}
+const ueGet=ed=>ed._ue||(ed._ue={u:[],r:[],c:ueState(ed),t:0,busy:0});
+function ueMark(ed,typing){const s=ueGet(ed);if(s.busy)return;const st=ueState(ed);if(st.h===s.c.h){s.c=st;return}
+if(typing&&s.u.length&&Date.now()-s.t<900){s.c=st;s.t=Date.now();return}
+s.u.push(s.c);if(s.u.length>200)s.u.shift();s.r=[];s.c=st;s.t=typing?Date.now():0}
+function ueApply(ed,st){const s=ueGet(ed);s.busy=1;try{ed.innerHTML=st.h;ed.focus();
+if(st.sel){const a=ueNode(ed,st.sel.a),b=ueNode(ed,st.sel.b);if(a&&b){try{const r=document.createRange();r.setStart(a,st.sel.ao);r.setEnd(b,st.sel.bo);const g=getSelection();g.removeAllRanges();g.addRange(r)}catch(e){}}}
+if(ed.id=='ned')ntSync();else annEdInput(ed)}finally{s.busy=0}s.c=ueState(ed);s.t=0}
+function ueUndo(ed){const s=ueGet(ed);if(!s.u.length)return;s.r.push(s.c);ueApply(ed,s.u.pop())}
+function ueRedo(ed){const s=ueGet(ed);if(!s.r.length)return;s.u.push(s.c);ueApply(ed,s.r.pop())}
+document.addEventListener('focusin',e=>{const ed=ueEd(e.target);if(ed)ueGet(ed)},true);
+document.addEventListener('beforeinput',e=>{const ed=ueEd(e.target);if(!ed)return;ueGet(ed);
+if(e.inputType=='historyUndo'||e.inputType=='historyRedo'){e.preventDefault();e.inputType=='historyUndo'?ueUndo(ed):ueRedo(ed);return}
+ed._ty=/^(insertText|insertCompositionText|deleteContentBackward|deleteContentForward)$/.test(e.inputType)},true);
+document.addEventListener('keydown',e=>{const ed=ueEd(e.target);if(!ed||!(e.ctrlKey||e.metaKey)||e.altKey)return;const k=e.key.toLowerCase();
+if(k=='z'){e.preventDefault();e.shiftKey?ueRedo(ed):ueUndo(ed)}else if(k=='y'){e.preventDefault();ueRedo(ed)}},true);
+/* pasting something copied from an editor keeps its icons and badges (plain text and outside content paste as text) */
+function emoPaste(e,ed){const h=(e.clipboardData&&e.clipboardData.getData('text/html'))||'';if(!/class=["'][^"']*\b(aic|abdg)\b/.test(h))return false;
+const g0=getSelection();if(!g0.rangeCount||!ed.contains(g0.anchorNode))return false;
+const box=document.createElement('div');box.innerHTML=annHtml(h,1);const lines=[];let grp=[];const flush=()=>{if(grp.length){lines.push(grp);grp=[]}};
+[...box.childNodes].forEach(n=>{if(n.nodeType==1&&/^(DIV|P|H3)$/.test(n.tagName)){flush();lines.push([...n.childNodes])}else if(n.nodeType==1&&/^(UL|OL)$/.test(n.tagName)){flush();[...n.children].forEach(li=>lines.push([...li.childNodes]))}else if(n.nodeName=='BR')flush();else grp.push(n)});flush();
+if(!lines.length)return false;e.preventDefault();if(!g0.isCollapsed)document.execCommand('delete');
+lines.forEach((l,i)=>{if(i)document.execCommand('insertParagraph');const g=getSelection(),r=g.getRangeAt(0);l.forEach(n=>{const c=n.cloneNode(true);r.insertNode(c);r.setStartAfter(c);r.collapse(true)});g.removeAllRanges();g.addRange(r)});
+if(ed.id=='ned')ntSync();else annEdInput(ed);return true}
+function annPaste(e,ed){if(emoPaste(e,ed))return;e.preventDefault();document.execCommand('insertText',false,(e.clipboardData||window.clipboardData).getData('text/plain'))}
 /* ----- icon bank: site icons, emoji and badges ----- */
 function emoClose(){const p=$('#emoPick');if(p)p.remove();EMO.open=0}
 function emoOpen(btn,mode){if(EMO.open&&EMO.btn===btn){emoClose();return}EMO.mode=mode;EMO.btn=btn;EMO.q='';
