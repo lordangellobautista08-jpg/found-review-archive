@@ -68,3 +68,43 @@ self.addEventListener('fetch', (event) => {
   if (url.origin === self.location.origin) { event.respondWith(staleWhileRevalidate(req)); return; }
   if (CDN.test(req.url)) event.respondWith(cacheFirst(req));
 });
+
+/* ---- Push notifications (chat messages and pokes), sent by the chat-push Supabase function ---- */
+const IOS = /iPhone|iPad|iPod/.test(self.navigator.userAgent);
+
+self.addEventListener('push', (event) => {
+  let d = {};
+  try { d = event.data ? event.data.json() : {}; } catch (e) { d = { title: 'New message', body: event.data ? event.data.text() : '' }; }
+  event.waitUntil((async () => {
+    /* the site is open and in front: the page already shows the alert (iPhone must always show one, or it cancels push) */
+    if (!IOS) {
+      const wins = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+      if (wins.some((c) => c.visibilityState === 'visible' && c.focused)) return;
+    }
+    await self.registration.showNotification(d.title || 'CE Review Archive', {
+      body: d.body || '',
+      tag: d.tag || 'chat',
+      renotify: true,
+      icon: new URL('icons/apple-touch-icon.png', SCOPE).href,
+      data: { room: d.room || null, user: d.user || null }
+    });
+  })());
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const { room, user } = event.notification.data || {};
+  event.waitUntil((async () => {
+    const wins = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+    for (const c of wins) {
+      if (c.url.startsWith(SCOPE)) {
+        await c.focus();
+        if (room) c.postMessage({ type: 'openChat', room });
+        else if (user) c.postMessage({ type: 'openDM', user });
+        return;
+      }
+    }
+    const q = room ? '?chat=' + encodeURIComponent(room) : user ? '?dm=' + encodeURIComponent(user) : '';
+    await clients.openWindow(SCOPE + q);
+  })());
+});
