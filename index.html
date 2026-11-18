@@ -626,6 +626,7 @@ body.ntdrag .notes:not(.pinned) .ned,body.ntdrag .notes:not(.pinned) .ntb{displa
 .an-chip{display:inline-block;padding:3px 12px;border-radius:99px;font-size:.8rem;font-weight:700;background:var(--soft);color:var(--ink)}
 .an-chip.live{background:#16A34A;color:#fff}.an-chip.off{background:#78716C;color:#fff}
 /* icon bank */
+.an-emobtn .ic{margin:0}
 .emo{position:fixed;z-index:80;width:344px;max-width:calc(100vw - 12px);background:var(--card);border:1px solid var(--teal);border-radius:12px;box-shadow:0 14px 44px #0006;display:flex;flex-direction:column;overflow:hidden}
 .emo-h{display:flex;gap:6px;padding:8px;border-bottom:1px solid var(--bd)}.emo-h input{flex:1;min-width:0;padding:6px 9px}
 .emo-t{display:flex;gap:4px;padding:6px 8px 0}.emo-t button{border:0;background:transparent;color:var(--tx);padding:5px 10px;border-bottom:2px solid transparent;cursor:pointer;font-size:.85rem}.emo-t button.on{border-color:var(--teal);font-weight:700;color:var(--ink)}
@@ -1488,7 +1489,7 @@ if(!ed.firstChild)ed.innerHTML='<div><br></div>';
 if(isAtt(ed.lastElementChild))ed.insertAdjacentHTML('beforeend','<div><br></div>');
 if(isAtt(ed.firstElementChild))ed.insertAdjacentHTML('afterbegin','<div><br></div>');
 if(ch&&an&&ed.contains(an))caretTo(an,ao)}
-function ntSync(){const ed=NED();if(!ed)return;ntNorm();ed.classList.toggle('emp',!ed.textContent.trim()&&!ed.querySelector('.nimg,.nfile,.nph,[data-cb]'));NT.h=ntExp(ed.innerHTML);ntStore();ntGrow()}
+function ntSync(){const ed=NED();if(!ed)return;ntNorm();ed.classList.toggle('emp',!ed.textContent.trim()&&!ed.querySelector('.nimg,.nfile,.nph,.aic,[data-cb]'));NT.h=ntExp(ed.innerHTML);ntStore();ntGrow()}
 /* Notes: remembered per account and synced through the notes_state table (run notes_state.sql once). Newest copy wins.
    On phones only the text shows: attached images/files become a small placeholder and are kept intact in the saved copy. */
 let ntQuiet=0,ntPT=null,NTOK=true,NTB=0;
@@ -1665,7 +1666,7 @@ const on=ME&&n!='quiz'&&n!='hist'&&n!='auth'&&n!='quickiz';
 if(!on){r.innerHTML='';const o=$('#nt');if(o)o.remove();ntPlace();ntRail();if(ntObs)ntObs.disconnect();document.body.classList.remove('nto');document.documentElement.style.removeProperty('--ntH');document.documentElement.style.removeProperty('--ftH');return}
 if($('#nt')){ntFit();return}
 r.innerHTML=`<div class="notes" id="nt"><div class="nh" onpointerdown="ntDown(event)" onclick="ntHdr(event)"><b>${ico('note')}Notes</b><span><a class="nc" onclick="ntClr()">Clear</a><a class="ntp" onclick="ntPinToggle()" title="Pin to sidebar">${ico('pin')}</a><a class="ntm" onclick="ntToggleMin()" title="Minimize / expand">–</a></span></div>
-<div class="ntb" onmousedown="event.preventDefault()"><button type="button" data-f="bold" title="Bold (Ctrl+B)" onclick="ntFmt('bold')">${ico('bold')}</button><button type="button" data-f="italic" title="Italic (Ctrl+I)" onclick="ntFmt('italic')">${ico('italic')}</button><button type="button" title="Checkbox (or type [] and a space)" onclick="ntCb()">${ico('box')}</button><span class="sp"></span>${rsBlocked('na')?'':`<button type="button" title="Add an image or file from this site" onclick="ntPick()">${ico('image')}</button>`}</div>
+<div class="ntb" onmousedown="event.preventDefault()"><button type="button" data-f="bold" title="Bold (Ctrl+B)" onclick="ntFmt('bold')">${ico('bold')}</button><button type="button" data-f="italic" title="Italic (Ctrl+I)" onclick="ntFmt('italic')">${ico('italic')}</button><button type="button" title="Checkbox (or type [] and a space)" onclick="ntCb()">${ico('box')}</button><button type="button" class="an-emobtn" title="Icons and emoji" onclick="emoOpen(this,'insert')">${ico('smile')}</button><span class="sp"></span>${rsBlocked('na')?'':`<button type="button" title="Add an image or file from this site" onclick="ntPick()">${ico('image')}</button>`}</div>
 <div class="ned emp" id="ned" contenteditable="true" role="textbox" aria-multiline="true" spellcheck="true" data-ph="Type what you are thinking…" oninput="ntSync()" onkeydown="ntKey(event)" onclick="ntClick(event)" onpaste="ntPaste(event)" ondragover="ntOver(event)" ondragleave="this.classList.remove('over')" ondrop="ntDrop(event)" ondragstart="ntSelf=1" ondragend="ntSelf=0"></div><i class="ngr sw" onpointerdown="ntGrip(event,'w')"></i><i class="ngr se" onpointerdown="ntGrip(event,'e')"></i></div>`;
 ntPlace();ntInit();ntApply();ntFit();ntPinUi();
 if(window.ResizeObserver){if(!ntObs)ntObs=new ResizeObserver(ntLay);ntObs.disconnect();ntObs.observe($('#nt'))}}
@@ -1963,7 +1964,18 @@ return h==12?'Happy Lunch Time! '+ico('utensils')+'':h>=5&&h<12?'Good morning! '
 
 /* ===== ANNOUNCEMENT / WHAT'S NEW =====
  Run announcements.sql once. Admin writes it under Admin > Announcement; everyone reads it from the What's New buttons and the popup. */
-const ANI={star:['star favorite','<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>'],
+const ANI={smile:['smile happy face emoji smiley','<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01"/><path d="M15 9h.01"/>'],
+laugh:['laugh grin happy face lol','<circle cx="12" cy="12" r="10"/><path d="M18 13a6 6 0 0 1-6 5 6 6 0 0 1-6-5h12Z"/><path d="M9 9h.01"/><path d="M15 9h.01"/>'],
+wink:['wink playful face','<circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M8 9h2"/><path d="M15 9h.01"/>'],
+frown:['sad frown unhappy face','<circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2"/><path d="M9 9h.01"/><path d="M15 9h.01"/>'],
+cry:['cry sad tears face','<circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2"/><path d="M9 9h.01"/><path d="M15 9h.01"/><path d="M8.5 12v3"/>'],
+meh:['meh neutral face','<circle cx="12" cy="12" r="10"/><path d="M8 15h8"/><path d="M9 9h.01"/><path d="M15 9h.01"/>'],
+surprised:['surprised shocked wow face','<circle cx="12" cy="12" r="10"/><circle cx="12" cy="15.5" r="1.6"/><path d="M9 9h.01"/><path d="M15 9h.01"/>'],
+angry:['angry mad face','<circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2"/><path d="M7.5 8 10 9"/><path d="m14 9 2.5-1"/><path d="M9 11h.01"/><path d="M15 11h.01"/>'],
+annoyed:['annoyed unamused face','<circle cx="12" cy="12" r="10"/><path d="M8 15h8"/><path d="M8 9h2"/><path d="M14 9h2"/>'],
+sleepy:['sleepy tired zzz face','<circle cx="12" cy="12" r="10"/><path d="M7.5 10h3"/><path d="M13.5 10h3"/><path d="M10 16h4"/>'],
+cool:['cool sunglasses face','<circle cx="12" cy="12" r="10"/><path d="M8 15s1.5 1.5 4 1.5 4-1.5 4-1.5"/><path d="M6.5 8.5h4v2.5a2 2 0 0 1-2 2h0a2 2 0 0 1-2-2z"/><path d="M13.5 8.5h4v2.5a2 2 0 0 1-2 2h0a2 2 0 0 1-2-2z"/><path d="M10.5 9.5h3"/>'],
+star:['star favorite','<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>'],
 heart:['heart love','<path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>'],
 check:['check done tick','<path d="M20 6 9 17l-5-5"/>'],
 checkc:['check circle done ok','<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>'],
@@ -2463,9 +2475,9 @@ const s=ANN.s,un=annUnread();if((s.popup_auto&&(s.popup_every||un))||(s.popup_lo
 function annFormInit(){const a=ANN||{header:'',body:'',sections:[],enabled:false,s:{...ANS0}};ANF=JSON.parse(JSON.stringify({header:a.header,body:a.body,sections:a.sections,enabled:a.enabled,s:{...ANS0,...a.s}}))}
 const annSw=(k,l,d,dis)=>`<label class="an-swr ${dis?'off':''}"><span><b>${l}</b><span class="mu sm">${d}</span></span><span class="an-sw"><input type="checkbox" ${(k=='enabled'?ANF.enabled:ANF.s[k])?'checked':''} ${dis?'disabled':''} onchange="annSet('${k}',this.checked)"><i></i></span></label>`;
 function annSet(k,v){if(k=='enabled')ANF.enabled=v;else ANF.s[k]=v;route()}
-const annTb=`<button type="button" title="Bold (Ctrl+B)" onclick="annCmd(this,'bold')">${ico('bold')}</button><button type="button" title="Italic (Ctrl+I)" onclick="annCmd(this,'italic')">${ico('italic')}</button><button type="button" title="Underline (Ctrl+U)" onclick="annCmd(this,'underline')"><u>U</u></button><button type="button" title="Strikethrough" onclick="annCmd(this,'strikeThrough')"><s>S</s></button><button type="button" title="Heading" onclick="annCmd(this,'h')">H</button><button type="button" title="Bulleted list (or type - and a space)" onclick="annCmd(this,'insertUnorderedList')">${ico('list')}</button><button type="button" title="Numbered list (or type 1. and a space)" onclick="annCmd(this,'insertOrderedList')">1.</button><button type="button" title="Checklist (or type [] and a space)" onclick="annCmd(this,'cb')">${ico('box')}</button><button type="button" title="Link" onclick="annCmd(this,'link')">${ico('link')}</button><button type="button" title="Clear formatting" onclick="annCmd(this,'clear')">Tx</button><span class="sp"></span><button type="button" class="an-emobtn" title="Icons, emoji and badges" onclick="emoOpen(this,'insert')">😊</button>`;
+const annTb=`<button type="button" title="Bold (Ctrl+B)" onclick="annCmd(this,'bold')">${ico('bold')}</button><button type="button" title="Italic (Ctrl+I)" onclick="annCmd(this,'italic')">${ico('italic')}</button><button type="button" title="Underline (Ctrl+U)" onclick="annCmd(this,'underline')"><u>U</u></button><button type="button" title="Strikethrough" onclick="annCmd(this,'strikeThrough')"><s>S</s></button><button type="button" title="Heading" onclick="annCmd(this,'h')">H</button><button type="button" title="Bulleted list (or type - and a space)" onclick="annCmd(this,'insertUnorderedList')">${ico('list')}</button><button type="button" title="Numbered list (or type 1. and a space)" onclick="annCmd(this,'insertOrderedList')">1.</button><button type="button" title="Checklist (or type [] and a space)" onclick="annCmd(this,'cb')">${ico('box')}</button><button type="button" title="Link" onclick="annCmd(this,'link')">${ico('link')}</button><button type="button" title="Clear formatting" onclick="annCmd(this,'clear')">Tx</button><span class="sp"></span><button type="button" class="an-emobtn" title="Icons, emoji and badges" onclick="emoOpen(this,'insert')">${ico('smile')}</button>`;
 const annEd=(sec,html,ph)=>`<div class="an-edw"><div class="ntb" onmousedown="event.preventDefault()">${annTb}</div><div class="an-ed ann-rt" contenteditable="true" spellcheck="true" data-sec="${sec}" data-ph="${E(ph)}" oninput="annEdInput(this)" onkeydown="annKeyEd(event,this)" onclick="annEdClick(event,this)" onblur="annSaveRng(this)" onpaste="event.preventDefault();document.execCommand('insertText',false,(event.clipboardData||window.clipboardData).getData('text/plain'))">${annHtml(html,1)}</div></div>`;
-const annIn=(id,val,ph,oi)=>`<div class="an-inrow"><textarea id="${id}" class="an-ta" rows="1" placeholder="${E(ph)}" oninput="annGrow(this);${oi}">${E(val)}</textarea><button type="button" class="btn an-emobtn" title="Emoji" onclick="emoOpen(this,'insert')">😊</button></div>`;
+const annIn=(id,val,ph,oi)=>`<div class="an-inrow"><textarea id="${id}" class="an-ta" rows="1" placeholder="${E(ph)}" oninput="annGrow(this);${oi}">${E(val)}</textarea><button type="button" class="btn an-emobtn" title="Emoji" onclick="emoOpen(this,'insert')">${ico('smile')}</button></div>`;
 function annGrow(el){el.style.height='auto';el.style.height=(el.scrollHeight+2)+'px'}
 function annEdInput(ed){const v=annClean(ed.innerHTML),k=ed.dataset.sec;if(k=='-1')ANF.body=v;else if(ANF.sections[+k])ANF.sections[+k].body=v}
 function annSaveRng(ed){const s=getSelection();if(s.rangeCount&&ed.contains(s.anchorNode))ed._r=s.getRangeAt(0).cloneRange()}
@@ -2530,27 +2542,34 @@ ${annSw('show_date','Show the posted date','')}
 /* ----- icon bank: site icons, emoji and badges ----- */
 function emoClose(){const p=$('#emoPick');if(p)p.remove();EMO.open=0}
 function emoOpen(btn,mode){if(EMO.open&&EMO.btn===btn){emoClose();return}EMO.mode=mode;EMO.btn=btn;EMO.q='';
-EMO.t=mode=='icon'?null:(btn.closest('.an-edw')?btn.closest('.an-edw').querySelector('.an-ed'):btn.closest('.an-inrow').querySelector('input,textarea'));
-if(EMO.t&&EMO.t.classList.contains('an-ed')){annSaveRng(EMO.t)}
-if(mode=='icon'&&EMO.tab=='badges')EMO.tab='icons';EMO.open=1;emoDraw(1)}
+EMO.nt=!!btn.closest('#nt');
+EMO.t=mode=='icon'?null:(EMO.nt?NED():btn.closest('.an-edw')?btn.closest('.an-edw').querySelector('.an-ed'):btn.closest('.an-inrow').querySelector('input,textarea'));
+if(EMO.t&&(EMO.t.classList.contains('an-ed')||EMO.t.id=='ned')){annSaveRng(EMO.t)}
+if((mode=='icon'||EMO.nt)&&EMO.tab=='badges')EMO.tab='icons';EMO.open=1;emoDraw(1)}
 function emoDraw(place){let p=$('#emoPick');if(!p){p=document.createElement('div');p.id='emoPick';p.className='emo';p.setAttribute('onmousedown',"if(!event.target.closest('input'))event.preventDefault()");p.setAttribute('onclick','event.stopPropagation()');document.body.appendChild(p)}
-const q=EMO.q.trim().toLowerCase(),tabs=[['icons','Icons'],['emoji','Emoji']].concat(EMO.mode=='icon'?[]:[['badges','Badges']]);let body='',cats='',note='';
-if(EMO.tab=='icons'){const ks=Object.keys(ICP).filter(k=>!ICHIDE.includes(k)&&(!q||k.includes(q)||(ICN[k]||'').includes(q)));body=`<div class="emo-g">${ks.map(k=>`<button type="button" title="${E((ICN[k]||k).split(' ')[0])}" onclick="emoPick('i','${k}')">${ico(k)}</button>`).join('')||'<p class="mu sm" style="grid-column:1/-1;padding:10px">Nothing found.</p>'}</div>`;note='Site-style line icons (work in the body text)'}
+const q=EMO.q.trim().toLowerCase(),tabs=[['icons','Icons'],['emoji','Emoji']].concat(EMO.mode=='icon'||EMO.nt?[]:[['badges','Badges']]);let body='',cats='',note='';
+if(EMO.tab=='icons'){const ks=Object.keys(ICP).filter(k=>!ICHIDE.includes(k)&&(!q||k.includes(q)||(ICN[k]||'').includes(q)));body=`<div class="emo-g">${ks.map(k=>`<button type="button" title="${E((ICN[k]||k).split(' ')[0])}" onclick="emoPick('i','${k}')">${ico(k)}</button>`).join('')||'<p class="mu sm" style="grid-column:1/-1;padding:10px">Nothing found.</p>'}</div>`;note=EMO.nt?'Site-style line icons':'Site-style line icons (work in the body text)'}
 else if(EMO.tab=='badges'){body=`<div class="emo-g bd">${Object.entries(ABD).map(([k,l])=>`<button type="button" onclick="emoPick('b','${k}')"><span class="abdg" data-b="${k}">${l}</span></button>`).join('')}</div>`;note='Colored labels for the body text'}
 else{const list=q?EMOALL.flatMap(c=>c[2]).filter(([e,k])=>k.toLowerCase().includes(q)||e==q):(EMOALL[EMO.cat]||EMOALL[0])[2];
 if(!q)cats=`<div class="emo-c">${EMOALL.map((c,i)=>`<button type="button" class="${i==EMO.cat?'on':''}" title="${E(c[0])}" onclick="EMO.cat=${i};emoDraw()">${c[1]}</button>`).join('')}</div>`;
 body=`<div class="emo-g">${list.map(([e,k])=>`<button type="button" title="${E(k)}" onclick="emoPick('e','${e}')">${e}</button>`).join('')||'<p class="mu sm" style="grid-column:1/-1;padding:10px">Nothing found.</p>'}</div>`;note=q?'Search results':(EMOALL[EMO.cat]||EMOALL[0])[0]}
 p.innerHTML=`<div class="emo-h"><input placeholder="Search icons, emoji, badges…" value="${E(EMO.q)}" oninput="EMO.q=this.value;emoDraw();const i=document.querySelector('#emoPick input');i.focus();i.setSelectionRange(99,99)"><button type="button" class="vbt x" onclick="emoClose()" title="Close">${ico('x')}</button></div><div class="emo-t">${tabs.map(([k,n])=>`<button type="button" class="${EMO.tab==k?'on':''}" onclick="EMO.tab='${k}';EMO.q='';emoDraw()">${n}</button>`).join('')}</div>${cats}<div class="emo-n">${E(note)}</div>${body}`;
 if(place&&EMO.btn){const r=EMO.btn.getBoundingClientRect(),w=Math.min(344,innerWidth-12);p.style.left=Math.max(6,Math.min(r.left,innerWidth-w-6))+'px';const h=p.offsetHeight||380;p.style.top=(r.bottom+6+h>innerHeight&&r.top-h-6>0?r.top-h-6:Math.max(6,Math.min(r.bottom+6,innerHeight-h-6)))+'px'}}
+/* Inserting a non-text inline element with execCommand('insertHTML') makes the browser split the current line,
+   which pushed the text after the caret onto the next line. Placing the node directly keeps the line intact. */
+function emoIns(t,el){const s=getSelection();let r=s.rangeCount&&t.contains(s.anchorNode)?s.getRangeAt(0):(t._r&&t.contains(t._r.startContainer)?t._r:null);
+if(!r){const l=t.lastElementChild&&/^(DIV|P)$/.test(t.lastElementChild.tagName)?t.lastElementChild:t;r=document.createRange();r.selectNodeContents(l);r.collapse(false);const b=l.lastChild;if(b&&b.nodeName=='BR'){r.setStartBefore(b);r.collapse(true)}}
+r.deleteContents();const sp=document.createTextNode('\u00a0');r.insertNode(sp);r.insertNode(el);
+const nx=sp.nextSibling;if(nx&&nx.nodeName=='BR'&&!nx.nextSibling)nx.remove();
+const n=document.createRange();n.setStart(sp,1);n.collapse(true);s.removeAllRanges();s.addRange(n)}
 function emoPick(kind,val){
 if(EMO.mode=='icon'){ANF.s.icon=val;emoClose();route();return}
 const t=EMO.t;if(!t||!document.contains(t))return toast('Click into a field first');
 if(t.tagName=='INPUT'||t.tagName=='TEXTAREA'){if(kind!='e')return toast('Icons and badges work in the body text. Pick an emoji for this field.');const a=t.selectionStart==null?t.value.length:t.selectionStart,b=t.selectionEnd==null?a:t.selectionEnd;t.setRangeText(val,a,b,'end');t.focus();t.dispatchEvent(new Event('input'));return}
 t.focus();annRestore(t);
 if(kind=='e')document.execCommand('insertText',false,val);
-else if(kind=='i')document.execCommand('insertHTML',false,`<span class="aic" data-i="${val}" contenteditable="false">${ico(val)}</span>&nbsp;`);
-else document.execCommand('insertHTML',false,`<span class="abdg" data-b="${val}" contenteditable="false">${ABD[val]}</span>&nbsp;`);
-annEdInput(t);annSaveRng(t)}
+else{const el=document.createElement('span');el.contentEditable='false';if(kind=='i'){el.className='aic';el.dataset.i=val;el.innerHTML=ico(val)}else{el.className='abdg';el.dataset.b=val;el.textContent=ABD[val]}emoIns(t,el)}
+if(t.id=='ned')ntSync();else annEdInput(t);annSaveRng(t)}
 document.addEventListener('click',e=>{if(EMO.open&&!e.target.closest('.emo,.an-emobtn'))emoClose()});
 
 /* session: runs on page load, login, logout and password-reset links */
