@@ -724,6 +724,10 @@ body.nto .cbtn{bottom:calc(var(--ftH,0px) + var(--ntH,0px) + 16px + 64px)}body.n
 .cbtn.nb{bottom:208px}body.nofab .cbtn.nb{bottom:136px}.npan{bottom:270px;max-height:min(540px,calc(100vh - 312px))}body.nofab .npan{bottom:198px}
 .nfi{width:34px;height:34px;border-radius:50%;background:var(--soft);color:var(--teal);display:inline-flex;align-items:center;justify-content:center;flex:none}.nfi .ic{width:18px;height:18px;margin:0}
 @media(max-width:600px){.cbtn.nb{width:46px;height:46px;bottom:138px}body.nto .cbtn.nb{bottom:calc(var(--ftH,0px) + var(--ntH,0px) + 16px + 120px)}body.nofab .cbtn.nb{bottom:78px}body.nofab.nto .cbtn.nb{bottom:calc(var(--ftH,0px) + var(--ntH,0px) + 76px)}.npan{bottom:192px}body.nofab .npan{bottom:136px}}
+/* chat: active / not-read state */
+.cw.act{box-shadow:0 0 0 2px var(--teal),0 -4px 24px #0003}
+.cnrb{display:block;width:100%;border:0;border-top:1px solid #e0245e55;background:#e0245e14;color:var(--tx);font:inherit;font-size:.8rem;font-weight:600;padding:7px 10px;cursor:pointer;text-align:center}.cnrb:hover{background:#e0245e24}
+.cnew{display:flex;align-items:center;gap:8px;margin:10px 0 4px;color:#e0245e;font-size:.7rem;font-weight:700}.cnew:before,.cnew:after{content:"";flex:1;height:1px;background:#e0245e66}
 </style>
 </head>
 <body>
@@ -1851,7 +1855,7 @@ const drawer=(n,a)=>{const cur=n=='f'?(D.FO.find(x=>x.id==a)||{}).c:a,lnk=(h,t,o
 return lnk("go('dash')",'Dashboard',n=='dash')+lnk("go('quiz')",'Quiz',n=='quiz')+lnk("go('hist')",'Quiz History',n=='hist')+lnk("go('shared')",'Shared with you',n=='shared')+lnk("go('starred')",'Starred files',n=='starred')+`<p class="dl">Components</p>`+C.map(c=>lnk(`go('c/${c}')`,c,(n=='c'||n=='f')&&cur==c)).join('')+`<p class="dl">Study</p>`+lnk("go('cards')",'Flashcards',n=='cards'&&FF.k!='img')+lnk("FF={c:'',k:'img'};go('cards')",'Formula Cards',n=='cards'&&FF.k=='img')+lnk("go('myq')",'My Questions',n=='myq')+(role=='admin'?`<p class="dl">Admin</p>`+lnk("go('admin')",'Admin Dashboard',n=='admin'):'')+`<p class="dl"></p>`+lnk("out()",'Log out',false)+'<div class="stDr"></div>'};
 const tbar=()=>ME?`<span class="sm mu" style="white-space:nowrap">${E(PR&&PR.display_name||'')} <span class="tag">${role}</span></span><button class="btn lo" onclick="out()">Log out</button>`:`<button class="btn" onclick="AU.mode='in';AU.msg='';go('auth')">Log in</button> <button class="btn p" onclick="AU.mode='up';AU.msg='';go('auth')">Sign up</button>`;
 let USER_OUT=0;
-function out(){USER_OUT=1;sb.auth.signOut({scope:'local'})}
+function out(){USER_OUT=1;Promise.resolve(typeof pushDrop=='function'?pushDrop():0).catch(()=>{}).then(()=>sb.auth.signOut({scope:'local'}))}
 V.auth=()=>{const m=AU.mode,T={in:'Log in',up:'Create account',reset:'Reset password',newpw:'Set a new password'};
 return hd(T[m],m=='newpw'?'Choose a new password for your account.':'Sign in to save your progress and keep it on every device.')+`<div class="w sec"><div class="card art stack" style="max-width:440px;margin:auto">${AU.msg?`<div class="exp">${E(AU.msg)}</div>`:''}${m=='up'?'<input id="an" placeholder="Display name" style="width:100%">':''}${m=='newpw'?'':'<input id="ae" type="email" placeholder="Email" autocomplete="email" style="width:100%">'}${m=='reset'?'':`<input id="ap" type="password" placeholder="${m=='newpw'?'New password':'Password'}" autocomplete="${m=='in'?'current-password':'new-password'}" style="width:100%">`}<button class="btn p" onclick="doAuth()">${T[m]}</button><p class="sm">${m=='in'?`<a class="lk" onclick="AU.mode='up';AU.msg='';route()">Create an account</a> · <a class="lk" onclick="AU.mode='reset';AU.msg='';route()">Forgot password?</a>`:m=='newpw'?'':`<a class="lk" onclick="AU.mode='in';AU.msg='';route()">Back to log in</a>`}</p></div></div>`};
 async function doAuth(){const m=AU.mode,e=m=='newpw'?'':v('ae').trim(),p=m=='reset'?'':v('ap');let r;
@@ -1936,7 +1940,7 @@ stSave=s=>{s.ts=Date.now();try{localStorage.setItem('st_'+ME.id,JSON.stringify(s
 stEl=(a,n=Date.now())=>Math.max(0,Math.floor((n-a.start-a.pt-(a.pa?n-a.pa:0))/1000)),
 stW=a=>a.w||600,
 stPl=a=>a.pl||((a.mode=='mini'||a.mn)?900:3600),stPlLeft=a=>Math.max(0,Math.floor((stPl(a)*1000-a.pt-(a.pa?Date.now()-a.pa:0))/1000)),
-stDer=s=>{const t=phDay(),rd=s.rd||[];let br=false;if(s.streak>0){if(!s.last)br=true;else{const gap=dayDiff(s.last,t);for(let i=1;i<gap&&i<400;i++){const d=new Date(Date.parse(s.last+'T00:00:00Z')+i*864e5).toISOString().slice(0,10);if(!rd.includes(d)){br=true;break}}}}return{t,br,rest:rd.includes(t),cur:br?0:s.streak,lost:br?s.streak:0,today:(s.dc[t]||0)>=1,fd:(s.dc[t]||0)>=1,rv:7-(s.rv.m==t.slice(0,7)?s.rv.u:0)}},
+stDer=s=>{const t=phDay(),rd=s.rd||[];let br=false;if(s.streak>0){if(!s.last)br=true;else{const gap=dayDiff(s.last,t);for(let i=1;i<gap&&i<3660;i++){const d=new Date(Date.parse(s.last+'T00:00:00Z')+i*864e5).toISOString().slice(0,10);if(!rd.includes(d)){br=true;break}}}}return{t,br,rest:rd.includes(t),cur:br?0:s.streak,lost:br?s.streak:0,today:(s.dc[t]||0)>=1,fd:(s.dc[t]||0)>=1,rv:7-(s.rv.m==t.slice(0,7)?s.rv.u:0)}},
 stPhase=s=>{const a=s.a;if(!a)return'i';const r=a.g-stEl(a);return a.pa?'p':r<=0?'o':'r'},
 stExp=s=>{const a=s.a;return tmd(Date.now()+(a?Math.max(0,a.g-stEl(a)):s.goal*60)*1000)},
 stName=m=>`<div class="stT lt">${m=='mini'?'Mini Lock In':'Lock in Study'}</div>`,
@@ -2759,10 +2763,10 @@ async function chInit(){if(!ME||CH.init)return;CH.init=1;
 try{const[u,o]=await Promise.all([sb.rpc('chat_users'),sb.rpc('chat_overview')]);
 if(u.error||o.error){CH.ok=false;CH.err=(u.error||o.error).message||'';chPos();chRender();return}
 CH.users={};(u.data||[]).forEach(x=>{CH.users[x.id]={name:x.display_name,role:x.role}});chIndex();chSetRooms(o.data||[]);
-await Promise.all([chPrefsLoad(),chBlocksLoad(),chMuteLoad(),chRPLoad()]);CH.ok=true;CH.st=chSt();stPresTrack();chSub();chPos();chRender();
+await Promise.all([chPrefsLoad(),chBlocksLoad(),chMuteLoad(),chRPLoad()]);CH.ok=true;CH.st=chSt();stPresTrack();chSub();chPos();chRender();pushResync();chPendOpen();
 clearInterval(CH.poll);CH.poll=setInterval(()=>{const s=chSt();if(s!=CH.st){CH.st=s;stPresTrack()}if(!CH.rt)chRefresh()},5000)}
 catch(e){console.warn('Chat:',e);CH.ok=false;CH.err=e.message||''}}
-function chReset(){clearInterval(CH.poll);if(CH.sub){try{sb.removeChannel(CH.sub)}catch(e){}}Object.assign(CH,{ok:null,err:'',init:0,users:{},tint:{},rooms:[],open:0,tab:'pub',set:0,q:'',mon:0,wins:[],msgs:{},old:{},reads:{},draft:{},focus:null,sub:null,rt:0,mod:null,mute:null,rp:{}});NF.ld=0;NF.pk={};NF.open=0;if(NF.sub){try{sb.removeChannel(NF.sub)}catch(e){}NF.sub=null}ntfSoft();CH.blk={mine:new Set(),by:new Set()};const r=document.getElementById('chatRoot');if(r)r.innerHTML=''}
+function chReset(){clearInterval(CH.poll);if(CH.sub){try{sb.removeChannel(CH.sub)}catch(e){}}Object.assign(CH,{ok:null,err:'',init:0,users:{},tint:{},rooms:[],open:0,tab:'pub',set:0,q:'',mon:0,wins:[],msgs:{},old:{},reads:{},draft:{},focus:null,act:null,sub:null,rt:0,mod:null,mute:null,rp:{}});NF.ld=0;NF.pk={};NF.open=0;if(NF.sub){try{sb.removeChannel(NF.sub)}catch(e){}NF.sub=null}ntfSoft();CH.blk={mine:new Set(),by:new Set()};const r=document.getElementById('chatRoot');if(r)r.innerHTML=''}
 function chSetRooms(a){CH.rooms=a.map(x=>({id:x.room_id,kind:x.kind,key:x.key,name:x.name,p1:x.p1,p2:x.p2,mine:!!x.mine,lastId:x.last_id||0,body:x.last_body||'',att:!!x.last_att,sender:x.last_sender,at:x.last_at,del:!!x.last_deleted,unread:x.unread||0}))}
 async function chLoad(){const o=await sb.rpc('chat_overview');if(o.error)throw o.error;chSetRooms(o.data||[])}
 async function chBlocksLoad(){const r=await sb.from('chat_blocks').select('*');CH.blk={mine:new Set(),by:new Set()};((r&&r.data)||[]).forEach(x=>{if(x.blocker==ME.id)CH.blk.mine.add(x.blocked);else if(x.blocked==ME.id)CH.blk.by.add(x.blocker)})}
@@ -2771,7 +2775,7 @@ const chMuted=s=>!!(CH.mute&&CH.mute[s]&&(!CH.mute.until||new Date(CH.mute.until
 async function chRefresh(){if(!ME||!CH.ok)return;try{await chLoad();for(const w of CH.wins){const L=CH.msgs[w.k];if(L){const last=L.filter(x=>!x._p).slice(-1)[0],r=await sb.from('chat_messages').select('*').eq('room_id',w.k).gt('id',last?last.id:0).order('id');((r&&r.data)||[]).forEach(m=>{if(!L.some(x=>x.id==m.id))L.push(m)})}}
 chBadge();if(CH.open)chListPatch();CH.wins.forEach(w=>chPatch(w.k))}catch(e){}}
 function chSub(){if(CH.sub)return;CH.sub=sb.channel('chat-live').on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages'},p=>chOnMsg(p.new)).on('postgres_changes',{event:'UPDATE',schema:'public',table:'chat_messages'},p=>chOnUpd(p.new)).on('postgres_changes',{event:'DELETE',schema:'public',table:'chat_messages'},p=>chOnDel(p.old)).on('postgres_changes',{event:'*',schema:'public',table:'chat_reads'},p=>chOnRead(p.new)).subscribe(s=>{CH.rt=(s=='SUBSCRIBED')})}
-addEventListener('focus',()=>{if(CH.ok){chRefresh();CH.wins.forEach(w=>!w.min&&chRead(w.k))}});
+addEventListener('focus',()=>{if(CH.ok)chRefresh()});
 /* ---- rooms ---- */
 const chRoom=id=>CH.rooms.find(r=>r.id==id);
 const chOther=r=>r.kind=='dm'?(r.p1==ME.id?r.p2:r.p1):r.kind=='admin'&&role=='admin'?r.p1:null;
@@ -2789,7 +2793,7 @@ const chErr=e=>{const m=(e&&e.message)||String(e);return /row-level security|vio
 /* ---- open / close ---- */
 function chCap(){const avail=innerWidth-110-(document.body.classList.contains('sbo')?320:0)-(document.body.classList.contains('stp')?224:0),cap=innerWidth<=700?1:Math.max(1,Math.min(3,Math.floor(avail/340))),v=CH.wins.filter(w=>!w.min);while(v.length>cap)v.shift().min=1}
 async function chOpen(k){const r=chRoom(k);if(!r)return;let w=CH.wins.find(x=>x.k==k);if(w){CH.wins=CH.wins.filter(x=>x!==w);w.min=0}else w={k,min:0,att:[]};CH.wins.push(w);
-CH.open=0;CH.set=0;chCap();CH.focus=k;chRender();
+CH.open=0;CH.set=0;chCap();CH.focus=k;CH.act=k;w.nrId=0;chRender();
 try{if(!CH.msgs[k])await chMsgsLoad(k);await chReadsLoad(k)}catch(e){toast(chErr(e))}
 chRender();chRead(k)}
 async function chMsgsLoad(k,before){let q=sb.from('chat_messages').select('*').eq('room_id',k).order('id',{ascending:false}).limit(40);if(before)q=q.lt('id',before);const r=await q;if(r.error)throw r.error;const rows=(r.data||[]).reverse(),cur=CH.msgs[k]||[];
@@ -2815,11 +2819,26 @@ chLoad().then(()=>{const r2=chRoom(m.room_id);if(!r2)return;if(m.sender_id!=ME.i
 function chOnMsg2(r,m){const mine=m.sender_id==ME.id,L=CH.msgs[r.id];
 if(L){const ix=L.findIndex(x=>x.id==m.id);if(ix>=0)Object.assign(L[ix],m);else{const p=mine?L.findIndex(x=>x._p&&x.body==m.body):-1;if(p>=0)L[p]=m;else L.push(m)}}
 if(m.id>=r.lastId){r.lastId=m.id;r.body=m.body;r.att=!!(m.att&&m.att.length);r.sender=m.sender_id;r.at=m.created_at;r.del=m.deleted}
-const w=CH.wins.find(x=>x.k==r.id&&!x.min),vis=w&&!document.hidden;
-if(!mine&&r.mine){if(r.kind!='channel')chDeliver(r.id);if(vis)chRead(r.id);else{r.unread=Math.min(99,(r.unread||0)+1);if(r.kind!='channel'&&!CH.open&&!document.hidden&&!chIgn(r))toast(chNm(m.sender_id)+': '+(m.body||'sent a file').slice(0,60))}}
-chBadge();if(CH.open)chListPatch();chPatch(r.id);chHeads()}
+const w=CH.wins.find(x=>x.k==r.id&&!x.min),vis=w&&chIsAct(r.id);
+if(!mine&&r.mine){if(r.kind!='channel')chDeliver(r.id);if(vis)chRead(r.id);else{r.unread=Math.min(99,(r.unread||0)+1);if(w&&!w.nrId)w.nrId=m.id;if(!w&&r.kind!='channel'&&!CH.open&&!document.hidden&&!chIgn(r))toast(chNm(m.sender_id)+': '+(m.body||'sent a file').slice(0,60))}}
+chBadge();if(CH.open)chListPatch();chPatch(r.id);chNrPatch(r.id);chHeads()}
 function chOnUpd(m){if(!m)return;const L=CH.msgs[m.room_id];if(L){const x=L.find(y=>y.id==m.id);if(x)Object.assign(x,m)}const r=chRoom(m.room_id);if(r&&r.lastId==m.id){r.body=m.body;r.del=m.deleted;r.att=!!(m.att&&m.att.length)}if(CH.open)chListPatch();chPatch(m.room_id)}
 function chOnRead(row){if(!row||!row.room_id)return;(CH.reads[row.room_id]=CH.reads[row.room_id]||{})[row.user_id]=row.last_id;chPatch(row.room_id)}
+/* ---- active chat: a chat counts as READ only once you click or type inside it. Clicking anywhere else on the site, switching tabs or pressing Esc makes it inactive, and anything that arrives meanwhile stays unread (with a "not read yet" bar) ---- */
+function chIsAct(k){return CH.act==k&&!document.hidden&&document.hasFocus()&&CH.wins.some(w=>w.k==k&&!w.min)}
+function chNrN(k){const r=chRoom(k),w=CH.wins.find(x=>x.k==k);return r&&w&&!w.min&&r.mine&&!chIsAct(k)?(r.unread||0):0}
+function chNrHtml(k){const n=chNrN(k);return n?`<button class="cnrb" onclick="chActivate('${k}')">${n>=99?'99+':n} new message${n==1?'':'s'} · not read yet. Click here to read</button>`:''}
+function chNrPatch(k){const cw=document.querySelector('.cw[data-k="'+k+'"]');if(!cw)return;cw.classList.toggle('act',chIsAct(k));const b=cw.querySelector('.cnrb'),h=chNrHtml(k);
+if(!h){if(b)b.remove()}else if(b)b.outerHTML=h;else cw.querySelector('.cwm').insertAdjacentHTML('afterend',h)}
+function chActivate(k){const w=CH.wins.find(x=>x.k==k);if(!w||w.min)return;CH.act=k;const r=chRoom(k);if(r&&r.mine&&(r.unread||chRP(k).fu))chRead(k);if(w.nrId){w.nrId=0;chPatch(k)}chNrPatch(k)}
+function chDeact(){if(!CH.act)return;const k=CH.act;CH.act=null;chNrPatch(k)}
+document.addEventListener('pointerdown',e=>{const t=e.target,cw=t.closest&&t.closest('#chatRoot .cw');if(cw)chActivate(cw.dataset.k);else if(!(t.closest&&t.closest('#chPop')))chDeact()},true);
+document.addEventListener('keydown',e=>{if(e.key=='Escape'||e.ctrlKey||e.metaKey||e.altKey)return;const cw=e.target.closest&&e.target.closest('#chatRoot .cw');if(cw)chActivate(cw.dataset.k)},true);
+addEventListener('blur',chDeact);document.addEventListener('visibilitychange',()=>{if(document.hidden)chDeact()});
+/* Esc minimizes the chat you are in (a menu open inside the chat closes first) */
+addEventListener('keydown',e=>{if(e.key!=='Escape'||MD)return;if(document.getElementById('chPop')){chPopClose();e.stopImmediatePropagation();return}
+const cw=e.target.closest&&e.target.closest('#chatRoot .cw'),k=cw?cw.dataset.k:(CH.act&&chIsAct(CH.act)?CH.act:null);
+if(k){e.stopImmediatePropagation();e.preventDefault();if(CH.act==k)CH.act=null;chMin(null,k)}},true);
 /* ---- send ---- */
 function chCan(r){if(!r.mine)return{ok:0,why:'Read-only view for admins.'};
 if(r.kind=='channel')return chMuted('pub')?{ok:0,why:'You are muted in public chat.'}:{ok:1};
@@ -2851,7 +2870,7 @@ function chMsgMenu(e,k,id){const m=(CH.msgs[k]||[]).find(x=>x.id==id);if(!m)retu
 chPop(e,[live&&(mine||role=='admin')?[mine?'Unsend':'Remove for everyone',`chDel(${id})`,1]:null,mine||role=='admin'?['Delete for everyone',`chPurgeAsk('${k}',${id})`,1]:null,['Delete for me',`chDelMe('${k}',${id})`],live&&!mine?['Report',`chReportAsk(${id})`]:null,live&&role=='admin'&&!mine?['Mute sender…',`chMuteAsk('${m.sender_id}')`]:null])}
 function chPurgeAsk(k,id){showConfirm('Delete for everyone?','The message disappears from the chat for everyone, with no “Message removed” left behind. This cannot be undone.',async()=>{const r=await sb.rpc('chat_purge',{mid:id});
 if(r.error){toast(/not allowed/i.test(r.error.message)?'You can only delete your own messages.':'Delete for everyone is not set up yet. Run chat_extras.sql once.');return}chOnDel({id})})}
-function chOnDel(o){if(!o||o.id==null)return;let hit=null;Object.keys(CH.msgs).forEach(k=>{const L=CH.msgs[k],i=L.findIndex(x=>x.id==o.id);if(i>=0){L.splice(i,1);hit=k}});if(hit)chPatch(hit);chRefresh()}
+function chOnDel(o){if(!o||o.id==null)return;let hit=null;Object.keys(CH.msgs).forEach(k=>{const L=CH.msgs[k],i=L.findIndex(x=>x.id==o.id);if(i>=0){L.splice(i,1);hit=k}});if(hit)chPatch(hit);clearTimeout(CH.timers.dl);CH.timers.dl=setTimeout(chRefresh,400)}
 async function chDel(id){const r=await sb.rpc('chat_delete',{mid:id});if(r.error)toast(chErr(r.error))}
 function chWinMenu(e,k){const r=chRoom(k);if(!r)return;const o=chOther(r);
 chPop(e,[r.kind=='dm'&&r.mine&&o?(CH.blk.mine.has(o)?['Unblock '+E(chNm(o)),`chUnblock('${o}')`]:['Block '+E(chNm(o)),`chBlockAsk('${o}')`,1]):null,role=='admin'&&o?['Mute '+E(chNm(o))+'…',`chMuteAsk('${o}')`]:null,['Close chat',`chClose(null,'${k}')`]])}
@@ -2865,14 +2884,14 @@ const r=await sb.from('chat_mutes').upsert({user_id:u,pub,dm,until,by:ME.id});if
 /* ---- rendering ---- */
 const chLink=t=>E(t).replace(/\n/g,'<br>').replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
 function chSeers(k){const r=chRoom(k),rd=CH.reads[k]||{},o=[];Object.keys(rd).forEach(u=>{if(u==ME.id)return;if(r.kind=='admin'&&role!='admin'&&!(CH.users[u]&&CH.users[u].role=='admin'))return;o.push({u,last:rd[u]})});return o}
-function chMsgsHtml(k){const r=chRoom(k),L=chVis(k),me=ME.id;if(!r)return'';let h='';
+function chMsgsHtml(k){const r=chRoom(k),L=chVis(k),me=ME.id;if(!r)return'';let h='';const nw=CH.wins.find(x=>x.k==k),nr=nw&&!chIsAct(k)&&r.mine?nw.nrId:0;
 if(CH.old[k])h+=`<button class="cmore" onclick="chOlder('${k}')">Load earlier messages</button>`;
 h+=`<p class="cnote">${r.kind=='channel'?'Public channel. Everyone can read this.':!r.mine?'Read-only admin view.':'Admins can read this conversation.'}</p>`;
 const dm=r.kind!='channel'&&r.mine,mineIds=L.filter(m=>m.sender_id==me&&!m._f&&m.id>0).map(m=>m.id),heads={};
 if(dm){chSeers(k).forEach(s=>{const up=mineIds.filter(i=>i<=s.last).pop();if(up)(heads[up]=heads[up]||[]).push(s.u)})}
 const lastMine=[...L].reverse().find(m=>m.sender_id==me&&!m.deleted);let prev=null;
 L.forEach((m,i)=>{const t=+new Date(m.created_at),sep=!prev||t-(+new Date(prev.created_at))>18e5,mine=m.sender_id==me;
-if(sep)h+=`<div class="csep">${phDay(t)==phDay()?'':phF({month:'short',day:'numeric'},t)+' · '}${tm(t)}</div>`;
+if(nr&&m.id==nr&&!mine)h+='<div class="cnew"><span>New</span></div>';if(sep)h+=`<div class="csep">${phDay(t)==phDay()?'':phF({month:'short',day:'numeric'},t)+' · '}${tm(t)}</div>`;
 const first=sep||prev.sender_id!=m.sender_id,nx=L[i+1],last=!nx||nx.sender_id!=m.sender_id||(+new Date(nx.created_at))-t>18e5;
 let body=m.deleted?'<i class="mu">Message removed</i>':(m.body?`<span>${chLink(m.body)}</span>`:'')+((m.att||[]).map(a=>`<a class="cat" onclick="chAtt('${a.id}')">${ico('file')}<b>${E(a.title)}</b></a>`).join(''));
 h+=`<div class="cmr ${mine?'me':''}">${!mine?`<div class="cmv">${last?chAv(m.sender_id,28,false):''}</div>`:''}<div class="cmc">${!mine&&first&&r.kind!='dm'?`<small class="cnm">${E(chNm(m.sender_id))}${CH.users[m.sender_id]&&CH.users[m.sender_id].role=='admin'?' · admin':''}</small>`:''}<div class="cmbw"><div class="cmb ${m._f?'bad':''} ${m._p?'pend':''}" ${m._f?`onclick="chRetry('${k}',${m.id})"`:''} title="${E(phF({dateStyle:'medium',timeStyle:'short'},t))}">${body}</div>${m.id>0?`<button class="cmm" aria-label="Message options" onclick="chMsgMenu(event,'${k}',${m.id})">${ico('more')}</button>`:''}</div></div></div>`;
@@ -2883,7 +2902,7 @@ if(!L.length)h+=`<p class="cnote">${r.mine?'No messages yet. Say hi!':'No messag
 function chFootHtml(w,r){const c=chCan(r);if(!c.ok)return `<div class="cwf off">${E(c.why)}${c.unb?` <a onclick="chUnblock('${c.unb}')">Unblock</a>`:''}</div>`;
 return `<div class="cwf">${(w.att||[]).length?`<div class="cwa">${w.att.map((a,i)=>`<span class="cch">${ico('file')}<b>${E(a.title)}</b><a onclick="chUnatt('${w.k}',${i})" aria-label="Remove">${ico('x')}</a></span>`).join('')}</div>`:''}<div class="cwr"><button class="cwb" title="Attach a file from the site" onclick="chPick('${w.k}')">${ico('clipf')}</button><textarea class="cwi" rows="1" maxlength="2000" placeholder="Aa" oninput="chInput(this,'${w.k}')" onkeydown="chKey(event,'${w.k}')">${E(CH.draft[w.k]||'')}</textarea><button class="cwb send" title="Send" onclick="chSend('${w.k}')">${ico('send')}</button></div></div>`}
 function chWinHtml(w,i){const r=chRoom(w.k);if(!r)return'';const sub=chSubT(r);
-return `<div class="cw" data-k="${w.k}" style="--ci:${i}"><div class="cwh">${chRoomAv(r,32)}<div class="cwt"><b>${E(chTitle(r))}</b><small>${E(sub)}</small></div><button class="cwb" title="Options" onclick="chWinMenu(event,'${w.k}')">${ico('more')}</button><button class="cwb" title="Minimize" onclick="chMin(event,'${w.k}')">${ico('minus')}</button><button class="cwb" title="Close" onclick="chClose(event,'${w.k}')">${ico('x')}</button></div><div class="cwm" onscroll="this.dataset.b=(this.scrollHeight-this.scrollTop-this.clientHeight<40)?1:0">${chMsgsHtml(w.k)}</div>${chFootHtml(w,r)}</div>`}
+return `<div class="cw${chIsAct(w.k)?' act':''}" data-k="${w.k}" style="--ci:${i}"><div class="cwh">${chRoomAv(r,32)}<div class="cwt"><b>${E(chTitle(r))}</b><small>${E(sub)}</small></div><button class="cwb" title="Options" onclick="chWinMenu(event,'${w.k}')">${ico('more')}</button><button class="cwb" title="Minimize" onclick="chMin(event,'${w.k}')">${ico('minus')}</button><button class="cwb" title="Close" onclick="chClose(event,'${w.k}')">${ico('x')}</button></div><div class="cwm" onscroll="this.dataset.b=(this.scrollHeight-this.scrollTop-this.clientHeight<40)?1:0">${chMsgsHtml(w.k)}</div>${chNrHtml(w.k)}${chFootHtml(w,r)}</div>`}
 function chHeads(){const r=document.getElementById('chatRoot');if(!r)return;r.querySelectorAll('.chd').forEach(h=>{const rm=chRoom(h.dataset.k),n=rm?chU(rm):0;let b=h.querySelector('.cb');if(n){if(!b){b=document.createElement('i');b.className='cb';h.appendChild(b)}b.textContent=n>9?'9+':n}else if(b)b.remove()})}
 function chPatch(k,force){const m=document.querySelector('.cw[data-k="'+k+'"] .cwm');if(!m)return;const atB=force||m.dataset.b!=='0',r=chRoom(k);m.innerHTML=chMsgsHtml(k);if(atB)m.scrollTop=m.scrollHeight;const s=document.querySelector('.cw[data-k="'+k+'"] .cwt small');if(s&&r)s.textContent=chSubT(r)}
 function chTabs(){const t=[['pub','Public',chUn(r=>r.kind=='channel')],['dm','DMs',chUn(r=>r.kind=='dm')],['adm','Admin',chUn(r=>r.kind=='admin')]];return `<div class="ctabs">${t.map(([k,n,u])=>`<a class="${CH.tab==k?'on':''}" onclick="CH.tab='${k}';CH.q='';chRender()">${n}${u?`<i class="cb">${u>9?'9+':u}</i>`:''}</a>`).join('')}</div>`}
@@ -2950,7 +2969,14 @@ function chMarkUnread(k){const r=chRoom(k);if(!r)return;chRP(k).fu=1;chRPSave(k)
 function chIgnAsk(k){const r=chRoom(k);if(!r)return;openMdl({title:'Ignore '+chTitle(r),okText:'Ignore',body:`<div class="field"><label>For</label>${dd('chIgT',[['1','1 hour'],['2','2 hours'],['4','4 hours'],['8','8 hours'],['24','24 hours'],['inf','Until I stop ignoring']],'8')}</div><p class="mu sm">No alerts and no badge count from this chat. Messages still arrive, and you can open it any time.</p>`,
 onOk:()=>{const t=v('chIgT');chRP(k).ig=t=='inf'?'inf':Date.now()+(+t)*36e5;chRPSave(k);chBadge();chListPatch();ntfSoft();toast('Ignoring '+chTitle(r))}})}
 function chIgnOff(k){chRP(k).ig=0;chRPSave(k);chBadge();chListPatch();ntfSoft();if(CH.set)chRender();toast('No longer ignored')}
-function chDelChatAsk(k){const r=chRoom(k);if(!r)return;showConfirm('Delete this chat?','It leaves your list and your history is cleared on your side only. The other person keeps their copy, and a new message brings the chat back without the old ones.',()=>{const p=chRP(k);p.hb=r.lastId||0;p.fu=0;p.hm=[];chRPSave(k);r.unread=0;sb.rpc('chat_mark_read',{rid:k,upto:r.lastId||0});CH.wins=CH.wins.filter(w=>w.k!=k);chBadge();chRender();toast('Chat deleted')})}
+function chDelChatAsk(k){const r=chRoom(k);if(!r)return;const all=r.mine&&(r.kind=='dm'||(r.kind=='admin'&&role=='admin'));
+openMdl({title:'Delete this chat?',okText:'Delete',body:`<label class="msi"><input type="radio" name="chdm" value="me" checked><span><b>Delete for me</b><br><small class="mu">It leaves your list and your history is cleared on your side only. The other person keeps their copy, and a new message brings the chat back without the old ones.</small></span></label>${all?`<label class="msi" style="margin-top:10px"><input type="radio" name="chdm" value="all"><span><b>Delete for everyone</b><br><small class="mu">Permanently deletes every message in this chat for both of you, including messages that were already unsent or removed. This cannot be undone.</small></span></label>`:''}`,
+onOk:async()=>{const m=(document.querySelector('input[name="chdm"]:checked')||{}).value;if(m=='all')return chDelChatAll(k);chDelChatMe(k)}})}
+function chDelChatMe(k){const r=chRoom(k);if(!r)return;const p=chRP(k);p.hb=r.lastId||0;p.fu=0;p.hm=[];chRPSave(k);r.unread=0;sb.rpc('chat_mark_read',{rid:k,upto:r.lastId||0});CH.wins=CH.wins.filter(w=>w.k!=k);if(CH.act==k)CH.act=null;chBadge();chRender();toast('Chat deleted')}
+async function chDelChatAll(k){const x=await sb.rpc('chat_purge_room',{rid:String(k)});
+if(x.error){const m=x.error.message||'';toast(/could not find|does not exist|schema cache/i.test(m)?'Delete for everyone is not set up yet. Run chat_delete_everyone.sql once.':/not allowed/i.test(m)?'You cannot delete this chat for everyone.':m);return false}
+const r=chRoom(k);CH.msgs[k]=[];CH.wins=CH.wins.filter(w=>w.k!=k);if(CH.act==k)CH.act=null;if(r){r.lastId=0;r.body='';r.att=false;r.del=false;r.unread=0;r.at=null;r.sender=null}
+const p=chRP(k);p.hb=0;p.hm=[];p.fu=0;chRPSave(k);chBadge();chRender();chRefresh();toast('Chat deleted for everyone')}
 function chDelMe(k,id){const p=chRP(k);p.hm=(p.hm||[]).concat(id).slice(-500);chRPSave(k);chPatch(k)}
 async function chReportRoom(k){const r=chRoom(k);let L=(CH.msgs[k]||[]).filter(m=>m.sender_id!=ME.id&&m.id>0&&!m.deleted),id=L.length?L[L.length-1].id:0;
 if(!id){const x=await sb.from('chat_messages').select('id').eq('room_id',k).neq('sender_id',ME.id).order('id',{ascending:false}).limit(1);id=x&&x.data&&x.data[0]?x.data[0].id:0}
@@ -2964,11 +2990,32 @@ function chSetHtml(){const p=CH.prefs,mu=CH.rooms.filter(r=>r.mine&&chIgnR(r.id)
 return `<div class="chh"><button class="cwb" onclick="CH.set=0;chRender()" aria-label="Back">${ico('back')}</button><b>Settings</b></div><div class="cset"><label class="tgl"><input type="checkbox" ${p.show?'checked':''} onchange="chPref('show',this.checked)"><i></i><span>Show when I am active</span></label><p class="mu sm">When this is off you appear offline, and you also will not see who else is active.</p>
 <div class="cgrp"><b class="sm">During a Lock In session</b>${[['show','Show me as “Locked in”'],['hide','Hide my status (appear offline)'],['active','Keep showing “Active”']].map(([k,t])=>`<label class="msi"><input type="radio" name="chlm" ${p.lock==k?'checked':''} ${p.show?'':'disabled'} onchange="chPref('lock','${k}')"><span>${t}</span></label>`).join('')}</div><p class="mu sm">Right now you appear as: <b>${{active:'Active',lockin:'Locked in',hidden:'Offline'}[chSt()]}</b>.</p>
 <div class="cgrp"><b class="sm">Notifications</b><label class="tgl"><input type="checkbox" ${p.mlock?'checked':''} onchange="chPref('mlock',this.checked?1:0)"><i></i><span>Mute chats during Lock In</span></label><p class="mu sm">No chat alerts or badge counts while a session runs. Messages still arrive and show up afterwards.</p>
-<label class="tgl"><input type="checkbox" ${p.bn?'checked':''} onchange="chBn(this)"><i></i><span>Browser notifications</span></label><p class="mu sm">Alerts while this tab is in the background. The tab title also shows your count.</p></div>
+<label class="tgl"><input type="checkbox" ${p.bn?'checked':''} onchange="chBn(this)"><i></i><span>Browser notifications</span></label><p class="mu sm">Alerts while this tab is in the background. The tab title also shows your count.</p>
+<label class="tgl"><input type="checkbox" ${p.push&&pushOK()?'checked':''} onchange="chPush(this)"><i></i><span>Push notifications (site closed)</span></label><p class="mu sm">${E(pushNote())}</p></div>
 <div class="cgrp"><b class="sm">Muted users and chats</b>${mu.length?mu.map(r=>{const g=CH.rp[r.id].ig;return `<div class="crow"><span>${E(chTitle(r))}<small class="mu"> · ${g=='inf'?'until you unmute':'until '+E(phF({dateStyle:'medium',timeStyle:'short'},g))}</small></span><button class="btn" onclick="chIgnOff('${r.id}')">Unmute</button></div>`}).join(''):'<p class="mu sm">Nobody is muted. Use the ⋯ menu on a chat to ignore it.</p>'}</div>
 <div class="cgrp"><b class="sm">Blocked users</b>${bl.length?bl.map(u=>`<div class="crow"><span>${E(chNm(u))}</span><button class="btn" onclick="chUnblock('${u}')">Unblock</button></div>`).join(''):'<p class="mu sm">Nobody is blocked.</p>'}</div></div>`}
+/* ===== PUSH NOTIFICATIONS (work with the site closed): needs push_setup.sql, the chat-push function and a VAPID key. See PUSH_SETUP.md ===== */
+const PUSH_KEY=''; /* paste your VAPID PUBLIC key here */
+const pushIOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform=='MacIntel'&&navigator.maxTouchPoints>1),
+pushStandalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true,
+pushOK=()=>!!PUSH_KEY&&window.isSecureContext&&'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window,
+b64u=t=>{const r=atob((t+'='.repeat((4-t.length%4)%4)).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from([...r].map(c=>c.charCodeAt(0)))};
+function pushNote(){if(!PUSH_KEY)return'Not set up yet: the site owner still needs to finish the push setup.';if(pushIOS()&&!pushStandalone())return'On iPhone or iPad: tap Share, then Add to Home Screen, open the app from your Home Screen, and turn this on there.';if(!pushOK())return'This browser does not support push notifications.';if(window.Notification&&Notification.permission=='denied')return'Notifications are blocked for this site. Allow them in your browser or phone settings first.';return'Message alerts on this device, even when the site is closed.'}
+async function pushSub(){const reg=await navigator.serviceWorker.ready;let s=await reg.pushManager.getSubscription();if(!s)s=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64u(PUSH_KEY)});const j=s.toJSON(),r=await sb.rpc('push_register',{p_endpoint:j.endpoint,p_p256dh:j.keys.p256dh,p_auth:j.keys.auth,p_ua:navigator.userAgent.slice(0,200)});if(r.error)throw r.error;return s}
+async function pushDrop(){try{const reg=await navigator.serviceWorker.getRegistration(),s=reg&&await reg.pushManager.getSubscription();if(s){await sb.rpc('push_unregister',{p_endpoint:s.endpoint});await s.unsubscribe()}}catch(e){}}
+function pushResync(){if(CH.prefs.push&&pushOK()&&Notification.permission=='granted')pushSub().catch(e=>console.warn('Push:',e.message))}
+async function chPush(el){if(!el.checked){chPref('push',0);pushDrop();return}
+if(!PUSH_KEY){el.checked=false;return toast('Push is not set up yet. See PUSH_SETUP.md.')}
+if(pushIOS()&&!pushStandalone()){el.checked=false;return toast('On iPhone: Share, Add to Home Screen, open the app from there, then turn this on.')}
+if(!pushOK()){el.checked=false;return toast('This browser does not support push notifications.')}
+try{const p=await Notification.requestPermission();if(p!=='granted'){el.checked=false;chPref('push',0);return toast('Notifications are blocked. Allow them in your browser or phone settings.')}await pushSub();chPref('push',1);toast('Push notifications are on for this device')}
+catch(e){el.checked=false;chPref('push',0);toast(/push_register|schema cache|could not find/i.test(e.message||'')?'Push is not set up yet. Run push_setup.sql once.':'Could not turn on push: '+(e.message||e))}}
+/* tapping a push notification: open that chat (or the poker's chat) */
+(()=>{const q=new URLSearchParams(location.search);CH.pend=q.get('chat')?{room:q.get('chat')}:q.get('dm')?{dm:q.get('dm')}:null;if(CH.pend){try{history.replaceState(null,'',location.pathname+location.hash)}catch(e){}}})();
+function chPendOpen(){const p=CH.pend;if(!p||!CH.ok)return;if(p.room&&chRoom(p.room)){CH.pend=null;chOpen(p.room)}else if(p.dm){CH.pend=null;chOpenDM(p.dm)}else if(p.room){CH.pend=null}}
+if('serviceWorker' in navigator)navigator.serviceWorker.addEventListener('message',e=>{const d=e.data||{};if(d.type=='openChat'&&d.room){CH.pend={room:String(d.room)};chPendOpen()}else if(d.type=='openDM'&&d.user){CH.pend={dm:String(d.user)};chPendOpen()}});
 /* ---- notification bell ---- */
-const NF={open:0,pk:{},last:[],t:null,tl:[],ti:null,sig:'',seen:new Set(),init:0,ld:0,sub:null},BASE_T=document.title;
+const NF={open:0,pk:{},last:[],t:null,tl:[],ti:null,sig:'',seen:new Set(),init:0,ld:0,sub:null},BASE_T=(document.title||'Found / CE Review Archive').replace(/^\(\d+\)\s*/,'');
 const ntfIgn=u=>CH.rooms.some(r=>r.kind=='dm'&&r.mine&&chOther(r)==u&&chIgnR(r.id)),
 ntfDK=()=>'nfx_'+ME.id,ntfDismissed=()=>{try{return JSON.parse(localStorage.getItem(ntfDK())||'{}')}catch(e){return{}}},
 ntfDismiss=k=>{const d=ntfDismissed();d[k]=1;const ks=Object.keys(d);if(ks.length>300)delete d[ks[0]];try{localStorage.setItem(ntfDK(),JSON.stringify(d))}catch(e){}},
@@ -2999,7 +3046,7 @@ function ntfAct(i){const x=NF.last[i];if(!x)return;NF.open=0;ntfRender();if(x.go
 function ntfDis(e,i){e.stopPropagation();const x=NF.last[i];if(x&&x.dis)x.dis();ntfSoft()}
 function ntfClear(){NF.last.forEach(x=>x.dis&&x.dis());ntfSoft()}
 /* tab title: "(2) Found / CE Review Archive", swapping the first part for the newest alerts */
-function ntfTitle(L){const n=L.length,tl=L.map(x=>x.tt).slice(0,3),sig=n+'|'+tl.join('|');if(sig===NF.sig&&(NF.ti||!n))return;NF.sig=sig;clearInterval(NF.ti);NF.ti=null;
+function ntfTitle(L){const n=L.length,tl=L.map(x=>x.tt).slice(0,3),sig=n+'|'+tl.join('|');if(sig===NF.sig&&(NF.ti||(!n&&document.title===BASE_T)))return;NF.sig=sig;clearInterval(NF.ti);NF.ti=null;
 const first=BASE_T.split(' / ')[0],rest=BASE_T.slice(first.length);if(!n){document.title=BASE_T;return}
 let i=0;const set=()=>{const k=i%(tl.length*2),a=k%2==0?first:tl[(k-1)/2];document.title='('+n+') '+String(a).slice(0,50)+rest;i++};set();NF.ti=setInterval(set,2500)}
 function ntfDesk(L){if(NF.init&&document.hidden&&CH.prefs.bn&&window.Notification&&Notification.permission=='granted')L.forEach(x=>{if(x.dk&&!NF.seen.has(x.id)){try{new Notification(x.h,{body:x.s,tag:String(x.id).replace(/:.*/,'')})}catch(e){}}});NF.seen=new Set(L.filter(x=>x.dk).map(x=>x.id));NF.init=1}
@@ -3035,7 +3082,7 @@ catch(e){console.warn('PDF viewer:',e);if(host)host.innerHTML='';if(ld)ld.remove
 function stRest(){const s=stLoad(),d=stDer(s);if(s.a)return toast('Finish or stop your session first.');s.rd=s.rd||[];
 if(d.rest){s.rd=s.rd.filter(x=>x!=d.t);stSave(s);stRender();return toast('Rest day cancelled')}
 if((s.dc[d.t]||0)>0)return toast('You already studied today, so you do not need a rest day.');if(d.br)return toast('Your streak is already broken. Revive it first.');
-showConfirm('Take today as a rest day?','Your streak stays safe even if you do not study today.',()=>{const s=stLoad();s.rd=(s.rd||[]).concat(stDer(s).t).slice(-400);stSave(s);stRender();toast('Rest day set. Your streak is safe today.')})}
+showConfirm('Take today as a rest day?','Your streak stays safe even if you do not study today.',()=>{const s=stLoad();s.rd=Array.from(new Set((s.rd||[]).concat(stDer(s).t)));stSave(s);stRender();toast('Rest day set. Your streak is safe today.')})}
 const stRestBtn=s=>{const d=stDer(s);return `<div class="stRow" style="margin-top:10px"><button class="btn" ${s.a?'disabled':''} onclick="stRest()">${ico('moon')}${d.rest?'Cancel rest day':'Rest day'}</button>${d.rest?'<span class="mu sm">Streak is safe today</span>':''}</div>`};
 route=(f=>function(){f();placeCtx();annAfterRoute();ntfSoft()})(route);syncTheme();annLoad().then(()=>{if(!ME&&QL&&(location.hash.slice(2)||'home').split('/')[0]=='home')route()});route();
 /* PWA: lets the app install on PC and phones and open its shell offline */
