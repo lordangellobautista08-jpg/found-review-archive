@@ -2995,7 +2995,7 @@ return `<div class="chh"><button class="cwb" onclick="CH.set=0;chRender()" aria-
 <div class="cgrp"><b class="sm">Muted users and chats</b>${mu.length?mu.map(r=>{const g=CH.rp[r.id].ig;return `<div class="crow"><span>${E(chTitle(r))}<small class="mu"> · ${g=='inf'?'until you unmute':'until '+E(phF({dateStyle:'medium',timeStyle:'short'},g))}</small></span><button class="btn" onclick="chIgnOff('${r.id}')">Unmute</button></div>`}).join(''):'<p class="mu sm">Nobody is muted. Use the ⋯ menu on a chat to ignore it.</p>'}</div>
 <div class="cgrp"><b class="sm">Blocked users</b>${bl.length?bl.map(u=>`<div class="crow"><span>${E(chNm(u))}</span><button class="btn" onclick="chUnblock('${u}')">Unblock</button></div>`).join(''):'<p class="mu sm">Nobody is blocked.</p>'}</div></div>`}
 /* ===== PUSH NOTIFICATIONS (work with the site closed): needs push_setup.sql, the chat-push function and a VAPID key. See PUSH_SETUP.md ===== */
-const PUSH_KEY=''; /* paste your VAPID PUBLIC key here */
+const PUSH_KEY='BDhFc54eY-NCNjKGFLsT5-34-ZUIqlwqJna04cM7oOMQMH7eFcSqtHa2Rmhw61r6tHEtXFfcD-TB8kVDHq0-QVw'; /* paste your VAPID PUBLIC key here */
 const pushIOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform=='MacIntel'&&navigator.maxTouchPoints>1),
 pushStandalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true,
 pushOK=()=>!!PUSH_KEY&&window.isSecureContext&&'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window,
