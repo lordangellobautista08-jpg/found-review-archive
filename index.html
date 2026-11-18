@@ -708,6 +708,22 @@ body.nofab .cpan{bottom:134px}
 @media(max-width:600px){#chatRoot{--cr:18px}.cbtn{width:46px;height:46px;right:calc(var(--cr) + 4px);bottom:82px}
 body.nto .cbtn{bottom:calc(var(--ftH,0px) + var(--ntH,0px) + 16px + 64px)}body.nofab .cbtn{bottom:22px}body.nofab.nto .cbtn{bottom:calc(var(--ftH,0px) + var(--ntH,0px) + 20px)}
 .cpan{left:8px;right:8px;width:auto;bottom:136px}body.nofab .cpan{bottom:80px}}
+/* quiz: more room between Quit and Submit */
+.qbar>span:last-child{display:inline-flex;align-items:center;gap:24px}.qbar a.lk{padding:8px 4px}
+/* file viewer: smoother */
+.vb.pdfv{display:block;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;contain:layout paint}
+.pvl{padding:40px;text-align:center;color:var(--mu)}
+.pvp{display:flex;flex-direction:column;align-items:center;gap:10px;padding:8px;width:max-content;min-width:100%;box-sizing:border-box}
+.pvg{background:#fff;box-shadow:0 1px 6px #0003;flex:none;position:relative;overflow:hidden}.pvg canvas{display:block;width:100%;height:100%}
+.vwin .vb img{opacity:0;transition:opacity .18s}.vwin .vb img.ld{opacity:1}.pvn{padding:0 6px;white-space:nowrap}
+/* chat rows: options + poke, notification bell */
+.crb{display:none;align-items:center;gap:2px;flex:none}.cli:hover .crb{display:flex}.cli:hover .cls{display:none}
+@media(hover:none){.crb{display:flex}.cli .cls{display:flex}}
+.crb button{border:0;background:transparent;color:var(--mu);width:30px;height:30px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0}.crb button:hover{background:var(--card);color:var(--tx)}.crb .ic{width:16px;height:16px;margin:0}
+.cli.ign{opacity:.65}.crow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px 0}.cpan .cset{overflow:auto}
+.cbtn.nb{bottom:208px}body.nofab .cbtn.nb{bottom:136px}.npan{bottom:270px;max-height:min(540px,calc(100vh - 312px))}body.nofab .npan{bottom:198px}
+.nfi{width:34px;height:34px;border-radius:50%;background:var(--soft);color:var(--teal);display:inline-flex;align-items:center;justify-content:center;flex:none}.nfi .ic{width:18px;height:18px;margin:0}
+@media(max-width:600px){.cbtn.nb{width:46px;height:46px;bottom:138px}body.nto .cbtn.nb{bottom:calc(var(--ftH,0px) + var(--ntH,0px) + 16px + 120px)}body.nofab .cbtn.nb{bottom:78px}body.nofab.nto .cbtn.nb{bottom:calc(var(--ftH,0px) + var(--ntH,0px) + 76px)}.npan{bottom:192px}body.nofab .npan{bottom:136px}}
 </style>
 </head>
 <body>
@@ -1079,11 +1095,11 @@ if(moved){vwApply(v);ntRail()}
 if(!dir&&!v.min){VWD.w=v.w;VWD.h=v.h;try{localStorage.setItem('vw',JSON.stringify(VWD))}catch(_){}}else if(dir){VWD.w=v.w;VWD.h=v.h;try{localStorage.setItem('vw',JSON.stringify(VWD))}catch(_){}}};
 el.addEventListener('pointermove',mv);el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up)}
 addEventListener('resize',()=>{VWS.forEach(v=>{vwClamp(v);vwApply(v)});fvRender();renderSidebar()});
-const vwHtml=v=>{const pdf=v.type==='pdf',i=v.vid,nd=rsBlocked('dl');return `<div class="vwin" data-vid="${i}" onpointerdown="vwFocus('${i}')"><div class="vh" onpointerdown="vwDown(event,'${i}','')" ondblclick="if(!event.target.closest('button,a'))vwMax('${i}')"><h2>${E(v.title)}</h2><div class="vbs">${nd?'':`<a class="vbt vdl" href="${v.url}" target="_blank" rel="noopener" title="Download">${IC.dl}</a>`}<button class="vbt vpn" title="Pin to sidebar" onclick="vwPin('${i}')">${ico('pin')}</button><button class="vbt vmn" title="Minimize" onclick="vwMin('${i}')">${IC.min}</button><button class="vbt vmx" title="Maximize" onclick="vwMax('${i}')">${IC.max}</button><button class="vbt x" title="Close" onclick="closeViewer('${i}')">${IC.x}</button></div></div><div class="vb">${pdf?`<object data="${v.url}${nd?'#toolbar=0&navpanes=0':''}" type="application/pdf" style="width:100%;height:100%"><div style="padding:30px;text-align:center"><p style="margin-bottom:12px">This browser can't show the PDF here.</p>${nd?'':`<a href="${v.url}" target="_blank" rel="noopener" class="btn p">Open PDF in a new tab</a>`}</div></object>`:`<img src="${v.url}" alt="" draggable="false" ${nd?'oncontextmenu="return false"':''}>`}</div>${['n','s','e','w','ne','nw','se','sw'].map(d=>`<i class="vrs" data-d="${d}" onpointerdown="vwDown(event,'${i}','${d}')"></i>`).join('')}</div>`};
+const vwHtml=v=>{const pdf=v.type==='pdf',i=v.vid,nd=rsBlocked('dl');return `<div class="vwin" data-vid="${i}" onpointerdown="vwFocus('${i}')"><div class="vh" onpointerdown="vwDown(event,'${i}','')" ondblclick="if(!event.target.closest('button,a'))vwMax('${i}')"><h2>${E(v.title)}</h2><div class="vbs">${pdf?`<span class="pvn mu sm"></span><button class="vbt" title="Zoom out" onclick="pvZoom('${i}',-1)">${ico('minus')}</button><button class="vbt" title="Zoom in" onclick="pvZoom('${i}',1)">${ico('plus')}</button>`:''}${nd?'':`<a class="vbt vdl" href="${v.url}" target="_blank" rel="noopener" title="Download">${IC.dl}</a>`}<button class="vbt vpn" title="Pin to sidebar" onclick="vwPin('${i}')">${ico('pin')}</button><button class="vbt vmn" title="Minimize" onclick="vwMin('${i}')">${IC.min}</button><button class="vbt vmx" title="Maximize" onclick="vwMax('${i}')">${IC.max}</button><button class="vbt x" title="Close" onclick="closeViewer('${i}')">${IC.x}</button></div></div><div class="vb${pdf?' pdfv':''}">${pdf?`<div class="pvl">Loading PDF…</div><div class="pvp"></div>`:`<img src="${v.url}" alt="" decoding="async" draggable="false" onload="this.classList.add('ld')" onerror="this.classList.add('ld')" ${nd?'oncontextmenu="return false"':''}>`}</div>${['n','s','e','w','ne','nw','se','sw'].map(d=>`<i class="vrs" data-d="${d}" onpointerdown="vwDown(event,'${i}','${d}')"></i>`).join('')}</div>`};
 function renderFileViewer(){let r=$('#fileViewerRoot');if(!r){r=document.createElement('div');r.id='fileViewerRoot';document.body.appendChild(r)}
-[...r.children].forEach(c=>{if(!VWS.some(v=>v.vid==c.dataset.vid))c.remove()});
+[...r.children].forEach(c=>{if(!VWS.some(v=>v.vid==c.dataset.vid)){pvKill(c.dataset.vid);c.remove()}});
 VWS.forEach(v=>{if(!r.querySelector('.vwin[data-vid="'+v.vid+'"]'))r.insertAdjacentHTML('beforeend',vwHtml(v))});
-VWS.forEach(vwApply);fvRender()}
+VWS.forEach(vwApply);fvRender();VWS.forEach(v=>{if(v.type==='pdf'&&!v.pv){v.pv=1;pvInit(v)}})}
 
 /* click outside the file windows, or Esc: float windows go to the sidebar (PC) or the bottom strip (phone) */
 function vwAuto(top){const fl=VWS.filter(v=>!v.pin&&!v.min);if(!fl.length)return false;
@@ -1920,7 +1936,7 @@ stSave=s=>{s.ts=Date.now();try{localStorage.setItem('st_'+ME.id,JSON.stringify(s
 stEl=(a,n=Date.now())=>Math.max(0,Math.floor((n-a.start-a.pt-(a.pa?n-a.pa:0))/1000)),
 stW=a=>a.w||600,
 stPl=a=>a.pl||((a.mode=='mini'||a.mn)?900:3600),stPlLeft=a=>Math.max(0,Math.floor((stPl(a)*1000-a.pt-(a.pa?Date.now()-a.pa:0))/1000)),
-stDer=s=>{const t=phDay(),gap=s.last?dayDiff(s.last,t):99,br=s.streak>0&&gap>=2;return{t,br,cur:br?0:s.streak,lost:br?s.streak:0,today:(s.dc[t]||0)>=1,fd:(s.dc[t]||0)>=1,rv:7-(s.rv.m==t.slice(0,7)?s.rv.u:0)}},
+stDer=s=>{const t=phDay(),rd=s.rd||[];let br=false;if(s.streak>0){if(!s.last)br=true;else{const gap=dayDiff(s.last,t);for(let i=1;i<gap&&i<400;i++){const d=new Date(Date.parse(s.last+'T00:00:00Z')+i*864e5).toISOString().slice(0,10);if(!rd.includes(d)){br=true;break}}}}return{t,br,rest:rd.includes(t),cur:br?0:s.streak,lost:br?s.streak:0,today:(s.dc[t]||0)>=1,fd:(s.dc[t]||0)>=1,rv:7-(s.rv.m==t.slice(0,7)?s.rv.u:0)}},
 stPhase=s=>{const a=s.a;if(!a)return'i';const r=a.g-stEl(a);return a.pa?'p':r<=0?'o':'r'},
 stExp=s=>{const a=s.a;return tmd(Date.now()+(a?Math.max(0,a.g-stEl(a)):s.goal*60)*1000)},
 stName=m=>`<div class="stT lt">${m=='mini'?'Mini Lock In':'Lock in Study'}</div>`,
@@ -1932,7 +1948,7 @@ stLog=l=>`<p class="sm mu">${{start:''+ico('play')+'Started',pause:''+ico('pause
 /* phone version of the Lock in card: title, live clock, then the streak */
 function stMobHtml(s){const d=stDer(s),a=s.a,nm=a?(a.mode=='mini'||a.mn?'mini':'full'):(d.fd?'mini':s.pm);
 const hide=rsBlocked('ms');/* streak hidden by the admin: only the clock stays */
-return `${hide?'':stName(nm)}<div class="stMc" data-st="clock">${tms(Date.now())}</div><p class="mu sm" style="margin:0"><span data-st="date">${phF({weekday:'long',month:'long',day:'numeric'},Date.now())}</span> · ${tzn()}</p>${hide?'':stStreak(s)}`}
+return `${hide?'':stName(nm)}<div class="stMc" data-st="clock">${tms(Date.now())}</div><p class="mu sm" style="margin:0"><span data-st="date">${phF({weekday:'long',month:'long',day:'numeric'},Date.now())}</span> · ${tzn()}</p>${hide?'':stStreak(s)+stRestBtn(s)}`}
 function stStreak(s){const d=stDer(s),n=d.cur,full=n>0&&n%7==0,c=full?7:n%7,nx=(Math.floor(n/7)+1)*7,nxi=Math.floor(c);
 return `<div class="stS"><div class="stSh"><b>${ico('flame')}${fm(n)} day${n==1?'':'s'} streak</b>${full?`<span class="stM">${ico('trophy')}${fm(n)} days straight!</span>`:''}</div><div class="stDots">${[0,1,2,3,4,5,6].map(i=>{const f=Math.min(1,Math.max(0,c-i));return `<span class="sd${f>=1?' on':f>0?' half':i==nxi&&!d.today?' nx':''}">${ico('flame')}</span>`}).join('')}</div><p class="sm mu">Next milestone: <b class="stM">${nx} days</b> · ${fm(nx-n)} to go</p></div>`}
 const stDelOk=(s,x)=>x.res!='live'&&x.day==phDay()&&(!x.sn||s.h.find(y=>y.sn&&y.day==x.day)===x);
@@ -1948,13 +1964,13 @@ const stHist=s=>`<button class="btn" onclick="stHistOpen()">${ico('history')}Stu
 function stDashHtml(){const s=stLoad(),d=stDer(s),a=s.a,run=!!a,pm=d.fd?'mini':s.pm,g=s.gk==pm?s.goal:0,w=a?stW(a):0,e=a?stEl(a):0,r=a?Math.max(0,a.g-e):0,ov=a?Math.max(0,e-a.g):0,l=a||s.h.find(x=>x.day==d.t),sd=l?tm(l.start):'--',ed=!a&&l&&l.end?tm(l.end):'--',
 nm=a?(a.mode=='mini'||a.mn?'mini':'full'):pm;
 return `${stName(nm)}<div class="stTop"><div><div class="stBig" data-st="clock">${tms(Date.now())}</div><p class="mu sm"><span data-st="date">${phF({weekday:'long',month:'long',day:'numeric'},Date.now())}</span> · ${tzn()}</p></div>${stStreak(s)}</div>
-${d.br&&!run?stBrk(d):''}
+${d.br&&!run?stBrk(d):''}${d.rest?'<p class="stRst sm">'+ico('moon')+'Rest day today. Your streak is safe.</p>':''}
 <div class="stCols"><div class="stL">
 <div class="seg" ${run?'style="pointer-events:none;opacity:.5"':''} style="align-self:flex-start"><button class="${pm=='full'?'on':''}" ${d.fd?'disabled':''} onclick="stMode('full')">Lock in Study${d.fd?' '+ico('check')+'':''}</button><button class="${pm=='mini'?'on':''}" onclick="stMode('mini')">Mini Lock In</button></div>
 <div class="stRow"><div ${run?'style="pointer-events:none;opacity:.5"':''}>${dd('stGoal',[['','Select timer']].concat((pm=='mini'?MINI:FULL).map(x=>[x,gl(x)])),g||'')}</div><button class="btn" ${run?'disabled':''} onclick="stSet()">Set</button>${g&&!run?`<span class="tag">Timer set: ${gl(g)}</span>`:''}</div>
 <button class="btn p" ${g&&!run?'':'disabled'} onclick="stAsk()">${ico('play')}Start study</button>
 <button class="btn p" ${run?'':'disabled'} onclick="stEnd()">${ico('square')}End study</button>
-<div class="stRow"><button class="btn" ${run?'':'disabled'} onclick="stStop()">Stop</button><button class="btn" ${run||g?'':'disabled'} onclick="stReset()">Reset</button></div>
+<div class="stRow"><button class="btn" ${run?'':'disabled'} onclick="stStop()">Stop</button><button class="btn" ${run||g?'':'disabled'} onclick="stReset()">Reset</button><button class="btn" ${run?'disabled':''} onclick="stRest()">${ico('moon')}${d.rest?'Cancel rest day':'Rest day'}</button></div>
 </div><div class="stR">
 <div class="stKv"><span class="mu sm">Time left</span><b class="stTL" data-st="rem">${hms(run?r:g*60)}</b></div>
 <div class="stKv sm"><span class="mu">Expected end</span><b data-st="exp">${g||run?stExp(s):'--'}</b></div>
@@ -2721,7 +2737,7 @@ if(AU.mode=='newpw')go('auth');else if(location.hash=='#/auth')go('dash');else r
 Object.assign(ICP,{chat:'<path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>',send:'<path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/>',minus:'<path d="M5 12h14"/>',more:'<circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>',sliders:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',back:'<path d="m12 19-7-7 7-7M19 12H5"/>',clipf:'<path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/>',hash:'<path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"/>',shield:'<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/>'});
 RESTR.push({k:'chat',t:'Chat',d:'The whole chat: public channels, direct messages and the admin thread. Restricted students do not see the chat button and cannot send messages.',on:'Chat off',off:'Chat on',who:'Chat turned off for'},
 {k:'dm',t:'Direct messages between students',d:'One-to-one chats with other students. Public channels and the admin thread keep working.',on:'DMs off',off:'DMs on',who:'Direct messages turned off for'});
-const CH={ok:null,err:'',init:0,users:{},tint:{},rooms:[],open:0,tab:'pub',set:0,q:'',mon:0,wins:[],msgs:{},old:{},reads:{},draft:{},focus:null,prefs:{show:true,lock:'show'},blk:{mine:new Set(),by:new Set()},mute:null,sub:null,poll:null,rt:0,st:'',stT:null,mod:null,timers:{}};
+const CH={ok:null,err:'',init:0,users:{},tint:{},rooms:[],open:0,tab:'pub',set:0,q:'',mon:0,wins:[],msgs:{},old:{},reads:{},draft:{},focus:null,prefs:{show:true,lock:'show',mlock:0,bn:0},rp:{},blk:{mine:new Set(),by:new Set()},mute:null,sub:null,poll:null,rt:0,st:'',stT:null,mod:null,timers:{}};
 const chRoot=()=>{let r=document.getElementById('chatRoot');if(!r){r=document.createElement('div');r.id='chatRoot';document.body.appendChild(r)}return r};
 const chNm=id=>{const u=CH.users[id];return u?u.name:'User'};
 const chIni=n=>{const m=(n||'').match(/\p{L}/u);return m?m[0].toUpperCase():((n||'?').trim().slice(0,1).toUpperCase()||'?')};
@@ -2734,7 +2750,7 @@ function chSt(){if(!CH.prefs.show)return'hidden';let a=null;try{a=ME&&stLoad().a
 function chPres(uid){if(!ME||!CH.prefs.show||uid==ME.id)return'';const m=ONL[uid];if(!m||!m.length)return'';const s=(m[m.length-1].cs)||'active';return s=='hidden'?'':s}
 function chPresSync(){clearTimeout(CH.timers.p);CH.timers.p=setTimeout(()=>{if(CH.ok&&(CH.open||CH.wins.length))chRender()},400)}
 async function chPrefsLoad(){try{const l=JSON.parse(localStorage.getItem('chp_'+ME.id)||'null');if(l)CH.prefs=Object.assign(CH.prefs,l)}catch(e){}
-const r=await sb.from('chat_prefs').select('*').eq('user_id',ME.id).maybeSingle();if(r&&r.data){CH.prefs={show:r.data.show_active,lock:r.data.lock_mode};try{localStorage.setItem('chp_'+ME.id,JSON.stringify(CH.prefs))}catch(e){}}}
+const r=await sb.from('chat_prefs').select('*').eq('user_id',ME.id).maybeSingle();if(r&&r.data){CH.prefs=Object.assign(CH.prefs,{show:r.data.show_active,lock:r.data.lock_mode});try{localStorage.setItem('chp_'+ME.id,JSON.stringify(CH.prefs))}catch(e){}}}
 function chPref(k,v){CH.prefs[k]=v;try{localStorage.setItem('chp_'+ME.id,JSON.stringify(CH.prefs))}catch(e){}
 sb.from('chat_prefs').upsert({user_id:ME.id,show_active:CH.prefs.show,lock_mode:CH.prefs.lock,updated_at:new Date().toISOString()}).then(r=>r.error&&console.warn('Chat prefs:',r.error.message));
 CH.st=chSt();stPresTrack();chRender()}
@@ -2743,10 +2759,10 @@ async function chInit(){if(!ME||CH.init)return;CH.init=1;
 try{const[u,o]=await Promise.all([sb.rpc('chat_users'),sb.rpc('chat_overview')]);
 if(u.error||o.error){CH.ok=false;CH.err=(u.error||o.error).message||'';chPos();chRender();return}
 CH.users={};(u.data||[]).forEach(x=>{CH.users[x.id]={name:x.display_name,role:x.role}});chIndex();chSetRooms(o.data||[]);
-await Promise.all([chPrefsLoad(),chBlocksLoad(),chMuteLoad()]);CH.ok=true;CH.st=chSt();stPresTrack();chSub();chPos();chRender();
+await Promise.all([chPrefsLoad(),chBlocksLoad(),chMuteLoad(),chRPLoad()]);CH.ok=true;CH.st=chSt();stPresTrack();chSub();chPos();chRender();
 clearInterval(CH.poll);CH.poll=setInterval(()=>{const s=chSt();if(s!=CH.st){CH.st=s;stPresTrack()}if(!CH.rt)chRefresh()},5000)}
 catch(e){console.warn('Chat:',e);CH.ok=false;CH.err=e.message||''}}
-function chReset(){clearInterval(CH.poll);if(CH.sub){try{sb.removeChannel(CH.sub)}catch(e){}}Object.assign(CH,{ok:null,err:'',init:0,users:{},tint:{},rooms:[],open:0,tab:'pub',set:0,q:'',mon:0,wins:[],msgs:{},old:{},reads:{},draft:{},focus:null,sub:null,rt:0,mod:null,mute:null});CH.blk={mine:new Set(),by:new Set()};const r=document.getElementById('chatRoot');if(r)r.innerHTML=''}
+function chReset(){clearInterval(CH.poll);if(CH.sub){try{sb.removeChannel(CH.sub)}catch(e){}}Object.assign(CH,{ok:null,err:'',init:0,users:{},tint:{},rooms:[],open:0,tab:'pub',set:0,q:'',mon:0,wins:[],msgs:{},old:{},reads:{},draft:{},focus:null,sub:null,rt:0,mod:null,mute:null,rp:{}});NF.ld=0;NF.pk={};NF.open=0;if(NF.sub){try{sb.removeChannel(NF.sub)}catch(e){}NF.sub=null}ntfSoft();CH.blk={mine:new Set(),by:new Set()};const r=document.getElementById('chatRoot');if(r)r.innerHTML=''}
 function chSetRooms(a){CH.rooms=a.map(x=>({id:x.room_id,kind:x.kind,key:x.key,name:x.name,p1:x.p1,p2:x.p2,mine:!!x.mine,lastId:x.last_id||0,body:x.last_body||'',att:!!x.last_att,sender:x.last_sender,at:x.last_at,del:!!x.last_deleted,unread:x.unread||0}))}
 async function chLoad(){const o=await sb.rpc('chat_overview');if(o.error)throw o.error;chSetRooms(o.data||[])}
 async function chBlocksLoad(){const r=await sb.from('chat_blocks').select('*');CH.blk={mine:new Set(),by:new Set()};((r&&r.data)||[]).forEach(x=>{if(x.blocker==ME.id)CH.blk.mine.add(x.blocked);else if(x.blocked==ME.id)CH.blk.by.add(x.blocker)})}
@@ -2754,7 +2770,7 @@ async function chMuteLoad(){const r=await sb.from('chat_mutes').select('*').eq('
 const chMuted=s=>!!(CH.mute&&CH.mute[s]&&(!CH.mute.until||new Date(CH.mute.until)>Date.now()));
 async function chRefresh(){if(!ME||!CH.ok)return;try{await chLoad();for(const w of CH.wins){const L=CH.msgs[w.k];if(L){const last=L.filter(x=>!x._p).slice(-1)[0],r=await sb.from('chat_messages').select('*').eq('room_id',w.k).gt('id',last?last.id:0).order('id');((r&&r.data)||[]).forEach(m=>{if(!L.some(x=>x.id==m.id))L.push(m)})}}
 chBadge();if(CH.open)chListPatch();CH.wins.forEach(w=>chPatch(w.k))}catch(e){}}
-function chSub(){if(CH.sub)return;CH.sub=sb.channel('chat-live').on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages'},p=>chOnMsg(p.new)).on('postgres_changes',{event:'UPDATE',schema:'public',table:'chat_messages'},p=>chOnUpd(p.new)).on('postgres_changes',{event:'*',schema:'public',table:'chat_reads'},p=>chOnRead(p.new)).subscribe(s=>{CH.rt=(s=='SUBSCRIBED')})}
+function chSub(){if(CH.sub)return;CH.sub=sb.channel('chat-live').on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_messages'},p=>chOnMsg(p.new)).on('postgres_changes',{event:'UPDATE',schema:'public',table:'chat_messages'},p=>chOnUpd(p.new)).on('postgres_changes',{event:'DELETE',schema:'public',table:'chat_messages'},p=>chOnDel(p.old)).on('postgres_changes',{event:'*',schema:'public',table:'chat_reads'},p=>chOnRead(p.new)).subscribe(s=>{CH.rt=(s=='SUBSCRIBED')})}
 addEventListener('focus',()=>{if(CH.ok){chRefresh();CH.wins.forEach(w=>!w.min&&chRead(w.k))}});
 /* ---- rooms ---- */
 const chRoom=id=>CH.rooms.find(r=>r.id==id);
@@ -2764,7 +2780,7 @@ function chRoomAv(r,sz){sz=sz||38;if(r.kind=='channel')return `<span class="cav 
 if(r.kind=='admin'&&role!='admin')return `<span class="cav adm" style="width:${sz}px;height:${sz}px">${ico('shield')}</span>`;return chAv(r.kind=='dm'&&r.mine?chOther(r):r.p1,sz)}
 function chSubT(r){if(r.kind=='channel')return 'Public channel';if(!r.mine)return 'Read-only (admin view)';const o=chOther(r),p=o?chPres(o):'';if(r.kind=='admin'&&role!='admin')return 'Ask the reviewers anything';return p=='active'?'Active now':p=='lockin'?'Locked in':''}
 const chUn=f=>CH.rooms.filter(f).reduce((n,r)=>n+(r.mine?r.unread:0),0);
-const chBadgeN=()=>chUn(r=>r.kind!='channel');
+const chBadgeN=()=>CH.rooms.filter(r=>chU(r)>0&&!chIgn(r)).length;
 function chBadge(){const b=document.getElementById('chBtn');if(!b)return;const n=chBadgeN();let i=b.querySelector('.cb');if(n){if(!i){i=document.createElement('i');i.className='cb';b.appendChild(i)}i.textContent=n>9?'9+':n}else if(i)i.remove()}
 function chPos(){document.body.classList.toggle('nofab',!document.querySelector('#fabRoot .fab'))}
 renderFab=(f=>function(){f();chPos()})(renderFab);
@@ -2785,22 +2801,22 @@ function chMin(e,k){e&&e.stopPropagation();const w=CH.wins.find(x=>x.k==k);if(w)
 function chHeadClick(e,k){}
 async function chOpenDM(uid){try{if(CH.users[uid]&&CH.users[uid].role=='admin')return chOpenAdmin();const r=await sb.rpc('chat_open_dm',{other:uid});if(r.error)throw r.error;await chLoad();CH.q='';chOpen(r.data)}catch(e){toast(chErr(e))}}
 async function chOpenAdmin(sid){try{const r=await sb.rpc('chat_open_admin',{student:sid||null});if(r.error)throw r.error;await chLoad();CH.q='';chOpen(r.data)}catch(e){toast(chErr(e))}}
-function chToggle(e){e.stopPropagation();CH.open=!CH.open;CH.set=0;CH.q='';chRender();if(CH.open)chRefresh()}
+function chToggle(e){e.stopPropagation();NF.open=0;ntfRender();CH.open=!CH.open;CH.set=0;CH.q='';chRender();if(CH.open)chRefresh()}
 document.addEventListener('click',e=>{if(CH.open&&!e.target.closest('.cpan,#chBtn')){CH.open=0;chRender()}if(!e.target.closest('#chPop,.cmm,.cwb'))chPopClose()});
 addEventListener('keydown',e=>{if(e.key=='Escape'&&CH.open&&!MD){CH.open=0;chRender()}});
 addEventListener('resize',()=>{if(CH.ok){chCap();chRender()}});
 /* ---- read / delivered ---- */
-function chRead(k){const r=chRoom(k);if(!r||!r.mine)return;r.unread=0;chBadge();if(CH.open)chListPatch();clearTimeout(CH.timers['r'+k]);CH.timers['r'+k]=setTimeout(()=>{sb.rpc('chat_mark_read',{rid:k,upto:r.lastId||0}).then(x=>x.error&&console.warn('Chat read:',x.error.message))},300)}
+function chRead(k){const r=chRoom(k);if(!r||!r.mine)return;r.unread=0;if(chRP(k).fu){chRP(k).fu=0;chRPSave(k)}chBadge();if(CH.open)chListPatch();clearTimeout(CH.timers['r'+k]);CH.timers['r'+k]=setTimeout(()=>{sb.rpc('chat_mark_read',{rid:k,upto:r.lastId||0}).then(x=>x.error&&console.warn('Chat read:',x.error.message))},300)}
 function chDeliver(k){clearTimeout(CH.timers['d'+k]);CH.timers['d'+k]=setTimeout(()=>{sb.rpc('chat_mark_delivered',{rid:k}).then(x=>x.error&&console.warn('Chat delivered:',x.error.message))},250)}
 /* ---- live events ---- */
 function chOnMsg(m){if(!ME||!m)return;const r=chRoom(m.room_id);
 if(!r){/* a brand-new conversation: the server's overview already counts this message as unread, so do not add it twice */
-chLoad().then(()=>{const r2=chRoom(m.room_id);if(!r2)return;if(m.sender_id!=ME.id&&r2.mine&&r2.kind!='channel'){chDeliver(r2.id);if(!CH.open&&!document.hidden)toast(chNm(m.sender_id)+': '+(m.body||'sent a file').slice(0,60))}chBadge();if(CH.open)chListPatch();chHeads()}).catch(()=>{});return}chOnMsg2(r,m)}
+chLoad().then(()=>{const r2=chRoom(m.room_id);if(!r2)return;if(m.sender_id!=ME.id&&r2.mine&&r2.kind!='channel'){chDeliver(r2.id);if(!CH.open&&!document.hidden&&!chIgn(r2))toast(chNm(m.sender_id)+': '+(m.body||'sent a file').slice(0,60))}chBadge();if(CH.open)chListPatch();chHeads()}).catch(()=>{});return}chOnMsg2(r,m)}
 function chOnMsg2(r,m){const mine=m.sender_id==ME.id,L=CH.msgs[r.id];
 if(L){const ix=L.findIndex(x=>x.id==m.id);if(ix>=0)Object.assign(L[ix],m);else{const p=mine?L.findIndex(x=>x._p&&x.body==m.body):-1;if(p>=0)L[p]=m;else L.push(m)}}
 if(m.id>=r.lastId){r.lastId=m.id;r.body=m.body;r.att=!!(m.att&&m.att.length);r.sender=m.sender_id;r.at=m.created_at;r.del=m.deleted}
 const w=CH.wins.find(x=>x.k==r.id&&!x.min),vis=w&&!document.hidden;
-if(!mine&&r.mine){if(r.kind!='channel')chDeliver(r.id);if(vis)chRead(r.id);else{r.unread=Math.min(99,(r.unread||0)+1);if(r.kind!='channel'&&!CH.open&&!document.hidden)toast(chNm(m.sender_id)+': '+(m.body||'sent a file').slice(0,60))}}
+if(!mine&&r.mine){if(r.kind!='channel')chDeliver(r.id);if(vis)chRead(r.id);else{r.unread=Math.min(99,(r.unread||0)+1);if(r.kind!='channel'&&!CH.open&&!document.hidden&&!chIgn(r))toast(chNm(m.sender_id)+': '+(m.body||'sent a file').slice(0,60))}}
 chBadge();if(CH.open)chListPatch();chPatch(r.id);chHeads()}
 function chOnUpd(m){if(!m)return;const L=CH.msgs[m.room_id];if(L){const x=L.find(y=>y.id==m.id);if(x)Object.assign(x,m)}const r=chRoom(m.room_id);if(r&&r.lastId==m.id){r.body=m.body;r.del=m.deleted;r.att=!!(m.att&&m.att.length)}if(CH.open)chListPatch();chPatch(m.room_id)}
 function chOnRead(row){if(!row||!row.room_id)return;(CH.reads[row.room_id]=CH.reads[row.room_id]||{})[row.user_id]=row.last_id;chPatch(row.room_id)}
@@ -2831,14 +2847,17 @@ function chAtt(id){if(!D.M.find(x=>x.id==id))return toast('You do not have acces
 function chPopClose(){const p=document.getElementById('chPop');if(p)p.remove()}
 function chPop(e,items){e.stopPropagation();chPopClose();const b=e.currentTarget.getBoundingClientRect(),p=document.createElement('div');p.id='chPop';p.className='cpop';p.innerHTML=items.filter(Boolean).map(([t,fn,d])=>`<a class="${d?'dng':''}" onclick="chPopClose();${fn}">${t}</a>`).join('');document.getElementById('chatRoot').appendChild(p);
 const w=p.offsetWidth,h=p.offsetHeight;let x=Math.min(innerWidth-w-8,Math.max(8,b.right-w)),y=b.bottom+4;if(y+h>innerHeight-8)y=Math.max(8,b.top-h-4);p.style.left=x+'px';p.style.top=y+'px'}
-function chMsgMenu(e,k,id){const m=(CH.msgs[k]||[]).find(x=>x.id==id);if(!m||m.deleted)return;const mine=m.sender_id==ME.id;
-chPop(e,[mine||role=='admin'?[mine?'Unsend':'Remove for everyone',`chDel(${id})`,1]:null,!mine?['Report',`chReportAsk(${id})`]:null,role=='admin'&&!mine?['Mute sender…',`chMuteAsk('${m.sender_id}')`]:null])}
+function chMsgMenu(e,k,id){const m=(CH.msgs[k]||[]).find(x=>x.id==id);if(!m)return;const mine=m.sender_id==ME.id,live=!m.deleted;
+chPop(e,[live&&(mine||role=='admin')?[mine?'Unsend':'Remove for everyone',`chDel(${id})`,1]:null,mine||role=='admin'?['Delete for everyone',`chPurgeAsk('${k}',${id})`,1]:null,['Delete for me',`chDelMe('${k}',${id})`],live&&!mine?['Report',`chReportAsk(${id})`]:null,live&&role=='admin'&&!mine?['Mute sender…',`chMuteAsk('${m.sender_id}')`]:null])}
+function chPurgeAsk(k,id){showConfirm('Delete for everyone?','The message disappears from the chat for everyone, with no “Message removed” left behind. This cannot be undone.',async()=>{const r=await sb.rpc('chat_purge',{mid:id});
+if(r.error){toast(/not allowed/i.test(r.error.message)?'You can only delete your own messages.':'Delete for everyone is not set up yet. Run chat_extras.sql once.');return}chOnDel({id})})}
+function chOnDel(o){if(!o||o.id==null)return;let hit=null;Object.keys(CH.msgs).forEach(k=>{const L=CH.msgs[k],i=L.findIndex(x=>x.id==o.id);if(i>=0){L.splice(i,1);hit=k}});if(hit)chPatch(hit);chRefresh()}
 async function chDel(id){const r=await sb.rpc('chat_delete',{mid:id});if(r.error)toast(chErr(r.error))}
 function chWinMenu(e,k){const r=chRoom(k);if(!r)return;const o=chOther(r);
 chPop(e,[r.kind=='dm'&&r.mine&&o?(CH.blk.mine.has(o)?['Unblock '+E(chNm(o)),`chUnblock('${o}')`]:['Block '+E(chNm(o)),`chBlockAsk('${o}')`,1]):null,role=='admin'&&o?['Mute '+E(chNm(o))+'…',`chMuteAsk('${o}')`]:null,['Close chat',`chClose(null,'${k}')`]])}
 function chBlockAsk(u){showConfirm('Block '+chNm(u)+'?','They will not be able to message you and you cannot message them, until you unblock. Admins can still read past messages.',async()=>{const r=await sb.rpc('chat_block',{u});if(r.error)throw r.error;CH.blk.mine.add(u);chRender();toast(chNm(u)+' blocked')})}
 async function chUnblock(u){const r=await sb.rpc('chat_unblock',{u});if(r.error)return toast(chErr(r.error));CH.blk.mine.delete(u);chRender();toast(chNm(u)+' unblocked')}
-function chReportAsk(id){openMdl({title:'Report message',okText:'Send report',body:`<div class="field"><label>Reason</label>${dd('chRsn',['Spam','Harassment or bullying','Inappropriate content','Cheating or sharing answers','Other'],'Spam')}</div><div class="field"><label>Details (optional)</label><textarea id="chRn" maxlength="500" placeholder="Tell the admins what happened"></textarea></div>`,
+function chReportAsk(id,ti){openMdl({title:ti||'Report message',okText:'Send report',body:`<div class="field"><label>Reason</label>${dd('chRsn',['Spam','Harassment or bullying','Inappropriate content','Cheating or sharing answers','Other'],'Spam')}</div><div class="field"><label>Details (optional)</label><textarea id="chRn" maxlength="500" placeholder="Tell the admins what happened"></textarea></div>`,
 onOk:async()=>{const r=await sb.rpc('chat_report',{mid:id,why:v('chRsn'),extra:($('#chRn').value||'').trim()||null});if(r.error)throw r.error;toast('Report sent to the admins')}})}
 function chMuteAsk(u){openMdl({title:'Mute '+chNm(u),okText:'Mute',body:`<div class="field"><label class="msi"><input type="checkbox" id="chMp" checked><span>Public channels</span></label><label class="msi"><input type="checkbox" id="chMd"><span>Direct messages</span></label></div><div class="field"><label>For</label>${dd('chMt',[['1h','1 hour'],['1d','1 day'],['7d','7 days'],['inf','Until I unmute']],'1d')}</div><p class="mu sm">Muted students can still message the admins.</p>`,
 onOk:async()=>{const pub=$('#chMp').checked,dm=$('#chMd').checked;if(!pub&&!dm){toast('Pick public chat, direct messages, or both');return false}const t=v('chMt'),until=t=='inf'?null:new Date(Date.now()+({'1h':36e5,'1d':864e5,'7d':6048e5})[t]).toISOString();
@@ -2846,7 +2865,7 @@ const r=await sb.from('chat_mutes').upsert({user_id:u,pub,dm,until,by:ME.id});if
 /* ---- rendering ---- */
 const chLink=t=>E(t).replace(/\n/g,'<br>').replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
 function chSeers(k){const r=chRoom(k),rd=CH.reads[k]||{},o=[];Object.keys(rd).forEach(u=>{if(u==ME.id)return;if(r.kind=='admin'&&role!='admin'&&!(CH.users[u]&&CH.users[u].role=='admin'))return;o.push({u,last:rd[u]})});return o}
-function chMsgsHtml(k){const r=chRoom(k),L=CH.msgs[k]||[],me=ME.id;if(!r)return'';let h='';
+function chMsgsHtml(k){const r=chRoom(k),L=chVis(k),me=ME.id;if(!r)return'';let h='';
 if(CH.old[k])h+=`<button class="cmore" onclick="chOlder('${k}')">Load earlier messages</button>`;
 h+=`<p class="cnote">${r.kind=='channel'?'Public channel. Everyone can read this.':!r.mine?'Read-only admin view.':'Admins can read this conversation.'}</p>`;
 const dm=r.kind!='channel'&&r.mine,mineIds=L.filter(m=>m.sender_id==me&&!m._f&&m.id>0).map(m=>m.id),heads={};
@@ -2856,7 +2875,7 @@ L.forEach((m,i)=>{const t=+new Date(m.created_at),sep=!prev||t-(+new Date(prev.c
 if(sep)h+=`<div class="csep">${phDay(t)==phDay()?'':phF({month:'short',day:'numeric'},t)+' · '}${tm(t)}</div>`;
 const first=sep||prev.sender_id!=m.sender_id,nx=L[i+1],last=!nx||nx.sender_id!=m.sender_id||(+new Date(nx.created_at))-t>18e5;
 let body=m.deleted?'<i class="mu">Message removed</i>':(m.body?`<span>${chLink(m.body)}</span>`:'')+((m.att||[]).map(a=>`<a class="cat" onclick="chAtt('${a.id}')">${ico('file')}<b>${E(a.title)}</b></a>`).join(''));
-h+=`<div class="cmr ${mine?'me':''}">${!mine?`<div class="cmv">${last?chAv(m.sender_id,28,false):''}</div>`:''}<div class="cmc">${!mine&&first&&r.kind!='dm'?`<small class="cnm">${E(chNm(m.sender_id))}${CH.users[m.sender_id]&&CH.users[m.sender_id].role=='admin'?' · admin':''}</small>`:''}<div class="cmbw"><div class="cmb ${m._f?'bad':''} ${m._p?'pend':''}" ${m._f?`onclick="chRetry('${k}',${m.id})"`:''} title="${E(phF({dateStyle:'medium',timeStyle:'short'},t))}">${body}</div>${!m.deleted&&m.id>0?`<button class="cmm" aria-label="Message options" onclick="chMsgMenu(event,'${k}',${m.id})">${ico('more')}</button>`:''}</div></div></div>`;
+h+=`<div class="cmr ${mine?'me':''}">${!mine?`<div class="cmv">${last?chAv(m.sender_id,28,false):''}</div>`:''}<div class="cmc">${!mine&&first&&r.kind!='dm'?`<small class="cnm">${E(chNm(m.sender_id))}${CH.users[m.sender_id]&&CH.users[m.sender_id].role=='admin'?' · admin':''}</small>`:''}<div class="cmbw"><div class="cmb ${m._f?'bad':''} ${m._p?'pend':''}" ${m._f?`onclick="chRetry('${k}',${m.id})"`:''} title="${E(phF({dateStyle:'medium',timeStyle:'short'},t))}">${body}</div>${m.id>0?`<button class="cmm" aria-label="Message options" onclick="chMsgMenu(event,'${k}',${m.id})">${ico('more')}</button>`:''}</div></div></div>`;
 if(mine&&dm&&!m.deleted){const hd=heads[m.id];if(hd&&hd.length)h+=`<div class="cseen">${hd.slice(0,3).map(u=>chAv(u,14,false)).join('')}</div>`;
 else if(lastMine&&lastMine.id==m.id){h+=`<div class="cst">${m._f?'Not sent. Tap the message to retry.':m._p?'Sending…':m.delivered_at?'Delivered':'Sent'}</div>`}}
 prev=m});
@@ -2865,30 +2884,28 @@ function chFootHtml(w,r){const c=chCan(r);if(!c.ok)return `<div class="cwf off">
 return `<div class="cwf">${(w.att||[]).length?`<div class="cwa">${w.att.map((a,i)=>`<span class="cch">${ico('file')}<b>${E(a.title)}</b><a onclick="chUnatt('${w.k}',${i})" aria-label="Remove">${ico('x')}</a></span>`).join('')}</div>`:''}<div class="cwr"><button class="cwb" title="Attach a file from the site" onclick="chPick('${w.k}')">${ico('clipf')}</button><textarea class="cwi" rows="1" maxlength="2000" placeholder="Aa" oninput="chInput(this,'${w.k}')" onkeydown="chKey(event,'${w.k}')">${E(CH.draft[w.k]||'')}</textarea><button class="cwb send" title="Send" onclick="chSend('${w.k}')">${ico('send')}</button></div></div>`}
 function chWinHtml(w,i){const r=chRoom(w.k);if(!r)return'';const sub=chSubT(r);
 return `<div class="cw" data-k="${w.k}" style="--ci:${i}"><div class="cwh">${chRoomAv(r,32)}<div class="cwt"><b>${E(chTitle(r))}</b><small>${E(sub)}</small></div><button class="cwb" title="Options" onclick="chWinMenu(event,'${w.k}')">${ico('more')}</button><button class="cwb" title="Minimize" onclick="chMin(event,'${w.k}')">${ico('minus')}</button><button class="cwb" title="Close" onclick="chClose(event,'${w.k}')">${ico('x')}</button></div><div class="cwm" onscroll="this.dataset.b=(this.scrollHeight-this.scrollTop-this.clientHeight<40)?1:0">${chMsgsHtml(w.k)}</div>${chFootHtml(w,r)}</div>`}
-function chHeads(){const r=document.getElementById('chatRoot');if(!r)return;r.querySelectorAll('.chd').forEach(h=>{const rm=chRoom(h.dataset.k),n=rm?rm.unread:0;let b=h.querySelector('.cb');if(n){if(!b){b=document.createElement('i');b.className='cb';h.appendChild(b)}b.textContent=n>9?'9+':n}else if(b)b.remove()})}
+function chHeads(){const r=document.getElementById('chatRoot');if(!r)return;r.querySelectorAll('.chd').forEach(h=>{const rm=chRoom(h.dataset.k),n=rm?chU(rm):0;let b=h.querySelector('.cb');if(n){if(!b){b=document.createElement('i');b.className='cb';h.appendChild(b)}b.textContent=n>9?'9+':n}else if(b)b.remove()})}
 function chPatch(k,force){const m=document.querySelector('.cw[data-k="'+k+'"] .cwm');if(!m)return;const atB=force||m.dataset.b!=='0',r=chRoom(k);m.innerHTML=chMsgsHtml(k);if(atB)m.scrollTop=m.scrollHeight;const s=document.querySelector('.cw[data-k="'+k+'"] .cwt small');if(s&&r)s.textContent=chSubT(r)}
 function chTabs(){const t=[['pub','Public',chUn(r=>r.kind=='channel')],['dm','DMs',chUn(r=>r.kind=='dm')],['adm','Admin',chUn(r=>r.kind=='admin')]];return `<div class="ctabs">${t.map(([k,n,u])=>`<a class="${CH.tab==k?'on':''}" onclick="CH.tab='${k}';CH.q='';chRender()">${n}${u?`<i class="cb">${u>9?'9+':u}</i>`:''}</a>`).join('')}</div>`}
-function chRow(r){const un=r.mine?r.unread:0,p=(r.sender==ME.id?'You: ':r.kind!='dm'&&r.sender?chNm(r.sender)+': ':'')+(r.del?'Message removed':r.body||(r.att?'Sent a file':''));
-return `<div class="cli" onclick="chOpen('${r.id}')">${chRoomAv(r)}<div class="clm"><b>${E(chTitle(r))}${!r.mine?' <span class="tag">read-only</span>':''}</b><span class="${un?'u':''}">${E(r.lastId?p:r.kind=='channel'?'No messages yet':'')}</span></div><div class="cls">${r.at?`<small>${chAgo(r.at)}</small>`:''}${un?`<i class="cb">${un>9?'9+':un}</i>`:''}</div></div>`}
+function chRow(r){const un=chU(r),ig=chIgnR(r.id),p=(r.sender==ME.id?'You: ':r.kind!='dm'&&r.sender?chNm(r.sender)+': ':'')+(r.del?'Message removed':r.body||(r.att?'Sent a file':'')),o=r.kind=='dm'&&r.mine?chOther(r):null;
+return `<div class="cli${ig?' ign':''}" onclick="chOpen('${r.id}')">${chRoomAv(r)}<div class="clm"><b>${E(chTitle(r))}${!r.mine?' <span class="tag">read-only</span>':''}${ig?` <span class="mu">${ico('bellOff')}</span>`:''}</b><span class="${un?'u':''}">${E(r.lastId?p:r.kind=='channel'?'No messages yet':'')}</span></div><div class="cls">${r.at?`<small>${chAgo(r.at)}</small>`:''}${un?`<i class="cb">${un>9?'9+':un}</i>`:''}</div><div class="crb">${o?`<button title="Poke" aria-label="Poke" onclick="event.stopPropagation();chPoke('${o}')">${ico('hand')}</button>`:''}<button title="Chat options" aria-label="Chat options" onclick="chRowMenu(event,'${r.id}')">${ico('more')}</button></div></div>`}
 function chListHtml(){const me=ME.id,q=(CH.q||'').trim().toLowerCase(),byAt=(a,b)=>String(b.at||'').localeCompare(String(a.at||''));let h='';
 if(CH.tab=='pub'){const o=['general','MSTC','HPGE','PSAD'];h=CH.rooms.filter(r=>r.kind=='channel').sort((a,b)=>(o.indexOf(a.key)+1||9)-(o.indexOf(b.key)+1||9)).map(chRow).join('')||'<p class="cempty">No channels yet.</p>'}
-else if(CH.tab=='dm'){let l=CH.rooms.filter(r=>r.kind=='dm'&&r.mine&&(r.lastId||CH.wins.some(w=>w.k==r.id))).sort(byAt);if(q)l=l.filter(r=>chTitle(r).toLowerCase().includes(q));h=l.map(chRow).join('');
+else if(CH.tab=='dm'){let l=CH.rooms.filter(r=>r.kind=='dm'&&r.mine&&!chHid(r)&&(r.lastId||CH.wins.some(w=>w.k==r.id))).sort(byAt);if(q)l=l.filter(r=>chTitle(r).toLowerCase().includes(q));h=l.map(chRow).join('');
 if(rsBlocked('dm'))h='<p class="cempty">Direct messages are turned off for your account.</p>';
-else{const ppl=q?Object.keys(CH.users).filter(id=>id!=me&&CH.users[id].role!='admin'&&CH.users[id].name.toLowerCase().includes(q)&&!l.some(r=>chOther(r)==id)).slice(0,8):[];
+else{const ppl=Object.keys(CH.users).filter(id=>id!=me&&CH.users[id].role!='admin'&&(!q||CH.users[id].name.toLowerCase().includes(q))&&!l.some(r=>chOther(r)==id)).sort((a,b)=>chNm(a).localeCompare(chNm(b))).slice(0,q?8:300);
 h+=ppl.length?`<div class="chl">People</div>`+ppl.map(id=>`<div class="cli" onclick="chOpenDM('${id}')">${chAv(id,38)}<div class="clm"><b>${E(chNm(id))}</b><span>Start a conversation</span></div></div>`).join(''):'';
 if(!h)h=`<p class="cempty">${q?'Nobody found.':'No direct messages yet. Search a name above to start one.'}</p>`}
 if(role=='admin'){const mon=CH.rooms.filter(r=>r.kind=='dm'&&!r.mine&&r.lastId).sort(byAt);if(mon.length)h+=`<div class="chl"><a onclick="CH.mon=!CH.mon;chRender()">${CH.mon?'Hide':'Show'} all student DMs (${mon.length})</a></div>`+(CH.mon?mon.filter(r=>!q||chTitle(r).toLowerCase().includes(q)).map(chRow).join(''):'')}}
-else{if(role=='admin'){let l=CH.rooms.filter(r=>r.kind=='admin'&&r.lastId).sort(byAt);if(q)l=l.filter(r=>chTitle(r).toLowerCase().includes(q));h=l.map(chRow).join('');
-const ppl=q?Object.keys(CH.users).filter(id=>CH.users[id].role!='admin'&&CH.users[id].name.toLowerCase().includes(q)&&!l.some(r=>r.p1==id)).slice(0,8):[];
+else{if(role=='admin'){let l=CH.rooms.filter(r=>r.kind=='admin'&&r.lastId&&!chHid(r)).sort(byAt);if(q)l=l.filter(r=>chTitle(r).toLowerCase().includes(q));h=l.map(chRow).join('');
+const ppl=Object.keys(CH.users).filter(id=>CH.users[id].role!='admin'&&(!q||CH.users[id].name.toLowerCase().includes(q))&&!l.some(r=>r.p1==id)).sort((a,b)=>chNm(a).localeCompare(chNm(b))).slice(0,q?8:300);
 h+=ppl.length?`<div class="chl">Students</div>`+ppl.map(id=>`<div class="cli" onclick="chOpenAdmin('${id}')">${chAv(id,38)}<div class="clm"><b>${E(chNm(id))}</b><span>Message this student</span></div></div>`).join(''):'';if(!h)h=`<p class="cempty">${q?'Nobody found.':'No student messages yet. Search a name above to start one.'}</p>`}
 else{const r=CH.rooms.find(x=>x.kind=='admin');h=r?chRow(r):`<div class="cli" onclick="chOpenAdmin()"><span class="cav adm" style="width:38px;height:38px">${ico('shield')}</span><div class="clm"><b>Admins</b><span>Ask the reviewers anything</span></div></div>`}}
 return h}
-function chSetHtml(){const p=CH.prefs;return `<div class="chh"><button class="cwb" onclick="CH.set=0;chRender()" aria-label="Back">${ico('back')}</button><b>Active status</b></div><div class="cset"><label class="tgl"><input type="checkbox" ${p.show?'checked':''} onchange="chPref('show',this.checked)"><i></i><span>Show when I am active</span></label><p class="mu sm">When this is off you appear offline, and you also will not see who else is active.</p>
-<div class="cgrp"><b class="sm">During a Lock In session</b>${[['show','Show me as “Locked in”'],['hide','Hide my status (appear offline)'],['active','Keep showing “Active”']].map(([k,t])=>`<label class="msi"><input type="radio" name="chlm" ${p.lock==k?'checked':''} ${p.show?'':'disabled'} onchange="chPref('lock','${k}')"><span>${t}</span></label>`).join('')}</div><p class="mu sm">Right now you appear as: <b>${{active:'Active',lockin:'Locked in',hidden:'Offline'}[chSt()]}</b>.</p></div>`}
 function chPanelHtml(){if(CH.ok===false)return `<div class="cpan"><div class="chh"><b>Messages</b></div><div class="cset"><p>Chat is not set up yet.</p><p class="mu sm">Run <b>chat.sql</b> once in the Supabase SQL editor, then reload.</p>${CH.err?`<p class="mu sm">${E(CH.err)}</p>`:''}</div></div>`;
 if(CH.set)return `<div class="cpan">${chSetHtml()}</div>`;
 const showQ=CH.tab!='pub'&&!(CH.tab=='adm'&&role!='admin');
-return `<div class="cpan"><div class="chh"><b>Messages</b><button class="cwb" title="Active status" onclick="CH.set=1;chRender()">${ico('sliders')}</button></div>${chTabs()}${showQ?`<div class="csr"><input id="chQ" placeholder="${CH.tab=='adm'?'Search students':'Search people'}" value="${E(CH.q)}" oninput="CH.q=this.value;chListPatch()" autocomplete="off"></div>`:''}<div class="cll" id="chList">${chListHtml()}</div>${CH.tab=='dm'&&!rsBlocked('dm')?'<p class="cft">Admins can read direct messages.</p>':''}</div>`}
+return `<div class="cpan"><div class="chh"><b>Messages</b><button class="cwb" title="Settings" onclick="CH.set=1;chRender()">${ico('sliders')}</button></div>${chTabs()}${showQ?`<div class="csr"><input id="chQ" placeholder="${CH.tab=='adm'?'Search students':'Search people'}" value="${E(CH.q)}" oninput="CH.q=this.value;chListPatch()" autocomplete="off"></div>`:''}<div class="cll" id="chList">${chListHtml()}</div>${CH.tab=='dm'&&!rsBlocked('dm')?'<p class="cft">Admins can read direct messages.</p>':''}</div>`}
 function chListPatch(){const l=document.getElementById('chList');if(l)l.innerHTML=chListHtml();const t=document.querySelector('.cpan .ctabs');if(t)t.outerHTML=chTabs()}
 function chBtnHtml(){const n=chBadgeN();return `<button id="chBtn" class="cbtn" onclick="chToggle(event)" aria-label="Messages" title="Messages">${ico('chat')}${n?`<i class="cb">${n>9?'9+':n}</i>`:''}</button>`}
 function chRender(){const r=chRoot();if(!ME||CH.ok===null||rsBlocked('chat')||(CH.ok===false&&role!='admin')){r.innerHTML='';return}
@@ -2896,7 +2913,7 @@ const sc={};r.querySelectorAll('.cw').forEach(w=>{const m=w.querySelector('.cwm'
 const ae=document.activeElement,fk=ae&&ae.classList&&ae.classList.contains('cwi')?ae.closest('.cw').dataset.k:null,fq=ae&&ae.id=='chQ';
 chCap();const vis=CH.wins.filter(w=>!w.min&&chRoom(w.k)),hd=CH.wins.filter(w=>w.min&&chRoom(w.k));
 r.style.setProperty('--hw',hd.length&&innerWidth>700?'62px':'0px');
-r.innerHTML=chBtnHtml()+(CH.open?chPanelHtml():'')+vis.slice().reverse().map((w,i)=>chWinHtml(w,i)).join('')+(innerWidth>700?hd.map((w,i)=>{const rm=chRoom(w.k),n=rm.unread;return `<div class="chd" data-k="${w.k}" style="--hi:${i}" title="${E(chTitle(rm))}" onclick="chOpen('${w.k}')">${chRoomAv(rm,44)}<a class="chx" onclick="chClose(event,'${w.k}')" aria-label="Close">${ico('x')}</a>${n?`<i class="cb">${n>9?'9+':n}</i>`:''}</div>`}).join(''):'');
+r.innerHTML=chBtnHtml()+(CH.open?chPanelHtml():'')+vis.slice().reverse().map((w,i)=>chWinHtml(w,i)).join('')+(innerWidth>700?hd.map((w,i)=>{const rm=chRoom(w.k),n=chU(rm);return `<div class="chd" data-k="${w.k}" style="--hi:${i}" title="${E(chTitle(rm))}" onclick="chOpen('${w.k}')">${chRoomAv(rm,44)}<a class="chx" onclick="chClose(event,'${w.k}')" aria-label="Close">${ico('x')}</a>${n?`<i class="cb">${n>9?'9+':n}</i>`:''}</div>`}).join(''):'');
 r.querySelectorAll('.cw').forEach(w=>{const m=w.querySelector('.cwm'),k=w.dataset.k;if(m){m.dataset.b=sc[k]===undefined||sc[k]===-1?1:0;m.scrollTop=sc[k]===undefined||sc[k]===-1?m.scrollHeight:sc[k]}const t=w.querySelector('.cwi');if(t&&CH.draft[k])t.style.height=Math.min(t.scrollHeight,110)+'px'});
 const want=fk||CH.focus;if(want){const t=r.querySelector('.cw[data-k="'+want+'"] .cwi');if(t&&!('ontouchstart' in window&&!fk)){t.focus();const n=t.value.length;try{t.setSelectionRange(n,n)}catch(e){}}CH.focus=null}
 if(fq){const q=document.getElementById('chQ');if(q){q.focus();const n=q.value.length;q.setSelectionRange(n,n)}}}
@@ -2913,14 +2930,121 @@ async function chModDel(mid,rid){await sb.rpc('chat_delete',{mid});await sb.from
 async function chModResolve(id){await sb.from('chat_reports').update({resolved:true}).eq('id',id);CH.mod=null;route()}
 async function chUnmute(u){const r=await sb.from('chat_mutes').delete().eq('user_id',u);if(r.error)return toast(r.error.message);CH.mod=null;route();toast('Unmuted')}
 
-route=(f=>function(){f();placeCtx();annAfterRoute()})(route);syncTheme();annLoad().then(()=>{if(!ME&&QL&&(location.hash.slice(2)||'home').split('/')[0]=='home')route()});route();
+/* ===== CHAT EXTRAS + NOTIFICATIONS (needs chat_extras.sql for pokes; per-chat settings also work offline) ===== */
+Object.assign(ICP,{hand:'<path d="M18 11V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2"/><path d="M14 10V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v2"/><path d="M10 10.5V6a2 2 0 0 0-2-2a2 2 0 0 0-2 2v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>',bellOff:'<path d="M8.7 3A6 6 0 0 1 18 8c0 2.7.4 4.6.8 5.9"/><path d="M17 17H3s3-2 3-9a4.67 4.67 0 0 1 .3-1.7"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/><path d="m2 2 20 20"/>',rfsh:'<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/>'});
+/* per-chat settings: ignore, delete-for-me, mark unread. Kept in this browser and synced to chat_room_prefs when that table exists */
+const chRP=k=>CH.rp[k]||(CH.rp[k]={}),chIgnR=k=>{const p=CH.rp[k];return !!p&&(p.ig==='inf'||p.ig>Date.now())},
+stLockOn=()=>{try{return !!stLoad().a}catch(e){return false}},
+chIgn=r=>chIgnR(r.id)||!!(CH.prefs.mlock&&stLockOn()),
+chHid=r=>{const p=CH.rp[r.id];return !!p&&p.hb>0&&r.lastId<=p.hb},
+chU=r=>r.mine?(r.unread||((CH.rp[r.id]||{}).fu?1:0)):0;
+function chVis(k){const p=CH.rp[k]||{},hm=p.hm||[];return (CH.msgs[k]||[]).filter(m=>m.id<=0||((!p.hb||m.id>p.hb)&&!hm.includes(m.id)))}
+function chRPStore(){try{localStorage.setItem('chr_'+ME.id,JSON.stringify(CH.rp))}catch(e){}}
+async function chRPLoad(){CH.rp={};try{CH.rp=JSON.parse(localStorage.getItem('chr_'+ME.id)||'{}')}catch(e){}
+const r=await sb.from('chat_room_prefs').select('*').eq('user_id',ME.id);if(r&&!r.error&&r.data){r.data.forEach(x=>{CH.rp[x.room_id]={ig:x.ignore_forever?'inf':x.ignore_until?+new Date(x.ignore_until):0,fu:x.force_unread?1:0,hb:+x.hidden_before||0,hm:(x.hidden_ids||[]).map(Number)}});chRPStore()}}
+function chRPSave(k){chRPStore();clearTimeout(CH.timers['p'+k]);CH.timers['p'+k]=setTimeout(()=>{const p=chRP(k);sb.from('chat_room_prefs').upsert({user_id:ME.id,room_id:String(k),ignore_until:p.ig&&p.ig!=='inf'?new Date(p.ig).toISOString():null,ignore_forever:p.ig==='inf',force_unread:!!p.fu,hidden_before:p.hb||0,hidden_ids:p.hm||[],updated_at:new Date().toISOString()}).then(x=>x.error&&console.warn('Chat room prefs (run chat_extras.sql to sync):',x.error.message))},600)}
+function chRowMenu(e,k){const r=chRoom(k);if(!r)return;const o=chOther(r),un=chU(r)>0,ig=chIgnR(k),own=r.mine&&r.kind!='channel';
+chPop(e,[un?['Mark as read',`chMarkRead('${k}')`]:['Mark as unread',`chMarkUnread('${k}')`],ig?['Stop ignoring',`chIgnOff('${k}')`]:['Ignore…',`chIgnAsk('${k}')`],own?['Delete chat',`chDelChatAsk('${k}')`,1]:null,r.mine&&(o||r.kind=='channel')?[o?'Report user':'Report chat',`chReportRoom('${k}')`,1]:null])}
+function chMarkRead(k){const r=chRoom(k);if(!r)return;r.unread=0;chRP(k).fu=0;chRPSave(k);sb.rpc('chat_mark_read',{rid:k,upto:r.lastId||0}).then(x=>x.error&&console.warn(x.error.message));chBadge();chListPatch();chHeads()}
+function chMarkUnread(k){const r=chRoom(k);if(!r)return;chRP(k).fu=1;chRPSave(k);chBadge();chListPatch();chHeads()}
+function chIgnAsk(k){const r=chRoom(k);if(!r)return;openMdl({title:'Ignore '+chTitle(r),okText:'Ignore',body:`<div class="field"><label>For</label>${dd('chIgT',[['1','1 hour'],['2','2 hours'],['4','4 hours'],['8','8 hours'],['24','24 hours'],['inf','Until I stop ignoring']],'8')}</div><p class="mu sm">No alerts and no badge count from this chat. Messages still arrive, and you can open it any time.</p>`,
+onOk:()=>{const t=v('chIgT');chRP(k).ig=t=='inf'?'inf':Date.now()+(+t)*36e5;chRPSave(k);chBadge();chListPatch();ntfSoft();toast('Ignoring '+chTitle(r))}})}
+function chIgnOff(k){chRP(k).ig=0;chRPSave(k);chBadge();chListPatch();ntfSoft();if(CH.set)chRender();toast('No longer ignored')}
+function chDelChatAsk(k){const r=chRoom(k);if(!r)return;showConfirm('Delete this chat?','It leaves your list and your history is cleared on your side only. The other person keeps their copy, and a new message brings the chat back without the old ones.',()=>{const p=chRP(k);p.hb=r.lastId||0;p.fu=0;p.hm=[];chRPSave(k);r.unread=0;sb.rpc('chat_mark_read',{rid:k,upto:r.lastId||0});CH.wins=CH.wins.filter(w=>w.k!=k);chBadge();chRender();toast('Chat deleted')})}
+function chDelMe(k,id){const p=chRP(k);p.hm=(p.hm||[]).concat(id).slice(-500);chRPSave(k);chPatch(k)}
+async function chReportRoom(k){const r=chRoom(k);let L=(CH.msgs[k]||[]).filter(m=>m.sender_id!=ME.id&&m.id>0&&!m.deleted),id=L.length?L[L.length-1].id:0;
+if(!id){const x=await sb.from('chat_messages').select('id').eq('room_id',k).neq('sender_id',ME.id).order('id',{ascending:false}).limit(1);id=x&&x.data&&x.data[0]?x.data[0].id:0}
+if(!id)return toast('There are no messages from them to report yet.');chReportAsk(id,r&&r.kind=='channel'?'Report chat':'Report user')}
+async function chPoke(u){if(!u||!ME)return;if(CH.blk.mine.has(u)||CH.blk.by.has(u))return toast('You cannot poke this person.');
+const k='pk_'+ME.id+'_'+u;if(Date.now()-(+localStorage.getItem(k)||0)<30000)return toast('Easy there. Wait a few seconds before poking '+chNm(u)+' again.');
+const r=await sb.from('chat_pokes').insert({from_id:ME.id,to_id:u});if(r.error){console.warn(r.error.message);return toast('Poke is not set up yet. Run chat_extras.sql once.')}try{localStorage.setItem(k,Date.now())}catch(e){}toast('Poked '+chNm(u))}
+function chBn(el){if(!el.checked){chPref('bn',0);return}if(!window.Notification){el.checked=false;return toast('This browser does not support notifications.')}
+Notification.requestPermission().then(p=>{if(p=='granted'){chPref('bn',1);toast('Browser notifications are on')}else{el.checked=false;chPref('bn',0);toast('Notifications are blocked. Allow them in your browser settings.')}})}
+function chSetHtml(){const p=CH.prefs,mu=CH.rooms.filter(r=>r.mine&&chIgnR(r.id)),bl=[...CH.blk.mine];
+return `<div class="chh"><button class="cwb" onclick="CH.set=0;chRender()" aria-label="Back">${ico('back')}</button><b>Settings</b></div><div class="cset"><label class="tgl"><input type="checkbox" ${p.show?'checked':''} onchange="chPref('show',this.checked)"><i></i><span>Show when I am active</span></label><p class="mu sm">When this is off you appear offline, and you also will not see who else is active.</p>
+<div class="cgrp"><b class="sm">During a Lock In session</b>${[['show','Show me as “Locked in”'],['hide','Hide my status (appear offline)'],['active','Keep showing “Active”']].map(([k,t])=>`<label class="msi"><input type="radio" name="chlm" ${p.lock==k?'checked':''} ${p.show?'':'disabled'} onchange="chPref('lock','${k}')"><span>${t}</span></label>`).join('')}</div><p class="mu sm">Right now you appear as: <b>${{active:'Active',lockin:'Locked in',hidden:'Offline'}[chSt()]}</b>.</p>
+<div class="cgrp"><b class="sm">Notifications</b><label class="tgl"><input type="checkbox" ${p.mlock?'checked':''} onchange="chPref('mlock',this.checked?1:0)"><i></i><span>Mute chats during Lock In</span></label><p class="mu sm">No chat alerts or badge counts while a session runs. Messages still arrive and show up afterwards.</p>
+<label class="tgl"><input type="checkbox" ${p.bn?'checked':''} onchange="chBn(this)"><i></i><span>Browser notifications</span></label><p class="mu sm">Alerts while this tab is in the background. The tab title also shows your count.</p></div>
+<div class="cgrp"><b class="sm">Muted users and chats</b>${mu.length?mu.map(r=>{const g=CH.rp[r.id].ig;return `<div class="crow"><span>${E(chTitle(r))}<small class="mu"> · ${g=='inf'?'until you unmute':'until '+E(phF({dateStyle:'medium',timeStyle:'short'},g))}</small></span><button class="btn" onclick="chIgnOff('${r.id}')">Unmute</button></div>`}).join(''):'<p class="mu sm">Nobody is muted. Use the ⋯ menu on a chat to ignore it.</p>'}</div>
+<div class="cgrp"><b class="sm">Blocked users</b>${bl.length?bl.map(u=>`<div class="crow"><span>${E(chNm(u))}</span><button class="btn" onclick="chUnblock('${u}')">Unblock</button></div>`).join(''):'<p class="mu sm">Nobody is blocked.</p>'}</div></div>`}
+/* ---- notification bell ---- */
+const NF={open:0,pk:{},last:[],t:null,tl:[],ti:null,sig:'',seen:new Set(),init:0,ld:0,sub:null},BASE_T=document.title;
+const ntfIgn=u=>CH.rooms.some(r=>r.kind=='dm'&&r.mine&&chOther(r)==u&&chIgnR(r.id)),
+ntfDK=()=>'nfx_'+ME.id,ntfDismissed=()=>{try{return JSON.parse(localStorage.getItem(ntfDK())||'{}')}catch(e){return{}}},
+ntfDismiss=k=>{const d=ntfDismissed();d[k]=1;const ks=Object.keys(d);if(ks.length>300)delete d[ks[0]];try{localStorage.setItem(ntfDK(),JSON.stringify(d))}catch(e){}},
+ntfBase=()=>{const k='nfb_'+ME.id;let b=+localStorage.getItem(k)||0;if(!b){b=Date.now();try{localStorage.setItem(k,b)}catch(e){}}return b};
+async function ntfLoad(){NF.pk={};const r=await sb.from('chat_pokes').select('from_id,created_at').eq('to_id',ME.id).eq('seen',false).order('created_at',{ascending:false}).limit(200);
+if(r&&!r.error)(r.data||[]).forEach(x=>{const o=NF.pk[x.from_id]||(NF.pk[x.from_id]={n:0,at:x.created_at});o.n++});ntfSub();ntfSoft()}
+function ntfSub(){if(NF.sub||!ME)return;NF.sub=sb.channel('notif-live').on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_pokes',filter:'to_id=eq.'+ME.id},p=>{const x=p.new;if(!x||CH.blk.mine.has(x.from_id))return;
+const o=NF.pk[x.from_id]||(NF.pk[x.from_id]={n:0,at:x.created_at});o.n++;o.at=x.created_at;if(!document.hidden&&!ntfIgn(x.from_id))toast(chNm(x.from_id)+' poked you');ntfSoft()}).subscribe()}
+function ntfPokeSeen(u){delete NF.pk[u];sb.from('chat_pokes').update({seen:true}).eq('to_id',ME.id).eq('from_id',u).then(x=>x.error&&console.warn(x.error.message))}
+function ntfList(){const L=[];if(!ME)return L;const dis=ntfDismissed(),day=phDay();
+CH.rooms.forEach(r=>{const n=chU(r);if(!n||chIgn(r))return;const t=chTitle(r);L.push({id:'c'+r.id+':'+n,dk:1,ic:'chat',h:t,s:n+' new message'+(n==1?'':'s'),tt:t+': '+n+' new message'+(n==1?'':'s'),at:+new Date(r.at||0),go:()=>chOpen(r.id)})});
+Object.keys(NF.pk).forEach(u=>{if(CH.blk.mine.has(u)||ntfIgn(u))return;const o=NF.pk[u],h=chNm(u)+' poked you';L.push({id:'p'+u+':'+o.n,dk:1,ic:'hand',h,s:o.n>1?o.n+' times':'Just now',tt:o.n>1?h+' ('+o.n+'x)':h,at:+new Date(o.at),go:()=>{ntfPokeSeen(u);chOpenDM(u)},dis:()=>ntfPokeSeen(u)})});
+if(role!='admin'){const b=ntfBase();(D.M||[]).filter(m=>!m.own&&m.pub!==false&&m.ts>b&&!dis['f'+m.id]).sort((a,c)=>c.ts-a.ts).slice(0,30).forEach(m=>{const f=(D.FO||[]).find(x=>x.id==m.fo);L.push({id:'f'+m.id,dk:1,ic:'file',h:m.title,s:'New file'+(f?' in '+f.name:''),tt:'New file: '+m.title,at:m.ts,go:()=>{ntfDismiss('f'+m.id);go('f/'+m.fo)},dis:()=>ntfDismiss('f'+m.id)})})}
+if(window.NEWVER)L.push({id:'v',dk:1,ic:'rfsh',h:'New version available',s:'Refresh to get the latest update',tt:'New version available',at:Date.now(),btn:'Refresh',go:()=>location.reload()});
+try{const s=stLoad(),d=stDer(s);if(d.br&&!dis['rl'+day])L.push({id:'rl',ic:'flame',h:'Lock In streak missed',s:'You lost a '+fm(d.lost)+'-day streak. Tap to revive it',tt:'Lock In streak missed',at:0,go:()=>{ntfDismiss('rl'+day);go('dash');setTimeout(stRevive,120)},dis:()=>ntfDismiss('rl'+day)});
+else if(!d.br&&d.cur>0&&!d.today&&!d.rest&&!dis['rl'+day])L.push({id:'rl',ic:'flame',h:'Keep your Lock In streak',s:'Study today to keep your '+fm(d.cur)+'-day streak',tt:'Study today to keep your streak',at:0,go:()=>go('dash'),dis:()=>ntfDismiss('rl'+day)})}catch(e){}
+try{const q=qkState();if(q.s.streak>0&&q.st=='ok'&&!dis['rq'+day])L.push({id:'rq',ic:'flame',h:'Keep your QuickiZ streak',s:'Do today’s QuickiZ to keep your '+q.s.streak+'-day streak',tt:'Do today’s QuickiZ',at:0,go:()=>go('quickiz'),dis:()=>ntfDismiss('rq'+day)});
+else if(q.st=='rev'&&!dis['rq'+day])L.push({id:'rq',ic:'flame',h:'QuickiZ streak missed',s:'Tap to revive it',tt:'QuickiZ streak missed',at:0,go:()=>go('quickiz'),dis:()=>ntfDismiss('rq'+day)})}catch(e){}
+return L.sort((a,b)=>b.at-a.at)}
+function ntfRender(){let r=document.getElementById('ntfRoot');if(!r){r=document.createElement('div');r.id='ntfRoot';document.body.appendChild(r)}
+if(!ME){r.innerHTML='';ntfTitle([]);return}if(!NF.ld){NF.ld=1;ntfLoad()}
+const L=NF.last=ntfList(),n=L.length;
+r.innerHTML=`<button id="ntBtn" class="cbtn nb" onclick="ntfToggle(event)" aria-label="Notifications" title="Notifications">${ico('bell')}${n?`<i class="cb">${n>9?'9+':n}</i>`:''}</button>${NF.open?`<div class="cpan npan"><div class="chh"><b>Notifications</b>${L.some(x=>x.dis)?`<button class="btn" style="padding:4px 10px" onclick="ntfClear()">Clear</button>`:''}</div><div class="cll">${L.length?L.map((x,i)=>`<div class="cli nfe" onclick="ntfAct(${i})"><span class="nfi">${ico(x.ic)}</span><div class="clm"><b>${E(x.h)}</b><span>${E(x.s)}</span></div>${x.btn?`<button class="btn p" style="padding:4px 10px">${x.btn}</button>`:x.dis?`<button class="cwb" title="Dismiss" onclick="ntfDis(event,${i})">${ico('x')}</button>`:''}</div>`).join(''):'<p class="cempty">You are all caught up.</p>'}</div></div>`:''}`;
+ntfTitle(L.filter(x=>x.ic=='chat'||x.ic=='hand'));ntfDesk(L)}
+const ntfSoft=()=>{clearTimeout(NF.t);NF.t=setTimeout(ntfRender,150)};
+function ntfToggle(e){e.stopPropagation();NF.open=!NF.open;CH.open=0;chRender();ntfRender()}
+function ntfAct(i){const x=NF.last[i];if(!x)return;NF.open=0;ntfRender();if(x.go)x.go()}
+function ntfDis(e,i){e.stopPropagation();const x=NF.last[i];if(x&&x.dis)x.dis();ntfSoft()}
+function ntfClear(){NF.last.forEach(x=>x.dis&&x.dis());ntfSoft()}
+/* tab title: "(2) Found / CE Review Archive", swapping the first part for the newest alerts */
+function ntfTitle(L){const n=L.length,tl=L.map(x=>x.tt).slice(0,3),sig=n+'|'+tl.join('|');if(sig===NF.sig&&(NF.ti||!n))return;NF.sig=sig;clearInterval(NF.ti);NF.ti=null;
+const first=BASE_T.split(' / ')[0],rest=BASE_T.slice(first.length);if(!n){document.title=BASE_T;return}
+let i=0;const set=()=>{const k=i%(tl.length*2),a=k%2==0?first:tl[(k-1)/2];document.title='('+n+') '+String(a).slice(0,50)+rest;i++};set();NF.ti=setInterval(set,2500)}
+function ntfDesk(L){if(NF.init&&document.hidden&&CH.prefs.bn&&window.Notification&&Notification.permission=='granted')L.forEach(x=>{if(x.dk&&!NF.seen.has(x.id)){try{new Notification(x.h,{body:x.s,tag:String(x.id).replace(/:.*/,'')})}catch(e){}}});NF.seen=new Set(L.filter(x=>x.dk).map(x=>x.id));NF.init=1}
+document.addEventListener('click',e=>{if(NF.open&&!e.target.closest('.npan,#ntBtn')){NF.open=0;ntfRender()}});
+addEventListener('keydown',e=>{if(e.key=='Escape'&&NF.open&&!MD){NF.open=0;ntfRender()}});
+chBadge=(f=>function(){f();ntfSoft()})(chBadge);
+setInterval(()=>{if(ME){chBadge();ntfSoft()}},60000);
+/* ===== PDF viewer: pages are drawn on demand so scrolling stays smooth on PC and phones ===== */
+const PV={};
+const pvFallback=v=>`<object data="${v.url}${rsBlocked('dl')?'#toolbar=0&navpanes=0':''}" type="application/pdf" style="width:100%;height:100%"><div style="padding:30px;text-align:center"><p style="margin-bottom:12px">This browser can't show the PDF here.</p>${rsBlocked('dl')?'':`<a href="${v.url}" target="_blank" rel="noopener" class="btn p">Open PDF in a new tab</a>`}</div></object>`;
+function pvFree(g){if(g._t){try{g._t.cancel()}catch(e){}g._t=null}const c=g.querySelector('canvas');if(c){c.width=c.height=0;c.remove()}g.dataset.r='';g.classList.remove('ok')}
+async function pvPage(s,n){const g=s.host.querySelector('.pvg[data-n="'+n+'"]');if(!g||!s.w||g.dataset.r===s.rk)return;const rk=s.rk;g.dataset.r=rk;
+try{const pg=await s.pdf.getPage(n);if(g.dataset.r!==rk||!s.host.isConnected)return;const b=pg.getViewport({scale:1}),dpr=Math.min(window.devicePixelRatio||1,2),vp=pg.getViewport({scale:s.w/b.width*dpr});g.dataset.ar=b.height/b.width;g.style.height=Math.round(s.w*b.height/b.width)+'px';
+let c=g.querySelector('canvas');if(g._t){try{g._t.cancel()}catch(e){}}if(!c){c=document.createElement('canvas');if(s.nd)c.oncontextmenu=()=>false;g.appendChild(c)}c.width=vp.width;c.height=vp.height;
+const t=pg.render({canvasContext:c.getContext('2d',{alpha:false}),viewport:vp});g._t=t;await t.promise;g.classList.add('ok')}catch(e){if(!(e&&e.name=='RenderingCancelledException')&&g.dataset.r===rk)g.dataset.r=''}}
+function pvInd(s){const top=s.el.scrollTop+s.el.clientHeight*.35,gs=s.host.children;let cur=1;for(let i=0;i<gs.length;i++){if(gs[i].offsetTop>top)break;cur=i+1}const t=document.querySelector('.vwin[data-vid="'+s.vid+'"] .pvn');if(t)t.textContent=cur+' / '+s.n}
+function pvLay(s){const cw=s.el.clientWidth;if(!cw)return;const w=Math.max(160,Math.round((cw-16)*s.z)),k=String(w);if(k===s.rk)return;const f=s.el.scrollHeight?s.el.scrollTop/s.el.scrollHeight:0;s.rk=k;s.w=w;
+s.host.querySelectorAll('.pvg').forEach(g=>{g.style.width=w+'px';g.style.height=Math.round(w*(+g.dataset.ar||s.ar))+'px';pvFree(g)});s.el.scrollTop=f*s.el.scrollHeight;s.vis.forEach(n=>pvPage(s,n));pvInd(s)}
+function pvZoom(vid,d){const s=PV[vid];if(!s)return;const z=Math.min(3,Math.max(.6,+(s.z*(d>0?1.25:.8)).toFixed(2)));if(z===s.z)return;s.z=z;s.rk='';pvLay(s)}
+function pvKill(vid){const s=PV[vid];if(!s)return;s.dead=1;try{s.io.disconnect();s.ro.disconnect()}catch(e){}try{s.pdf.destroy()}catch(e){}delete PV[vid]}
+async function pvInit(v){const el=document.querySelector('.vwin[data-vid="'+v.vid+'"] .vb');if(!el)return;const host=el.querySelector('.pvp'),ld=el.querySelector('.pvl');
+try{const lib=await loadPdfJs(),task=lib.getDocument({url:v.url,cMapUrl:'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/cmaps/',cMapPacked:true});
+task.onProgress=p=>{if(ld&&p.total)ld.textContent='Loading PDF… '+Math.round(p.loaded/p.total*100)+'%'};const pdf=await task.promise;
+if(!document.body.contains(el)){pdf.destroy();return}
+const pg1=await pdf.getPage(1),b=pg1.getViewport({scale:1}),s=PV[v.vid]={vid:v.vid,pdf,el,host,z:1,ar:b.height/b.width,vis:new Set(),rk:'',w:0,nd:rsBlocked('dl'),n:pdf.numPages};
+host.innerHTML=Array.from({length:s.n},(_,i)=>`<div class="pvg" data-n="${i+1}"></div>`).join('');if(ld)ld.remove();
+s.io=new IntersectionObserver(es=>es.forEach(en=>{const n=+en.target.dataset.n;if(en.isIntersecting){s.vis.add(n);pvPage(s,n)}else{s.vis.delete(n);pvFree(en.target)}}),{root:el,rootMargin:'900px 0px'});
+host.querySelectorAll('.pvg').forEach(g=>s.io.observe(g));
+s.ro=new ResizeObserver(()=>{clearTimeout(s.rt);s.rt=setTimeout(()=>pvLay(s),120)});s.ro.observe(el);
+el.addEventListener('scroll',()=>{if(s.raf)return;s.raf=requestAnimationFrame(()=>{s.raf=0;pvInd(s)})},{passive:true});pvLay(s)}
+catch(e){console.warn('PDF viewer:',e);if(host)host.innerHTML='';if(ld)ld.remove();el.classList.remove('pdfv');el.insertAdjacentHTML('beforeend',pvFallback(v))}}
+/* ===== Lock In: rest day (keeps the streak safe on days you will not study) ===== */
+function stRest(){const s=stLoad(),d=stDer(s);if(s.a)return toast('Finish or stop your session first.');s.rd=s.rd||[];
+if(d.rest){s.rd=s.rd.filter(x=>x!=d.t);stSave(s);stRender();return toast('Rest day cancelled')}
+if((s.dc[d.t]||0)>0)return toast('You already studied today, so you do not need a rest day.');if(d.br)return toast('Your streak is already broken. Revive it first.');
+showConfirm('Take today as a rest day?','Your streak stays safe even if you do not study today.',()=>{const s=stLoad();s.rd=(s.rd||[]).concat(stDer(s).t).slice(-400);stSave(s);stRender();toast('Rest day set. Your streak is safe today.')})}
+const stRestBtn=s=>{const d=stDer(s);return `<div class="stRow" style="margin-top:10px"><button class="btn" ${s.a?'disabled':''} onclick="stRest()">${ico('moon')}${d.rest?'Cancel rest day':'Rest day'}</button>${d.rest?'<span class="mu sm">Streak is safe today</span>':''}</div>`};
+route=(f=>function(){f();placeCtx();annAfterRoute();ntfSoft()})(route);syncTheme();annLoad().then(()=>{if(!ME&&QL&&(location.hash.slice(2)||'home').split('/')[0]=='home')route()});route();
 /* PWA: lets the app install on PC and phones and open its shell offline */
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('SW:',e)));
 /* ===== UPDATE BANNER: every few minutes (and when you come back to the tab) the page asks the server whether index.html changed since this page loaded; if so it offers a Refresh ===== */
 (()=>{if(!/^https?:$/.test(location.protocol))return;
 const U=location.href.split('#')[0].split('?')[0]+'?upd=1';let base=null,asked=null,busy=0;
 const sig=async()=>{const r=await fetch(U,{cache:'no-cache'});if(!r.ok)return null;const h=r.headers.get('etag')||r.headers.get('last-modified');if(h)return h;const t=await r.text();let x=0;for(let i=0;i<t.length;i++)x=(x*31+t.charCodeAt(i))|0;return t.length+':'+x};
-function show(s){asked=s;if(document.getElementById('updBar'))return;const d=document.createElement('div');d.id='updBar';d.setAttribute('role','status');d.innerHTML='<span>A new version is available.</span><button class="ub1" onclick="location.reload()">Refresh</button><button class="ub2" onclick="this.parentNode.remove()">Later</button>';document.body.appendChild(d)}
+function show(s){asked=s;window.NEWVER=1;try{ntfSoft()}catch(e){}if(document.getElementById('updBar'))return;const d=document.createElement('div');d.id='updBar';d.setAttribute('role','status');d.innerHTML='<span>A new version is available.</span><button class="ub1" onclick="location.reload()">Refresh</button><button class="ub2" onclick="this.parentNode.remove()">Later</button>';document.body.appendChild(d)}
 async function chk(first){if(busy||(document.hidden&&!first))return;busy=1;try{const s=await sig();if(!s)return;if(base===null)base=s;else if(s!==base&&s!==asked)show(s)}catch(e){}finally{busy=0}}
 chk(1);setInterval(chk,5*60*1000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)chk()});addEventListener('online',()=>chk())})();
 </script>
