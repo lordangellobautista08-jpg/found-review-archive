@@ -786,9 +786,10 @@ body.nto{padding-bottom:calc(var(--ftH,0px) + var(--ntH,0px) + 8px)}
 .nfe.nfin{animation:nfIn .34s cubic-bezier(.2,.9,.3,1.25) backwards}
 @keyframes nfIn{from{opacity:0;transform:translateY(16px) scale(.95)}to{opacity:1;transform:none}}
 .nfe.nfsw{transition:none}
-.nfe.nfo{--dir:1;transform:translateX(calc(115% * var(--dir))) rotate(calc(5deg * var(--dir)));opacity:0;transition:transform .3s cubic-bezier(.5,-.35,.9,.45),opacity .3s ease .05s,background .1s;background:rgba(46,204,113,.18);pointer-events:none}
-.nfe.nfo .nfi{background:#2ecc71;color:#fff;transform:scale(1.18);transition:transform .15s,background .15s}
-.nfe.nfc{max-height:0;padding-top:0;padding-bottom:0;margin:0;border:0}
+.nfe.nfk{background:rgba(46,204,113,.22);pointer-events:none;transition:background .25s}
+.nfe.nfk .nfi,.nfe.nfo .nfi{background:#2ecc71;color:#fff;transform:scale(1.22);transition:transform .3s cubic-bezier(.3,1.7,.5,1),background .2s}
+.nfe.nfo{--dir:1;transform:translateX(calc(115% * var(--dir))) rotate(calc(5deg * var(--dir)));opacity:0;transition:transform .5s cubic-bezier(.6,-.28,.74,.05),opacity .45s ease .1s;background:rgba(46,204,113,.22);pointer-events:none}
+.nfe.nfc{max-height:0;padding-top:0;padding-bottom:0;margin:0;border:0;transition:max-height .32s ease,padding .32s ease,margin .32s ease}
 .nfx{flex:none;width:28px;height:28px;border-radius:50%;border:0;background:transparent;color:var(--mu);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0;transition:transform .18s cubic-bezier(.3,1.6,.5,1),background .12s,color .12s}
 .nfx .ic{width:15px;height:15px;margin:0}
 .nfx:hover{background:var(--soft);color:var(--ink)}
@@ -3169,9 +3170,13 @@ function ntfBadgeNow(){const U=ntfList().filter(x=>!ntfIsRead(x)),n=U.length,b=d
 if(b){if(!n)b.remove();else{b.textContent=n>9?'9+':n;b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump')}}ntfTitle(U)}
 function ntfBurst(btn){const pan=document.querySelector('.npan');if(!pan||!btn)return;const pr=pan.getBoundingClientRect(),br=btn.getBoundingClientRect(),cx=br.left+br.width/2-pr.left,cy=br.top+br.height/2-pr.top,cols=['#2ecc71','#f59e0b','#7c3aed','#ff5a5f','#3cc7b5'];
 for(let i=0;i<9;i++){const p=document.createElement('i');p.className='nfp';const a=Math.PI*2*i/9+Math.random()*.5,d=22+Math.random()*28;p.style.cssText=`left:${cx}px;top:${cy}px;background:${cols[i%5]};--dx:${Math.cos(a)*d}px;--dy:${Math.sin(a)*d}px`;pan.appendChild(p);setTimeout(()=>p.remove(),640)}}
-function ntfOut(el,x,dir){if(!el||el.classList.contains('nfo'))return;ntfHide(x);ntfBadgeNow();try{navigator.vibrate&&navigator.vibrate(12)}catch(_){}
-NF.anim=(NF.anim||0)+1;el.style.setProperty('--dir',dir||1);el.style.transform='';el.style.opacity='';el.classList.remove('nfsw');el.classList.add('nfo');
-setTimeout(()=>el.classList.add('nfc'),210);setTimeout(()=>{NF.anim=Math.max(0,NF.anim-1);if(!NF.anim)ntfRender()},480)}
+/* one entry leaving: 1) icon turns into a green check and the row glows, 2) it slides away, 3) the gap closes. Returns the total time in ms. */
+function ntfSeq(el,dir,fast){el.style.setProperty('--dir',dir||1);el.style.transform='';el.style.opacity='';
+if(fast){el.classList.remove('nfsw');el.classList.add('nfo');setTimeout(()=>el.classList.add('nfc'),520);return 900}
+const ic=el.querySelector('.nfi');el.classList.add('nfk');if(ic)ic.innerHTML=ico('check');
+setTimeout(()=>el.classList.add('nfo'),420);setTimeout(()=>el.classList.add('nfc'),940);return 1300}
+function ntfOut(el,x,dir){if(!el||el.classList.contains('nfk')||el.classList.contains('nfo'))return;ntfHide(x);ntfBadgeNow();try{navigator.vibrate&&navigator.vibrate(12)}catch(_){}
+NF.anim=(NF.anim||0)+1;const T=ntfSeq(el,dir,el.classList.contains('nfsw'));setTimeout(()=>{NF.anim=Math.max(0,NF.anim-1);if(!NF.anim)ntfRender()},T)}
 const NFDOTS='<svg class="ic" viewBox="0 0 24 24" style="fill:currentColor;stroke:none"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>';
 const ntfMarkUnread=x=>{const m=ntfReadMap();delete m[ntfKey(x)];try{localStorage.setItem(ntfRK(),JSON.stringify(m))}catch(e){}ntfPushSoft()};
 const ntfByKey=k=>NF.last.find(x=>ntfKey(x)===k),ntfEl=k=>[...document.querySelectorAll('.npan .nfe')].find(e=>e.dataset.k===k);
@@ -3182,15 +3187,15 @@ m.innerHTML=`<button role="menuitem" onclick="ntfMenuAct('${rd?'unread':'read'}'
 document.body.appendChild(m);const r=b.getBoundingClientRect(),w=m.offsetWidth,h=m.offsetHeight;
 m.style.left=Math.max(8,Math.min(r.right-w,innerWidth-w-8))+'px';m.style.top=(r.bottom+6+h>innerHeight-8?Math.max(8,r.top-h-6):r.bottom+6)+'px'}
 function ntfMenuAct(act){const m=document.getElementById('nfMenu');if(!m)return;const k=m.dataset.k,x=ntfByKey(k),el=ntfEl(k);ntfMenuClose();if(!x||!el)return;
-if(act=='dismiss'){const b=el.querySelector('.nfx');if(b){b.classList.add('pop');ntfBurst(b)}ntfOut(el,x,1);return}
+if(act=='dismiss'){ntfOut(el,x,1);return}
 if(act=='unread'){ntfMarkUnread(x);el.classList.remove('rd')}else{ntfMarkRead(x);el.classList.add('rd')}
 el.classList.remove('nfu');void el.offsetWidth;el.classList.add('nfu');try{navigator.vibrate&&navigator.vibrate(8)}catch(_){}ntfBadgeNow()}
 document.addEventListener('click',e=>{if(!e.target.closest('#nfMenu,.nfx'))ntfMenuClose()});
 addEventListener('keydown',e=>{if(e.key=='Escape'&&document.getElementById('nfMenu')){ntfMenuClose();e.stopImmediatePropagation()}},true);
 function ntfClear(){ntfMenuClose();if(!NF.last.length)return;const els=[...document.querySelectorAll('.npan .nfe')];NF.last.forEach(ntfHide);ntfBadgeNow();if(!els.length){ntfRender();return}
 NF.anim=(NF.anim||0)+1;try{navigator.vibrate&&navigator.vibrate([10,30,10])}catch(_){}
-els.forEach((el,i)=>setTimeout(()=>{el.style.setProperty('--dir',i%2?-1:1);el.classList.add('nfo');setTimeout(()=>el.classList.add('nfc'),200)},i*70));
-setTimeout(()=>{NF.anim=Math.max(0,NF.anim-1);NF.all=0;if(!NF.anim)ntfRender()},els.length*70+520)}
+els.forEach((el,i)=>setTimeout(()=>ntfSeq(el,i%2?-1:1,0),i*130));
+setTimeout(()=>{NF.anim=Math.max(0,NF.anim-1);NF.all=0;if(!NF.anim)ntfRender()},(els.length-1)*130+1300)}
 /* swipe a notification sideways to dismiss it (touch) */
 let NSW=null;
 document.addEventListener('pointerdown',e=>{if(e.pointerType!='touch')return;const el=e.target.closest&&e.target.closest('.nfe');if(!el||e.target.closest('.nfx,button'))return;NSW={el,x:e.clientX,y:e.clientY,dx:0,id:e.pointerId,m:0}});
