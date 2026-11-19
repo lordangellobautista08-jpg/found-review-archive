@@ -653,7 +653,7 @@ body.nofab .cbtn{bottom:74px}
 .cav.chn{background:var(--teal);color:var(--onfab)}.cav.adm{background:var(--ink);color:var(--card)}.cav .ic{width:55%;height:55%;margin:0}
 .cdot{position:absolute;right:-2px;bottom:-2px;width:28%;min-width:9px;height:28%;min-height:9px;border-radius:50%;border:2px solid var(--card);background:#2ecc71;box-sizing:content-box}
 .cdot.lockin{background:#f59e0b}
-.cseen{position:absolute;right:-7px;bottom:-6px;min-width:22px;height:15px;line-height:15px;padding:0 5px;border-radius:99px;background:#1fa65a;color:#fff;font-size:.62rem;font-weight:700;font-style:normal;text-align:center;border:2px solid var(--card);box-sizing:content-box;white-space:nowrap}
+.cseenb{position:absolute;right:-7px;bottom:-6px;min-width:22px;height:15px;line-height:15px;padding:0 5px;border-radius:99px;background:#1fa65a;color:#fff;font-size:.62rem;font-weight:700;font-style:normal;text-align:center;border:2px solid var(--card);box-sizing:content-box;white-space:nowrap}
 .cpan{position:fixed;right:var(--cr);bottom:206px;width:340px;max-height:min(540px,calc(100vh - 250px));background:var(--card);border:1px solid var(--bd);border-radius:14px;box-shadow:0 12px 40px #0004;z-index:42;display:flex;flex-direction:column;overflow:hidden}
 body.nofab .cpan{bottom:134px}
 .chh{display:flex;align-items:center;gap:8px;justify-content:space-between;padding:10px 10px 6px 14px;font-size:1.05rem}
@@ -919,6 +919,28 @@ body.pvmob{overflow:hidden}
 /* review centers */
 select.rcsel{padding:5px 8px;border-radius:8px;border:1px solid var(--bd);background:var(--card);color:var(--tx);font:inherit;font-size:.85rem;max-width:190px}
 .agvia{margin-left:6px;padding:1px 7px;border-radius:99px;background:var(--soft);font-size:.7rem}
+
+/* ===== chat: seen avatars, joined notes, photos and files ===== */
+.cseen{align-items:center}
+.cseena{display:inline-flex}.cseena .cav{box-shadow:0 0 0 2px var(--card)}
+.cseena.new{animation:seenPop .5s cubic-bezier(.3,1.7,.5,1)}
+@keyframes seenPop{0%{transform:translateX(-20px) scale(.3);opacity:0}100%{transform:none;opacity:1}}
+.cseenn{font-size:.62rem;color:var(--mu);margin-left:2px}
+.csys{display:flex;align-items:center;justify-content:center;gap:6px;margin:12px 10px;font-size:.76rem;color:var(--mu);text-align:center}
+.csys b{color:var(--ink);font-weight:600}.csyav{display:inline-flex}.csyav .cav{box-shadow:0 0 0 2px var(--card);margin-left:-4px}.csyav .cav:first-child{margin-left:0}
+.cimg{display:block;margin-top:5px;max-width:240px;min-height:70px;border-radius:12px;overflow:hidden;background:#0002;cursor:zoom-in;position:relative}
+.cimg img{display:block;width:100%;height:100%;object-fit:cover}
+.cimg.gone{cursor:default;display:flex;align-items:center;justify-content:center;min-height:60px;padding:8px}.cimg.gone img{display:none}.cimg.gone:after{content:'Image removed';font-size:.75rem;opacity:.7}
+.cat small{opacity:.7;font-size:.7rem;margin-left:auto;padding-left:6px;flex:none}
+.cmedc img{width:22px;height:22px;object-fit:cover;border-radius:6px;flex:none}
+.cwr.upl{opacity:.55;pointer-events:none}
+.chlb{position:fixed;inset:0;z-index:120;background:rgba(5,0,12,.82);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px}
+.chlb img{max-width:100%;max-height:82vh;border-radius:10px;object-fit:contain}
+.chlbx{position:absolute;top:14px;right:14px;width:38px;height:38px;border:0;border-radius:50%;background:rgba(255,255,255,.16);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.chlbx .ic{width:18px;height:18px;margin:0}
+/* ===== admin storage card ===== */
+.stot{margin-top:4px}.stbar{height:10px;border-radius:99px;background:var(--soft);overflow:hidden;margin:6px 0 10px}.stbar i{display:block;height:100%;border-radius:99px;background:var(--teal);transition:width .3s}
+.stbar.sm{height:6px;margin:4px 0 0;grid-column:1/-1}.stbk{display:grid;grid-template-columns:1fr auto auto;gap:4px 14px;align-items:baseline;padding:8px 0;border-top:1px solid var(--bd)}
 </style>
 </head>
 <body class="hm">
@@ -3067,7 +3089,7 @@ function chPresSync(){clearTimeout(CH.timers.p);CH.timers.p=setTimeout(()=>{if(C
 const chSeenShort=ms=>{const m=Math.max(1,Math.floor(ms/6e4));if(m<60)return m+'m';const h=Math.floor(m/60);if(h<24)return h+'h';const d=Math.floor(h/24);return d<7?d+'d':Math.floor(d/7)+'w'};
 const chSeenLong=u=>{const ms=chSeenMs(u);if(ms==null)return'';const m=Math.floor(ms/6e4);if(m<1)return'Active just now';if(m<60)return'Active '+m+(m==1?' minute':' minutes')+' ago';const h=Math.floor(m/60);if(h<24)return'Active '+h+(h==1?' hour':' hours')+' ago';const d=Math.floor(h/24);return'Active '+d+(d==1?' day':' days')+' ago'};
 function chSeenMs(uid){if(!ME||!CH.prefs.show||uid==ME.id||!CH.seenOK)return null;const m=ONL[uid];if(m&&m.length)return null;const t=CH.seen[uid];if(!t)return null;const ms=Date.now()-t;return ms>30*864e5?null:Math.max(0,ms)}
-const chSeenBadge=uid=>{const ms=chSeenMs(uid);return ms==null?'':`<i class="cseen" title="${E(chSeenLong(uid))}">${chSeenShort(ms)}</i>`};
+const chSeenBadge=uid=>{const ms=chSeenMs(uid);return ms==null?'':`<i class="cseenb" title="${E(chSeenLong(uid))}">${chSeenShort(ms)}</i>`};
 async function chSeenBeat(force){if(!ME||!CH.ok||!CH.seenOK)return;const now=Date.now();if(now-CH.seenT<(force?4000:25000))return;
 if(chSt()=='hidden'){if(CH.seenClr)return;CH.seenClr=1;CH.seenT=now;const r=await sb.from('chat_seen').upsert({user_id:ME.id,last_seen:null});if(r.error){CH.seenOK=false;console.warn('Last active is off (run chat_seen.sql):',r.error.message)}return}
 if(document.hidden&&!force)return;CH.seenClr=0;CH.seenT=now;const r=await sb.from('chat_seen').upsert({user_id:ME.id,last_seen:new Date(now).toISOString()});if(r.error){CH.seenOK=false;console.warn('Last active is off (run chat_seen.sql):',r.error.message)}}
@@ -3081,7 +3103,7 @@ const pvDay=d=>phDay(+d)==phDay()?'Today':phDay(+d)==phDay(Date.now()-864e5)?'Ye
 function chPvBody(k){const r=chRoom(k);if(!r)return'';const L=chVis(k).filter(m=>m.id>0).slice(-40);if(!L.length)return'<p class="cempty">No messages yet.</p>';let day='',prev='',h='';
 L.forEach(m=>{const d=new Date(m.created_at),dk=phDay(+d);if(dk!==day){day=dk;prev='';h+=`<div class="pvd">${E(pvDay(d))}</div>`}
 const mine=m.sender_id==ME.id,nm=!mine&&r.kind!='dm'&&prev!==m.sender_id?`<b class="pvn">${E(chNm(m.sender_id))}</b>`:'';prev=m.sender_id;
-const at=Array.isArray(m.att)&&m.att.length?`<div class="pva">${ico('clip')}${E(m.att.length==1?(m.att[0].name||'File'):m.att.length+' files')}</div>`:'';
+const at=Array.isArray(m.att)&&m.att.length?`<div class="pva">${ico('clip')}${E(m.att.length==1?(m.att[0].title||m.att[0].name||'File'):m.att.length+' files')}</div>`:'';
 h+=`<div class="pvm${mine?' me':''}">${nm}<div class="pvb${m.deleted?' del':''}">${m.deleted?'Message removed':E(m.body||'')}${at}</div><small>${E(tm(+d))}</small></div>`});return h}
 function chPvHide(){clearTimeout(PVT);clearTimeout(PVH);PVH=null;const e=document.getElementById('chPv');if(e)e.remove();CH.pv=null;document.body.classList.remove('pvmob')}
 function chPvOpen(){const k=CH.pv&&CH.pv.k;chPvHide();if(k)chOpen(k)}
@@ -3109,6 +3131,73 @@ document.addEventListener('pointermove',e=>{if(PVL&&!PVL.fired&&(Math.abs(e.clie
 const pvEnd=()=>{if(!PVL)return;clearTimeout(PVL.t);if(PVL.fired)CH.swc=Date.now();PVL=null};
 document.addEventListener('pointerup',pvEnd);document.addEventListener('pointercancel',pvEnd);
 document.addEventListener('contextmenu',e=>{if(PVL&&e.target.closest&&e.target.closest('#chList .cav'))e.preventDefault()});
+
+/* ===== "X joined the channel" notes (needs chat_joins.sql) ===== */
+CH.joins=CH.joins||{};
+const chJoinScope=r=>chRc(r)?r.key:(r&&r.kind=='channel'&&!chAnn(r)?'public':null);
+async function chJoinsLoad(k){const r=chRoom(k),sc=r&&chJoinScope(r);if(!sc||CH.joinOff)return;
+const q=await sb.from('chat_joins').select('id,user_id,created_at').eq('scope',sc).order('created_at',{ascending:false}).limit(60);
+if(q.error){CH.joinOff=/relation|schema cache|does not exist/i.test(q.error.message);return}CH.joins[sc]=(q.data||[]).reverse();chJoinSub()}
+function chJoinSub(){if(CH.js||CH.joinOff)return;try{CH.js=sb.channel('chat-joins').on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_joins'},p=>{const n=p.new;if(!n||!n.scope)return;(CH.joins[n.scope]=CH.joins[n.scope]||[]).push({id:n.id,user_id:n.user_id,created_at:n.created_at});CH.wins.forEach(w=>{const r=chRoom(w.k);if(r&&chJoinScope(r)==n.scope)chPatch(w.k)})}).subscribe()}catch(e){}}
+function chJoinMerge(k,L){const r=chRoom(k),sc=r&&chJoinScope(r),J=sc&&CH.joins[sc];if(!J||!J.length)return L;const t0=CH.old[k]&&L.length?+new Date(L[0].created_at):0;
+const all=L.map(m=>({m,t:+new Date(m.created_at)})).concat(J.filter(j=>+new Date(j.created_at)>=t0).map(j=>({j,t:+new Date(j.created_at)}))).sort((a,b)=>a.t-b.t),out=[];let g=null;
+all.forEach(x=>{if(x.m){g=null;out.push(x.m)}else if(!g){g={sys:1,id:0,sender_id:'__sys',created_at:x.j.created_at,us:[x.j.user_id]};out.push(g)}else g.us.push(x.j.user_id)});return out}
+const chSysHtml=m=>{const us=[...new Set(m.us)],n=us.map(chNm),tx=us.length==1?n[0]:us.length==2?n[0]+' and '+n[1]:n[0]+', '+n[1]+' and '+(us.length-2)+' others';
+return `<div class="csys"><span class="csyav">${us.slice(0,3).map(u=>chAv(u,16,false)).join('')}</span><span><b>${E(tx)}</b> joined the channel</span></div>`};
+
+/* ===== photos and files from the device in chat (needs chat_media.sql) =====
+ Photos are shrunk in the browser first (longest side 1280 px, WebP), files are capped at 5 MB, so each upload is small. */
+const CHM_OK=/^(image\/(jpeg|png|webp|gif)|application\/pdf|text\/plain|application\/(msword|vnd\.ms-excel|vnd\.ms-powerpoint|vnd\.openxmlformats-officedocument\.(wordprocessingml\.document|spreadsheetml\.sheet|presentationml\.presentation)))$/;
+async function chShrink(f){if(!/^image\//.test(f.type)||f.type=='image/gif')return f;
+const bmp=await createImageBitmap(f),sc=Math.min(1,1280/Math.max(bmp.width,bmp.height)),w=Math.max(1,Math.round(bmp.width*sc)),h=Math.max(1,Math.round(bmp.height*sc)),cv=document.createElement('canvas');cv.width=w;cv.height=h;const cx=cv.getContext('2d');cx.fillStyle='#fff';cx.fillRect(0,0,w,h);cx.drawImage(bmp,0,0,w,h);if(bmp.close)bmp.close();
+let b=await new Promise(r=>cv.toBlob(r,'image/webp',.8));if(!b||b.type!='image/webp')b=await new Promise(r=>cv.toBlob(r,'image/jpeg',.82));if(!b)return f;
+if(b.size>=f.size&&sc==1){return Object.assign(f,{w,h})}
+const ext=b.type=='image/webp'?'webp':'jpg',base=((f.name||'photo').replace(/\.[^.]+$/,'')||'photo').slice(0,40);return Object.assign(new File([b],(f.name&&f.name!='image.png'?base:'photo-'+new Date().toISOString().slice(0,16).replace(/[-:T]/g,''))+'.'+ext,{type:b.type}),{w,h})}
+async function chMedAdd(k,files){const w=CH.wins.find(x=>x.k==k);if(!w||!files.length)return;w.media=w.media||[];
+for(const f of files){if((w.att||[]).length+w.media.length>=4){toast('Up to 4 attachments per message');break}
+if(!CHM_OK.test(f.type||'')){toast('"'+(f.name||'That file')+'" can\'t be sent here. Photos, PDF, Office files and text only.');continue}
+let o=f;try{o=await chShrink(f)}catch(e){}
+const img=/^image\//.test(o.type);if(o.size>(img?1.5:5)*1048576){toast('"'+(f.name||'That file')+'" is too large ('+(img?'photos up to 1.5 MB after shrinking':'files up to 5 MB')+').');continue}
+w.media.push({file:o,name:o.name||f.name||'file',size:o.size,img,w:o.w,h:o.h,url:img?URL.createObjectURL(o):''})}
+chRender();const ta=document.querySelector('.cw[data-k="'+k+'"] .cwi');if(ta)ta.focus()}
+function chDev(k){const i=document.createElement('input');i.type='file';i.multiple=true;i.accept='image/*,.pdf,.txt,.doc,.docx,.xls,.xlsx,.ppt,.pptx';i.onchange=()=>chMedAdd(k,[...i.files]);i.click()}
+function chPaste(e,k){const fs=[...((e.clipboardData&&e.clipboardData.files)||[])];if(fs.length){e.preventDefault();chMedAdd(k,fs)}}
+function chDrag(e){if(e.dataTransfer&&[...e.dataTransfer.types].includes('Files')){e.preventDefault();e.stopPropagation()}}
+function chDrop(e,k){if(!(e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files.length))return;e.preventDefault();e.stopPropagation();chMedAdd(k,[...e.dataTransfer.files])}
+function chUnmed(k,i){const w=CH.wins.find(x=>x.k==k);if(!w||!w.media)return;const a=w.media.splice(i,1)[0];if(a&&a.url)URL.revokeObjectURL(a.url);chRender()}
+const chMediaChips=(k,w)=>(w.media||[]).map((a,i)=>`<span class="cch cmedc">${a.img?`<img src="${a.url}" alt="">`:ico('file')}<b>${E(a.name)}</b>${w.upl?'':`<a onclick="chUnmed('${k}',${i})" aria-label="Remove">${ico('x')}</a>`}</span>`).join('')+(w.upl?'<span class="cch">Uploading…</span>':'');
+async function chUpMedia(list){const out=[],done=[];try{for(const a of list){const ext=((a.name.split('.').pop()||'bin').toLowerCase().replace(/[^a-z0-9]/g,'')||'bin').slice(0,5),id=crypto.randomUUID?crypto.randomUUID():Date.now()+''+Math.random().toString(36).slice(2),path=ME.id+'/'+id+'.'+ext;
+const r=await sb.storage.from('chat-media').upload(path,a.file,{contentType:a.file.type||'application/octet-stream',upsert:false});
+if(r.error)throw new Error(/bucket not found/i.test(r.error.message)?'Chat uploads are not set up yet. Run chat_media.sql once in Supabase.':r.error.message);done.push(path);
+out.push({u:1,path,title:a.name,type:a.img?'img':'file',mime:a.file.type,size:a.size,w:a.w||null,h:a.h||null})}}catch(e){if(done.length)sb.storage.from('chat-media').remove(done);throw e}
+list.forEach(a=>{if(a.url)URL.revokeObjectURL(a.url)});return out}
+function chAttHtml(a){if(!a.path)return `<a class="cat" onclick="chAtt('${a.id}')">${ico('file')}<b>${E(a.title)}</b></a>`;
+if(a.type=='img')return `<a class="cimg" onclick="chLb('${E(a.path)}')" style="${a.w&&a.h?'aspect-ratio:'+(+a.w)+'/'+(+a.h):''}"><img data-p="${E(a.path)}" alt="${E(a.title)}" draggable="false"></a>`;
+return `<a class="cat" onclick="chMediaGo('${E(a.path)}')">${ico('file')}<b>${E(a.title)}</b><small>${E(fsz(+a.size||0))}</small></a>`}
+const chMu=async paths=>{const need=paths.filter(p=>!CH.mu[p]||CH.mu[p].exp<Date.now()+6e4);if(!need.length)return;const r=await sb.storage.from('chat-media').createSignedUrls(need,3600);(r.data||[]).forEach(x=>{CH.mu[x.path]={u:x.signedUrl||'',exp:Date.now()+(x.signedUrl?36e5:3e5)}})};
+async function chMediaHydrate(){const els=[...document.querySelectorAll('img[data-p]:not([src])')];if(!els.length)return;try{await chMu([...new Set(els.map(e=>e.dataset.p))])}catch(e){}
+els.forEach(e=>{const m=CH.mu[e.dataset.p];if(m&&m.u){e.onerror=()=>e.parentNode.classList.add('gone');e.src=m.u}else e.parentNode.classList.add('gone')})}
+let CHMH=null;new MutationObserver(()=>{clearTimeout(CHMH);CHMH=setTimeout(chMediaHydrate,50)}).observe(document.body,{childList:true,subtree:true});
+async function chLb(path){await chMu([path]);const m=CH.mu[path];if(!m||!m.u)return toast('That image is no longer available.');const d=document.createElement('div');d.id='chLb';d.className='chlb';d.onclick=e=>{if(e.target===d)d.remove()};
+d.innerHTML=`<img src="${m.u}" alt=""><a class="btn" href="${m.u}" target="_blank" rel="noopener">Open original</a><button class="chlbx" aria-label="Close" onclick="this.parentNode.remove()">${ico('x')}</button>`;document.body.appendChild(d)}
+async function chMediaGo(path){await chMu([path]);const m=CH.mu[path];if(!m||!m.u)return toast('That file is no longer available.');window.open(m.u,'_blank','noopener')}
+addEventListener('keydown',e=>{if(e.key=='Escape'){const d=document.getElementById('chLb');if(d){d.remove();e.stopImmediatePropagation()}}},true);
+
+/* ===== ADMIN: storage usage (needs storage_usage.sql) ===== */
+let STO=null,STOQ=+(localStorage.getItem('sto_q')||1);
+const stoFmt=b=>b>=1073741824?(b/1073741824).toFixed(2)+' GB':b>=1048576?(b/1048576).toFixed(1)+' MB':Math.max(1,Math.round(b/1024))+' KB';
+async function stoLoad(){const r=await sb.rpc('storage_usage');STO=r.error?{err:/function|schema cache/i.test(r.error.message)?'setup':r.error.message}:{rows:r.data||[]};const b=document.getElementById('stoBox');if(b)b.innerHTML=stoHtml()}
+function stoRefresh(){STO=null;const b=document.getElementById('stoBox');if(b)b.innerHTML=stoHtml();stoLoad()}
+function stoPlan(v){if(v=='c'){const g=+prompt('Your storage limit in GB?',String(STOQ));if(!g||g<=0)return route();STOQ=g}else STOQ=+v;try{localStorage.setItem('sto_q',String(STOQ))}catch(e){}route()}
+function stoHtml(){if(!STO)return'<p class="mu sm">Loading…</p>';if(STO.err==='setup')return'<p class="mu sm">Run <b>storage_usage.sql</b> once in the Supabase SQL editor to see your storage here.</p>';if(STO.err)return`<p class="mu sm">${E(STO.err)}</p>`;
+const rows=STO.rows,db=rows.find(r=>r.bucket=='(database)'),bk=rows.filter(r=>r.bucket!='(database)'),tot=bk.reduce((a,r)=>a+(+r.bytes),0),pc=Math.min(100,tot/(STOQ*1073741824)*100),col=pc>=90?'#e5484d':pc>=70?'#f59e0b':'var(--teal)';
+return `<div class="stot"><b>${stoFmt(tot)}</b> <span class="mu">of ${STOQ} GB used by files (${pc.toFixed(pc<10?1:0)}%)</span></div><div class="stbar"><i style="width:${pc}%;background:${col}"></i></div>${bk.map(r=>`<div class="stbk"><span>${E(r.bucket)}</span><span class="mu">${(+r.files).toLocaleString()} files</span><b>${stoFmt(+r.bytes)}</b><div class="stbar sm"><i style="width:${tot?(+r.bytes/tot*100):0}%"></i></div></div>`).join('')}${db?`<div class="stbk"><span>Database</span><span></span><b>${stoFmt(+db.bytes)}</b></div>`:''}<p class="mu sm" style="margin-top:8px">Downloads (bandwidth) are counted separately by Supabase. Check Project Settings → Usage for that.</p><div class="row"><button class="btn" onclick="stoClean()">Remove unused files</button><button class="btn" onclick="stoOld()">Delete old chat uploads…</button><button class="btn" onclick="stoRefresh()">Refresh</button></div>`}
+function stoCard(){if(role!='admin')return'';if(!STO)stoLoad();return `<div class="card stack" style="margin-top:16px"><div class="row" style="justify-content:space-between;margin:0"><h3 style="margin:0">Storage</h3><select onchange="stoPlan(this.value)" title="Your Supabase plan's storage limit"><option value="1" ${STOQ==1?'selected':''}>Limit 1 GB (Free)</option><option value="100" ${STOQ==100?'selected':''}>Limit 100 GB (Pro)</option><option value="c" ${STOQ!=1&&STOQ!=100?'selected':''}>${STOQ!=1&&STOQ!=100?'Limit '+STOQ+' GB':'Other…'}</option></select></div><div id="stoBox">${stoHtml()}</div></div>`}
+{const _o=AD.o;AD.o=function(){return _o.apply(this,arguments)+stoCard()}}
+async function stoClean(){const r=await sb.rpc('orphaned_storage_objects');if(r.error)return toast(/function|schema cache/i.test(r.error.message)?'Run storage_usage.sql in the Supabase SQL editor first.':r.error.message);const rows=r.data||[];if(!rows.length)return toast('Nothing to clean up. Every stored file is in use.');
+showConfirm('Remove unused files','Found '+rows.length+' stored file(s) that nothing uses any more. Delete them from storage permanently?',async()=>{RMFAIL=0;let n=0;for(const b of [...new Set(rows.map(x=>x.bucket))])n+=await rmStore(b,rows.filter(x=>x.bucket==b).map(x=>x.path));toast('Removed '+n+' of '+rows.length+' unused file(s)'+(RMFAIL?'. Some were blocked by storage permissions.':''));stoRefresh()})}
+async function stoOld(){const d=Math.floor(+prompt('Delete chat photos and files older than how many days?','60'));if(!d||d<1)return;const r=await sb.rpc('chat_media_older',{p_days:d});if(r.error)return toast(/function|schema cache/i.test(r.error.message)?'Run storage_usage.sql in the Supabase SQL editor first.':r.error.message);const rows=(r.data||[]).map(x=>x.path||x.name||x);if(!rows.length)return toast('No chat uploads older than '+d+' days.');
+showConfirm('Delete old chat uploads','Delete '+rows.length+' chat photo(s)/file(s) older than '+d+' days? The messages stay, but the pictures and files will show as removed.',async()=>{RMFAIL=0;const n=await rmStore('chat-media',rows);toast('Removed '+n+' of '+rows.length+' file(s)'+(RMFAIL?'. Some were blocked.':''));stoRefresh()})}
 async function chPrefsLoad(){try{const l=JSON.parse(localStorage.getItem('chp_'+ME.id)||'null');if(l)CH.prefs=Object.assign(CH.prefs,l)}catch(e){}
 const r=await sb.from('chat_prefs').select('*').eq('user_id',ME.id).maybeSingle();if(r&&r.data){CH.prefs=Object.assign(CH.prefs,{show:r.data.show_active,lock:r.data.lock_mode});try{localStorage.setItem('chp_'+ME.id,JSON.stringify(CH.prefs))}catch(e){}}}
 function chPref(k,v){CH.prefs[k]=v;try{localStorage.setItem('chp_'+ME.id,JSON.stringify(CH.prefs))}catch(e){}
@@ -3122,7 +3211,7 @@ CH.users={};(u.data||[]).forEach(x=>{CH.users[x.id]={name:x.display_name,role:x.
 await Promise.all([chPrefsLoad(),chBlocksLoad(),chMuteLoad(),chRPLoad()]);CH.ok=true;CH.st=chSt();stPresTrack();chSeenPull();chSub();chTySub();chRxSub();chMentLoad();chPos();chRender();pushResync();chPendOpen();
 clearInterval(CH.poll);CH.poll=setInterval(()=>{const s=chSt();if(s!=CH.st){CH.st=s;stPresTrack()}if(!CH.rt)chRefresh();chRxPoll()},5000)}
 catch(e){console.warn('Chat:',e);CH.ok=false;CH.err=e.message||''}}
-function chReset(){clearInterval(CH.poll);if(CH.sub){try{sb.removeChannel(CH.sub)}catch(e){}}['tch','rch'].forEach(c=>{if(CH[c]){try{sb.removeChannel(CH[c])}catch(e){}CH[c]=null}});Object.assign(CH,{ok:null,err:'',init:0,users:{},tint:{},rooms:[],open:0,tab:'dm',set:0,q:'',mon:0,wins:[],msgs:{},old:{},reads:{},draft:{},focus:null,act:null,sub:null,rt:0,mod:null,mute:null,rp:{},ty:{},tyAt:{},rx:{},rxOff:0,rxT:0,ment:[],mn:null,_mnN:null,rcm:{},rcmL:{},rcT:0});NF.ld=0;NF.pk={};NF.open=0;if(NF.sub){try{sb.removeChannel(NF.sub)}catch(e){}NF.sub=null}ntfSoft();CH.blk={mine:new Set(),by:new Set()};const r=document.getElementById('chatRoot');if(r)r.innerHTML=''}
+function chReset(){clearInterval(CH.poll);if(CH.sub){try{sb.removeChannel(CH.sub)}catch(e){}}['tch','rch','js'].forEach(c=>{if(CH[c]){try{sb.removeChannel(CH[c])}catch(e){}CH[c]=null}});Object.assign(CH,{joins:{},sp:{},mu:{},joinOff:false,ok:null,err:'',init:0,users:{},tint:{},rooms:[],open:0,tab:'dm',set:0,q:'',mon:0,wins:[],msgs:{},old:{},reads:{},draft:{},focus:null,act:null,sub:null,rt:0,mod:null,mute:null,rp:{},ty:{},tyAt:{},rx:{},rxOff:0,rxT:0,ment:[],mn:null,_mnN:null,rcm:{},rcmL:{},rcT:0});NF.ld=0;NF.pk={};NF.open=0;if(NF.sub){try{sb.removeChannel(NF.sub)}catch(e){}NF.sub=null}ntfSoft();CH.blk={mine:new Set(),by:new Set()};const r=document.getElementById('chatRoot');if(r)r.innerHTML=''}
 function chSetRooms(a){CH.rooms=a.filter(chRcShow).map(x=>({id:x.room_id,kind:x.kind,key:x.key,name:x.name,p1:x.p1,p2:x.p2,mine:!!x.mine,lastId:x.last_id||0,body:x.last_body||'',att:!!x.last_att,sender:x.last_sender,at:x.last_at,del:!!x.last_deleted,unread:x.unread||0}))}
 /* review center groups: a public group per review center. Members are the people tagged with it, plus admins. Everyone else never sees it. */
 const chRc=r=>!!r&&r.kind=='channel'&&/^rc:/.test(r.key||''),
@@ -3160,7 +3249,7 @@ const chErr=e=>{const m=(e&&e.message)||String(e);return /row-level security|vio
 function chCap(){const avail=innerWidth-110-(document.body.classList.contains('sbo')?320:0)-(document.body.classList.contains('stp')?224:0),cap=innerWidth<=700?1:Math.max(1,Math.min(3,Math.floor(avail/340))),v=CH.wins.filter(w=>!w.min);while(v.length>cap)v.shift().min=1}
 async function chOpen(k){const r=chRoom(k);if(!r)return;let w=CH.wins.find(x=>x.k==k);if(w){CH.wins=CH.wins.filter(x=>x!==w);w.min=0}else w={k,min:0,att:[]};CH.wins.push(w);
 CH.open=0;CH.set=0;chCap();CH.focus=k;CH.act=k;w.nrId=0;chRender();
-try{if(!CH.msgs[k])await chMsgsLoad(k);await chReadsLoad(k)}catch(e){toast(chErr(e))}
+try{if(!CH.msgs[k])await chMsgsLoad(k);await chReadsLoad(k);await chJoinsLoad(k)}catch(e){toast(chErr(e))}
 chRender();chRead(k);chMentSeen(k)}
 async function chMsgsLoad(k,before){let q=sb.from('chat_messages').select('*').eq('room_id',k).order('id',{ascending:false}).limit(40);if(before)q=q.lt('id',before);const r=await q;if(r.error)throw r.error;const rows=(r.data||[]).reverse(),cur=CH.msgs[k]||[];
 if(before){CH.msgs[k]=rows.concat(cur)}else{CH.msgs[k]=rows.concat(cur.filter(x=>x._p))}CH.old[k]=rows.length>=40;await chRxLoad(rows.map(x=>x.id))}
@@ -3213,8 +3302,9 @@ if(chAnn(r))return role=='admin'?{ok:1}:{ok:0,why:'Only admins can send messages
 if(r.kind=='channel')return chMuted('pub')?{ok:0,why:'You are muted in public chat.'}:{ok:1};
 if(r.kind=='dm'){if(rsBlocked('dm'))return{ok:0,why:'Direct messages are turned off for your account.'};if(chMuted('dm'))return{ok:0,why:'You are muted in direct messages.'};const o=chOther(r);if(CH.blk.mine.has(o))return{ok:0,why:'You blocked '+chNm(o)+'.',unb:o};if(CH.blk.by.has(o))return{ok:0,why:'You cannot reply to this conversation.'}}
 return{ok:1}}
-async function chSend(k,like){const r=chRoom(k),w=CH.wins.find(x=>x.k==k);if(!r||!w||!chCan(r).ok)return;const ta=document.querySelector('.cw[data-k="'+k+'"] .cwi'),body=like?'👍':(ta?ta.value:CH.draft[k]||'').trim(),att=like?[]:(w.att||[]);if(!body&&!att.length)return;
+async function chSend(k,like){const r=chRoom(k),w=CH.wins.find(x=>x.k==k);if(!r||!w||!chCan(r).ok)return;const ta=document.querySelector('.cw[data-k="'+k+'"] .cwi'),body=like?'👍':(ta?ta.value:CH.draft[k]||'').trim(),att0=like?[]:(w.att||[]),hm=!like&&(w.media||[]).length;if(w.upl)return;if(!body&&!att0.length&&!hm)return;
 if(body.length>2000)return toast('That message is too long (2000 characters max).');
+let med=[];if(hm){w.upl=1;chRender();try{med=await chUpMedia(w.media)}catch(e){w.upl=0;chRender();return toast(e.message||'Upload failed')}w.upl=0;w.media=[]}const att=att0.concat(med);
 const tmp={id:-Date.now(),room_id:k,sender_id:ME.id,body,att:att.length?att:null,created_at:new Date().toISOString(),_p:1};(CH.msgs[k]=CH.msgs[k]||[]).push(tmp);if(!like){CH.draft[k]='';w.att=[];if(ta){ta.value='';ta.style.height=''}}chMnClose();chTypeSend(k,1);chRender();chPatch(k,1);
 const x=await sb.from('chat_messages').insert({room_id:k,body,att:att.length?att:null}).select().single();
 if(x.error){tmp._p=0;tmp._f=1;chPatch(k);toast(chErr(x.error));return}
@@ -3244,7 +3334,7 @@ chPop(e,[live&&(mine||role=='admin')?[mine?'Unsend':'Remove for everyone',`chDel
 function chPurgeAsk(k,id){showConfirm('Delete for everyone?','The message disappears from the chat for everyone, with no “Message removed” left behind. This cannot be undone.',async()=>{const r=await sb.rpc('chat_purge',{mid:id});
 if(r.error){toast(/not allowed/i.test(r.error.message)?'You can only delete your own messages.':'Delete for everyone is not set up yet. Run chat_extras.sql once.');return}chOnDel({id})})}
 function chOnDel(o){if(!o||o.id==null)return;CH.ment=CH.ment.filter(x=>x.id!=o.id);delete CH.rx[o.id];let hit=null;Object.keys(CH.msgs).forEach(k=>{const L=CH.msgs[k],i=L.findIndex(x=>x.id==o.id);if(i>=0){L.splice(i,1);hit=k}});if(hit)chPatch(hit);clearTimeout(CH.timers.dl);CH.timers.dl=setTimeout(chRefresh,400)}
-async function chDel(id){const r=await sb.rpc('chat_delete',{mid:id});if(r.error)toast(chErr(r.error))}
+async function chDel(id){const mm=Object.values(CH.msgs).flat().find(x=>x&&x.id==id),ps=mm&&mm.sender_id==ME.id?(mm.att||[]).filter(a=>a&&a.path).map(a=>a.path):[];const r=await sb.rpc('chat_delete',{mid:id});if(r.error)return toast(chErr(r.error));if(ps.length)sb.storage.from('chat-media').remove(ps).then(x=>x.error&&console.warn(x.error.message))}
 function chWinMenu(e,k){const r=chRoom(k);if(!r)return;const o=chOther(r),ig=chIgnR(k),an=chAnn(r);
 chPop(e,[r.kind=='channel'?['Group info',`chInfo('${k}')`]:null,r.mine&&!an?(ig?['Unmute',`chIgnOff('${k}')`]:['Mute…',`chIgnAsk('${k}')`]):null,r.kind=='dm'&&r.mine&&o?(CH.blk.mine.has(o)?['Unblock '+E(chNm(o)),`chUnblock('${o}')`]:['Block '+E(chNm(o)),`chBlockAsk('${o}')`,1]):null,role=='admin'&&o?['Mute '+E(chNm(o))+' site-wide…',`chMuteAsk('${o}')`]:null,['Close chat',`chClose(null,'${k}')`]])}
 function chBlockAsk(u){showConfirm('Block '+chNm(u)+'?','They will not be able to message you and you cannot message them, until you unblock. Admins can still read past messages. You will both still see each other and each other’s messages in group chats.',async()=>{const r=await sb.rpc('chat_block',{u});if(r.error)throw r.error;CH.blk.mine.add(u);chRender();toast(chNm(u)+' blocked')})}
@@ -3257,27 +3347,30 @@ const r=await sb.from('chat_mutes').upsert({user_id:u,pub,dm,until,by:ME.id});if
 /* ---- rendering ---- */
 const chLink=t=>E(t).replace(/\n/g,'<br>').replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener noreferrer">$1</a>');
 function chSeers(k){const r=chRoom(k),rd=CH.reads[k]||{},o=[];Object.keys(rd).forEach(u=>{if(u==ME.id)return;if(r.kind=='admin'&&role!='admin'&&!(CH.users[u]&&CH.users[u].role=='admin'))return;o.push({u,last:rd[u]})});return o}
-function chMsgsHtml(k){const r=chRoom(k),L=chVis(k),me=ME.id;if(!r)return'';let h='';const nw=CH.wins.find(x=>x.k==k),nr=nw&&!chIsAct(k)&&r.mine?nw.nrId:0;
+function chMsgsHtml(k){const r=chRoom(k),L=chJoinMerge(k,chVis(k)),me=ME.id;if(!r)return'';let h='';const nw=CH.wins.find(x=>x.k==k),nr=nw&&!chIsAct(k)&&r.mine?nw.nrId:0;
 if(CH.old[k])h+=`<button class="cmore" onclick="chOlder('${k}')">Load earlier messages</button>`;
 h+=`<p class="cnote">${chAnn(r)?'Announcements from the admins. Only admins can post here.':r.kind=='channel'?(chRc(r)?'Review center group. Only people in this review center, and admins, can read this. Type @ to mention someone.':'Public group. Everyone can read this. Type @ to mention someone.'):!r.mine?'Read-only admin view.':'Admins can read this conversation.'}</p>`;
-const dm=r.kind!='channel'&&r.mine,mineIds=L.filter(m=>m.sender_id==me&&!m._f&&m.id>0).map(m=>m.id),heads={};
-if(dm){chSeers(k).forEach(s=>{const up=mineIds.filter(i=>i<=s.last).pop();if(up)(heads[up]=heads[up]||[]).push(s.u)})}
+const dm=r.kind!='channel'&&r.mine,gr=r.kind=='channel'&&r.mine,mineIds=L.filter(m=>m.sender_id==me&&!m._f&&m.id>0).map(m=>m.id),heads={},ok=L.filter(m=>m.id>0&&!m._f&&!m._p&&!m.deleted),nowSp={},oldSp=(CH.sp=CH.sp||{})[k]||{},newU=new Set();
+/* each person's avatar sits under the newest message they have seen: DMs under my messages, groups and channels under any message */
+if(dm){chSeers(k).forEach(s=>{const up=mineIds.filter(i=>i<=s.last).pop();if(up){(heads[up]=heads[up]||[]).push(s.u);nowSp[s.u]=up}})}
+else if(gr){chSeers(k).forEach(s=>{const c=ok.filter(m=>m.id<=s.last&&m.sender_id!=s.u).pop();if(c){(heads[c.id]=heads[c.id]||[]).push(s.u);nowSp[s.u]=c.id}})}
+Object.keys(nowSp).forEach(u=>{if(oldSp[u]!==undefined&&oldSp[u]!==nowSp[u])newU.add(u)});CH.sp[k]=nowSp;
 const lastMine=[...L].reverse().find(m=>m.sender_id==me&&!m.deleted);let prev=null;
-L.forEach((m,i)=>{const t=+new Date(m.created_at),sep=!prev||t-(+new Date(prev.created_at))>18e5,mine=m.sender_id==me;
+L.forEach((m,i)=>{if(m.sys){h+=chSysHtml(m);prev=m;return}const t=+new Date(m.created_at),sep=!prev||t-(+new Date(prev.created_at))>18e5,mine=m.sender_id==me;
 if(nr&&m.id==nr&&!mine)h+='<div class="cnew"><span>New</span></div>';if(sep)h+=`<div class="csep">${phDay(t)==phDay()?'':phF({month:'short',day:'numeric'},t)+' · '}${tm(t)}</div>`;
 const first=sep||prev.sender_id!=m.sender_id,nx=L[i+1],last=!nx||nx.sender_id!=m.sender_id||(+new Date(nx.created_at))-t>18e5;
-const lk=!m.deleted&&!(m.att&&m.att.length)&&(m.body||'').trim()=='👍',grp=r.kind=='channel';let body=m.deleted?'<i class="mu">Message removed</i>':(m.body?(lk?'<span class="clk">👍</span>':`<span>${chBodyHtml(m,r)}</span>`):'')+((m.att||[]).map(a=>`<a class="cat" onclick="chAtt('${a.id}')">${ico('file')}<b>${E(a.title)}</b></a>`).join(''));
+const lk=!m.deleted&&!(m.att&&m.att.length)&&(m.body||'').trim()=='👍',grp=r.kind=='channel';let body=m.deleted?'<i class="mu">Message removed</i>':(m.body?(lk?'<span class="clk">👍</span>':`<span>${chBodyHtml(m,r)}</span>`):'')+((m.att||[]).map(chAttHtml).join(''));
 h+=`<div class="cmr ${mine?'me':''}">${!mine?`<div class="cmv">${last?(grp?`<a class="cprf" title="View profile" onclick="chProf(event,'${m.sender_id}')">${chAv(m.sender_id,28,false)}</a>`:chAv(m.sender_id,28,false)):''}</div>`:''}<div class="cmc">${!mine&&first&&r.kind!='dm'?`<small class="cnm${grp?' cprf':''}" ${grp?`onclick="chProf(event,'${m.sender_id}')"`:''}>${E(chNm(m.sender_id))}${CH.users[m.sender_id]&&CH.users[m.sender_id].role=='admin'?' · admin':''}</small>`:''}<div class="cmbw"><div class="cmb ${m._f?'bad':''} ${m._p?'pend':''} ${lk?'lk':''}" ${m._f?`onclick="chRetry('${k}',${m.id})"`:''} title="${E(phF({dateStyle:'medium',timeStyle:'short'},t))}">${body}</div>${m.id>0&&!m.deleted&&r.mine?`<button class="cmx" title="React" aria-label="React" onclick="chRxOpen(event,'${k}',${m.id})">🙂</button>`:''}${m.id>0?`<button class="cmm" aria-label="Message options" onclick="chMsgMenu(event,'${k}',${m.id})">${ico('more')}</button>`:''}</div>${m.deleted?'':chRxHtml(k,m)}</div></div>`;
-if(mine&&dm&&!m.deleted){const hd=heads[m.id];if(hd&&hd.length)h+=`<div class="cseen">${hd.slice(0,3).map(u=>chAv(u,14,false)).join('')}</div>`;
-else if(lastMine&&lastMine.id==m.id){h+=`<div class="cst">${m._f?'Not sent. Tap the message to retry.':m._p?'Sending…':m.delivered_at?'Delivered':'Sent'}</div>`}}
+if(!m.deleted){const hd=heads[m.id];if(hd&&hd.length&&(dm?mine:gr))h+=`<div class="cseen">${hd.slice(0,5).map(u=>`<span class="cseena${newU.has(u)?' new':''}" title="Seen by ${E(chNm(u))}">${chAv(u,14,false)}</span>`).join('')}${hd.length>5?`<span class="cseenn">+${hd.length-5}</span>`:''}</div>`;
+else if(mine&&dm&&lastMine&&lastMine.id==m.id){h+=`<div class="cst">${m._f?'Not sent. Tap the message to retry.':m._p?'Sending…':m.delivered_at?'Delivered':'Sent'}</div>`}}
 prev=m});
 if(!L.length)h+=`<p class="cnote">${r.mine?'No messages yet. Say hi!':'No messages in this conversation.'}</p>`;return h}
 function chFootHtml(w,r){const c=chCan(r);if(!c.ok)return `<div class="cwf off">${E(c.why)}${c.unb?` <a onclick="chUnblock('${c.unb}')">Unblock</a>`:''}</div>`;
-const k=w.k,emp=!(CH.draft[k]||'').trim()&&!(w.att||[]).length;
-return `<div class="cwf">${chMnHtml(k)}${(w.att||[]).length?`<div class="cwa">${w.att.map((a,i)=>`<span class="cch">${ico('file')}<b>${E(a.title)}</b><a onclick="chUnatt('${k}',${i})" aria-label="Remove">${ico('x')}</a></span>`).join('')}</div>`:''}<div class="cwr${emp?' emp':''}"><button class="cwb" title="Attach a file from the site" onclick="chPick('${k}')">${ico('clipf')}</button><textarea class="cwi" rows="1" maxlength="2000" placeholder="Aa" oninput="chInput(this,'${k}')" onkeydown="chKey(event,'${k}')" onkeyup="chMnKu(event,this,'${k}')" onclick="chMnCheck(this,'${k}')" onblur="chMnBlur()">${E(CH.draft[k]||'')}</textarea><button class="cwb emj" title="Emoji" aria-label="Emoji" onclick="chEmoOpen(event,'${k}')">😊</button><button class="cwb send" title="Send" onclick="chSend('${k}')">${ico('send')}</button><button class="cwb clkb" title="Like" aria-label="Like" onclick="chLike('${k}')">👍</button></div></div>`}
+const k=w.k,emp=!(CH.draft[k]||'').trim()&&!(w.att||[]).length&&!(w.media||[]).length;
+return `<div class="cwf">${chMnHtml(k)}${((w.att||[]).length||(w.media||[]).length)?`<div class="cwa">${w.att.map((a,i)=>`<span class="cch">${ico('file')}<b>${E(a.title)}</b><a onclick="chUnatt('${k}',${i})" aria-label="Remove">${ico('x')}</a></span>`).join('')}${chMediaChips(k,w)}</div>`:''}<div class="cwr${emp?' emp':''}${w.upl?' upl':''}"><button class="cwb" title="Attach a file from the site" onclick="chPick('${k}')">${ico('clipf')}</button><button class="cwb" title="Photo or file from your device (you can also paste or drop)" onclick="chDev('${k}')">${ico('image')}</button><textarea class="cwi" rows="1" maxlength="2000" placeholder="Aa" oninput="chInput(this,'${k}')" onkeydown="chKey(event,'${k}')" onkeyup="chMnKu(event,this,'${k}')" onclick="chMnCheck(this,'${k}')" onblur="chMnBlur()" onpaste="chPaste(event,'${k}')">${E(CH.draft[k]||'')}</textarea><button class="cwb emj" title="Emoji" aria-label="Emoji" onclick="chEmoOpen(event,'${k}')">😊</button><button class="cwb send" title="Send" onclick="chSend('${k}')">${ico('send')}</button><button class="cwb clkb" title="Like" aria-label="Like" onclick="chLike('${k}')">👍</button></div></div>`}
 function chWinHtml(w,i){const r=chRoom(w.k);if(!r)return'';const sub=chSubT(r),ch=r.kind=='channel',k=w.k;
 if(w.info&&ch)return `<div class="cw${chIsAct(k)?' act':''}" data-k="${k}" style="--ci:${i}"><div class="cwh"><button class="cwb" title="Back" aria-label="Back" onclick="chInfoBack('${k}')">${ico('back')}</button><div class="cwt"><b>${w.info=='mem'?'Members':'Group info'}</b><small>${E(chTitle(r))}</small></div><button class="cwb" title="Minimize" onclick="chMin(event,'${k}')">${ico('minus')}</button><button class="cwb" title="Close" onclick="chClose(event,'${k}')">${ico('x')}</button></div>${chInfoHtml(w,r)}</div>`;
-return `<div class="cw${chIsAct(k)?' act':''}" data-k="${k}" style="--ci:${i}"><div class="cwh">${chRoomAv(r,32)}<div class="cwt${ch?' cwt-l':''}" ${ch?`onclick="chInfo('${k}')" title="Group info"`:''}><b>${E(chTitle(r))}</b><small>${E(sub)}</small></div><button class="cwb" title="Options" onclick="chWinMenu(event,'${k}')">${ico('more')}</button><button class="cwb" title="Minimize" onclick="chMin(event,'${k}')">${ico('minus')}</button><button class="cwb" title="Close" onclick="chClose(event,'${k}')">${ico('x')}</button></div><div class="cwm" onscroll="this.dataset.b=(this.scrollHeight-this.scrollTop-this.clientHeight<40)?1:0">${chMsgsHtml(k)}</div>${chNrHtml(k)}${chTyHtml(k)}${chFootHtml(w,r)}</div>`}
+return `<div class="cw${chIsAct(k)?' act':''}" data-k="${k}" style="--ci:${i}" ondragover="chDrag(event)" ondrop="chDrop(event,'${k}')"><div class="cwh">${chRoomAv(r,32)}<div class="cwt${ch?' cwt-l':''}" ${ch?`onclick="chInfo('${k}')" title="Group info"`:''}><b>${E(chTitle(r))}</b><small>${E(sub)}</small></div><button class="cwb" title="Options" onclick="chWinMenu(event,'${k}')">${ico('more')}</button><button class="cwb" title="Minimize" onclick="chMin(event,'${k}')">${ico('minus')}</button><button class="cwb" title="Close" onclick="chClose(event,'${k}')">${ico('x')}</button></div><div class="cwm" onscroll="this.dataset.b=(this.scrollHeight-this.scrollTop-this.clientHeight<40)?1:0">${chMsgsHtml(k)}</div>${chNrHtml(k)}${chTyHtml(k)}${chFootHtml(w,r)}</div>`}
 function chHeads(){const r=document.getElementById('chatRoot');if(!r)return;r.querySelectorAll('.chd').forEach(h=>{const rm=chRoom(h.dataset.k),n=rm?chU(rm):0;let b=h.querySelector('.cb');if(n){if(!b){b=document.createElement('i');b.className='cb';h.appendChild(b)}b.textContent=n>9?'9+':n}else if(b)b.remove()})}
 function chPatch(k,force){const m=document.querySelector('.cw[data-k="'+k+'"] .cwm');if(!m)return;const atB=force||m.dataset.b!=='0',r=chRoom(k);m.innerHTML=chMsgsHtml(k);if(atB)m.scrollTop=m.scrollHeight;const s=document.querySelector('.cw[data-k="'+k+'"] .cwt small');if(s&&r)s.textContent=chSubT(r)}
 function chTabs(){const t=[['pub','Public',chUn(r=>r.kind=='channel')],['dm','DMs',chUn(r=>r.kind=='dm')],['adm','Admin',chUn(r=>r.kind=='admin')]];return `<div class="ctabs">${t.map(([k,n,u])=>`<a class="${CH.tab==k?'on':''}" onclick="CH.tab='${k}';CH.q='';CH.fresh=1;chRender()">${n}${u?`<i class="cb">${u>9?'9+':u}</i>`:''}</a>`).join('')}</div>`}
