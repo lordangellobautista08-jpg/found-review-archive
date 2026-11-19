@@ -2014,8 +2014,13 @@ rcTag=a=>a.length<=2?a.map(rcName).filter(Boolean).join(', ')||'Deleted review c
 function rcSel(u){if(u.role=='admin')return'<span class="mu sm">—</span>';if(!RCOK)return'<span class="mu sm">Not set up</span>';
 return `<select class="rcsel" onchange="rcSet('${u.id}',this.value)"><option value="">— None —</option>${(D.RC||[]).map(r=>`<option value="${r.id}" ${u.review_center_id==r.id?'selected':''}>${E(r.name)}</option>`).join('')}</select>`}
 async function rcSet(uid,val){const u=D.U.find(x=>x.id==uid);if(!u||role!='admin')return;
-const r=await sb.from('profiles').update({review_center_id:val||null}).eq('id',uid).select('id');
-if(r.error||!(r.data&&r.data.length)){toast('Could not save. Run review_centers.sql once; it also lets admins set this.');route();return}
+/* the admin-only database function sets it directly, so it works whatever the table permissions on profiles are */
+let r=await sb.rpc('rc_set_user',{p_user:uid,p_rc:val||null});
+if(r.error&&/could not find the function|schema cache|PGRST202|does not exist/i.test((r.error.code||'')+' '+(r.error.message||''))){
+/* function not installed yet: try the plain update, which only works if profiles allows it */
+const d=await sb.from('profiles').update({review_center_id:val||null}).eq('id',uid).select('id');
+r=d.error?{error:d.error}:(d.data&&d.data.length?{}:{error:{message:'nothing was updated. Run the rc_set_user SQL once in Supabase.'}})}
+if(r.error){toast('Could not save: '+(r.error.message||'unknown error'));route();return}
 u.review_center_id=val||null;toast(val?(u.display_name||'User')+' is now in '+rcName(val):'Review center cleared')}
 function rcList(){const rows=(D.RC||[]).map(r=>{const n=D.U.filter(u=>u.review_center_id==r.id).length,use=OQ.filter(x=>(x.rc||[]).includes(r.id)).length+D.F.filter(x=>(x.rc||[]).includes(r.id)).length+(D.AR||[]).filter(a=>a.rc_id==r.id).length;
 if(RCST.edit==r.id)return `<div class="row" style="margin:0 0 8px"><input id="rcEd" value="${E(r.name)}" style="flex:1" onkeydown="if(event.key=='Enter'){event.preventDefault();rcRenameSave('${r.id}')}"><button class="btn p" onclick="rcRenameSave('${r.id}')">Save</button><a class="lk sm" onclick="RCST.edit=null;rcRefresh()">Cancel</a></div>`;
