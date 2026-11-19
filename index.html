@@ -2273,17 +2273,26 @@ u.role=to;toast('Role updated');route()})}
 /* greeting from the device's time zone and, when location is allowed, the weather (Open-Meteo, free, no key). Only the weather code is cached, never your coordinates. */
 let WX=null,WXB=0;try{WX=JSON.parse(localStorage.getItem('wx')||'null')}catch(e){}
 /* location is only asked after the person taps Enable on a short explainer note; "No thanks" is remembered */
-function stWxFetch(){if(WXB)return;WXB=1;navigator.geolocation.getCurrentPosition(p=>fetch('https://api.open-meteo.com/v1/forecast?latitude='+p.coords.latitude.toFixed(2)+'&longitude='+p.coords.longitude.toFixed(2)+'&current=weather_code').then(r=>r.json()).then(j=>{WX={ts:Date.now(),c:j.current.weather_code};try{localStorage.setItem('wx',JSON.stringify(WX))}catch(e){}const g=$('#stGr');if(g)g.innerHTML=stGreet()}).catch(()=>{}).finally(()=>{WXB=0}),()=>{WXB=0},{timeout:10000,maximumAge:36e5})}
+function stWxFetch(){if(WXB)return;WXB=1;navigator.geolocation.getCurrentPosition(p=>fetch('https://api.open-meteo.com/v1/forecast?latitude='+p.coords.latitude.toFixed(2)+'&longitude='+p.coords.longitude.toFixed(2)+'&current=weather_code,precipitation,cloud_cover').then(r=>r.json()).then(j=>{WX={ts:Date.now(),c:j.current.weather_code,p:j.current.precipitation,cc:j.current.cloud_cover};try{localStorage.setItem('wx',JSON.stringify(WX))}catch(e){}const g=$('#stGr');if(g)g.innerHTML=stGreet()}).catch(()=>{}).finally(()=>{WXB=0}),()=>{WXB=0},{timeout:10000,maximumAge:36e5})}
 function stWxNote(){if(localStorage.getItem('wxNo'))return;const el=$('#stWxN');if(!el||el.innerHTML)return;
 el.innerHTML=`<div class="card sm" style="display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap"><span>${ico('mapPin')}Allow your location to get a weather-aware greeting (like a rainy-day note). It's only used to check the weather and is never saved.</span><span class="row" style="margin:0"><button class="btn p" onclick="stWxOn()">Enable</button><a class="lk sm mu" onclick="stWxNo()">No thanks</a></span></div>`}
 function stWxOn(){const el=$('#stWxN');if(el)el.innerHTML='';stWxFetch()}
 function stWxNo(){try{localStorage.setItem('wxNo','1')}catch(e){}const el=$('#stWxN');if(el)el.innerHTML=''}
-function stWxGet(){if(WXB||!navigator.geolocation||(WX&&Date.now()-WX.ts<18e5))return;const f=st=>{if(st=='granted')stWxFetch();else if(st=='prompt')stWxNote()};
+function stWxGet(){if(WXB||!navigator.geolocation||(WX&&Date.now()-WX.ts<18e5&&WX.p!==undefined))return;const f=st=>{if(st=='granted')stWxFetch();else if(st=='prompt')stWxNote()};
 try{navigator.permissions.query({name:'geolocation'}).then(r=>f(r.state),()=>f('prompt'))}catch(e){f('prompt')}}
-function stGreet(){stWxGet();const h=+new Intl.DateTimeFormat('en-US',{timeZone:TZ,hour:'numeric',hour12:false}).format(Date.now())%24,c=WX&&Date.now()-WX.ts<108e5?WX.c:-1;
-if(c>=95)return 'Stormy out there, perfect time to lock in! '+ico('cloudLightning')+'';
-if((c>=51&&c<=67)||(c>=80&&c<=82))return 'What a rainy '+(h>=18||h<5?'night':'day')+' to study! '+ico('cloudRain')+'';
+Object.assign(ICP,{cloud:'<path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/>',cloudSun:'<path d="M12 2v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="M20 12h2"/><path d="m19.07 4.93-1.41 1.41"/><path d="M15.947 12.65a4 4 0 0 0-5.925-4.128"/><path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"/>',cloudFog:'<path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 17H7"/><path d="M17 21H9"/>',snowflake:'<line x1="2" x2="22" y1="12" y2="12"/><line x1="12" x2="12" y1="2" y2="22"/><path d="m20 16-4-4 4-4"/><path d="m4 8 4 4-4 4"/><path d="m16 4-4 4-4-4"/><path d="m8 20 4-4 4 4"/>'});
+/* weather codes (Open-Meteo): 0-1 clear, 2 partly cloudy, 3 overcast, 45/48 fog, 51-57 drizzle, 61-67 rain, 71-77 snow, 80-82 showers, 85-86 snow showers, 95+ thunderstorm.
+ A "rain" code with no rain actually falling (precipitation 0) is shown as a cloudy day instead. */
+function stGreet(){stWxGet();const h=+new Intl.DateTimeFormat('en-US',{timeZone:TZ,hour:'numeric',hour12:false}).format(Date.now())%24,fresh=WX&&Date.now()-WX.ts<72e5,c=fresh?WX.c:-1,wet=!fresh||WX.p==null||WX.p>0,nt=h>=18||h<5,w=nt?'night':'day';
+if(c>=95)return 'Stormy out there, perfect time to lock in! '+ico('cloudLightning');
+if((c>=71&&c<=77)||c==85||c==86)return 'Snowy out there, cozy up and study! '+ico('snowflake');
+if(((c>=61&&c<=67)||(c>=80&&c<=82))&&wet)return 'What a rainy '+w+' to study! '+ico('cloudRain');
+if(c>=51&&c<=57&&wet)return 'A little drizzle out there, perfect for studying! '+ico('cloudRain');
+if(c==45||c==48)return 'Foggy out there, a quiet time to focus! '+ico('cloudFog');
+if(c==3||(c>=51&&c<=82))return 'A cloudy '+w+', a calm one to study! '+ico('cloud');
+if(c==2)return 'Partly cloudy '+(nt?'tonight':'today')+', nice time to study! '+ico(nt?'cloud':'cloudSun');
 return h==12?'Happy Lunch Time! '+ico('utensils')+'':h>=5&&h<12?'Good morning! '+ico('sun')+'':h>=13&&h<18?'Good afternoon! '+ico('sun')+'':h>=18&&h<22?'Good evening! '+ico('moon')+'':'Burning the midnight oil! '+ico('moon')+''}
+
 
 /* ===== ANNOUNCEMENT / WHAT'S NEW =====
  Run announcements.sql once. Admin writes it under Admin > Announcement; everyone reads it from the What's New buttons and the popup. */
