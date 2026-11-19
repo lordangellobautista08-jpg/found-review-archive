@@ -868,6 +868,31 @@ body.hm #fabRoot,body.hm #chatRoot,body.hm #ntfRoot{display:none!important}
 .cin-list small{margin-left:auto;color:var(--mu);font-size:.74rem;text-align:right}
 .cin-off{cursor:default;opacity:.75;color:var(--mu)}
 .cmem .cli{padding:6px 4px}
+
+/* ===== Review 3: phone Lock in settings dropdown, chat list juice ===== */
+.stSetD{margin-top:12px;border-top:1px solid var(--bd);padding-top:6px}
+.stSetD summary{cursor:pointer;font-weight:700;font-size:.9rem;display:flex;align-items:center;gap:6px;list-style:none;padding:8px 0}
+.stSetD summary::-webkit-details-marker{display:none}
+.stSetD summary::after{content:'▾';margin-left:auto;transition:transform .2s}
+.stSetD[open] summary::after{transform:rotate(180deg)}
+.stSetD .stL{padding:6px 0 2px}.stMob .stL>.stRow .btn{flex:1}.stMob .stL .btn{width:auto}
+#chList .cli{position:relative;overflow:hidden;touch-action:pan-y;transition:background .12s,transform .18s cubic-bezier(.3,1.5,.5,1),opacity .2s}
+#chList .cli:hover{transform:translateX(3px)}#chList .cli:active{transform:scale(.97)}
+#chList .cli .cav{transition:transform .22s cubic-bezier(.3,1.7,.5,1)}#chList .cli:hover .cav{transform:scale(1.08)}
+#chList .cli .cb{animation:cbPop .4s cubic-bezier(.3,1.7,.5,1) backwards}
+@keyframes cbPop{from{transform:scale(0)}}
+#chList.cfresh .cli{animation:nfIn .34s cubic-bezier(.2,.9,.3,1.25) backwards}
+#chList.cfresh .cli:nth-child(2){animation-delay:55ms}#chList.cfresh .cli:nth-child(3){animation-delay:110ms}#chList.cfresh .cli:nth-child(4){animation-delay:165ms}
+#chList.cfresh .cli:nth-child(5){animation-delay:220ms}#chList.cfresh .cli:nth-child(6){animation-delay:275ms}#chList.cfresh .cli:nth-child(7){animation-delay:330ms}
+#chList.cfresh .cli:nth-child(8){animation-delay:385ms}#chList.cfresh .cli:nth-child(n+9){animation-delay:440ms}
+#chList .cli.csw{transition:none}#chList .cli.chot{background:var(--soft)}
+#chList .cli.chk{background:rgba(46,204,113,.22)}#chList .cli.chu{background:rgba(59,130,246,.2)}
+#chList .cli.chk .cav,#chList .cli.chu .cav{transform:scale(1.18)}
+#chList .cli.chk::after,#chList .cli.chu::after{content:'';position:absolute;right:12px;top:50%;width:24px;height:24px;margin-top:-12px;border-radius:50%;animation:cliTick .4s cubic-bezier(.3,1.7,.5,1) both}
+#chList .cli.chk::after{background:#2ecc71 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E") center/14px no-repeat}
+#chList .cli.chu::after{background:#3b82f6}
+@keyframes cliTick{from{transform:scale(0) rotate(-40deg)}}
+@media(prefers-reduced-motion:reduce){#chList .cli,#chList.cfresh .cli,#chList .cli .cb{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body class="hm">
@@ -1202,8 +1227,8 @@ function fvRowDown(e,vid){if(e.button||e.target.closest('button'))return;const v
 const stop=()=>{removeEventListener('pointermove',mo);removeEventListener('pointerup',up);removeEventListener('pointercancel',up)};
 const mo=ev=>{if(dead)return;if(!mv&&Math.abs(ev.clientX-sx)+Math.abs(ev.clientY-sy)<5)return;
 if(!mv){gx=Math.min(v.w/2,200);if(vwUnpin(vid,ev.clientX-gx,ev.clientY-14)===false){dead=1;stop();return}mv=1;fvDragging=1;document.body.classList.add('fvdrag');ntRail();
-const el=document.querySelector('.vwin[data-vid="'+vid+'"]');if(el){el.classList.add('moving','drg');try{el.querySelector('.vh').setPointerCapture(pid)}catch(_){}}}
-v.x=ev.clientX-gx;v.y=ev.clientY-14;vwClamp(v);vwApply(v);over=fvHit(ev);fvZoneOn(over)};
+const el=document.querySelector('.vwin[data-vid="'+vid+'"]');if(el){el.classList.add('moving');try{el.querySelector('.vh').setPointerCapture(pid)}catch(_){}}}
+v.x=ev.clientX-gx;v.y=ev.clientY-14;vwClamp(v);vwApply(v);over=fvHit(ev);fvZoneOn(over);const w2=document.querySelector('.vwin[data-vid="'+vid+'"]');if(w2)w2.classList.toggle('drg',!!over)};
 const up=ev=>{stop();if(dead)return;
 if(!mv){vwUnpin(vid);return}
 const ok=ev.type=='pointerup'&&(fvHit(ev)||over);/* measure the dock BEFORE the drag state hides it */
@@ -1224,12 +1249,12 @@ const mx=el.querySelector('.vmx');if(mx){mx.innerHTML=v.max&&!mn?IC.res:IC.max;m
 function vwDown(e,id,dir){const v=vwGet(id);if(!v||e.button>0||v.max||(v.min&&dir)||(!dir&&e.target.closest('button,a')))return;const el=e.currentTarget,w=el.closest('.vwin');vwFocus(id);e.preventDefault();
 const s={x:e.clientX,y:e.clientY,g:{x:v.x,y:v.y,w:v.w,h:v.h}},b0=w.getBoundingClientRect(),can=!dir&&FVP(),off={x:e.clientX-v.x,y:Math.min(e.clientY-v.y,30)};let moved=0,over=0;w.classList.add('moving');try{el.setPointerCapture(e.pointerId)}catch(_){}
 const mv=ev=>{const dx=ev.clientX-s.x,dy=ev.clientY-s.y;
-if(can&&!moved&&Math.abs(dx)+Math.abs(dy)>4){moved=1;fvDragging=1;document.body.classList.add('fvdrag');w.classList.add('drg');ntRail()}
-if(!dir){if(v.min){w.style.left=(b0.left+dx)+'px';w.style.top=(b0.top+dy)+'px'}else if(moved&&can){const cx=Math.max(24,Math.min(236,off.x*260/Math.max(1,s.g.w)));v.x=ev.clientX-cx;v.y=ev.clientY-off.y}else{v.x=s.g.x+dx;v.y=s.g.y+dy}}
+if(can&&!moved&&Math.abs(dx)+Math.abs(dy)>4){moved=1;fvDragging=1;document.body.classList.add('fvdrag');ntRail()}
+if(!dir){if(v.min){w.style.left=(b0.left+dx)+'px';w.style.top=(b0.top+dy)+'px'}else if(moved&&can&&over){const cx=Math.max(24,Math.min(236,off.x*260/Math.max(1,s.g.w)));v.x=ev.clientX-cx;v.y=ev.clientY-off.y}else{v.x=s.g.x+dx;v.y=s.g.y+dy}}
 else{let{x,y,w:W,h:H}=s.g;if(dir.includes('e'))W=s.g.w+dx;if(dir.includes('s'))H=s.g.h+dy;if(dir.includes('w')){W=s.g.w-dx;x=s.g.x+dx}if(dir.includes('n')){H=s.g.h-dy;y=s.g.y+dy}
 if(W<280){if(dir.includes('w'))x-=280-W;W=280}if(H<200){if(dir.includes('n'))y-=200-H;H=200}v.x=x;v.y=y;v.w=W;v.h=H}
 if(!v.min){vwClamp(v);vwApply(v)}
-if(moved){over=fvHit(ev);fvZoneOn(over)}};
+if(moved){over=fvHit(ev);fvZoneOn(over);w.classList.toggle('drg',!!over)}};
 const up=ev=>{el.removeEventListener('pointermove',mv);el.removeEventListener('pointerup',up);el.removeEventListener('pointercancel',up);
 const ok=moved&&can&&ev.type=='pointerup'&&(fvHit(ev)||over);/* measure the dock BEFORE the drag state hides it */
 if(moved){fvDragging=0;document.body.classList.remove('fvdrag');fvZoneOn(0);w.classList.remove('drg')}
@@ -1373,7 +1398,7 @@ ${sharedCard()}
 const QK_RE=/problem[\s_-]*sets?|evaluations?/i,qkTag=x=>QK_RE.test((x.src||'')+' '+(x.t||'')),
 ymd=(o=0)=>{const d=new Date();d.setDate(d.getDate()+o);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')},
 dayDiff=(a,b)=>Math.round((Date.parse(b+'T00:00:00Z')-Date.parse(a+'T00:00:00Z'))/864e5),
-qkEmpty=()=>({ts:0,today:null,streak:0,last:'',seen:{},sub:null,lost:0,rev:{tries:0,lastTry:'',used:[]}});
+qkEmpty=()=>({rd:[],ts:0,today:null,streak:0,last:'',seen:{},sub:null,lost:0,rev:{tries:0,lastTry:'',used:[]}});
 let QKS=null,QKI=null;
 function qkLoad(){try{return Object.assign(qkEmpty(),JSON.parse(localStorage.getItem('qk_'+ME.id)||'{}'))}catch(e){return qkEmpty()}}
 let QKOK=false;/* true once the quickiz_state table answered, so progress also syncs through Supabase */
@@ -1385,13 +1410,20 @@ if(r.error){QKOK=false;console.warn('QuickiZ sync is off:',r.error.message);retu
 QKOK=true;const rm=r.data&&r.data.data,lc=qkLoad();
 if(rm&&(rm.ts||0)>(lc.ts||0)){try{localStorage.setItem('qk_'+ME.id,JSON.stringify(rm))}catch(e){}}
 else if(lc.ts&&(!rm||(rm.ts||0)<lc.ts))qkSave(lc)}catch(e){console.warn(e)}}
-function qkReset(s){s.lost=s.streak;s.streak=0;s.last='';s.seen={};s.rev={tries:0,lastTry:'',used:[]}}
+function qkReset(s){s.lost=s.streak;s.streak=0;s.last='';s.rd=[];s.seen={};s.rev={tries:0,lastTry:'',used:[]}}
 /* st: new (no streak) | ok (can play today) | done (played today) | rev (missed a day: revive chance available) | revdone (today's revive chance already used) */
+/* rest days: every missed day since the last QuickiZ was a rest day, so the streak is still alive */
+const qkBridged=(s,d)=>{const rd=s.rd||[];for(let i=1;i<d;i++){const x=new Date(Date.parse(s.last+'T00:00:00Z')+i*864e5).toISOString().slice(0,10);if(!rd.includes(x))return false}return true};
 function qkState(){const s=qkLoad(),t=ymd();let st='new';
-if(s.streak&&s.last){const d=dayDiff(s.last,t);
-if(d>4||(s.rev.tries>=3&&s.rev.lastTry!==t)){qkReset(s);qkSave(s)}
-else st=d<=0?(s.redo===t?'ok':'done'):d==1?'ok':s.rev.lastTry===t?'revdone':'rev'}
+if(s.streak&&s.last){const d=dayDiff(s.last,t),br=d>=2&&qkBridged(s,d);
+if(!br&&(d>4||(s.rev.tries>=3&&s.rev.lastTry!==t))){qkReset(s);qkSave(s)}
+else st=d<=0?(s.redo===t?'ok':'done'):(d==1||br)?'ok':s.rev.lastTry===t?'revdone':'rev'}
 return{s,st}}
+function qkRest(){const{s,st}=qkState(),t=ymd();s.rd=s.rd||[];
+if(s.rd.includes(t)){if(st=='done')return;s.rd=s.rd.filter(x=>x!=t);qkSave(s);route();return toast('Rest day cancelled')}
+if(st=='done'||s.last===t)return toast('You already did today\'s QuickiZ, so you do not need a rest day.');
+if(!s.streak)return toast('Start a streak first.');if(st=='rev'||st=='revdone')return toast('Your streak is already broken. Revive it first.');
+showConfirm('Take today as a rest day?','Your QuickiZ streak stays safe even if you skip today.',()=>{const s=qkLoad();s.rd=Array.from(new Set((s.rd||[]).concat(ymd()))).slice(-60);qkSave(s);route();toast('Rest day set. Your streak is safe today.')})}
 function qkPick(s){const g=new Map();allQ().filter(x=>!qkTag(x)).forEach(x=>{const k=x.c+'|'+x.s+'|'+x.t;if(!g.has(k))g.set(k,{c:x.c,s:x.s,t:x.t,n:1e9,q:[]});const e=g.get(k);e.q.push(x);e.n=Math.min(e.n,x.n||1e9)});
 const flat=[...g.values()].sort((a,b)=>(/^algebra/i.test(a.s)?0:1)-(/^algebra/i.test(b.s)?0:1)||cmp(a.c,b.c)||cmp(a.s,b.s)||a.n-b.n||cmp(a.t,b.t))
 .flatMap(e=>e.q.sort((a,b)=>(a.n||1e9)-(b.n||1e9)||a.ts-b.ts));
@@ -1424,10 +1456,11 @@ function qkHook(n){clearInterval(QKI);if(n=='quickiz'&&QKS&&!QKS.done&&QKS.mode!
 const qkDots=n=>{const p=n?((n-1)%7)+1:0;return `<div class="qkd">${[1,2,3,4,5,6,7].map(i=>`<i class="${i<=p?'on':''}"></i>`).join('')}</div><p class="mu sm">${p} / 7 days</p>`},
 qkLabel=n=>{if(!n)return '<p class="lb">No streak yet</p>';const nx=(Math.floor(n/7)+1)*7;return `<p class="lb">${n%7?'🔥':'🏆'} ${n}-day streak${n%7?'':'!'}</p><p class="mu sm">Next milestone: ${nx}-day streak</p>`};
 function qkCard(){const{s,st}=qkState(),has=allQ().length>0,
+rest=(s.rd||[]).includes(ymd()),rlock=!rest&&(st!='ok'||!s.streak||s.last===ymd()),
 msg={new:'5 flashcards, 20 minutes. Starts with Algebra.',ok:'5 flashcards, 20 minutes. Keep your streak going!',done:'✓ Done for today. Come back tomorrow.',
 rev:`You missed a day. Revive your ${s.streak}-day streak with 1 question (10 minutes). Chances used: ${s.rev.tries} / 3.`,revdone:`Revive chance used today. Try again tomorrow. Chances used: ${s.rev.tries} / 3.`}[st],
 btn=st=='done'&&s.today&&s.today.date==ymd()?`<button class="btn p" onclick="qkStart('review')">View today's cards</button>`:st=='rev'?`<button class="btn p" onclick="qkStart('rev')" ${has?'':'disabled'}>Revive streak</button>`:`<button class="btn p" onclick="qkStart()" ${has&&(st=='new'||st=='ok')?'':'disabled'}>Start a QuickiZ</button>`;
-return `<div class="card art stack ${st=='done'?'':'qkoff'}"><h3 class="fq">QuickiZ</h3>${qkLabel(s.streak)}${qkDots(s.streak)}${!s.streak&&s.lost?`<p class="mu sm">Your ${s.lost}-day streak ended. Start again at day 1.</p>`:''}<p class="mu">${msg}</p>${btn}</div>`}
+return `<div class="card art stack ${st=='done'?'':'qkoff'}"><h3 class="fq">QuickiZ</h3>${qkLabel(s.streak)}${qkDots(s.streak)}${!s.streak&&s.lost?`<p class="mu sm">Your ${s.lost}-day streak ended. Start again at day 1.</p>`:''}<p class="mu">${rest&&st=='ok'?ico('moon')+'Rest day today. Your streak is safe. You can still play if you want.':msg}</p>${btn}<div class="row"><button class="btn" ${rlock||st=='done'?'disabled':''} title="${rlock||st=='done'?'Not available once you have played today or after a broken streak':''}" onclick="qkRest()">${ico('moon')}${rest?'Cancel rest day':'Rest day'}</button>${rest&&st!='done'?'<span class="mu sm">Streak is safe today</span>':''}</div></div>`}
 function qkResult(){const S=QKS,r=S.res,back=`<div class="row"><button class="btn p" onclick="go('dash')">Back to dashboard</button></div>`;
 if(r.fail=='time'&&S.mode!='rev')return `<div class="card art stack"><h3>⏰ Time's up</h3><p class="mu">This QuickiZ didn't count. You can start a new one from the dashboard.</p>${back}</div>`;
 if(S.mode=='rev'){if(r.ok)return `<div class="card art stack"><h3>🔥 Streak revived!</h3><p>Your ${r.streak}-day streak is back. Do today's QuickiZ to add a day.</p>${back}</div>`;
@@ -2091,9 +2124,23 @@ stOv=(a,o,w)=>a.x?stXN(o):stWarn(o,w),
 stLog=l=>`<p class="sm mu">${{start:''+ico('play')+'Started',pause:''+ico('pause')+'Paused',resume:''+ico('play')+'Resumed',end:''+ico('check')+'Ended'}[l.t]} ${tm(l.ts)}${l.t=='pause'?' · after '+dur(l.m*60)+' of study':l.t=='resume'?' · paused for '+dur(l.m*60):''}</p>`;
 const stPill=a=>`<div class="stLive ${a?(a.pa?'pz':'on'):''}"><i></i>${a?(a.pa?'Session paused':'Session ongoing'):'No ongoing session'}</div>`;
 /* phone version of the Lock in card: title, live clock, then the streak */
-function stMobHtml(s){const d=stDer(s),a=s.a,nm=a?(a.mode=='mini'||a.mn?'mini':'full'):(d.fd?'mini':s.pm);
-const hide=rsBlocked('ms');/* streak hidden by the admin: only the clock stays */
-return `${hide?'':stName(nm)+stPill(a)}<div class="stMc" data-st="clock">${tms(Date.now())}</div><p class="mu sm" style="margin:0"><span data-st="date">${phF({weekday:'long',month:'long',day:'numeric'},Date.now())}</span> · ${tzn()}</p>${hide?'':stStreak(s)+stRestBtn(s)}`}
+let STMO=false;
+function stMobHtml(s){const d=stDer(s),a=s.a,run=!!a,nm=a?(a.mode=='mini'||a.mn?'mini':'full'):(d.fd?'mini':s.pm),hide=rsBlocked('ms');/* streak hidden by the admin: only the clock stays */
+const clk=`<div class="stMc" data-st="clock">${tms(Date.now())}</div><p class="mu sm" style="margin:0"><span data-st="date">${phF({weekday:'long',month:'long',day:'numeric'},Date.now())}</span> · ${tzn()}</p>`;
+if(hide)return clk;
+const pm=d.fd?'mini':s.pm,g=s.gk==pm?s.goal:0,w=a?stW(a):0,e=a?stEl(a):0,r=a?Math.max(0,a.g-e):0,ov=a?Math.max(0,e-a.g):0,l=a||s.h.find(x=>x.day==d.t),sd=l?tm(l.start):'--',ed=!a&&l&&l.end?tm(l.end):'--';
+return `${stName(nm)}${stPill(a)}${clk}${stStreak(s)}${d.br&&!run?stBrk(d):''}${d.rest?'<p class="stRst sm">'+ico('moon')+'Rest day today. Your streak is safe.</p>':''}
+<div class="stKv" style="margin-top:10px"><span class="mu sm">Time left</span><b class="stTL" data-st="rem">${hms(run?r:g*60)}</b></div>
+<div class="stKv sm"><span class="mu">Expected end</span><b data-st="exp">${g||run?stExp(s):'--'}</b></div>
+${run&&!(a.mode=='revive'&&!a.mn)?`<div class="stKv sm"><span class="mu">Pause left</span><b data-st="pl">${mmss(stPlLeft(a))}</b></div>`:''}${run&&!a.x?`<div class="stKv sm"><span class="mu">Clock-out window</span><b data-st="grace" class="${ov?'stHot':''}">${mmss(Math.max(0,w-ov))}</b></div>`:''}${ov?stOv(a,ov,w):''}
+<div class="stRow" style="margin-top:12px"><button class="btn p" style="flex:1" ${g&&!run?'':'disabled'} onclick="stAsk()">${ico('play')}Start study</button><button class="btn p" style="flex:1" ${run?'':'disabled'} onclick="stEnd()">${ico('square')}End study</button></div>
+<details class="stSetD" ${STMO?'open':''} ontoggle="STMO=this.open"><summary>${ico('sliders')}Lock in settings</summary><div class="stL">
+<div class="seg" ${run?'style="pointer-events:none;opacity:.5"':''} style="align-self:flex-start"><button class="${pm=='full'?'on':''}" ${d.fd?'disabled':''} onclick="stMode('full')">Lock in Study${d.fd?' '+ico('check'):''}</button><button class="${pm=='mini'?'on':''}" onclick="stMode('mini')">Mini Lock In</button></div>
+<div class="stRow"><div ${run?'style="pointer-events:none;opacity:.5"':''}>${dd('stGoalM',[['','Select timer']].concat((pm=='mini'?MINI:FULL).map(x=>[x,gl(x)])),g||'')}</div><button class="btn" ${run?'disabled':''} onclick="stSet(this)">Set</button>${g&&!run?`<span class="tag">Timer set: ${gl(g)}</span>`:''}</div>
+<div class="stRow"><button class="btn" ${run?'':'disabled'} onclick="stStop()">Stop</button><button class="btn" ${run||g?'':'disabled'} onclick="stReset()">Reset</button><button class="btn" ${run||stRestLock(s,d)?'disabled':''} onclick="stRest()">${ico('moon')}${d.rest?'Cancel rest day':'Rest day'}</button></div>
+<div class="stKv sm"><span class="mu">Started</span><b>${sd}</b></div><div class="stKv sm"><span class="mu">Ended</span><b>${ed}</b></div>
+${run?`<p class="sm mu">End in the last ${w/60} min of the timer to earn streak credit. Ending earlier is allowed but only logs your time.</p>`:''}
+${stHist(s)}</div></details>`}
 function stStreak(s){const d=stDer(s),n=d.cur,full=n>0&&n%7==0,c=full?7:n%7,nx=(Math.floor(n/7)+1)*7,nxi=Math.floor(c);
 return `<div class="stS"><div class="stSh"><b>${ico('flame')}${fm(n)} day${n==1?'':'s'} streak</b>${full?`<span class="stM">${ico('trophy')}${fm(n)} days straight!</span>`:''}</div><div class="stDots">${[0,1,2,3,4,5,6].map(i=>{const f=Math.min(1,Math.max(0,c-i));return `<span class="sd${f>=1?' on':f>0?' half':i==nxi&&!d.today?' nx':''}">${ico('flame')}</span>`}).join('')}</div><p class="sm mu">Next milestone: <b class="stM">${nx} days</b> · ${fm(nx-n)} to go</p></div>`}
 const stDelOk=(s,x)=>x.res!='live'&&x.day==phDay()&&(!x.sn||s.h.find(y=>y.sn&&y.day==x.day)===x);
@@ -2115,7 +2162,7 @@ ${d.br&&!run?stBrk(d):''}${d.rest?'<p class="stRst sm">'+ico('moon')+'Rest day t
 <div class="stRow"><div ${run?'style="pointer-events:none;opacity:.5"':''}>${dd('stGoal',[['','Select timer']].concat((pm=='mini'?MINI:FULL).map(x=>[x,gl(x)])),g||'')}</div><button class="btn" ${run?'disabled':''} onclick="stSet()">Set</button>${g&&!run?`<span class="tag">Timer set: ${gl(g)}</span>`:''}</div>
 <button class="btn p" ${g&&!run?'':'disabled'} onclick="stAsk()">${ico('play')}Start study</button>
 <button class="btn p" ${run?'':'disabled'} onclick="stEnd()">${ico('square')}End study</button>
-<div class="stRow"><button class="btn" ${run?'':'disabled'} onclick="stStop()">Stop</button><button class="btn" ${run||g?'':'disabled'} onclick="stReset()">Reset</button><button class="btn" ${run?'disabled':''} onclick="stRest()">${ico('moon')}${d.rest?'Cancel rest day':'Rest day'}</button></div>
+<div class="stRow"><button class="btn" ${run?'':'disabled'} onclick="stStop()">Stop</button><button class="btn" ${run||g?'':'disabled'} onclick="stReset()">Reset</button><button class="btn" ${run||stRestLock(s,d)?'disabled':''} title="${stRestLock(s,d)?'Not available once you have studied today or after a broken streak':''}" onclick="stRest()">${ico('moon')}${d.rest?'Cancel rest day':'Rest day'}</button></div>
 </div><div class="stR">
 <div class="stKv"><span class="mu sm">Time left</span><b class="stTL" data-st="rem">${hms(run?r:g*60)}</b></div>
 <div class="stKv sm"><span class="mu">Expected end</span><b data-st="exp">${g||run?stExp(s):'--'}</b></div>
@@ -2134,7 +2181,7 @@ return h+(mini?`<div class="stMin" onclick="$('#stRail').classList.toggle('open'
 function stRender(){const r=$('#stRailIn');if(!r)return;if(ME){stPresInit();stEmailSync()}const s=ME?stLoad():null,p=ME?stPanel(1):'';r.innerHTML=p;ntRail();
 const dr=document.querySelector('.stDr');if(dr)dr.innerHTML=ME?stPanel(0):'';const x=$('#stDash');if(x)x.innerHTML=ME?stDashHtml():'';const m=$('#stMobBox');if(m)m.innerHTML=ME?stMobHtml(s):'';stPh=ME?stPhase(s):''}
 function stMode(m){const s=stLoad();if(s.a||(m=='full'&&stDer(s).fd))return;s.pm=m;if(s.gk!=m)s.goal=0;stSave(s);stRender()}
-function stSet(){const g=+v('stGoal');if(!g)return toast('Pick a timer first');const s=stLoad(),pm=stDer(s).fd?'mini':s.pm;s.goal=g;s.gk=pm;stSave(s);stRender();toast('Timer set: '+gl(g))}
+function stSet(el){const sc=el&&el.closest?el.closest('.stMob'):null,gi=sc?sc.querySelector('input[id^="stGoal"]'):$('#stGoal'),g=+(gi?gi.value:0);if(!g)return toast('Pick a timer first');const s=stLoad(),pm=stDer(s).fd?'mini':s.pm;s.goal=g;s.gk=pm;stSave(s);stRender();toast('Timer set: '+gl(g))}
 function stAsk(mode,rm){const s=stLoad(),d=stDer(s),rv=mode=='revive',mn=!rv&&s.gk=='mini';if(s.a)return;if(rv&&(!d.br||d.rv<1))return toast('No revive available');const m=rv?(rm||120):s.goal;if(!m)return;
 const g=m*60,w=mn||rm?300:600,n=Date.now(),old=s.dc[d.t]||0,add=(mn||rm?(old>=1?old:old>=.5?1:.5):1)-old,R=(a,b)=>`<div class="stSr"><span class="mu">${a}</span><b>${b}</b></div>`;
 openMdl({title:rv?(rm?'Revive with Mini Lock In':'Revive with a 2-hour study'):mn?'Mini Lock In':'Lock in Study',okText:rv?(rm?'Start mini revive':'Start 2-hour revive'):'Lock in',onOk:()=>stStart(mode,rm),body:`<div class="stSum">${R('Timer',rv&&!rm?'2 hours minimum, straight':gl(m))}${R('Starts',tms(n)+' '+tzs())}${R('Expected end',tmd(n+g*1000))}${R('Streak credit',add>0?'+'+fm(add)+' day':'Already earned today')}<ul>${rv&&!rm?'<li>'+ico('timer')+'Study at least 2 hours straight, then press <b>End study</b> to revive your streak. Ending earlier is allowed but only logs your time.</li><li>'+ico('plus')+'Keep going past 2 hours and earn +½ streak day for every extra full hour.</li>':`<li>${ico('timer')}Press <b>End study</b> in the last ${w/60} minutes to earn streak credit. Ending earlier is allowed (life happens) but only logs your time.</li><li>${ico('bell')}When the timer hits zero you get ${w/60} extra minutes to clock out with <b>End study</b>. Miss it and the session won't count.</li>`}<li>${ico('repeat')}Refreshing or logging out won't stop the clock.</li><li>${rv&&!rm?''+ico('ban')+'Revive sessions can\'t be paused. It also counts as today\'s full study.':''+ico('pause')+'You have '+(mn||rm?'15 min':'1 hour')+' of total pause time. The expected end moves while you\'re paused.'}</li></ul></div>`})}
@@ -2959,7 +3006,7 @@ function chMin(e,k){e&&e.stopPropagation();const w=CH.wins.find(x=>x.k==k);if(w)
 function chHeadClick(e,k){}
 async function chOpenDM(uid){try{if(CH.users[uid]&&CH.users[uid].role=='admin')return chOpenAdmin();const r=await sb.rpc('chat_open_dm',{other:uid});if(r.error)throw r.error;await chLoad();CH.q='';chOpen(r.data)}catch(e){toast(chErr(e))}}
 async function chOpenAdmin(sid){try{const r=await sb.rpc('chat_open_admin',{student:sid||null});if(r.error)throw r.error;await chLoad();CH.q='';chOpen(r.data)}catch(e){toast(chErr(e))}}
-function chToggle(e){e.stopPropagation();NF.open=0;ntfRender();CH.open=!CH.open;CH.set=0;CH.q='';chRender();if(CH.open)chRefresh()}
+function chToggle(e){e.stopPropagation();NF.open=0;ntfRender();CH.open=!CH.open;CH.set=0;CH.q='';CH.fresh=1;chRender();if(CH.open)chRefresh()}
 document.addEventListener('click',e=>{if(CH.open&&!e.target.closest('.cpan,#chBtn')){CH.open=0;chRender()}if(!e.target.closest('#chPop,.cmm,.cwb'))chPopClose()});
 addEventListener('keydown',e=>{if(e.key=='Escape'&&CH.open&&!MD){CH.open=0;chRender()}});
 /* the phone keyboard opening only changes the height: rebuilding the chat then stole focus from the search box and looped */
@@ -3068,9 +3115,9 @@ if(w.info&&ch)return `<div class="cw${chIsAct(k)?' act':''}" data-k="${k}" style
 return `<div class="cw${chIsAct(k)?' act':''}" data-k="${k}" style="--ci:${i}"><div class="cwh">${chRoomAv(r,32)}<div class="cwt${ch?' cwt-l':''}" ${ch?`onclick="chInfo('${k}')" title="Group info"`:''}><b>${E(chTitle(r))}</b><small>${E(sub)}</small></div><button class="cwb" title="Options" onclick="chWinMenu(event,'${k}')">${ico('more')}</button><button class="cwb" title="Minimize" onclick="chMin(event,'${k}')">${ico('minus')}</button><button class="cwb" title="Close" onclick="chClose(event,'${k}')">${ico('x')}</button></div><div class="cwm" onscroll="this.dataset.b=(this.scrollHeight-this.scrollTop-this.clientHeight<40)?1:0">${chMsgsHtml(k)}</div>${chNrHtml(k)}${chTyHtml(k)}${chFootHtml(w,r)}</div>`}
 function chHeads(){const r=document.getElementById('chatRoot');if(!r)return;r.querySelectorAll('.chd').forEach(h=>{const rm=chRoom(h.dataset.k),n=rm?chU(rm):0;let b=h.querySelector('.cb');if(n){if(!b){b=document.createElement('i');b.className='cb';h.appendChild(b)}b.textContent=n>9?'9+':n}else if(b)b.remove()})}
 function chPatch(k,force){const m=document.querySelector('.cw[data-k="'+k+'"] .cwm');if(!m)return;const atB=force||m.dataset.b!=='0',r=chRoom(k);m.innerHTML=chMsgsHtml(k);if(atB)m.scrollTop=m.scrollHeight;const s=document.querySelector('.cw[data-k="'+k+'"] .cwt small');if(s&&r)s.textContent=chSubT(r)}
-function chTabs(){const t=[['pub','Public',chUn(r=>r.kind=='channel')],['dm','DMs',chUn(r=>r.kind=='dm')],['adm','Admin',chUn(r=>r.kind=='admin')]];return `<div class="ctabs">${t.map(([k,n,u])=>`<a class="${CH.tab==k?'on':''}" onclick="CH.tab='${k}';CH.q='';chRender()">${n}${u?`<i class="cb">${u>9?'9+':u}</i>`:''}</a>`).join('')}</div>`}
+function chTabs(){const t=[['pub','Public',chUn(r=>r.kind=='channel')],['dm','DMs',chUn(r=>r.kind=='dm')],['adm','Admin',chUn(r=>r.kind=='admin')]];return `<div class="ctabs">${t.map(([k,n,u])=>`<a class="${CH.tab==k?'on':''}" onclick="CH.tab='${k}';CH.q='';CH.fresh=1;chRender()">${n}${u?`<i class="cb">${u>9?'9+':u}</i>`:''}</a>`).join('')}</div>`}
 function chRow(r){const un=chU(r),ig=chIgnR(r.id),p=(r.sender==ME.id?'You: ':r.kind!='dm'&&r.sender?chNm(r.sender)+': ':'')+(r.del?'Message removed':r.body||(r.att?'Sent a file':'')),o=r.kind=='dm'&&r.mine?chOther(r):null;
-return `<div class="cli${ig?' ign':''}" onclick="chOpen('${r.id}')">${chRoomAv(r)}<div class="clm"><b>${E(chTitle(r))}${!r.mine?' <span class="tag">read-only</span>':''}${ig?` <span class="mu">${ico('bellOff')}</span>`:''}</b><span class="${un?'u':''}">${E(r.lastId?p:r.kind=='channel'?'No messages yet':'')}</span></div><div class="cls">${r.at?`<small>${chAgo(r.at)}</small>`:''}${un?`<i class="cb">${un>9?'9+':un}</i>`:''}</div><div class="crb">${o?`<button title="Poke" aria-label="Poke" onclick="event.stopPropagation();chPoke('${o}')">${ico('hand')}</button>`:''}<button title="Chat options" aria-label="Chat options" onclick="chRowMenu(event,'${r.id}')">${ico('more')}</button></div></div>`}
+return `<div class="cli${ig?' ign':''}" data-k="${r.id}" onclick="if(Date.now()-(CH.swc||0)<400)return;chOpen('${r.id}')">${chRoomAv(r)}<div class="clm"><b>${E(chTitle(r))}${!r.mine?' <span class="tag">read-only</span>':''}${ig?` <span class="mu">${ico('bellOff')}</span>`:''}</b><span class="${un?'u':''}">${E(r.lastId?p:r.kind=='channel'?'No messages yet':'')}</span></div><div class="cls">${r.at?`<small>${chAgo(r.at)}</small>`:''}${un?`<i class="cb">${un>9?'9+':un}</i>`:''}</div><div class="crb">${o?`<button title="Poke" aria-label="Poke" onclick="event.stopPropagation();chPoke('${o}')">${ico('hand')}</button>`:''}<button title="Chat options" aria-label="Chat options" onclick="chRowMenu(event,'${r.id}')">${ico('more')}</button></div></div>`}
 function chListHtml(){const me=ME.id,q=(CH.q||'').trim().toLowerCase(),byAt=(a,b)=>String(b.at||'').localeCompare(String(a.at||''));let h='';
 if(CH.tab=='pub'){const o=['announcement','general','MSTC','HPGE','PSAD'];h=CH.rooms.filter(r=>r.kind=='channel').sort((a,b)=>(o.indexOf(a.key)+1||9)-(o.indexOf(b.key)+1||9)).map(chRow).join('')||'<p class="cempty">No channels yet.</p>'}
 else if(CH.tab=='dm'){let l=CH.rooms.filter(r=>r.kind=='dm'&&r.mine&&!chHid(r)&&(r.lastId||CH.wins.some(w=>w.k==r.id))).sort(byAt);if(q)l=l.filter(r=>chTitle(r).toLowerCase().includes(q));h=l.map(chRow).join('');
@@ -3087,8 +3134,8 @@ return h}
 function chPanelHtml(){if(CH.ok===false)return `<div class="cpan"><div class="chh"><b>Messages</b></div><div class="cset"><p>Chat is not set up yet.</p><p class="mu sm">Run <b>chat.sql</b> once in the Supabase SQL editor, then reload.</p>${CH.err?`<p class="mu sm">${E(CH.err)}</p>`:''}</div></div>`;
 if(CH.set)return `<div class="cpan">${chSetHtml()}</div>`;
 const showQ=CH.tab!='pub'&&!(CH.tab=='adm'&&role!='admin');
-return `<div class="cpan"><div class="chh"><b>Messages</b><button class="cwb" title="Settings" onclick="CH.set=1;chRender()">${ico('sliders')}</button></div>${chTabs()}${showQ?`<div class="csr"><input id="chQ" placeholder="${CH.tab=='adm'?'Search students':'Search people'}" value="${E(CH.q)}" oninput="CH.q=this.value;clearTimeout(CH.qt);CH.qt=setTimeout(chListPatch,90)" autocomplete="off"></div>`:''}<div class="cll" id="chList">${chListHtml()}</div>${CH.tab=='dm'&&!rsBlocked('dm')?'<p class="cft">Admins can read direct messages.</p>':''}</div>`}
-function chListPatch(){const l=document.getElementById('chList');if(l)l.innerHTML=chListHtml();const t=document.querySelector('.cpan .ctabs');if(t)t.outerHTML=chTabs()}
+return `<div class="cpan"><div class="chh"><b>Messages</b><button class="cwb" title="Settings" onclick="CH.set=1;chRender()">${ico('sliders')}</button></div>${chTabs()}${showQ?`<div class="csr"><input id="chQ" placeholder="${CH.tab=='adm'?'Search students':'Search people'}" value="${E(CH.q)}" oninput="CH.q=this.value;clearTimeout(CH.qt);CH.qt=setTimeout(chListPatch,90)" autocomplete="off"></div>`:''}<div class="cll${CH.fresh?' cfresh':''}" id="chList">${(()=>{const h=chListHtml();CH.fresh=0;return h})()}</div>${CH.tab=='dm'&&!rsBlocked('dm')?'<p class="cft">Admins can read direct messages.</p>':''}</div>`}
+function chListPatch(){const l=document.getElementById('chList');if(l){l.classList.remove('cfresh');l.innerHTML=chListHtml()}const t=document.querySelector('.cpan .ctabs');if(t)t.outerHTML=chTabs()}
 function chBtnHtml(){const n=chBadgeN();return `<button id="chBtn" class="cbtn" onclick="chToggle(event)" aria-label="Messages" title="Messages">${ico('chat')}${n?`<i class="cb">${n>9?'9+':n}</i>`:''}</button>`}
 function chRender(){const r=chRoot();if(!ME||CH.ok===null||rsBlocked('chat')||(CH.ok===false&&role!='admin')){r.innerHTML='';return}
 const sc={};r.querySelectorAll('.cw').forEach(w=>{const m=w.querySelector('.cwm');if(m)sc[w.dataset.k]=m.dataset.b!=='0'?-1:m.scrollTop});
@@ -3376,6 +3423,17 @@ if(e.type=='pointerup'&&Math.abs(w.dx)>90){const i=[...w.el.parentNode.children]
 w.el.classList.remove('nfsw');w.el.style.transition='transform .22s cubic-bezier(.2,.9,.3,1.4),opacity .22s';w.el.style.transform='';w.el.style.opacity='';setTimeout(()=>{w.el.style.transition=''},240)};
 document.addEventListener('pointerup',ntfSwEnd);document.addEventListener('pointercancel',ntfSwEnd);
 
+/* ---- chat list juice: rows pop in one after another, press and hover feel springy, and a sideways swipe on a phone marks a chat read or unread ---- */
+let CSW=null;
+document.addEventListener('pointerdown',e=>{if(e.pointerType!='touch')return;const el=e.target.closest&&e.target.closest('#chList .cli[data-k]');if(!el||e.target.closest('button'))return;CSW={el,x:e.clientX,y:e.clientY,dx:0,id:e.pointerId,m:0}});
+document.addEventListener('pointermove',e=>{if(!CSW||e.pointerId!==CSW.id)return;const dx=e.clientX-CSW.x,dy=e.clientY-CSW.y;
+if(!CSW.m&&Math.abs(dx)>10&&Math.abs(dx)>Math.abs(dy)*1.4){CSW.m=1;CSW.el.classList.add('csw')}
+if(CSW.m){CSW.dx=dx;CSW.el.style.transform='translateX('+dx*.6+'px)';CSW.el.classList.toggle('chot',Math.abs(dx)>90)}else if(Math.abs(dy)>12)CSW=null});
+const cswEnd=e=>{if(!CSW||e.pointerId!==CSW.id)return;const w=CSW;CSW=null;if(!w.m)return;CH.swc=Date.now();const el=w.el,k=el.dataset.k;
+el.classList.remove('csw','chot');el.style.transition='transform .28s cubic-bezier(.2,.9,.3,1.4)';el.style.transform='';setTimeout(()=>{el.style.transition=''},300);
+if(e.type=='pointerup'&&Math.abs(w.dx)>90){const r=chRoom(k);if(!r)return;const un=chU(r)>0;try{navigator.vibrate&&navigator.vibrate(10)}catch(_){}
+el.classList.add(un?'chk':'chu');setTimeout(()=>{un?chMarkRead(k):chMarkUnread(k)},420)}};
+document.addEventListener('pointerup',cswEnd);document.addEventListener('pointercancel',cswEnd);
 /* tab title: "(2) Found / CE Review Archive", swapping the first part for the newest alerts */
 function ntfTitle(L){const n=L.length,tl=L.map(x=>x.tt).slice(0,3),sig=n+'|'+tl.join('|');if(sig===NF.sig&&(NF.ti||(!n&&document.title===BASE_T)))return;NF.sig=sig;clearInterval(NF.ti);NF.ti=null;
 const first=BASE_T.split(' / ')[0],rest=BASE_T.slice(first.length);if(!n){document.title=BASE_T;return}
@@ -3442,7 +3500,8 @@ function stRest(){const s=stLoad(),d=stDer(s);if(s.a)return toast('Finish or sto
 if(d.rest){s.rd=s.rd.filter(x=>x!=d.t);stSave(s);stRender();return toast('Rest day cancelled')}
 if((s.dc[d.t]||0)>0)return toast('You already studied today, so you do not need a rest day.');if(d.br)return toast('Your streak is already broken. Revive it first.');
 showConfirm('Take today as a rest day?','Your streak stays safe even if you do not study today.',()=>{const s=stLoad();s.rd=Array.from(new Set((s.rd||[]).concat(stDer(s).t)));stSave(s);stRender();toast('Rest day set. Your streak is safe today.')})}
-const stRestBtn=s=>{const d=stDer(s);return `<div class="stRow" style="margin-top:10px"><button class="btn" ${s.a?'disabled':''} onclick="stRest()">${ico('moon')}${d.rest?'Cancel rest day':'Rest day'}</button>${d.rest?'<span class="mu sm">Streak is safe today</span>':''}</div>`};
+const stRestLock=(s,d)=>!d.rest&&((s.dc[d.t]||0)>0||d.br),
+stRestBtn=s=>{const d=stDer(s);return `<div class="stRow" style="margin-top:10px"><button class="btn" ${s.a||stRestLock(s,d)?'disabled':''} title="${stRestLock(s,d)?'Not available once you have studied today or after a broken streak':''}" onclick="stRest()">${ico('moon')}${d.rest?'Cancel rest day':'Rest day'}</button>${d.rest?'<span class="mu sm">Streak is safe today</span>':''}</div>`};
 route=(f=>function(){f();placeCtx();annAfterRoute();ntfSoft()})(route);syncTheme();annLoad().then(()=>{if(!ME&&QL&&(location.hash.slice(2)||'home').split('/')[0]=='home')route()});route();
 /* PWA: lets the app install on PC and phones and open its shell offline */
 if('serviceWorker' in navigator&&/^https?:$/.test(location.protocol))addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(e=>console.warn('SW:',e)));
