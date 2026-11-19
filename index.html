@@ -893,6 +893,29 @@ body.hm #fabRoot,body.hm #chatRoot,body.hm #ntfRoot{display:none!important}
 #chList .cli.chu::after{background:#3b82f6}
 @keyframes cliTick{from{transform:scale(0) rotate(-40deg)}}
 @media(prefers-reduced-motion:reduce){#chList .cli,#chList.cfresh .cli,#chList .cli .cb{animation:none!important;transition:none!important}}
+
+/* ===== chat preview (blurred edges) ===== */
+.cav{-webkit-touch-callout:none}
+.chpv{position:fixed;z-index:97;display:flex;animation:pvIn .16s ease-out}
+.chpv.l{padding-right:14px}.chpv.r{padding-left:14px}
+.chpv.mob{inset:0;align-items:center;justify-content:center;background:rgba(10,0,24,.45)}
+.chpv.mob .chpvc{flex:none;width:min(92vw,380px);height:min(72vh,540px)}
+.chpvc{flex:1;min-width:0;display:flex;flex-direction:column;border-radius:20px;overflow:hidden;background:rgba(255,255,255,.74);-webkit-backdrop-filter:blur(18px) saturate(1.25);backdrop-filter:blur(18px) saturate(1.25);border:1px solid rgba(127,127,127,.28);box-shadow:0 0 0 7px rgba(127,127,127,.12),0 20px 54px #0006}
+@supports(background:color-mix(in srgb,red,blue)){.chpvc{background:color-mix(in srgb,var(--card) 76%,transparent)}}
+.chpvh{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px 12px;border-bottom:1px solid rgba(127,127,127,.25)}
+.chpvh b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--ink)}.chpvh .btn{padding:3px 12px;flex:none}
+.chpvl{flex:1;overflow-y:auto;padding:18px 12px;overscroll-behavior:contain;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 18px,#000 calc(100% - 18px),transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 18px,#000 calc(100% - 18px),transparent 100%)}
+.pvm{max-width:86%;margin:4px 0;display:flex;flex-direction:column;align-items:flex-start}.pvm.me{margin-left:auto;align-items:flex-end}
+.pvb{background:var(--soft);padding:7px 11px;border-radius:14px;white-space:pre-wrap;word-break:break-word;font-size:.88rem;line-height:1.35}
+.pvm.me .pvb{background:var(--aq);color:var(--onaq)}.pvb.del{font-style:italic;opacity:.65}
+.pvm small{font-size:.65rem;color:var(--mu);margin-top:2px}.pvd{text-align:center;font-size:.72rem;color:var(--mu);margin:12px 0 4px}
+.pvn{font-size:.72rem;margin:6px 0 2px;color:var(--mu)}.pva{display:flex;gap:4px;align-items:center;font-size:.8rem;opacity:.85;margin-top:3px}.pva .ic{width:14px;height:14px;margin:0}
+@keyframes pvIn{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
+body.pvmob{overflow:hidden}
+/* ===== notifications: Admins tab ===== */
+.ntabs{padding:0 6px;margin:0}
+.nfadf{display:flex;gap:6px;padding:8px 10px;border-bottom:1px solid var(--bd);flex:none}.nfadf input{flex:1;min-width:0}.nfadf select{max-width:46%}
+.nfa{cursor:default}.nfa.nw{box-shadow:inset 3px 0 0 var(--teal)}
 </style>
 </head>
 <body class="hm">
@@ -1031,7 +1054,7 @@ openMdl({title:'Move '+its.length+' item(s)',okText:'Move',body:`<div class="fie
 for(const[k,it]of its){const r=k[0]=='f'?await sb.from('folders').update({parent_id:to||null}).eq('id',it.id):await sb.from('materials').update({folder_id:to}).eq('id',it.id);if(r.error){toast(r.error.message);continue}k[0]=='f'?it.parent=to||null:it.fo=to;n++}
 toast('Moved '+n+' item(s)');selOff(1);route()}})}
 function folderInfo(id){const f=D.FO.find(x=>x.id==id);if(!f)return;showInfo('Folder information',[['Name',f.name],['Component',f.c],['Type',f.def?'Default folder':f.own?'Personal':'Official'],['Subfolders',D.FO.filter(x=>x.parent==id).length],['Files',D.M.filter(m=>m.fo==id).length]])}
-function fileInfo(id){const m=D.M.find(x=>x.id==id),f=m&&D.FO.find(x=>x.id==m.fo);if(!m)return;showInfo('File information',[['Title',m.title],['Type',m.type],['Folder',f?fpath(f):'None'],['Description',m.desc||'None'],['Access',m.own?'Personal (only you)':'Official'],['Times opened',(P.op||{})[id]||0]])}
+function fileInfo(id){const m=D.M.find(x=>x.id==id),f=m&&D.FO.find(x=>x.id==m.fo);if(!m)return;showInfo('File information',[['Title',m.title],['Type',m.type],['Folder',f?fpath(f):'None'],['Description',m.desc||'None'],['Access',m.own?'Personal (only you)':(m.rs?'Selected users only':'Everyone')+(role=='admin'?(m.cu?' · set individually':' · follows its folder'):'')],['Times opened',(P.op||{})[id]||0]])}
 
 /* ===== SELECTION ===== */
 function selOn(){selMode=true;SEL.clear();route()}
@@ -1169,7 +1192,7 @@ if(!on){r.innerHTML='';return}
 const isF=k[0]=='f',fo=isF?(it.parent?D.FO.find(x=>x.id==it.parent):null):D.FO.find(x=>x.id==it.fo),loc=fo?fpath(fo):(isF?it.c+' (root)':'None'),rows=[];
 if(isF){const nf=D.FO.filter(x=>x.parent==it.id).length,nm=D.M.filter(m=>m.fo==it.id).length;
 rows.push(['Type',it.def?'Folder (default)':it.own?'Folder (personal)':'Folder (official)'],['Component',it.c],['Location',loc],['Contains',nf+' folder(s), '+nm+' file(s)'],['Created',fdt(it.ts)],['Modified',fdt(it.mod||it.ts)])}
-else{rows.push(['Type',(it.type||'').toUpperCase()],['Size','<span id="sbSize">'+(SZ[it.id]||'…')+'</span>',1],['Location',loc],['Component',fo?fo.c:'—'],['Created',fdt(it.ts)],['Modified',fdt(it.mod||it.ts)],['Access',it.own?'Personal (only you)':it.rs?'Restricted':'Official'],['Opened',((P.op||{})[it.id]||0)+' time(s)']);if(it.desc)rows.push(['Description',it.desc])}
+else{rows.push(['Type',(it.type||'').toUpperCase()],['Size','<span id="sbSize">'+(SZ[it.id]||'…')+'</span>',1],['Location',loc],['Component',fo?fo.c:'—'],['Created',fdt(it.ts)],['Modified',fdt(it.mod||it.ts)],['Access',it.own?'Personal (only you)':(it.rs?'Selected users only':'Everyone')+(role=='admin'?(it.cu?' · set individually':' · follows its folder'):'')],['Opened',((P.op||{})[it.id]||0)+' time(s)']);if(it.desc)rows.push(['Description',it.desc])}
 const ph=isF?'<span class="ico">'+ico('folder')+'</span>':thPh(it),nmx=isF?it.name:it.title;
 r.innerHTML=`<aside class="sb"><div class="sbh"><b>Details</b><button class="vbt x" title="Close" onclick="sbClose()">${IC.x}</button></div><div class="sbp"><div class="thm" ${isF?'':`data-id="${it.id}"`}>${ph}</div></div><div class="sbn">${isF?ico('folder')+' ':''}${E(nmx)}</div><table class="sbt">${rows.map(([a,b,raw])=>`<tr><td>${a}</td><td>${raw?b:E(b)}</td></tr>`).join('')}</table><div class="row" style="margin:14px 0 0"><button class="btn p" onclick="cardOpen('${k}')">Open</button>${isF||rsBlocked('dl')?'':`<button class="btn" onclick="dlKeys(['${k}'])">Download</button>`}</div></aside>`;
 if(!isF){if(TH[it.id])thPaint(it.id);else thWant(it.id);if(it.path)sbSize(it)}
@@ -1345,8 +1368,8 @@ SORTS=[['az','Name A → Z'],['za','Name Z → A'],['new','Newest first'],['old'
 sortBy=(arr,mode,nm,ts)=>[...arr].sort((a,b)=>mode=='za'?cmp(nm(b),nm(a)):mode=='new'?ts(b)-ts(a):mode=='old'?ts(a)-ts(b):cmp(nm(a),nm(b)));
 const T0=x=>new Date(x||0).getTime();
 const dbq=x=>({id:x.id,n:x.question_number,c:x.component,s:x.subject,t:x.topic,q:x.question,o:[x.choice_a,x.choice_b,x.choice_c,x.choice_d],a:'ABCD'.indexOf(x.correct_answer),e:x.explanation||'',d:x.difficulty||'',st:x.verification_status||'',src:x.source||'',pub:x.published,own:x.owner_id?1:0,qp:x.question_image||'',ep:x.explanation_image||'',qi:'',ei:'',ts:T0(x.created_at)});
-const mapFo=x=>({id:x.id,c:x.component,name:x.name,parent:x.parent_id||null,def:x.is_default,rs:x.restricted,own:x.owner_id?1:0,ts:T0(x.created_at),mod:T0(x.updated_at||x.created_at)}),
-mapM=x=>({id:x.id,fo:x.folder_id,title:x.title,desc:x.description||'',type:x.file_type||'',path:x.file_path||'',rs:x.restricted,pub:x.published,own:x.owner_id?1:0,ts:T0(x.created_at),mod:T0(x.updated_at||x.created_at)}),
+const mapFo=x=>({id:x.id,c:x.component,name:x.name,parent:x.parent_id||null,def:x.is_default,rs:x.restricted,cu:!!x.access_custom,own:x.owner_id?1:0,ts:T0(x.created_at),mod:T0(x.updated_at||x.created_at)}),
+mapM=x=>({id:x.id,fo:x.folder_id,title:x.title,desc:x.description||'',type:x.file_type||'',path:x.file_path||'',rs:x.restricted,cu:!!x.access_custom,pub:x.published,own:x.owner_id?1:0,ts:T0(x.created_at),mod:T0(x.updated_at||x.created_at)}),
 mapF=(x,su)=>({id:x.id,c:x.component,f:x.front,b:x.back||'',img:su[x.image_path]||'',ip:x.image_path||'',fimg:su[x.front_image_path]||'',fip:x.front_image_path||'',pub:x.published,own:x.owner_id?1:0,ts:T0(x.created_at)});
 const allQ=()=>[...OQ,...D.MQ].filter(x=>x.pub),
 subs=c=>[...new Set(allQ().filter(x=>x.c==c).map(x=>x.s))].sort(cmp),
@@ -1985,14 +2008,30 @@ function agFind(el){const q=el.value.toLowerCase();document.querySelectorAll('#m
 function agToggle(m){const b=$('#agBox');if(b)b.style.display=m=='sel'?'':'none'}
 function openAssign(keys){const its=keys.map(k=>[k,gi(k)]).filter(x=>x[1]&&!x[1].own);if(!its.length)return toast('Select official items first');
 const one=its.length==1,cur=one?agUsers(its[0][0]):[],mode=one&&its[0][1].rs?'sel':'all',st=D.U.filter(u=>u.role!='admin').sort((a,b)=>cmp(a.display_name||'',b.display_name||''));
-openMdl({title:'Assign access',wide:1,okText:'Save',body:`<p class="mu sm">${its.length} item(s). A folder's setting applies to everything inside it. Selected users also see these items on their dashboard.</p><div class="field"><label>Who can see this?</label>${dd('agMode',[['all','Everyone'],['sel','Selected users only']],mode,"agToggle(v)")}</div><div id="agBox" style="${mode=='sel'?'':'display:none'}"><input placeholder="Search users…" oninput="agFind(this)" style="width:100%"><div class="aglist">${st.map(u=>`<label class="msi" data-t="${E((u.display_name||'').toLowerCase())}"><input type="checkbox" class="agk" value="${u.id}" ${cur.includes(u.id)?'checked':''}><span>${E(u.display_name||u.id.slice(0,8))}</span></label>`).join('')||'<p class="mu sm" style="padding:8px">No student accounts yet.</p>'}</div></div>`,onOk:()=>saveAssign(its)})}
-async function saveAssign(its){const mode=v('agMode'),ids=[...document.querySelectorAll('#mdlRoot .agk:checked')].map(x=>x.value);if(mode=='sel'&&!ids.length){toast('Pick at least one user');return false}
+openMdl({title:'Assign access',wide:1,okText:'Save',body:`<p class="mu sm">${its.length} item(s). A folder's setting applies to everything inside it, except items that were given their own setting. Selected users also see these items on their dashboard.</p>${its.some(x=>x[0][0]=='f')?'<label class="msi" style="margin:4px 0 12px"><input type="checkbox" id="agForce"><span>Also replace settings that items inside were given individually</span></label>':''}<div class="field"><label>Who can see this?</label>${dd('agMode',[['all','Everyone'],['sel','Selected users only']],mode,"agToggle(v)")}</div><div id="agBox" style="${mode=='sel'?'':'display:none'}"><input placeholder="Search users…" oninput="agFind(this)" style="width:100%"><div class="aglist">${st.map(u=>`<label class="msi" data-t="${E((u.display_name||'').toLowerCase())}"><input type="checkbox" class="agk" value="${u.id}" ${cur.includes(u.id)?'checked':''}><span>${E(u.display_name||u.id.slice(0,8))}</span></label>`).join('')||'<p class="mu sm" style="padding:8px">No student accounts yet.</p>'}</div></div>`,onOk:()=>saveAssign(its)})}
+let AGC=1;
+const agChunk=(a,n)=>{const o=[];for(let i=0;i<a.length;i+=n)o.push(a.slice(i,i+n));return o};
+/* a folder's setting flows down to everything inside it, skipping items (and folders) that were set on their own, unless "replace" is ticked */
+async function agCascade(fid,rs,uids,force){const fos=[],mats=[];
+const walk=id=>{D.FO.filter(f=>f.parent==id&&!f.own).forEach(f=>{if(!force&&f.cu)return;fos.push(f);walk(f.id)});D.M.filter(m=>m.fo==id&&!m.own).forEach(m=>{if(force||!m.cu)mats.push(m)})};walk(fid);
+for(const[tb,col,L]of[['folders','folder_id',fos],['materials','material_id',mats]]){if(!L.length)continue;
+for(const c of agChunk(L.map(x=>x.id),100)){let r=await sb.from(tb).update(force?{restricted:rs,access_custom:false}:{restricted:rs}).in('id',c);if(r.error)return r.error.message;
+r=await sb.from('access_grants').delete().in(col,c);if(r.error)return r.error.message;
+if(rs){const rows=[];c.forEach(id=>uids.forEach(u=>rows.push({user_id:u,[col]:id})));for(const rc of agChunk(rows,400)){r=await sb.from('access_grants').insert(rc);if(r.error)return r.error.message}}}
+const idset=new Set(L.map(x=>x.id));L.forEach(x=>{x.rs=rs;if(force)x.cu=false});D.AG=(D.AG||[]).filter(g=>!idset.has(g[col]));
+if(rs)L.forEach(x=>uids.forEach(u=>D.AG.push({user_id:u,folder_id:col=='folder_id'?x.id:null,material_id:col=='material_id'?x.id:null})))}
+return''}
+async function saveAssign(its){const mode=v('agMode'),ids=[...document.querySelectorAll('#mdlRoot .agk:checked')].map(x=>x.value),fe=document.getElementById('agForce'),force=!!(fe&&fe.checked);if(mode=='sel'&&!ids.length){toast('Pick at least one user');return false}
+let note='';
 for(const[k,it]of its){const col=k[0]=='f'?'folder_id':'material_id',tb=k[0]=='f'?'folders':'materials';
-let r=await sb.from(tb).update({restricted:mode=='sel'}).eq('id',it.id);if(r.error){toast(r.error.message);return false}
+let r=await sb.from(tb).update({restricted:mode=='sel',access_custom:true}).eq('id',it.id);
+if(r.error&&/access_custom/i.test(r.error.message)){AGC=0;r=await sb.from(tb).update({restricted:mode=='sel'}).eq('id',it.id)}
+if(r.error){toast(r.error.message);return false}
 r=await sb.from('access_grants').delete().eq(col,it.id);if(r.error){toast(r.error.message);return false}
 if(mode=='sel'){r=await sb.from('access_grants').insert(ids.map(u=>({user_id:u,[col]:it.id})));if(r.error){toast(r.error.message);return false}}
-D.AG=(D.AG||[]).filter(g=>g[col]!=it.id);if(mode=='sel')ids.forEach(u=>D.AG.push({user_id:u,folder_id:k[0]=='f'?it.id:null,material_id:k[0]=='m'?it.id:null}));it.rs=mode=='sel'}
-toast('Access updated');FSELA.clear();route()}
+D.AG=(D.AG||[]).filter(g=>g[col]!=it.id);if(mode=='sel')ids.forEach(u=>D.AG.push({user_id:u,folder_id:k[0]=='f'?it.id:null,material_id:k[0]=='m'?it.id:null}));it.rs=mode=='sel';if(AGC)it.cu=true;
+if(k[0]=='f'){if(!AGC){note=' Run folder_access.sql to apply a folder\'s setting to what is inside it.'}else{const e=await agCascade(it.id,mode=='sel',ids,force);if(e){toast(e);return false}}}}
+toast('Access updated.'+note);FSELA.clear();route()}
 let AF={c:'',q:'',so:'old',fo:'',ty:''},FSELA=new Set();
 const afComp=id=>(D.FO.find(x=>x.id==id)||{}).c;
 function afItems(){const q=AF.q.toLowerCase(),scope=AF.fo?new Set(dsc(AF.fo)):null,ty=AF.ty,
@@ -2217,7 +2256,7 @@ setInterval(stTick,1000);document.addEventListener('visibilitychange',stTick);
 let PCH=null,ONL={},EMS='';
 function stPresInit(){if(PCH||!ME)return;PCH=sb.channel('online-users',{config:{presence:{key:ME.id}}});
 PCH.on('presence',{event:'sync'},()=>{ONL=PCH.presenceState();stAdminRefresh();chPresSync()}).subscribe(st=>{if(st=='SUBSCRIBED')stPresTrack()})}
-function stPresTrack(){if(!PCH||!ME)return;try{const a=stLoad().a;PCH.track({lock:a?{m:a.mode=='mini'||a.mn?'mini':a.mode=='revive'?'revive':'full',end:Date.now()+Math.max(0,a.g-stEl(a))*1000,p:a.pa?1:0}:null,t:Date.now(),cs:chSt()})}catch(e){}try{chSeenBeat(1)}catch(e){}}
+function stPresTrack(){if(!PCH||!ME)return;try{const a=stLoad().a;PCH.track({lock:a?{m:a.mode=='mini'||a.mn?'mini':a.mode=='revive'?'revive':'full',end:Date.now()+Math.max(0,a.g-stEl(a))*1000,p:a.pa?1:0}:null,t:Date.now(),cs:chSt(),ml:CH.prefs.mlock?1:0})}catch(e){}try{chSeenBeat(1)}catch(e){}}
 function stEmailSync(){if(PR&&ME.email&&PR.email!==ME.email&&EMS!=ME.id){EMS=ME.id;sb.from('profiles').update({email:ME.email}).eq('id',ME.id).then(r=>{if(!r.error)PR.email=ME.email})}}
 function stAdminRefresh(){if(role=='admin'&&location.hash.slice(2).split('/')[0]=='admin'&&AT=='u'&&!MD&&!(document.activeElement&&document.activeElement.tagName=='INPUT'))route()}
 const stUs=u=>{const m=ONL[u.id]||[],p=m.find(x=>x.lock)||m[0],ss=(D.SS||[]).find(x=>x.user_id==u.id),a=ss&&ss.data&&ss.data.a;let lock=null;
@@ -2954,6 +2993,41 @@ if(document.hidden&&!force)return;CH.seenClr=0;CH.seenT=now;const r=await sb.fro
 async function chSeenPull(){if(!ME||!CH.ok||!CH.seenOK)return;const r=await sb.from('chat_seen').select('user_id,last_seen');if(r.error){CH.seenOK=false;console.warn('Last active is off (run chat_seen.sql):',r.error.message);return}
 const m={};(r.data||[]).forEach(x=>{if(x.last_seen)m[x.user_id]=+new Date(x.last_seen)});CH.seen=m;if(CH.open||CH.wins.length)chPresSync()}
 document.addEventListener('visibilitychange',()=>{chSeenBeat(1);if(!document.hidden)chSeenPull()});addEventListener('pagehide',()=>chSeenBeat(1));
+
+/* ===== chat preview: hover a conversation (PC) or hold its avatar (phone) ===== */
+CH.pv=null;let PVT=null,PVH=null,PVL=null;
+const pvDay=d=>phDay(+d)==phDay()?'Today':phDay(+d)==phDay(Date.now()-864e5)?'Yesterday':phF({month:'short',day:'numeric'},+d);
+function chPvBody(k){const r=chRoom(k);if(!r)return'';const L=chVis(k).filter(m=>m.id>0).slice(-40);if(!L.length)return'<p class="cempty">No messages yet.</p>';let day='',prev='',h='';
+L.forEach(m=>{const d=new Date(m.created_at),dk=phDay(+d);if(dk!==day){day=dk;prev='';h+=`<div class="pvd">${E(pvDay(d))}</div>`}
+const mine=m.sender_id==ME.id,nm=!mine&&r.kind!='dm'&&prev!==m.sender_id?`<b class="pvn">${E(chNm(m.sender_id))}</b>`:'';prev=m.sender_id;
+const at=Array.isArray(m.att)&&m.att.length?`<div class="pva">${ico('clip')}${E(m.att.length==1?(m.att[0].name||'File'):m.att.length+' files')}</div>`:'';
+h+=`<div class="pvm${mine?' me':''}">${nm}<div class="pvb${m.deleted?' del':''}">${m.deleted?'Message removed':E(m.body||'')}${at}</div><small>${E(tm(+d))}</small></div>`});return h}
+function chPvHide(){clearTimeout(PVT);clearTimeout(PVH);PVH=null;const e=document.getElementById('chPv');if(e)e.remove();CH.pv=null;document.body.classList.remove('pvmob')}
+function chPvOpen(){const k=CH.pv&&CH.pv.k;chPvHide();if(k)chOpen(k)}
+async function chPvShow(k,anchor,mob){const r=chRoom(k);if(!r||!ME||!document.contains(anchor))return;chPvHide();const tok=Date.now();CH.pv={k,tok};
+const el=document.createElement('div');el.id='chPv';el.dataset.k=k;
+el.innerHTML=`<div class="chpvc"><div class="chpvh"><b>${E(chTitle(r))}</b><button class="btn" onclick="chPvOpen()">Open</button></div><div class="chpvl" id="chPvL"><p class="cempty">Loading…</p></div></div>`;
+if(mob){el.className='chpv mob';el.onclick=e=>{if(e.target===el)chPvHide()};document.body.classList.add('pvmob')}
+else{const a=anchor.getBoundingClientRect(),w=340,gap=14,h=Math.min(420,innerHeight-24),left=a.left-w-gap>=8;el.className='chpv '+(left?'l':'r');
+el.style.width=(w+gap)+'px';el.style.height=h+'px';el.style.left=(left?a.left-w-gap:Math.min(a.right,innerWidth-w-gap-8))+'px';el.style.top=Math.max(8,Math.min(a.top+a.height/2-h/2,innerHeight-h-8))+'px'}
+document.body.appendChild(el);
+try{if(!CH.msgs[k])await chMsgsLoad(k)}catch(e){}
+if(!CH.pv||CH.pv.tok!==tok)return;const l=document.getElementById('chPvL');if(l){l.innerHTML=chPvBody(k);l.scrollTop=l.scrollHeight}}
+document.addEventListener('mouseover',e=>{if(!PCM()||!e.target.closest)return;const row=e.target.closest('#chList .cli[data-k]');
+if(e.target.closest('#chPv')){clearTimeout(PVH);PVH=null;return}
+if(row){clearTimeout(PVH);PVH=null;if(CH.pv&&CH.pv.k===row.dataset.k)return;clearTimeout(PVT);PVT=setTimeout(()=>chPvShow(row.dataset.k,row,0),CH.pv?120:380);return}
+clearTimeout(PVT);if(CH.pv&&!PVH)PVH=setTimeout(chPvHide,240)});
+document.documentElement.addEventListener('mouseleave',()=>{clearTimeout(PVT);if(CH.pv&&!PVH)PVH=setTimeout(chPvHide,240)});
+document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('#chList .cli'))chPvHide()},true);
+document.addEventListener('scroll',e=>{if(e.target&&e.target.id=='chList')chPvHide()},true);
+addEventListener('keydown',e=>{if(e.key=='Escape'&&CH.pv){chPvHide();e.stopImmediatePropagation()}},true);
+/* phones: hold the avatar */
+document.addEventListener('pointerdown',e=>{if(e.pointerType!='touch'||!e.target.closest)return;const av=e.target.closest('#chList .cli[data-k] .cav');if(!av)return;const row=av.closest('.cli');clearTimeout(PVL&&PVL.t);
+PVL={x:e.clientX,y:e.clientY,row,t:setTimeout(()=>{PVL.fired=1;CH.swc=Date.now();try{navigator.vibrate&&navigator.vibrate(15)}catch(_){}chPvShow(row.dataset.k,row,1)},450)}});
+document.addEventListener('pointermove',e=>{if(PVL&&!PVL.fired&&(Math.abs(e.clientX-PVL.x)>10||Math.abs(e.clientY-PVL.y)>10)){clearTimeout(PVL.t);PVL=null}});
+const pvEnd=()=>{if(!PVL)return;clearTimeout(PVL.t);if(PVL.fired)CH.swc=Date.now();PVL=null};
+document.addEventListener('pointerup',pvEnd);document.addEventListener('pointercancel',pvEnd);
+document.addEventListener('contextmenu',e=>{if(PVL&&e.target.closest&&e.target.closest('#chList .cav'))e.preventDefault()});
 async function chPrefsLoad(){try{const l=JSON.parse(localStorage.getItem('chp_'+ME.id)||'null');if(l)CH.prefs=Object.assign(CH.prefs,l)}catch(e){}
 const r=await sb.from('chat_prefs').select('*').eq('user_id',ME.id).maybeSingle();if(r&&r.data){CH.prefs=Object.assign(CH.prefs,{show:r.data.show_active,lock:r.data.lock_mode});try{localStorage.setItem('chp_'+ME.id,JSON.stringify(CH.prefs))}catch(e){}}}
 function chPref(k,v){CH.prefs[k]=v;try{localStorage.setItem('chp_'+ME.id,JSON.stringify(CH.prefs))}catch(e){}
@@ -2983,7 +3057,9 @@ const chOther=r=>r.kind=='dm'?(r.p1==ME.id?r.p2:r.p1):r.kind=='admin'&&role=='ad
 const chTitle=r=>r.kind=='channel'?(r.name||r.key):r.kind=='dm'?(r.mine?chNm(chOther(r)):chNm(r.p1)+' & '+chNm(r.p2)):role=='admin'?chNm(r.p1):'Admins';
 function chRoomAv(r,sz){sz=sz||38;if(r.kind=='channel')return `<span class="cav chn" style="width:${sz}px;height:${sz}px">${ico(chAnn(r)?'mega':'hash')}</span>`;
 if(r.kind=='admin'&&role!='admin')return `<span class="cav adm" style="width:${sz}px;height:${sz}px">${ico('shield')}</span>`;return chAv(r.kind=='dm'&&r.mine?chOther(r):r.p1,sz)}
-function chSubT(r){if(r.kind=='channel')return chAnn(r)?'Only admins can post':'Public group';if(!r.mine)return 'Read-only (admin view)';const o=chOther(r),p=o?chPres(o):'';if(r.kind=='admin'&&role!='admin')return 'Ask the reviewers anything';return p=='active'?'Active now':p=='lockin'?'Locked in':(o?chSeenLong(o):'')}
+function chSubT(r){if(r.kind=='channel')return chAnn(r)?'Only admins can post':'Public group';if(!r.mine)return 'Read-only (admin view)';const o=chOther(r),p=o?chPres(o):'';if(r.kind=='admin'&&role!='admin')return 'Ask the reviewers anything';return p=='active'?'Active now':p=='lockin'?chLockTxt(o):(o?chSeenLong(o):'')}
+/* Locked in, with the time left: "back in 25 min" when they muted chats for Lock In, "25 min left" otherwise */
+function chLockTxt(o){const m=ONL[o],x=m&&m[m.length-1],L=x&&x.lock;if(!L)return'Locked in';if(L.p)return'Locked in · paused';const ms=(L.end||0)-Date.now();if(ms<=0)return'Locked in';const mn=Math.ceil(ms/6e4),t=mn>=60?Math.floor(mn/60)+'h'+(mn%60?' '+(mn%60)+'m':''):mn+' min';return x.ml?'Locked in · back in '+t:'Locked in · '+t+' left'}
 const chUn=f=>CH.rooms.filter(f).reduce((n,r)=>n+(r.mine?r.unread:0),0);
 const chBadgeN=()=>CH.rooms.filter(r=>chU(r)>0&&!chIgn(r)).length;
 function chBadge(){const b=document.getElementById('chBtn');if(!b)return;const n=chBadgeN();let i=b.querySelector('.cb');if(n){if(!i){i=document.createElement('i');i.className='cb';b.appendChild(i)}i.textContent=n>9?'9+':n}else if(i)i.remove()}
@@ -3365,22 +3441,44 @@ else if(!d.br&&d.cur>0&&!d.today&&!d.rest&&!dis['rl'+day])L.push({id:'rl',ic:'fl
 try{const q=qkState();if(q.s.streak>0&&q.st=='ok'&&!dis['rq'+day])L.push({id:'rq',ic:'flame',h:'Keep your QuickiZ streak',s:'Do today’s QuickiZ to keep your '+q.s.streak+'-day streak',tt:'Do today’s QuickiZ',at:0,go:()=>go('quickiz'),dis:()=>ntfDismiss('rq'+day)});
 else if(q.st=='rev'&&!dis['rq'+day])L.push({id:'rq',ic:'flame',h:'QuickiZ streak missed',s:'Tap to revive it',tt:'QuickiZ streak missed',at:0,go:()=>go('quickiz'),dis:()=>ntfDismiss('rq'+day)})}catch(e){}
 const hid=ntfDismissed();return L.filter(x=>!hid['d:'+ntfKey(x)]).sort((a,b)=>b.at-a.at)}
-function ntfRender(){if(NF.anim>0){NF.dirty=1;return}let r=document.getElementById('ntfRoot');if(!r){r=document.createElement('div');r.id='ntfRoot';document.body.appendChild(r)}
+function ntfRender(){if(NF.anim>0){NF.dirty=1;return}if(role=='admin'&&ME&&!NF.adm.ld&&!NF.adm.busy)ntfAdmLoad();let r=document.getElementById('ntfRoot');if(!r){r=document.createElement('div');r.id='ntfRoot';document.body.appendChild(r)}
 if(!ME){r.innerHTML='';ntfTitle([]);return}if(!NF.ld){NF.ld=1;ntfLoad()}
 const L=NF.last=ntfList(),U=L.filter(x=>!ntfIsRead(x)),n=U.length,bump=NF.pn!=null&&n<NF.pn,osc=(document.querySelector('.npan .cll')||{}).scrollTop||0;NF.pn=n;
 r.innerHTML=`<button id="ntBtn" class="cbtn nb" onclick="ntfToggle(event)" aria-label="Notifications" title="Notifications">${ico('bell')}${n?`<i class="cb${bump?' bump':''}">${n>9?'9+':n}</i>`:''}</button>${NF.open?ntfPanelHtml(L):''}`;
 const nl=document.querySelector('.npan .cll');if(nl&&osc)nl.scrollTop=osc;
 ntfTitle(U);ntfDesk(L)}
 const ntfSoft=()=>{clearTimeout(NF.t);NF.t=setTimeout(ntfRender,150)};
-function ntfToggle(e){e.stopPropagation();ntfMenuClose();NF.open=!NF.open;if(NF.open){NF.all=0;NF.fresh=1}CH.open=0;chRender();ntfRender()}
+function ntfToggle(e){e.stopPropagation();ntfMenuClose();NF.open=!NF.open;if(NF.open){NF.all=0;NF.fresh=1;NF.tab='all'}CH.open=0;chRender();ntfRender()}
 function ntfAct(i){if(Date.now()-(NF.swc||0)<450)return;ntfMenuClose();const x=NF.last[i];if(!x)return;ntfMarkRead(x);NF.open=0;ntfRender();if(x.go)x.go()}
 /* ---- notification panel: last 3 entries, See all, juicy dismiss (button, swipe on phones, Clear all) ---- */
 const ntfHide=x=>{ntfDismiss('d:'+ntfKey(x));if(x.dis){try{x.dis()}catch(e){}}};
-function ntfPanelHtml(L){const vis=NF.all?L:L.slice(0,3),fresh=NF.fresh,sh=NF.shown||new Set(),keys=[];
+
+/* ===== notifications: Admins tab (what students do in their own library) - needs activity_log.sql ===== */
+NF.tab='all';NF.admN=0;NF.adm={rows:[],ld:0,busy:0,err:'',q:'',u:'',prev:0};
+const ntfAdmSeen=()=>+(localStorage.getItem('ntf_adm_'+(ME&&ME.id))||0);
+const ntfUn=u=>{const x=(D.U||[]).find(y=>y.id==u);return x?(x.display_name||String(u).slice(0,8)):(CH.users[u]?CH.users[u].name:'Unknown')};
+function ntfAdmMarkSeen(){const m=NF.adm.rows.reduce((a,x)=>Math.max(a,+x.id),0);if(m)try{localStorage.setItem('ntf_adm_'+ME.id,String(m))}catch(e){}NF.admN=0}
+async function ntfAdmLoad(){if(role!='admin'||!ME||NF.adm.busy)return;NF.adm.busy=1;
+try{const r=await sb.from('activity_log').select('*').order('id',{ascending:false}).limit(300);if(r.error){NF.adm.err=/relation|schema cache|does not exist/i.test(r.error.message)?'setup':r.error.message;NF.adm.rows=[]}else{NF.adm.err='';NF.adm.rows=r.data||[]}}catch(e){NF.adm.err=String(e.message||e)}
+NF.adm.ld=1;NF.adm.busy=0;if(NF.open&&NF.tab=='adm'){ntfAdmMarkSeen();ntfAdmPatch()}else{const s=ntfAdmSeen();NF.admN=NF.adm.rows.filter(x=>+x.id>s).length;if(NF.open)ntfRender()}}
+function ntfTab(t){NF.tab=t;ntfMenuClose();if(t=='adm'){NF.adm.prev=ntfAdmSeen();NF.adm.u='';NF.adm.q='';ntfAdmLoad()}ntfRender()}
+const ntfTabs=()=>role!='admin'?'':`<div class="ctabs ntabs"><a class="${NF.tab=='adm'?'':'on'}" onclick="ntfTab('all')">All</a><a class="${NF.tab=='adm'?'on':''}" onclick="ntfTab('adm')">Admins${NF.admN?`<i class="cb">${NF.admN>99?'99+':NF.admN}</i>`:''}</a></div>`;
+const ntfAdmT={upload:'uploaded',file_edit:'modified',file_delete:'deleted',folder_new:'created folder',folder_edit:'modified folder',folder_delete:'deleted folder',question_new:'added a question',question_edit:'edited a question',question_delete:'deleted a question',card_new:'added a flashcard',card_edit:'edited a flashcard',card_delete:'deleted a flashcard'};
+const ntfAdmI={upload:'upload',folder_new:'folder',folder_edit:'folder',folder_delete:'trash',file_edit:'note',file_delete:'trash',question_new:'plus',question_edit:'note',question_delete:'trash',card_new:'plus',card_edit:'note',card_delete:'trash'};
+const ntfAdmTxt=x=>(ntfAdmT[x.action]||x.action)+(x.label?' “'+String(x.label).slice(0,70)+'”':'')+(x.detail?' · '+x.detail:'');
+function ntfAdmList(){const A=NF.adm;if(A.err==='setup')return'<p class="cempty">Student activity is not set up yet.<br><span class="mu sm">Run <b>activity_log.sql</b> once in the Supabase SQL editor.</span></p>';
+if(A.err)return`<p class="cempty">${E(A.err)}</p>`;if(!A.ld)return'<p class="cempty">Loading…</p>';
+const q=A.q.trim().toLowerCase(),rows=A.rows.filter(x=>(!A.u||x.user_id==A.u)&&(!q||ntfUn(x.user_id).toLowerCase().includes(q)));
+if(!rows.length)return`<p class="cempty">${A.rows.length?'Nothing matches.':'No student activity yet.'}</p>`;
+return rows.slice(0,150).map(x=>{const ic=ntfAdmI[x.action],t=+new Date(x.created_at);return `<div class="cli nfa${+x.id>A.prev?' nw':''}"><span class="nfi">${ico(ic&&ICP[ic]?ic:'note')}</span><div class="clm"><b>${E(ntfUn(x.user_id))}</b><span>${E(ntfAdmTxt(x))}</span></div><div class="cls"><small title="${E(fdt(t))}">${E(chAgo(x.created_at))}</small></div></div>`}).join('')}
+function ntfAdmPatch(){const l=document.getElementById('nfAdmList');if(l)l.innerHTML=ntfAdmList()}
+function ntfAdmPanel(){const A=NF.adm,us=[...new Set(A.rows.map(x=>x.user_id).filter(Boolean))].map(u=>[u,ntfUn(u)]).sort((a,b)=>cmp(a[1],b[1]));
+return `<div class="cpan npan"><div class="chh"><b>Notifications</b></div>${ntfTabs()}<div class="nfadf"><input id="nfAdQ" placeholder="Search username…" value="${E(A.q)}" oninput="NF.adm.q=this.value;ntfAdmPatch()" autocomplete="off"><select id="nfAdU" onchange="NF.adm.u=this.value;ntfAdmPatch()"><option value="">All users</option>${us.map(([u,n])=>`<option value="${E(u)}" ${A.u==u?'selected':''}>${E(n)}</option>`).join('')}</select></div><div class="cll nfall" id="nfAdmList">${ntfAdmList()}</div></div>`}
+function ntfPanelHtml(L){if(role=='admin'&&NF.tab=='adm')return ntfAdmPanel();const vis=NF.all?L:L.slice(0,3),fresh=NF.fresh,sh=NF.shown||new Set(),keys=[];
 const rows=vis.map((x,i)=>{const k=ntfKey(x);keys.push(k);const nw=fresh||!sh.has(k);
 return `<div class="cli nfe${ntfIsRead(x)?' rd':''}${nw?' nfin':''}" data-k="${E(k)}" style="${nw?'animation-delay:'+(fresh?i*55:0)+'ms':''}" onclick="ntfAct(${i})"><span class="nfi">${ico(x.ic)}</span><div class="clm"><b>${E(x.h)}</b><span>${E(x.s)}</span></div>${x.btn?`<button class="btn p" style="padding:4px 10px">${x.btn}</button>`:''}<button class="nfx" title="More" aria-label="More options" aria-haspopup="menu" onclick="ntfMenu(event,${i})">${NFDOTS}</button></div>`}).join('');
 NF.shown=new Set(keys);NF.fresh=0;
-return `<div class="cpan npan"><div class="chh"><b>Notifications</b>${L.length?`<button class="btn" style="padding:4px 10px" onclick="ntfClear()">Clear all</button>`:''}</div><div class="cll${NF.all?' nfall':''}">${L.length?rows:`<div class="nfok"><span>${ico('check')}</span><p>You are all caught up.</p></div>`}</div>${L.length>3?`<div class="nff"><button class="btn" onclick="ntfAll()">${NF.all?'Show less':'See all ('+L.length+')'}</button></div>`:''}</div>`}
+return `<div class="cpan npan"><div class="chh"><b>Notifications</b>${L.length?`<button class="btn" style="padding:4px 10px" onclick="ntfClear()">Clear all</button>`:''}</div>${ntfTabs()}<div class="cll${NF.all?' nfall':''}">${L.length?rows:`<div class="nfok"><span>${ico('check')}</span><p>You are all caught up.</p></div>`}</div>${L.length>3?`<div class="nff"><button class="btn" onclick="ntfAll()">${NF.all?'Show less':'See all ('+L.length+')'}</button></div>`:''}</div>`}
 function ntfAll(){NF.all=!NF.all;ntfRender()}
 function ntfBadgeNow(){const U=ntfList().filter(x=>!ntfIsRead(x)),n=U.length,b=document.querySelector('#ntBtn .cb');NF.pn=n;
 if(b){if(!n)b.remove();else{b.textContent=n>9?'9+':n;b.classList.remove('bump');void b.offsetWidth;b.classList.add('bump')}}ntfTitle(U)}
@@ -3442,7 +3540,7 @@ function ntfDesk(L){if(NF.init&&document.hidden&&CH.prefs.bn&&window.Notificatio
 document.addEventListener('click',e=>{if(NF.open&&!e.target.closest('.npan,#ntBtn,#nfMenu')){NF.open=0;ntfMenuClose();ntfRender()}});
 addEventListener('keydown',e=>{if(e.key=='Escape'&&NF.open&&!MD){NF.open=0;ntfRender()}});
 chBadge=(f=>function(){f();ntfSoft()})(chBadge);
-setInterval(()=>{if(ME){chBadge();ntfPull();ntfSoft();chSeenBeat();chSeenPull()}},60000);
+setInterval(()=>{if(ME){chBadge();ntfPull();ntfSoft();chSeenBeat();chSeenPull();ntfAdmLoad();chPresSync()}},60000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&ME&&NF.ld)ntfPull()});
 /* ===== PDF viewer: pages are drawn on demand so scrolling stays smooth on PC and phones ===== */
 const PV={};
