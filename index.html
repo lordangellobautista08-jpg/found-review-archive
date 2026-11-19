@@ -1009,7 +1009,7 @@ function toggleMenu(id,e){e.stopPropagation();CTXP=null;activeMenu=activeMenu===
 const mnu=(id,items)=>activeMenu===id?`<div class="pop" onclick="event.stopPropagation()">${items.filter(Boolean).map(([t,fn,d])=>`<a class="${d?'dng':''}" onclick="${fn}">${t}</a>`).join('')}</div>`:'';
 document.addEventListener('click',()=>{ddc();if(activeMenu){activeMenu=null;CTXP=null;route()}});
 document.addEventListener('contextmenu',e=>{if(!ME||!e.target.closest)return;if(e.target.closest('input,textarea,[contenteditable="true"],.vwin,.notes,#stRail,.pop'))return;
-const c=e.target.closest('.fr[data-k]');if(!c)return;const k=c.dataset.k;e.preventDefault();ddc();
+const c=e.target.closest('.fr[data-k]');if(!c)return;const k=c.dataset.k;e.preventDefault();ddc();if(SEL.size>1&&SEL.has(k)){msMenuOpen(e.clientX,e.clientY);return}
 CTXP={x:e.clientX,y:e.clientY,t:Date.now()};activeMenu=(k[0]=='f'?'fo_':'m_')+k.slice(2);route()});
 addEventListener('scroll',()=>{if(CTXP&&activeMenu&&Date.now()-CTXP.t>400){activeMenu=null;CTXP=null;route()}},true);
 function placeCtx(){if(!CTXP||!activeMenu)return;const p=document.querySelector('.fr.mo .pop');if(!p)return;
@@ -1066,7 +1066,7 @@ function selTog(k){SEL.has(k)?SEL.delete(k):SEL.add(k);ANCH=k;ACT=k;route()}
 function chkClick(e,k){e.stopPropagation();if(e.shiftKey&&PCM()){e.preventDefault();rangeSel(k)}}
 function selAll(){VIS.forEach(k=>SEL.add(k));route()}
 const selKeys=()=>[...SEL].filter(k=>gi(k)),none=()=>toast('Select something first');
-const selBar=()=>selMode?`<div class="selbar"><b>${SEL.size} selected</b><a class="lk sm" onclick="selAll()">Select all</a><a class="lk sm" onclick="SEL.clear();route()">Clear</a><span class="sp"></span><button class="btn" onclick="copySel()">Copy</button><button class="btn" onclick="moveSel()">Move to…</button>${rsBlocked('dl')?'':'<button class="btn" onclick="dlSel()">Download</button>'}<button class="btn" onclick="delSel()">Delete</button><button class="btn p" onclick="selOff()">Done</button></div>`:'';
+const selBar=()=>selMode?`<div class="selbar"><b>${SEL.size} selected</b><a class="lk sm" onclick="selAll()">Select all</a><a class="lk sm" onclick="SEL.clear();route()">Clear</a><span class="sp"></span><button class="btn" onclick="copySel()">Copy</button><button class="btn" onclick="moveSel()">Move to…</button><button class="btn" onclick="dupSel()">Duplicate</button>${role=='admin'?'<button class="btn" onclick="assignSel()">Assign access…</button>':''}${rsBlocked('dl')?'':'<button class="btn" onclick="dlSel()">Download</button>'}<button class="btn" onclick="delSel()">Delete</button><button class="btn p" onclick="selOff()">Done</button></div>`:'';
 function copySel(){const k=selKeys();if(!k.length)return none();CB={keys:k,cut:false};toast('Copied '+k.length+' item(s). Open a folder and press Paste.');selOff()}
 function moveSel(){const k=selKeys();if(!k.length)return none();moveKeys(k)}
 function dlSel(){const k=selKeys();if(!k.length)return none();dlKeys(k)}
@@ -1075,6 +1075,18 @@ function delKeys(k){if(!k.length)return none();RMFAIL=0;showConfirm('Delete sele
 for(const x of k){const it=gi(x);if(!it)continue;if(x[0]=='f'){if(canFo(it)){await delFo(it.id,1);n++}else s++}else{if(canMat(it)){await delM(it.id,1);n++}else s++}}
 ACT='';selOff(1);toast('Deleted '+n+' item(s)'+(s?', '+s+' not allowed':'')+(RMFAIL?', '+RMFAIL+' stored file(s) not removed from Supabase':''));route()})}
 
+/* ===== multi-select: bulk actions from the selection bar or a right-click on any selected item ===== */
+function assignSel(){const k=selKeys();if(!k.length)return none();openAssign(k)}
+async function dupSel(){const k=selKeys();if(!k.length)return none();for(const x of k)await dupKey(x)}
+function msMenuClose(){const d=document.getElementById('msMenu');if(d)d.remove()}
+function msMenuOpen(x,y){msMenuClose();const keys=selKeys(),n=keys.length;if(!n)return;const its=keys.map(k=>[k,gi(k)]),
+ed=its.some(([k,it])=>k[0]=='f'?canFo(it):canMat(it)),off=role=='admin'&&its.some(([k,it])=>!it.own),
+items=[['Copy '+n+' items','copySel()'],ed&&['Move '+n+' items to…','moveSel()'],['Duplicate','dupSel()'],!rsBlocked('dl')&&['Download','dlSel()'],off&&['Assign access…','assignSel()'],ed&&['Delete','delSel()',1],['Clear selection','SEL.clear();route()']],
+d=document.createElement('div');d.id='msMenu';d.className='pop';d.setAttribute('onclick','event.stopPropagation()');
+d.innerHTML='<div class="mu sm" style="padding:6px 14px 4px">'+n+' selected</div>'+items.filter(Boolean).map(([t,fn,dg])=>'<a class="'+(dg?'dng':'')+'" onclick="msMenuClose();'+fn+'">'+t+'</a>').join('');
+d.style.cssText='position:fixed;right:auto;bottom:auto;left:0;top:0;max-height:'+(innerHeight-16)+'px;overflow:auto;z-index:60';document.body.appendChild(d);
+const w=d.offsetWidth,h=d.offsetHeight;d.style.left=Math.max(8,Math.min(x,innerWidth-w-8))+'px';d.style.top=Math.max(8,Math.min(y,innerHeight-h-8))+'px'}
+document.addEventListener('click',e=>{if(!e.target.closest('#msMenu'))msMenuClose()});document.addEventListener('keydown',e=>{if(e.key=='Escape')msMenuClose()});addEventListener('scroll',msMenuClose,true);
 /* ===== COPY, DUPLICATE, PASTE ===== */
 async function cloneFile(m,dest,title){const off=role=='admin'&&!dest.own,np=`${off?'official':ME.id}/${dest.id}/${Date.now()}_${U()}_${(title+'.'+m.type.toLowerCase()).replace(/[^a-zA-Z0-9._-]/g,'_')}`;
 const c=await sb.storage.from('review-materials').copy(m.path,np);if(c.error)throw c.error;
