@@ -3249,10 +3249,13 @@ const chErr=e=>{const m=(e&&e.message)||String(e);return /row-level security|vio
 function chCap(){const avail=innerWidth-110-(document.body.classList.contains('sbo')?320:0)-(document.body.classList.contains('stp')?224:0),cap=innerWidth<=700?1:Math.max(1,Math.min(3,Math.floor(avail/340))),v=CH.wins.filter(w=>!w.min);while(v.length>cap)v.shift().min=1}
 async function chOpen(k){const r=chRoom(k);if(!r)return;let w=CH.wins.find(x=>x.k==k);if(w){CH.wins=CH.wins.filter(x=>x!==w);w.min=0}else w={k,min:0,att:[]};CH.wins.push(w);
 CH.open=0;CH.set=0;chCap();CH.focus=k;CH.act=k;w.nrId=0;chRender();
-try{if(!CH.msgs[k])await chMsgsLoad(k);await chReadsLoad(k);await chJoinsLoad(k)}catch(e){toast(chErr(e))}
+/* each part loads on its own: one failing (for example reactions) must not stop the seen avatars or the join notes from loading */
+try{if(!CH.msgs[k])await chMsgsLoad(k)}catch(e){toast(chErr(e))}
+try{await chReadsLoad(k)}catch(e){console.warn('Seen avatars:',e)}
+try{await chJoinsLoad(k)}catch(e){console.warn('Join notes:',e)}
 chRender();chRead(k);chMentSeen(k)}
 async function chMsgsLoad(k,before){let q=sb.from('chat_messages').select('*').eq('room_id',k).order('id',{ascending:false}).limit(40);if(before)q=q.lt('id',before);const r=await q;if(r.error)throw r.error;const rows=(r.data||[]).reverse(),cur=CH.msgs[k]||[];
-if(before){CH.msgs[k]=rows.concat(cur)}else{CH.msgs[k]=rows.concat(cur.filter(x=>x._p))}CH.old[k]=rows.length>=40;await chRxLoad(rows.map(x=>x.id))}
+if(before){CH.msgs[k]=rows.concat(cur)}else{CH.msgs[k]=rows.concat(cur.filter(x=>x._p))}CH.old[k]=rows.length>=40;try{await chRxLoad(rows.map(x=>x.id))}catch(e){console.warn('Reactions:',e)}}
 async function chReadsLoad(k){const r=await sb.from('chat_reads').select('user_id,last_id').eq('room_id',k);const o={};((r&&r.data)||[]).forEach(x=>{o[x.user_id]=x.last_id});CH.reads[k]=o}
 async function chOlder(k){const L=CH.msgs[k];if(!L||!L.length)return;const m=document.querySelector('.cw[data-k="'+k+'"] .cwm'),h=m?m.scrollHeight:0;try{await chMsgsLoad(k,L[0].id)}catch(e){return toast(chErr(e))}chPatch(k,0);const n=document.querySelector('.cw[data-k="'+k+'"] .cwm');if(n)n.scrollTop=n.scrollHeight-h}
 function chClose(e,k){e&&e.stopPropagation();CH.wins=CH.wins.filter(w=>w.k!=k);chRender()}
