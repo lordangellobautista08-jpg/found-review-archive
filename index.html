@@ -941,6 +941,21 @@ select.rcsel{padding:5px 8px;border-radius:8px;border:1px solid var(--bd);backgr
 /* ===== admin storage card ===== */
 .stot{margin-top:4px}.stbar{height:10px;border-radius:99px;background:var(--soft);overflow:hidden;margin:6px 0 10px}.stbar i{display:block;height:100%;border-radius:99px;background:var(--teal);transition:width .3s}
 .stbar.sm{height:6px;margin:4px 0 0;grid-column:1/-1}.stbk{display:grid;grid-template-columns:1fr auto auto;gap:4px 14px;align-items:baseline;padding:8px 0;border-top:1px solid var(--bd)}
+
+/* ===== Search panel ===== */
+#srRoot{--cr:48px}body.sbo #srRoot{--cr:344px}
+body.hm #srRoot{display:none!important}
+.cbtn.sb{bottom:270px}body.nofab .cbtn.sb{bottom:198px}
+.cbtn.sb:active{transform:scale(.9)}.cbtn.sb.on{background:var(--teal);color:var(--onfab);border-color:var(--teal)}
+.spn{bottom:332px;max-height:min(540px,calc(100vh - 374px));transform-origin:bottom right;animation:srPop .2s cubic-bezier(.2,.9,.3,1.25)}body.nofab .spn{bottom:260px}
+@keyframes srPop{from{opacity:0;transform:translateY(10px) scale(.94)}to{opacity:1;transform:none}}
+.spn .csr{position:relative}.spn .csr input{padding-left:36px}.spn .csr .ic{position:absolute;left:22px;top:50%;margin-top:-2px;width:16px;height:16px;color:var(--mu);pointer-events:none}
+.spn .cli.on{background:var(--soft)}.spn .cli .tag{flex:none}
+.spn mark{background:#3cc7b540;color:inherit;border-radius:3px;padding:0 1px}
+.srin{animation:srIn .24s both;animation-delay:calc(var(--i)*24ms)}
+@keyframes srIn{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:none}}
+.srh{display:flex;justify-content:space-between;align-items:center}.srh a{cursor:pointer;color:var(--teal);text-transform:none;letter-spacing:0;font-size:.8rem}
+@media(max-width:600px){.cbtn.sb{width:46px;height:46px;bottom:200px}body.nto .cbtn.sb{bottom:calc(var(--ftH,0px) + var(--ntH,0px) + 16px + 182px)}body.nofab .cbtn.sb{bottom:140px}body.nofab.nto .cbtn.sb{bottom:calc(var(--ftH,0px) + var(--ntH,0px) + 138px)}.spn{bottom:254px;left:14px;right:14px;width:auto}body.nofab .spn{bottom:198px}#srRoot{--cr:20px}}
 </style>
 </head>
 <body class="hm">
@@ -3185,6 +3200,43 @@ d.innerHTML=`<img src="${m.u}" alt=""><a class="btn" href="${m.u}" target="_blan
 async function chMediaGo(path){const w=window.open('','_blank');try{await chMu([path])}catch(e){}const m=(CH.mu||{})[path];if(!m||!m.u){if(w)w.close();return toast('That file is no longer available.')}if(w){w.opener=null;w.location.href=m.u}else location.href=m.u}
 addEventListener('keydown',e=>{if(e.key=='Escape'){const d=document.getElementById('chLb');if(d){d.remove();e.stopImmediatePropagation()}}},true);
 
+/* ===== SEARCH: one panel to find any folder or file in every component ===== */
+Object.assign(ICP,{srch:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>'});
+const SR={open:0,q:'',sel:0,res:[],ix:null};
+const srEsc=t=>t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),srRK=()=>'srr_'+(ME?ME.id:'');
+function srIndex(){if(SR.ix)return SR.ix;const fo={};(D.FO||[]).forEach(f=>{fo[f.id]=f});
+const pth=f=>{const p=[];let x=f,n=0;while(x&&n++<30){p.unshift(x.name);x=x.parent?fo[x.parent]:null}return p.join(' › ')};
+const a=(D.FO||[]).map(f=>({t:'f',id:f.id,name:f.name||'',c:f.c||'',path:[f.c,pth(f.parent?fo[f.parent]:null)].filter(Boolean).join(' › ')}));
+const b=(D.M||[]).map(m=>{const f=m.fo?fo[m.fo]:null;return{t:'m',id:m.id,name:m.title||'',c:f?f.c:'',type:m.type||'',path:[f?f.c:'',f?pth(f):''].filter(Boolean).join(' › ')}});
+SR.ix=a.concat(b).map(x=>(x.lc=x.name.toLowerCase(),x.pl=x.path.toLowerCase(),x));return SR.ix}
+function srFind(q){const tk=q.toLowerCase().split(/\s+/).filter(Boolean);if(!tk.length)return[];const out=[];
+for(const x of srIndex()){let sc=0,ok=1;for(const t of tk){const i=x.lc.indexOf(t);if(i>=0)sc+=i==0?0:/[\s\-_.()]/.test(x.lc[i-1])?1:2;else if(x.pl.includes(t))sc+=5;else{ok=0;break}}if(ok){x.sc=sc;out.push(x)}}
+return out.sort((a,b)=>a.sc-b.sc||(a.t=='f'?-1:0)-(b.t=='f'?-1:0)||a.name.length-b.name.length||a.name.localeCompare(b.name)).slice(0,40)}
+const srMark=(n,q)=>{const tk=q.toLowerCase().split(/\s+/).filter(Boolean);if(!tk.length)return E(n);return n.split(new RegExp('('+tk.map(srEsc).join('|')+')','gi')).map((p,i)=>i%2?'<mark>'+E(p)+'</mark>':E(p)).join('')};
+function srRecent(){try{const r=JSON.parse(localStorage.getItem(srRK())||'[]'),ix=srIndex();return r.map(k=>ix.find(x=>x.t==k[0]&&x.id==k[1])).filter(Boolean)}catch(e){return[]}}
+function srListHtml(){const q=SR.q.trim();let h='';
+if(!q){SR.res=srRecent();h=SR.res.length?`<div class="chl srh">Recent<a onclick="srClearRecent()">Clear</a></div>`:`<p class="cempty">Type to search every folder and file in all components.</p>`}
+else{SR.res=srFind(q);if(!SR.res.length)h=`<p class="cempty">Nothing matches “${E(q)}”.</p>`}
+SR.sel=Math.min(SR.sel,Math.max(0,SR.res.length-1));
+return h+SR.res.map((x,i)=>`<div class="cli srin${i==SR.sel?' on':''}" style="--i:${Math.min(i,9)}" data-i="${i}" onmouseenter="srHover(${i})" onclick="srGo(${i})"><span class="nfi">${ico(x.t=='f'?'folder':'file')}</span><div class="clm"><b>${srMark(x.name,q)}</b><span>${E(x.path||'Folder')}</span></div>${x.t=='m'&&x.type?tag(x.type.toUpperCase()):x.c?tag(x.c):''}</div>`).join('')}
+function srPanel(){return `<div class="cpan spn"><div class="chh"><b>Search</b></div><div class="csr">${ico('srch')}<input id="srQ" placeholder="Search folders and files…" value="${E(SR.q)}" oninput="SR.q=this.value;SR.sel=0;clearTimeout(SR.t);SR.t=setTimeout(srPatch,60)" onkeydown="srKey(event)" autocomplete="off" spellcheck="false"></div><div class="cll" id="srL">${srListHtml()}</div><p class="cft">↑ ↓ to move · Enter to open · Esc to close</p></div>`}
+function srPatch(){const l=document.getElementById('srL');if(l)l.innerHTML=srListHtml()}
+function srRender(){let r=document.getElementById('srRoot');if(!ME){if(r)r.innerHTML='';SR.open=0;return}if(!r){r=document.createElement('div');r.id='srRoot';document.body.appendChild(r)}
+r.innerHTML=`<button id="srBtn" class="cbtn sb${SR.open?' on':''}" onclick="srToggle(event)" aria-label="Search" title="Search">${ico('srch')}</button>${SR.open?srPanel():''}`;
+if(SR.open){const i=document.getElementById('srQ');if(i&&!('ontouchstart' in window)){i.focus();i.setSelectionRange(99,99)}}}
+function srToggle(e){e.stopPropagation();SR.open=!SR.open;if(SR.open){SR.ix=null;SR.sel=0;if(CH.open){CH.open=0;chRender()}if(NF.open){NF.open=0;ntfRender()}}srRender()}
+function srClose(){if(!SR.open)return;SR.open=0;srRender()}
+function srHover(i){if(SR.sel==i)return;SR.sel=i;document.querySelectorAll('#srL .cli').forEach(e=>e.classList.toggle('on',+e.dataset.i==i))}
+function srKey(e){const n=SR.res.length;if(e.key=='ArrowDown'||e.key=='ArrowUp'){e.preventDefault();if(!n)return;SR.sel=(SR.sel+(e.key=='ArrowDown'?1:-1)+n)%n;document.querySelectorAll('#srL .cli').forEach(x=>x.classList.toggle('on',+x.dataset.i==SR.sel));const on=document.querySelector('#srL .cli.on');if(on)on.scrollIntoView({block:'nearest'})}
+else if(e.key=='Enter'){e.preventDefault();srGo(SR.sel)}else if(e.key=='Escape'){e.preventDefault();srClose()}}
+function srGo(i){const x=SR.res[i];if(!x)return;try{const r=JSON.parse(localStorage.getItem(srRK())||'[]').filter(k=>!(k[0]==x.t&&k[1]==x.id));r.unshift([x.t,x.id]);localStorage.setItem(srRK(),JSON.stringify(r.slice(0,6)))}catch(e){}
+SR.open=0;SR.q='';srRender();if(x.t=='f')go('f/'+x.id);else openM(x.id)}
+function srClearRecent(){try{localStorage.removeItem(srRK())}catch(e){}srPatch()}
+document.addEventListener('click',e=>{if(SR.open&&!e.target.closest('.spn,#srBtn'))srClose()});
+addEventListener('keydown',e=>{if(e.key=='Escape'&&SR.open&&!MD){srClose();e.stopImmediatePropagation()}},true);
+addEventListener('keydown',e=>{if(e.key=='/'&&ME&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!/^(INPUT|TEXTAREA|SELECT)$/.test((e.target||{}).tagName)&&!(e.target&&e.target.isContentEditable)&&!document.body.classList.contains('hm')&&!MD){e.preventDefault();if(!SR.open)srToggle(e)}});
+chToggle=(f=>function(e){srClose();return f.apply(this,arguments)})(chToggle);ntfToggle=(f=>function(e){srClose();return f.apply(this,arguments)})(ntfToggle);
+route=(f=>function(){SR.ix=null;f();if(!SR.open||!document.getElementById('srQ'))srRender()})(route);
 /* ===== ADMIN: storage usage (needs storage_usage.sql) ===== */
 let STO=null,STOQ=+(localStorage.getItem('sto_q')||1);
 const stoFmt=b=>b>=1073741824?(b/1073741824).toFixed(2)+' GB':b>=1048576?(b/1048576).toFixed(1)+' MB':Math.max(1,Math.round(b/1024))+' KB';
