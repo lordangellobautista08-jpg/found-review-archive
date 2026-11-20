@@ -3725,9 +3725,9 @@ async function chReportRoom(k){const r=chRoom(k);let L=(CH.msgs[k]||[]).filter(m
 if(!id){const x=await sb.from('chat_messages').select('id').eq('room_id',k).neq('sender_id',ME.id).order('id',{ascending:false}).limit(1);id=x&&x.data&&x.data[0]?x.data[0].id:0}
 if(!id)return toast('There are no messages from them to report yet.');chReportAsk(id,r&&r.kind=='channel'?'Report chat':'Report user')}
 async function chPoke(u){if(!u||!ME)return;if(CH.blk.mine.has(u)||CH.blk.by.has(u))return toast('You cannot poke this person.');
-const k='pk_'+ME.id+'_'+u;if(Date.now()-(+localStorage.getItem(k)||0)<30000)return toast('Easy there. Wait a few seconds before poking '+chNm(u)+' again.');
+const k='pk_'+ME.id+'_'+u;if(Date.now()-(+localStorage.getItem(k)||0)<5000)return toast('Easy there. Wait a few seconds before poking '+chNm(u)+' again.');
 const r=await sb.from('chat_pokes').insert({from_id:ME.id,to_id:u});if(r.error){console.warn(r.error.message);return toast('Poke is not set up yet. Run chat_extras.sql once.')}try{localStorage.setItem(k,Date.now())}catch(e){}toast('Poked '+chNm(u))}
-async function chPokeMany(ids,lab){if(!ME)return;const now=Date.now();ids=[...new Set(ids)].filter(u=>u&&u!=ME.id&&!CH.blk.mine.has(u)&&!CH.blk.by.has(u)&&now-(+localStorage.getItem('pk_'+ME.id+'_'+u)||0)>=30000);
+async function chPokeMany(ids,lab){if(!ME)return;const now=Date.now();ids=[...new Set(ids)].filter(u=>u&&u!=ME.id&&!CH.blk.mine.has(u)&&!CH.blk.by.has(u)&&now-(+localStorage.getItem('pk_'+ME.id+'_'+u)||0)>=5000);
 if(!ids.length)return toast('Nobody to poke right now. Wait a few seconds between pokes.');
 const r=await sb.from('chat_pokes').insert(ids.map(u=>({from_id:ME.id,to_id:u})));if(r.error){console.warn(r.error.message);return toast('Poke is not set up yet. Run chat_extras.sql once.')}
 try{ids.forEach(u=>localStorage.setItem('pk_'+ME.id+'_'+u,now))}catch(e){}toast(ids.length==1?'Poked '+chNm(ids[0]):'Poked '+(lab||ids.length+' people'))}
