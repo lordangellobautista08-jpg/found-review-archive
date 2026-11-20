@@ -956,6 +956,16 @@ body.hm #srRoot{display:none!important}
 @keyframes srIn{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:none}}
 .srh{display:flex;justify-content:space-between;align-items:center}.srh a{cursor:pointer;color:var(--teal);text-transform:none;letter-spacing:0;font-size:.8rem}
 @media(max-width:600px){.cbtn.sb{width:46px;height:46px;bottom:200px}body.nto .cbtn.sb{bottom:calc(var(--ftH,0px) + var(--ntH,0px) + 16px + 182px)}body.nofab .cbtn.sb{bottom:140px}body.nofab.nto .cbtn.sb{bottom:calc(var(--ftH,0px) + var(--ntH,0px) + 138px)}.spn{bottom:254px;left:14px;right:14px;width:auto}body.nofab .spn{bottom:198px}#srRoot{--cr:20px}}
+
+/* ===== account button + panel ===== */
+.accb{display:inline-flex;align-items:center;gap:6px;white-space:nowrap;background:transparent;border:1px solid transparent;border-radius:99px;padding:3px 9px;cursor:pointer;color:var(--mu);font:inherit;transition:background .12s,border-color .12s}
+.accb:hover{background:var(--soft);border-color:var(--bd);color:var(--ink)}
+.fm-card.acc{max-width:440px;width:100%}
+.acch{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.acch h2{margin:0}
+.accpw{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.accdots{flex:1;min-width:140px;padding:8px 12px;border:1px solid var(--bd);border-radius:var(--r);background:var(--bg2);letter-spacing:.22em;color:var(--mu);user-select:none}
+.accm{min-height:1.2em;margin:4px 0 10px;font-size:.82rem}.accm.err{color:#e5484d}.accm.ok{color:#1fa65a}
+#accPf{margin-top:6px;padding-top:12px;border-top:1px solid var(--bd)}#accPf[hidden]{display:none}
 </style>
 </head>
 <body class="hm">
@@ -2192,7 +2202,7 @@ V.shared=()=>{const it=shItems();return hd('Shared with you','Folders and files 
 /* ===== MENU, TOP BAR, LOGIN, ROUTER ===== */
 const drawer=(n,a)=>{const cur=n=='f'?(D.FO.find(x=>x.id==a)||{}).c:a,lnk=(h,t,on)=>`<a${on?' class="on"':''} onclick="dr(0);${h}">${t}</a>`;
 return lnk("go('dash')",'Dashboard',n=='dash')+lnk("go('quiz')",'Quiz',n=='quiz')+lnk("go('hist')",'Quiz History',n=='hist')+lnk("go('shared')",'Shared with you',n=='shared')+lnk("go('starred')",'Starred files',n=='starred')+`<p class="dl">Components</p>`+C.map(c=>lnk(`go('c/${c}')`,c,(n=='c'||n=='f')&&cur==c)).join('')+`<p class="dl">Study</p>`+lnk("go('cards')",'Flashcards',n=='cards'&&FF.k!='img')+lnk("FF={c:'',k:'img'};go('cards')",'Formula Cards',n=='cards'&&FF.k=='img')+lnk("go('myq')",'My Questions',n=='myq')+(role=='admin'?`<p class="dl">Admin</p>`+lnk("go('admin')",'Admin Dashboard',n=='admin'):'')+`<p class="dl"></p>`+lnk("out()",'Log out',false)+'<div class="stDr"></div>'};
-const tbar=()=>ME?`<span class="sm mu" style="white-space:nowrap">${E(PR&&PR.display_name||'')} <span class="tag">${role}</span></span><button class="btn lo" onclick="out()">Log out</button>`:`<button class="btn" onclick="AU.mode='in';AU.msg='';go('auth')">Log in</button> <button class="btn p" onclick="AU.mode='up';AU.msg='';go('auth')">Sign up</button>`;
+const tbar=()=>ME?`<button class="accb" onclick="accOpen()" title="Your account: change username or password"><span class="sm">${E(PR&&PR.display_name||'')}</span> <span class="tag">${role}</span></button><button class="btn lo" onclick="out()">Log out</button>`:`<button class="btn" onclick="AU.mode='in';AU.msg='';go('auth')">Log in</button> <button class="btn p" onclick="AU.mode='up';AU.msg='';go('auth')">Sign up</button>`;
 let USER_OUT=0;
 function out(){USER_OUT=1;Promise.resolve(typeof pushDrop=='function'?pushDrop():0).catch(()=>{}).then(()=>sb.auth.signOut({scope:'local'}))}
 V.auth=()=>{const m=AU.mode,T={in:'Log in',up:'Create account',reset:'Reset password',newpw:'Set a new password'};
@@ -3155,7 +3165,7 @@ const chJoinScope=r=>chRc(r)?r.key:(r&&r.kind=='channel'&&!chAnn(r)?'public':nul
 async function chJoinsLoad(k){const r=chRoom(k),sc=r&&chJoinScope(r);if(!sc||CH.joinOff)return;
 const q=await sb.from('chat_joins').select('id,user_id,created_at').eq('scope',sc).order('created_at',{ascending:false}).limit(60);
 if(q.error){CH.joinOff=/relation|schema cache|does not exist/i.test(q.error.message);return}CH.joins[sc]=(q.data||[]).reverse();chJoinSub()}
-function chJoinSub(){if(CH.js||CH.joinOff)return;try{CH.js=sb.channel('chat-joins').on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_joins'},p=>{const n=p.new;if(!n||!n.scope)return;(CH.joins[n.scope]=CH.joins[n.scope]||[]).push({id:n.id,user_id:n.user_id,created_at:n.created_at});CH.wins.forEach(w=>{const r=chRoom(w.k);if(r&&chJoinScope(r)==n.scope)chPatch(w.k)})}).subscribe()}catch(e){}}
+function chJoinSub(){if(CH.js||CH.joinOff)return;try{CH.js=sb.channel('chat-joins').on('postgres_changes',{event:'INSERT',schema:'public',table:'chat_joins'},p=>{const n=p.new;if(!n||!n.scope)return;(CH.joins[n.scope]=CH.joins[n.scope]||[]).push({id:n.id,user_id:n.user_id,created_at:n.created_at});CH.rooms.forEach(r=>{if(chJoinScope(r)==n.scope&&CH.wins.some(w=>w.k==r.id&&chIsAct(w.k)))chJoinSeen(r.id)});CH.wins.forEach(w=>{const r=chRoom(w.k);if(r&&chJoinScope(r)==n.scope)chPatch(w.k)});chBadge();if(CH.open)chListPatch();chHeads();try{ntfSoft()}catch(e){}}).subscribe()}catch(e){}}
 function chJoinMerge(k,L){const r=chRoom(k),sc=r&&chJoinScope(r),J=sc&&CH.joins[sc];if(!J||!J.length)return L;const t0=CH.old[k]&&L.length?+new Date(L[0].created_at):0;
 const all=L.map(m=>({m,t:+new Date(m.created_at)})).concat(J.filter(j=>+new Date(j.created_at)>=t0).map(j=>({j,t:+new Date(j.created_at)}))).sort((a,b)=>a.t-b.t),out=[];let g=null;
 all.forEach(x=>{if(x.m){g=null;out.push(x.m)}else if(!g){g={sys:1,id:0,sender_id:'__sys',created_at:x.j.created_at,us:[x.j.user_id]};out.push(g)}else g.us.push(x.j.user_id)});return out}
@@ -3252,6 +3262,60 @@ async function stoClean(){const r=await sb.rpc('orphaned_storage_objects');if(r.
 showConfirm('Remove unused files','Found '+rows.length+' stored file(s) that nothing uses any more. Delete them from storage permanently?',async()=>{RMFAIL=0;let n=0;for(const b of [...new Set(rows.map(x=>x.bucket))])n+=await rmStore(b,rows.filter(x=>x.bucket==b).map(x=>x.path));toast('Removed '+n+' of '+rows.length+' unused file(s)'+(RMFAIL?'. Some were blocked by storage permissions.':''));stoRefresh()})}
 async function stoOld(){const d=Math.floor(+prompt('Delete chat photos and files older than how many days?','60'));if(!d||d<1)return;const r=await sb.rpc('chat_media_older',{p_days:d});if(r.error)return toast(/function|schema cache/i.test(r.error.message)?'Run storage_usage.sql in the Supabase SQL editor first.':r.error.message);const rows=(r.data||[]).map(x=>x.path||x.name||x);if(!rows.length)return toast('No chat uploads older than '+d+' days.');
 showConfirm('Delete old chat uploads','Delete '+rows.length+' chat photo(s)/file(s) older than '+d+' days? The messages stay, but the pictures and files will show as removed.',async()=>{RMFAIL=0;const n=await rmStore('chat-media',rows);toast('Removed '+n+' of '+rows.length+' file(s)'+(RMFAIL?'. Some were blocked.':''));stoRefresh()})}
+
+/* ===== a join counts like an unread message (per device) ===== */
+CH.jr=null;
+const chJrKey=()=>'chjr_'+(ME&&ME.id);
+function chJrLoad(){if(CH.jr)return CH.jr;try{CH.jr=JSON.parse(localStorage.getItem(chJrKey())||'{}')}catch(e){CH.jr={}}return CH.jr}
+function chJrSave(){try{localStorage.setItem(chJrKey(),JSON.stringify(CH.jr))}catch(e){}}
+function chJoinList(r){const sc=r&&chJoinScope(r);if(!sc||!ME)return[];const s=chJrLoad()[sc];return s===undefined?[]:(CH.joins[sc]||[]).filter(j=>+j.id>s&&j.user_id!=ME.id)}
+const chJoinUnread=r=>chJoinList(r).length;
+function chJoinTxt(r){const us=[...new Set(chJoinList(r).map(j=>j.user_id))];if(!us.length)return'';return us.length==1?chNm(us[0])+' joined the channel':chNm(us[0])+' and '+(us.length-1)+(us.length==2?' other':' others')+' joined the channel'}
+function chJoinLastT(r){const sc=r&&chJoinScope(r),J=sc&&CH.joins[sc];if(!J||!J.length||!ME)return 0;for(let i=J.length-1;i>=0;i--){if(J[i].user_id!=ME.id)return+new Date(J[i].created_at)}return 0}
+const chAtMs=r=>Math.max(+new Date(r.at||0),r.mine?chJoinLastT(r):0);
+function chJoinSeen(k){const r=chRoom(k),sc=r&&chJoinScope(r);if(!sc)return;const m=(CH.joins[sc]||[]).reduce((a,j)=>Math.max(a,+j.id),0),jr=chJrLoad();if(m&&(jr[sc]===undefined||jr[sc]<m)){jr[sc]=m;chJrSave()}}
+async function chJoinsAll(force){if(!ME||CH.joinOff||!CH.rooms)return;if(!force&&Date.now()-(CH.jaT||0)<45e3)return;CH.jaT=Date.now();const sc=[...new Set(CH.rooms.map(chJoinScope).filter(Boolean))];if(!sc.length)return;
+const q=await sb.from('chat_joins').select('id,scope,user_id,created_at').in('scope',sc).order('id',{ascending:false}).limit(400);
+if(q.error){CH.joinOff=/relation|schema cache|does not exist/i.test(q.error.message);return}
+const g={};(q.data||[]).forEach(x=>{(g[x.scope]=g[x.scope]||[]).push(x)});const jr=chJrLoad();let ch=0;
+sc.forEach(s=>{const L=(g[s]||[]).slice(0,60).reverse();CH.joins[s]=L;if(jr[s]===undefined){jr[s]=L.reduce((a,j)=>Math.max(a,+j.id),0);ch=1}});if(ch)chJrSave();
+chJoinSub();chBadge();if(CH.open)chListPatch();chHeads();try{ntfSoft()}catch(e){}}
+
+/* ===== account panel: change username or password ===== */
+if(!ICP.eyeOff)ICP.eyeOff='<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" x2="22" y1="2" y2="22"/>';
+function accClose(){const r=document.getElementById('accRoot');if(r)r.remove()}
+const accPwRow=(id,ph,ac)=>`<div class="an-inrow" style="margin-bottom:8px"><input type="password" id="${id}" placeholder="${ph}" autocomplete="${ac}"><button type="button" class="vbt" onclick="accShow('${id}',this)" title="Show or hide" aria-label="Show or hide">${ico('eyeOff')}</button></div>`;
+function accOpen(){if(!ME)return;accClose();const r=document.createElement('div');r.id='accRoot';
+r.innerHTML=`<div class="fm-backdrop" onclick="accClose()"><div class="fm-card acc" onclick="event.stopPropagation()" role="dialog" aria-modal="true" aria-label="Your account"><div class="acch"><h2>Your account</h2><button class="vbt x" onclick="accClose()" title="Close" aria-label="Close">${ico('x')}</button></div>
+<label class="an-l">Username</label><div class="an-inrow"><input id="accN" maxlength="40" value="${E(PR&&PR.display_name||'')}" autocomplete="nickname" onkeydown="if(event.key=='Enter')accSaveName()"><button class="btn p" id="accNb" onclick="accSaveName()">Save</button></div><p class="accm" id="accNm"></p>
+${ME.email?`<p class="mu sm" style="margin:0 0 14px">Email: ${E(ME.email)}</p>`:''}
+<label class="an-l">Password</label><div class="accpw"><span class="accdots">••••••••••</span><button class="vbt" onclick="accEyeTip()" title="Password is hidden" aria-label="Password is hidden">${ico('eyeOff')}</button><button class="btn" id="accPb" onclick="accPwToggle()">Change password</button></div><p class="accm mu" id="accTip">Passwords are stored scrambled, so they can't be shown to anyone.</p>
+<div id="accPf" hidden>${accPwRow('accC','Current password','current-password')}${accPwRow('accP1','New password (6+ characters)','new-password')}${accPwRow('accP2','Confirm new password','new-password')}<button class="btn p" id="accPs" onclick="accPwSave()">Update password</button><p class="accm" id="accPm"></p></div></div></div>`;
+document.body.appendChild(r);setTimeout(()=>{const i=document.getElementById('accN');if(i){i.focus();i.select()}},30)}
+const accMsg=(id,t,bad)=>{const e=document.getElementById(id);if(e){e.textContent=t||'';e.className='accm'+(bad?' err':t?' ok':'')}};
+function accEyeTip(){accMsg('accTip','For your security your password is stored scrambled. It can\'t be viewed, but you can set a new one anytime.')}
+function accPwToggle(){const f=document.getElementById('accPf');if(!f)return;f.hidden=!f.hidden;if(!f.hidden)setTimeout(()=>{const i=document.getElementById('accC');i&&i.focus()},30)}
+function accShow(id,btn){const i=document.getElementById(id);if(!i)return;const show=i.type=='password';i.type=show?'text':'password';btn.innerHTML=ico(show?'eye':'eyeOff')}
+async function accSaveName(){const el=document.getElementById('accN'),b=document.getElementById('accNb');if(!el)return;const nm=el.value.trim().replace(/\s+/g,' ');
+if(nm.length<2||nm.length>40)return accMsg('accNm','Username needs 2 to 40 characters.',1);if(nm===(PR&&PR.display_name||''))return accMsg('accNm','That is already your username.');
+b.disabled=true;b.textContent='Saving…';
+try{let r=await sb.rpc('set_display_name',{p_name:nm});
+if(r.error&&/function|schema cache/i.test(r.error.message)){const u=await sb.from('profiles').update({display_name:nm}).eq('id',ME.id).select('display_name');if(u.error)throw u.error;if(!u.data||!u.data.length)throw new Error('Saving a username needs account_name.sql (ask your admin to run it once).')}
+else if(r.error)throw r.error;
+try{await sb.auth.updateUser({data:{display_name:nm}})}catch(e){}
+if(PR)PR.display_name=nm;const u=(D.U||[]).find(x=>x.id==ME.id);if(u)u.display_name=nm;if(CH.users&&CH.users[ME.id])CH.users[ME.id].name=nm;try{chIndex()}catch(e){}
+const tb=document.getElementById('tb');if(tb)tb.innerHTML=tbar();accMsg('accNm','Username saved. It is used everywhere from now on.');toast('Username updated');route()}
+catch(e){accMsg('accNm',e.message||String(e),1)}
+b.disabled=false;b.textContent='Save'}
+async function accPwSave(){const g=id=>(document.getElementById(id)||{}).value||'',cur=g('accC'),p1=g('accP1'),p2=g('accP2'),b=document.getElementById('accPs');
+if(!cur)return accMsg('accPm','Enter your current password.',1);if(p1.length<6)return accMsg('accPm','New password needs at least 6 characters.',1);if(p1!==p2)return accMsg('accPm','The two new passwords do not match.',1);if(p1===cur)return accMsg('accPm','Pick a password different from the current one.',1);
+b.disabled=true;b.textContent='Updating…';
+try{const v=await sb.auth.signInWithPassword({email:ME.email,password:cur});if(v.error)throw new Error('Your current password is not correct.');
+const r=await sb.auth.updateUser({password:p1});if(r.error)throw r.error;
+['accC','accP1','accP2'].forEach(id=>{const i=document.getElementById(id);if(i){i.value='';i.type='password'}});accMsg('accPm','Password updated. Use it the next time you log in.');toast('Password updated')}
+catch(e){accMsg('accPm',e.message||String(e),1)}
+b.disabled=false;b.textContent='Update password'}
+addEventListener('keydown',e=>{if(e.key=='Escape'&&document.getElementById('accRoot')){accClose();e.stopImmediatePropagation()}},true);
 async function chPrefsLoad(){try{const l=JSON.parse(localStorage.getItem('chp_'+ME.id)||'null');if(l)CH.prefs=Object.assign(CH.prefs,l)}catch(e){}
 const r=await sb.from('chat_prefs').select('*').eq('user_id',ME.id).maybeSingle();if(r&&r.data){CH.prefs=Object.assign(CH.prefs,{show:r.data.show_active,lock:r.data.lock_mode});try{localStorage.setItem('chp_'+ME.id,JSON.stringify(CH.prefs))}catch(e){}}}
 function chPref(k,v){CH.prefs[k]=v;try{localStorage.setItem('chp_'+ME.id,JSON.stringify(CH.prefs))}catch(e){}
@@ -3261,11 +3325,11 @@ CH.st=chSt();stPresTrack();chRender()}
 async function chInit(){if(!ME||CH.init)return;CH.init=1;
 try{const[u,o]=await Promise.all([sb.rpc('chat_users'),sb.rpc('chat_overview')]);
 if(u.error||o.error){CH.ok=false;CH.err=(u.error||o.error).message||'';chPos();chRender();return}
-CH.users={};(u.data||[]).forEach(x=>{CH.users[x.id]={name:x.display_name,role:x.role}});chIndex();chSetRooms(o.data||[]);
+CH.users={};(u.data||[]).forEach(x=>{CH.users[x.id]={name:x.display_name,role:x.role}});chIndex();chSetRooms(o.data||[]);chJoinsAll(1);
 await Promise.all([chPrefsLoad(),chBlocksLoad(),chMuteLoad(),chRPLoad()]);CH.ok=true;CH.st=chSt();stPresTrack();chSeenPull();chSub();chTySub();chRxSub();chMentLoad();chPos();chRender();pushResync();chPendOpen();
 clearInterval(CH.poll);CH.poll=setInterval(()=>{const s=chSt();if(s!=CH.st){CH.st=s;stPresTrack()}if(!CH.rt)chRefresh();chRxPoll()},5000)}
 catch(e){console.warn('Chat:',e);CH.ok=false;CH.err=e.message||''}}
-function chReset(){clearInterval(CH.poll);if(CH.sub){try{sb.removeChannel(CH.sub)}catch(e){}}['tch','rch','js'].forEach(c=>{if(CH[c]){try{sb.removeChannel(CH[c])}catch(e){}CH[c]=null}});Object.assign(CH,{joins:{},sp:{},mu:{},joinOff:false,ok:null,err:'',init:0,users:{},tint:{},rooms:[],open:0,tab:'dm',set:0,q:'',mon:0,wins:[],msgs:{},old:{},reads:{},draft:{},focus:null,act:null,sub:null,rt:0,mod:null,mute:null,rp:{},ty:{},tyAt:{},rx:{},rxOff:0,rxT:0,ment:[],mn:null,_mnN:null,rcm:{},rcmL:{},rcT:0});NF.ld=0;NF.aw=0;NF.pk={};NF.open=0;if(NF.sub){try{sb.removeChannel(NF.sub)}catch(e){}NF.sub=null}ntfSoft();CH.blk={mine:new Set(),by:new Set()};const r=document.getElementById('chatRoot');if(r)r.innerHTML=''}
+function chReset(){clearInterval(CH.poll);if(CH.sub){try{sb.removeChannel(CH.sub)}catch(e){}}['tch','rch','js'].forEach(c=>{if(CH[c]){try{sb.removeChannel(CH[c])}catch(e){}CH[c]=null}});Object.assign(CH,{joins:{},sp:{},mu:{},jr:null,jaT:0,joinOff:false,ok:null,err:'',init:0,users:{},tint:{},rooms:[],open:0,tab:'dm',set:0,q:'',mon:0,wins:[],msgs:{},old:{},reads:{},draft:{},focus:null,act:null,sub:null,rt:0,mod:null,mute:null,rp:{},ty:{},tyAt:{},rx:{},rxOff:0,rxT:0,ment:[],mn:null,_mnN:null,rcm:{},rcmL:{},rcT:0});NF.ld=0;NF.aw=0;NF.pk={};NF.open=0;if(NF.sub){try{sb.removeChannel(NF.sub)}catch(e){}NF.sub=null}ntfSoft();CH.blk={mine:new Set(),by:new Set()};const r=document.getElementById('chatRoot');if(r)r.innerHTML=''}
 function chSetRooms(a){CH.rooms=a.filter(chRcShow).map(x=>({id:x.room_id,kind:x.kind,key:x.key,name:x.name,p1:x.p1,p2:x.p2,mine:!!x.mine,lastId:x.last_id||0,body:x.last_body||'',att:!!x.last_att,sender:x.last_sender,at:x.last_at,del:!!x.last_deleted,unread:x.unread||0}))}
 /* review center groups: a public group per review center. Members are the people tagged with it, plus admins. Everyone else never sees it. */
 const chRc=r=>!!r&&r.kind=='channel'&&/^rc:/.test(r.key||''),
@@ -3275,7 +3339,7 @@ if(r&&!r.error&&r.data&&r.data.length)ids=r.data.map(x=>x.rc_id);else{const p=aw
 if(ids&&PR){if(ids.slice().sort().join()!==rcsOf(PR).slice().sort().join())CH.rcm={};PR.rcs=ids;PR.review_center_id=ids[0]||null}}catch(e){}}
 async function chRcMembers(k){CH.rcm=CH.rcm||{};if(CH.rcm[k]!==undefined||CH.rcmL&&CH.rcmL[k])return;(CH.rcmL=CH.rcmL||{})[k]=1;try{const r=await sb.rpc('chat_rc_members',{rid:String(k)});CH.rcm[k]=r.error?null:new Set((r.data||[]).map(x=>typeof x=='string'?x:x.chat_rc_members||x.id))}catch(e){CH.rcm[k]=null}CH.rcmL[k]=0}
 const chRcOk=(k,id)=>{const r=chRoom(k);if(!chRc(r))return true;const m=(CH.rcm||{})[k];return m===undefined?false:m===null?true:m.has(id)};
-async function chLoad(){const o=await sb.rpc('chat_overview');if(o.error)throw o.error;await chRcMine();chSetRooms(o.data||[])}
+async function chLoad(){const o=await sb.rpc('chat_overview');if(o.error)throw o.error;await chRcMine();chSetRooms(o.data||[]);chJoinsAll()}
 async function chBlocksLoad(){const r=await sb.from('chat_blocks').select('*');CH.blk={mine:new Set(),by:new Set()};((r&&r.data)||[]).forEach(x=>{if(x.blocker==ME.id)CH.blk.mine.add(x.blocked);else if(x.blocked==ME.id)CH.blk.by.add(x.blocker)})}
 async function chMuteLoad(){const r=await sb.from('chat_mutes').select('*').eq('user_id',ME.id).maybeSingle();CH.mute=(r&&r.data)||null}
 const chMuted=s=>!!(CH.mute&&CH.mute[s]&&(!CH.mute.until||new Date(CH.mute.until)>Date.now()));
@@ -3324,7 +3388,7 @@ addEventListener('keydown',e=>{if(e.key=='Escape'&&CH.open&&!MD){CH.open=0;chRen
 /* the phone keyboard opening only changes the height: rebuilding the chat then stole focus from the search box and looped */
 let chW=innerWidth;addEventListener('resize',()=>{if(innerWidth==chW)return;chW=innerWidth;if(CH.ok){chCap();chRender()}});
 /* ---- read / delivered ---- */
-function chRead(k){const r=chRoom(k);if(!r||!r.mine)return;r.unread=0;if(chRP(k).fu){chRP(k).fu=0;chRPSave(k)}chBadge();if(CH.open)chListPatch();clearTimeout(CH.timers['r'+k]);CH.timers['r'+k]=setTimeout(()=>{sb.rpc('chat_mark_read',{rid:k,upto:r.lastId||0}).then(x=>x.error&&console.warn('Chat read:',x.error.message))},300)}
+function chRead(k){const r=chRoom(k);if(!r||!r.mine)return;r.unread=0;chJoinSeen(k);if(chRP(k).fu){chRP(k).fu=0;chRPSave(k)}chBadge();if(CH.open)chListPatch();clearTimeout(CH.timers['r'+k]);CH.timers['r'+k]=setTimeout(()=>{sb.rpc('chat_mark_read',{rid:k,upto:r.lastId||0}).then(x=>x.error&&console.warn('Chat read:',x.error.message))},300)}
 function chDeliver(k){clearTimeout(CH.timers['d'+k]);CH.timers['d'+k]=setTimeout(()=>{sb.rpc('chat_mark_delivered',{rid:k}).then(x=>x.error&&console.warn('Chat delivered:',x.error.message))},250)}
 /* ---- live events ---- */
 function chOnMsg(m){if(!ME||!m)return;const r=chRoom(m.room_id);
@@ -3432,9 +3496,9 @@ return `<div class="cw${chIsAct(k)?' act':''}" data-k="${k}" style="--ci:${i}" o
 function chHeads(){const r=document.getElementById('chatRoot');if(!r)return;r.querySelectorAll('.chd').forEach(h=>{const rm=chRoom(h.dataset.k),n=rm?chU(rm):0;let b=h.querySelector('.cb');if(n){if(!b){b=document.createElement('i');b.className='cb';h.appendChild(b)}b.textContent=n>9?'9+':n}else if(b)b.remove()})}
 function chPatch(k,force){const m=document.querySelector('.cw[data-k="'+k+'"] .cwm');if(!m)return;const atB=force||m.dataset.b!=='0',r=chRoom(k);m.innerHTML=chMsgsHtml(k);if(atB)m.scrollTop=m.scrollHeight;const s=document.querySelector('.cw[data-k="'+k+'"] .cwt small');if(s&&r)s.textContent=chSubT(r)}
 function chTabs(){const t=[['pub','Public',chUn(r=>r.kind=='channel')],['dm','DMs',chUn(r=>r.kind=='dm')],['adm','Admin',chUn(r=>r.kind=='admin')]];return `<div class="ctabs">${t.map(([k,n,u])=>`<a class="${CH.tab==k?'on':''}" onclick="CH.tab='${k}';CH.q='';CH.fresh=1;chRender()">${n}${u?`<i class="cb">${u>9?'9+':u}</i>`:''}</a>`).join('')}</div>`}
-function chRow(r){const un=chU(r),ig=chIgnR(r.id),p=(r.sender==ME.id?'You: ':r.kind!='dm'&&r.sender?chNm(r.sender)+': ':'')+(r.del?'Message removed':r.body||(r.att?'Sent a file':'')),o=r.kind=='dm'&&r.mine?chOther(r):null;
-return `<div class="cli${ig?' ign':''}" data-k="${r.id}" onclick="if(Date.now()-(CH.swc||0)<400)return;chOpen('${r.id}')">${chRoomAv(r)}<div class="clm"><b>${E(chTitle(r))}${chRc(r)?' <span class="tag">Review center</span>':''}${!r.mine?' <span class="tag">read-only</span>':''}${ig?` <span class="mu">${ico('bellOff')}</span>`:''}${chPn(r)?` <span class="mu">${ico('pin')}</span>`:''}</b><span class="${un?'u':''}">${E(r.lastId?p:r.kind=='channel'?'No messages yet':'')}</span></div><div class="cls">${r.at?`<small>${chAgo(r.at)}</small>`:''}${un?`<i class="cb">${un>9?'9+':un}</i>`:''}</div><div class="crb">${o?`<button title="Poke" aria-label="Poke" onclick="event.stopPropagation();chPoke('${o}')">${ico('hand')}</button>`:''}<button title="Chat options" aria-label="Chat options" onclick="chRowMenu(event,'${r.id}')">${ico('more')}</button></div></div>`}
-function chListHtml(){const me=ME.id,q=(CH.q||'').trim().toLowerCase(),byAt=(a,b)=>String(b.at||'').localeCompare(String(a.at||''));let h='';
+function chRow(r){const un=chU(r),jtx=chJoinUnread(r)&&!r.unread&&chJoinLastT(r)>=+new Date(r.at||0)?chJoinTxt(r):'',ig=chIgnR(r.id),p=(r.sender==ME.id?'You: ':r.kind!='dm'&&r.sender?chNm(r.sender)+': ':'')+(r.del?'Message removed':r.body||(r.att?'Sent a file':'')),o=r.kind=='dm'&&r.mine?chOther(r):null;
+return `<div class="cli${ig?' ign':''}" data-k="${r.id}" onclick="if(Date.now()-(CH.swc||0)<400)return;chOpen('${r.id}')">${chRoomAv(r)}<div class="clm"><b>${E(chTitle(r))}${chRc(r)?' <span class="tag">Review center</span>':''}${!r.mine?' <span class="tag">read-only</span>':''}${ig?` <span class="mu">${ico('bellOff')}</span>`:''}${chPn(r)?` <span class="mu">${ico('pin')}</span>`:''}</b><span class="${un?'u':''}">${E(jtx||(r.lastId?p:r.kind=='channel'?'No messages yet':''))}</span></div><div class="cls">${(r.at||jtx)?`<small>${chAgo(jtx?new Date(chJoinLastT(r)).toISOString():r.at)}</small>`:''}${un?`<i class="cb">${un>9?'9+':un}</i>`:''}</div><div class="crb">${o?`<button title="Poke" aria-label="Poke" onclick="event.stopPropagation();chPoke('${o}')">${ico('hand')}</button>`:''}<button title="Chat options" aria-label="Chat options" onclick="chRowMenu(event,'${r.id}')">${ico('more')}</button></div></div>`}
+function chListHtml(){const me=ME.id,q=(CH.q||'').trim().toLowerCase(),byAt=(a,b)=>chAtMs(b)-chAtMs(a);let h='';
 if(CH.tab=='pub'){h=CH.rooms.filter(r=>r.kind=='channel').sort((a,b)=>(chAnn(b)-chAnn(a))||byAt(a,b)||chTitle(a).localeCompare(chTitle(b))).map(chRow).join('')||'<p class="cempty">No channels yet.</p>'}
 else if(CH.tab=='dm'){let l=CH.rooms.filter(r=>r.kind=='dm'&&r.mine&&!chHid(r)&&(r.lastId||CH.wins.some(w=>w.k==r.id))).sort((a,b)=>(chPn(b)>0)-(chPn(a)>0)||(chPn(a)&&chPn(b)?chPn(a)-chPn(b):0)||byAt(a,b));if(q)l=l.filter(r=>chTitle(r).toLowerCase().includes(q));h=l.map(chRow).join('');
 if(rsBlocked('dm'))h='<p class="cempty">Direct messages are turned off for your account.</p>';
@@ -3587,7 +3651,7 @@ const chRP=k=>CH.rp[k]||(CH.rp[k]={}),chIgnR=k=>{if(chAnn(chRoom(k)))return fals
 stLockOn=()=>{try{return !!stLoad().a}catch(e){return false}},
 chIgn=r=>chAnn(r)?false:(chIgnR(r.id)||!!(CH.prefs.mlock&&stLockOn())),
 chHid=r=>{const p=CH.rp[r.id];return !!p&&p.hb>0&&r.lastId<=p.hb},
-chU=r=>r.mine?(r.unread||((CH.rp[r.id]||{}).fu?1:0)):0;
+chU=r=>r.mine?((r.unread||((CH.rp[r.id]||{}).fu?1:0))+chJoinUnread(r)):0;
 function chVis(k){const p=CH.rp[k]||{},hm=p.hm||[];return (CH.msgs[k]||[]).filter(m=>m.id<=0||((!p.hb||m.id>p.hb)&&!hm.includes(m.id)))}
 function chRPStore(){try{localStorage.setItem('chr_'+ME.id,JSON.stringify(CH.rp))}catch(e){}}
 async function chRPLoad(){CH.rp={};try{CH.rp=JSON.parse(localStorage.getItem('chr_'+ME.id)||'{}')}catch(e){}const loc=CH.rp;
@@ -3715,7 +3779,7 @@ L.push({id:k,dk:1,ic:'file',h:m.title,s:W[o.w]+(f?' · '+f.name:''),tt:W[o.w]+':
 (D.FO||[]).filter(f=>!f.own&&!f.def&&C.mods['f'+f.id]&&C.mods['f'+f.id].at>b&&ev(f,'f')<=b).forEach(f=>{const o=C.mods['f'+f.id],k='uf'+f.id+'@'+o.at;if(dis[k])return;
 L.push({id:k,dk:1,ic:'folder',h:f.name,s:'Folder '+(o.w=='moved'?'moved':'renamed'),tt:'Folder '+(o.w=='moved'?'moved':'renamed')+': '+f.name,at:o.at,go:()=>{ntfDismiss(k);go('f/'+f.id)},dis:()=>ntfDismiss(k)})})}
 function ntfList(){const L=[];if(!ME)return L;const dis=ntfDismissed(),day=phDay();
-CH.rooms.forEach(r=>{const n=chU(r);if(!n||chIgn(r))return;const t=chTitle(r);L.push({id:'c'+r.id+':'+n,dk:1,ic:'chat',h:t,s:n+' new message'+(n==1?'':'s'),tt:t+': '+n+' new message'+(n==1?'':'s'),at:+new Date(r.at||0),go:()=>chOpen(r.id)})});
+CH.rooms.forEach(r=>{const n=chU(r);if(!n||chIgn(r))return;const t=chTitle(r);L.push({id:'c'+r.id+':'+n,dk:1,ic:'chat',h:t,s:(!r.unread&&chJoinUnread(r)?chJoinTxt(r):n+' new message'+(n==1?'':'s')),tt:t+': '+(!r.unread&&chJoinUnread(r)?chJoinTxt(r):n+' new message'+(n==1?'':'s')),at:chAtMs(r),go:()=>chOpen(r.id)})});
 Object.keys(NF.pk).forEach(u=>{if(CH.blk.mine.has(u)||ntfIgn(u))return;const o=NF.pk[u],h=chNm(u)+' poked you';L.push({id:'p'+u+':'+o.n,dk:1,ic:'hand',h,s:o.n>1?o.n+' times':'Just now',tt:o.n>1?h+' ('+o.n+'x)':h,at:+new Date(o.at),go:()=>{ntfPokeSeen(u);chOpenDM(u)},dis:()=>ntfPokeSeen(u)})});
 CH.ment.forEach(e=>{const r=chRoom(e.room);if(!r||chIgn(r)||CH.blk.mine.has(e.from))return;const h=chMentText(e);L.push({id:'m'+e.id,dk:1,ic:'atsign',h,s:'in '+chTitle(r),tt:h+' in '+chTitle(r),at:+new Date(e.at),go:()=>chOpen(e.room)})});
 if(role!='admin')ntfContList(L,dis,ntfBase());
