@@ -719,6 +719,7 @@ body.nto .cbtn{bottom:calc(var(--ftH,0px) + var(--ntH,0px) + 16px + 64px)}body.n
 .pvg{background:#fff;box-shadow:0 1px 6px #0003;flex:none;position:relative;overflow:hidden}.pvg canvas{display:block;width:100%;height:100%}
 .vwin .vb img{opacity:0;transition:opacity .18s}.vwin .vb img.ld{opacity:1}.pvn{padding:0 6px;white-space:nowrap}
 /* chat rows: options + poke, notification bell */
+.pkt{font-size:.78rem;color:var(--ac,#6c8cff);cursor:pointer;font-weight:600}.pkgo{width:100%;margin:0 0 6px}.cli.pks{background:var(--card)}.pkc{accent-color:var(--ac,#6c8cff)}
 .crb{display:none;align-items:center;gap:2px;flex:none}.cli:hover .crb{display:flex}.cli:hover .cls{display:none}
 @media(hover:none){.crb{display:flex}.cli .cls{display:flex}}
 .crb button{border:0;background:transparent;color:var(--mu);width:30px;height:30px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0}.crb button:hover{background:var(--card);color:var(--tx)}.crb .ic{width:16px;height:16px;margin:0}
@@ -3518,7 +3519,7 @@ if(CH.tab=='pub'){h=CH.rooms.filter(r=>r.kind=='channel').sort((a,b)=>(chAnn(b)-
 else if(CH.tab=='dm'){let l=CH.rooms.filter(r=>r.kind=='dm'&&r.mine&&!chHid(r)&&(r.lastId||CH.wins.some(w=>w.k==r.id))).sort((a,b)=>(chPn(b)>0)-(chPn(a)>0)||(chPn(a)&&chPn(b)?chPn(a)-chPn(b):0)||byAt(a,b));if(q)l=l.filter(r=>chTitle(r).toLowerCase().includes(q));h=l.map(chRow).join('');
 if(rsBlocked('dm'))h='<p class="cempty">Direct messages are turned off for your account.</p>';
 else{const ppl=Object.keys(CH.users).filter(id=>id!=me&&(role=='admin'?CH.users[id].role!='admin':true)&&(!q||CH.users[id].name.toLowerCase().includes(q))&&!l.some(r=>chOther(r)==id)).sort((a,b)=>(CH.users[b].role=='admin')-(CH.users[a].role=='admin')||chNm(a).localeCompare(chNm(b))).slice(0,q?8:300);
-h+=ppl.length?`<div class="chl">People</div>`+ppl.map(id=>`<div class="cli" onclick="chOpenDM('${id}')">${chAv(id,38)}<div class="clm"><b>${E(chNm(id))}${CH.users[id].role=='admin'?' <span class="tag">Admin</span>':''}</b><span>${CH.users[id].role=='admin'?'Message the admins':'Start a conversation'}</span></div></div>`).join(''):'';
+h+=ppl.length?`<div class="chl">People</div>`+ppl.map(id=>`<div class="cli" onclick="chOpenDM('${id}')">${chAv(id,38)}<div class="clm"><b>${E(chNm(id))}${CH.users[id].role=='admin'?' <span class="tag">Admin</span>':''}</b><span>${CH.users[id].role=='admin'?'Message the admins':'Start a conversation'}</span></div><div class="crb"><button title="Poke" aria-label="Poke" onclick="event.stopPropagation();chPoke('${id}')">${ico('hand')}</button></div></div>`).join(''):'';
 if(!h)h=`<p class="cempty">${q?'Nobody found.':'No direct messages yet. Search a name above to start one.'}</p>`}
 if(role=='admin'){const mon=CH.rooms.filter(r=>r.kind=='dm'&&!r.mine&&r.lastId).sort(byAt);if(mon.length)h+=`<div class="chl"><a onclick="CH.mon=!CH.mon;chRender()">${CH.mon?'Hide':'Show'} all student DMs (${mon.length})</a></div>`+(CH.mon?mon.filter(r=>!q||chTitle(r).toLowerCase().includes(q)).map(chRow).join(''):'')}}
 else{if(role=='admin'){let l=CH.rooms.filter(r=>r.kind=='admin'&&r.lastId&&!chHid(r)).sort(byAt);if(q)l=l.filter(r=>chTitle(r).toLowerCase().includes(q));h=l.map(chRow).join('');
@@ -3648,15 +3649,16 @@ function chInfoGo(k,v){const w=CH.wins.find(x=>x.k==k);if(!w)return;w.info=v;w.m
 const chInfoRefresh=()=>{if(CH.wins.some(w=>w.info))chRender()};
 function chMemList(k){const w=CH.wins.find(x=>x.k==k),q=((w&&w.mq)||'').trim().toLowerCase(),ids=Object.keys(CH.users).filter(id=>!q||chNm(id).toLowerCase().includes(q)).sort((a,b)=>(CH.users[b].role=='admin')-(CH.users[a].role=='admin')||chNm(a).localeCompare(chNm(b)));
 return ids.length?ids.map(id=>{const me=id==ME.id,p=chPres(id),sub=me?'You':p=='active'?'Active now':p=='lockin'?'Locked in':chSeenLong(id);
-return `<div class="cli" ${me?'':`onclick="chProf(event,'${id}')"`}>${chAv(id,38)}<div class="clm"><b>${E(chNm(id))}${CH.users[id].role=='admin'?' <span class="tag">Admin</span>':''}</b><span>${E(sub)}</span></div></div>`}).join(''):'<p class="cempty">Nobody found.</p>'}
+const pm=w&&w.pm&&!me,on=pm&&(w.ps||[]).includes(id);
+return `<div class="cli${on?' pks':''}" ${me?'':pm?`onclick="chPokeTog('${k}','${id}')"`:`onclick="chProf(event,'${id}')"`}>${pm?`<input type="checkbox" class="pkc" ${on?'checked':''} tabindex="-1" style="pointer-events:none;margin-right:2px">`:''}${chAv(id,38)}<div class="clm"><b>${E(chNm(id))}${CH.users[id].role=='admin'?' <span class="tag">Admin</span>':''}</b><span>${E(sub)}</span></div>${me||pm?'':`<div class="crb"><button title="Poke" aria-label="Poke" onclick="event.stopPropagation();chPoke('${id}')">${ico('hand')}</button></div>`}</div>`}).join(''):'<p class="cempty">Nobody found.</p>'}
 function chMemQ(k,val){const w=CH.wins.find(x=>x.k==k);if(!w)return;w.mq=val;const l=document.getElementById('cmem');if(l)l.innerHTML=chMemList(k)}
 function chInfoHtml(w,r){const k=w.k,n=Object.keys(CH.users).length;
-if(w.info=='mem')return `<div class="cinf"><div class="csr" style="padding:0 0 8px"><input placeholder="Search members" value="${E(w.mq||'')}" oninput="chMemQ('${k}',this.value)" autocomplete="off"></div><p class="mu sm" style="margin:0 0 4px">${n} member${n==1?'':'s'}</p><div class="cmem" id="cmem">${chMemList(k)}</div></div>`;
+if(w.info=='mem')return `<div class="cinf"><div class="csr" style="padding:0 0 8px"><input placeholder="Search members" value="${E(w.mq||'')}" oninput="chMemQ('${k}',this.value)" autocomplete="off"></div><div style="display:flex;align-items:center;gap:8px;margin:0 0 6px"><p class="mu sm" style="margin:0;flex:1">${n} member${n==1?'':'s'}</p><a class="pkt" onclick="chPokeMode('${k}')">${w.pm?'Cancel':'Poke people…'}</a></div>${w.pm?`<button id="cpkb" class="btn pkgo" disabled onclick="chPokeSel('${k}')">Select people to poke</button>`:''}<div class="cmem" id="cmem">${chMemList(k)}</div></div>`;
 if(w.info=='pins')return `<div class="cinf">${chMpListHtml(k)}</div>`;
 const an=chAnn(r),p=chRP(k),ig=chIgnR(k),un=chU(r)>0,g=p.ig,isch=r.kind=='channel',o=isch?null:chOther(r),pc=(CH.mp[k]||[]).length;
 return `<div class="cinf"><div class="cin-top">${chRoomAv(r,64)}<b>${E(chTitle(r))}</b><small>${isch?(an?'Announcements from the admins':'Public group')+' · '+n+' member'+(n==1?'':'s'):E(chSubT(r))}</small></div><div class="cin-list">
 <a onclick="chInfoGo('${k}','pins')">${ico('pin')}<span>Pinned messages</span><small>${pc}</small></a>
-${isch?`<a onclick="chInfoGo('${k}','mem')">${ico('grp')}<span>See all members</span><small>${n}</small></a>`:''}
+${isch?`<a onclick="chInfoGo('${k}','mem')">${ico('grp')}<span>See all members</span><small>${n}</small></a><a onclick="chPokeAll('${k}')">${ico('hand')}<span>Poke everyone</span></a><a onclick="chInfoGo('${k}','mem');CH.wins.find(x=>x.k=='${k}').pm=1;chRender()">${ico('hand')}<span>Poke certain people…</span></a>`:''}
 ${an?`<div class="cin-off">${ico('bellOff')}<span>Mute</span><small>Announcements cannot be muted</small></div>`:ig?`<a onclick="chIgnOff('${k}')">${ico('bellOff')}<span>Unmute</span><small>${g=='inf'?'Muted until you unmute':'Muted until '+E(phF({timeStyle:'short'},g))}</small></a>`:`<a onclick="chIgnAsk('${k}')">${ico('bellOff')}<span>Mute…</span></a>`}
 ${un?`<a onclick="chMarkRead('${k}')">${ico('check')}<span>Mark as read</span></a>`:`<a onclick="chMarkUnread('${k}')">${ico('chat')}<span>Mark as unread</span></a>`}
 ${r.kind=='dm'&&r.mine&&o?(CH.blk.mine.has(o)?`<a onclick="chUnblock('${o}')">${ico('x')}<span>Unblock</span></a>`:`<a class="dng" onclick="chBlockAsk('${o}')">${ico('x')}<span>Block</span></a>`):''}${an||!r.mine?'':`<a class="dng" onclick="chReportRoom('${k}')">${ico('flag')}<span>${isch?'Report chat':'Report user'}</span></a>`}
@@ -3725,6 +3727,15 @@ if(!id)return toast('There are no messages from them to report yet.');chReportAs
 async function chPoke(u){if(!u||!ME)return;if(CH.blk.mine.has(u)||CH.blk.by.has(u))return toast('You cannot poke this person.');
 const k='pk_'+ME.id+'_'+u;if(Date.now()-(+localStorage.getItem(k)||0)<30000)return toast('Easy there. Wait a few seconds before poking '+chNm(u)+' again.');
 const r=await sb.from('chat_pokes').insert({from_id:ME.id,to_id:u});if(r.error){console.warn(r.error.message);return toast('Poke is not set up yet. Run chat_extras.sql once.')}try{localStorage.setItem(k,Date.now())}catch(e){}toast('Poked '+chNm(u))}
+async function chPokeMany(ids,lab){if(!ME)return;const now=Date.now();ids=[...new Set(ids)].filter(u=>u&&u!=ME.id&&!CH.blk.mine.has(u)&&!CH.blk.by.has(u)&&now-(+localStorage.getItem('pk_'+ME.id+'_'+u)||0)>=30000);
+if(!ids.length)return toast('Nobody to poke right now. Wait a few seconds between pokes.');
+const r=await sb.from('chat_pokes').insert(ids.map(u=>({from_id:ME.id,to_id:u})));if(r.error){console.warn(r.error.message);return toast('Poke is not set up yet. Run chat_extras.sql once.')}
+try{ids.forEach(u=>localStorage.setItem('pk_'+ME.id+'_'+u,now))}catch(e){}toast(ids.length==1?'Poked '+chNm(ids[0]):'Poked '+(lab||ids.length+' people'))}
+const chPokeAll=k=>{const ids=Object.keys(CH.users).filter(u=>u!=ME.id);if(!ids.length)return toast('Nobody else to poke.');if(!confirm('Poke everyone ('+ids.length+') in this group?'))return;chPokeMany(ids,'everyone')};
+function chPokeTog(k,id){const w=CH.wins.find(x=>x.k==k);if(!w)return;w.ps=w.ps||[];const i=w.ps.indexOf(id);i<0?w.ps.push(id):w.ps.splice(i,1);chMemQ(k,w.mq||'');chPokeBar(k)}
+function chPokeMode(k){const w=CH.wins.find(x=>x.k==k);if(!w)return;w.pm=!w.pm;w.ps=[];chRender()}
+function chPokeSel(k){const w=CH.wins.find(x=>x.k==k);if(!w||!(w.ps||[]).length)return;const ids=w.ps.slice();w.pm=false;w.ps=[];chRender();chPokeMany(ids)}
+const chPokeBar=k=>{const w=CH.wins.find(x=>x.k==k),b=document.getElementById('cpkb');if(b&&w){const n=(w.ps||[]).length;b.disabled=!n;b.textContent=n?'Poke '+n+' selected':'Select people to poke'}};
 function chBn(el){if(!el.checked){chPref('bn',0);return}if(!window.Notification){el.checked=false;return toast('This browser does not support notifications.')}
 Notification.requestPermission().then(p=>{if(p=='granted'){chPref('bn',1);toast('Browser notifications are on')}else{el.checked=false;chPref('bn',0);toast('Notifications are blocked. Allow them in your browser settings.')}})}
 function chSetHtml(){const p=CH.prefs,mu=CH.rooms.filter(r=>r.mine&&chIgnR(r.id)),bl=[...CH.blk.mine];
