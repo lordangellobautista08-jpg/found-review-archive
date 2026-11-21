@@ -1063,6 +1063,15 @@ body.hm #srRoot{display:none!important}
 .fcont .fimgw.multi{display:flex;flex-direction:row;gap:8px}
 .fcont .fimgw.multi img{position:static;flex:1 1 0;min-width:0;min-height:0;width:0;height:100%;max-width:100%;max-height:none;object-fit:contain}
 @media(max-width:600px){.fcont .fimgw.multi{flex-direction:column}.fcont .fimgw.multi img{width:100%;height:0}}
+
+/* ===== figures library: grouped Component > Subject > Topic ===== */
+.fgG{border:1px solid var(--bd);border-radius:var(--r);margin:0 0 10px;background:var(--card)}
+.fgG>summary{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;list-style:none}
+.fgG>summary::-webkit-details-marker{display:none}
+.fgG>summary::before{content:'▸';margin-right:2px;transition:transform .15s}.fgG[open]>summary::before{transform:rotate(90deg)}
+.fgG>summary b{flex:1}.fgG.l1>summary{font-size:1.02rem}
+.fgGb{padding:2px 12px 12px}.fgG.l2,.fgG.l3{background:var(--bg2);margin:8px 0 0}
+.fgpk:not(.all) .msi.fgx{display:none}
 </style>
 </head>
 <body class="hm">
@@ -4228,13 +4237,22 @@ document.addEventListener('click',e=>{const t=e.target.closest&&e.target.closest
 document.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey)return;const t=e.target||{};if(/INPUT|TEXTAREA|SELECT/.test(t.tagName)||t.isContentEditable||(typeof MD!='undefined'&&MD))return;
 if(e.key=='Escape'&&FGS.open){fgClose(1);return}if(e.key&&e.key.toLowerCase()=='f'){const ch=document.querySelector('.fgchip[data-study]');if(ch){e.preventDefault();ch.click()}}});
 /* ---- admin: library ---- */
-async function fgThumbs(){for(const el of [...document.querySelectorAll('.fgthumb[data-fg]')]){const f=(D.FG||[]).find(x=>x.id==el.dataset.fg);if(!f||!f.ip.length)continue;const u=(await fgUrls({ip:[f.ip[0]]}))[0];if(u&&el.isConnected)el.innerHTML='<img alt="" src="'+u+'">'}}
+async function fgThumbs(){for(const el of [...document.querySelectorAll('.fgthumb[data-fg]')]){if(!el.offsetParent||el.querySelector('img'))continue;const f=(D.FG||[]).find(x=>x.id==el.dataset.fg);if(!f||!f.ip.length)continue;const u=(await fgUrls({ip:[f.ip[0]]}))[0];if(u&&el.isConnected)el.innerHTML='<img alt="" src="'+u+'">'}}
 const fgUse=(f,k)=>(D.FL||[]).filter(l=>l.figure_id==f.id&&l.kind==k).length;
+/* library: figures are grouped Component > Subject > Topic and stay collapsed until opened (or until you narrow them down) */
+const fgCardHtml=f=>`<div class="card stack"><div class="fgthumb" data-fg="${f.id}">${f.ip.length?'':E((f.body||'No content').slice(0,90))}</div><b>${E(f.name)}</b><div class="fgtags">${[f.c,f.s,f.t].filter(Boolean).map(t=>`<span class="tag">${E(t)}</span>`).join('')}</div><span class="mu sm">${fgUse(f,'q')} question${fgUse(f,'q')==1?'':'s'} · ${fgUse(f,'c')} card${fgUse(f,'c')==1?'':'s'}</span><div class="row" style="margin:0"><button class="btn" onclick="fgEdit('${f.id}')">Edit</button><button class="btn" onclick="fgDel('${f.id}')">Delete</button></div></div>`;
+function fgTog(el,k){(FGA.o=FGA.o||{})[decodeURIComponent(k)]=el.open;if(el.open)fgThumbs()}
 function fgAdmin(){if(!FGOK)return `<div class="card stack"><h3>Figures need a one-time setup</h3><p class="mu">Run <b>figures.sql</b> in the Supabase SQL editor, then refresh this page.</p></div>`;
-const l=(D.FG||[]).filter(f=>(!FGA.c||f.c==FGA.c)&&(!FGA.q||(f.name+' '+f.s+' '+f.t+' '+f.body).toLowerCase().includes(FGA.q.toLowerCase())));
-return `<div class="row" style="margin:0 0 12px;justify-content:space-between"><button class="btn p" onclick="fgEdit()">＋ New figure</button><div class="row" style="margin:0">${dd('fgC',[['','All components'],...C],FGA.c,"FGA.c=v;route()")}<input id="fgq" placeholder="Search figures…" value="${E(FGA.q)}" oninput="FGA.q=this.value;route();const i=$('#fgq');i.focus();i.setSelectionRange(99,99)"></div></div>
-<p class="mu sm" style="margin:0 0 12px">A figure is a named situation, diagram or data set. Make it once, attach it to as many questions and cards as you like, and it shows right inside each question or card, like an attached image.</p>
-<div class="g">${l.map(f=>`<div class="card stack"><div class="fgthumb" data-fg="${f.id}">${f.ip.length?'':E((f.body||'No content').slice(0,90))}</div><b>${E(f.name)}</b><div class="fgtags">${[f.c,f.s,f.t].filter(Boolean).map(t=>`<span class="tag">${E(t)}</span>`).join('')}</div><span class="mu sm">${fgUse(f,'q')} question${fgUse(f,'q')==1?'':'s'} · ${fgUse(f,'c')} card${fgUse(f,'c')==1?'':'s'}</span><div class="row" style="margin:0"><button class="btn" onclick="fgEdit('${f.id}')">Edit</button><button class="btn" onclick="fgDel('${f.id}')">Delete</button></div></div>`).join('')||empty('No figures yet. Add one with ＋ New figure.')}</div>`}
+const all=D.FG||[],q=(FGA.q||'').toLowerCase(),sb2=[...new Set(all.filter(f=>!FGA.c||f.c==FGA.c).map(f=>f.s).filter(Boolean))].sort(cmp),tb2=[...new Set(all.filter(f=>(!FGA.c||f.c==FGA.c)&&(!FGA.s||f.s==FGA.s)).map(f=>f.t).filter(Boolean))].sort(cmp);
+const l=all.filter(f=>(!FGA.c||f.c==FGA.c)&&(!FGA.s||f.s==FGA.s)&&(!FGA.t||f.t==FGA.t)&&(!q||(f.name+' '+f.s+' '+f.t+' '+f.body).toLowerCase().includes(q))),narrowed=!!(FGA.c||FGA.s||FGA.t||q);
+const tree={};l.forEach(f=>{const c=f.c||'No component',sj=f.s||'No subject',t=f.t||'No topic';(((tree[c]=tree[c]||{})[sj]=tree[c][sj]||{})[t]=tree[c][sj][t]||[]).push(f)});
+const cnt=o=>Array.isArray(o)?o.length:Object.values(o).reduce((a,x)=>a+cnt(x),0),isOpen=k=>FGA.o&&FGA.o[k]!==undefined?FGA.o[k]:narrowed,
+det=(k,label,n,inner,lv)=>`<details class="fgG l${lv}" ${isOpen(k)?'open':''} ontoggle="fgTog(this,'${encodeURIComponent(k).replace(/'/g,'%27')}')"><summary><b>${E(label)}</b><span class="mu sm">${n} figure${n==1?'':'s'}</span></summary><div class="fgGb">${inner}</div></details>`,
+ci=c=>C.indexOf(c)<0?99:C.indexOf(c);
+const body=Object.keys(tree).sort((a,b)=>ci(a)-ci(b)||cmp(a,b)).map(c=>det(c,c,cnt(tree[c]),Object.keys(tree[c]).sort(cmp).map(sj=>det(c+'|'+sj,sj,cnt(tree[c][sj]),Object.keys(tree[c][sj]).sort(cmp).map(t=>det(c+'|'+sj+'|'+t,t,tree[c][sj][t].length,`<div class="g">${tree[c][sj][t].map(fgCardHtml).join('')}</div>`,3)).join(''),2)).join(''),1)).join('');
+return `<div class="row" style="margin:0 0 12px;justify-content:space-between"><button class="btn p" onclick="fgEdit()">＋ New figure</button><div class="row" style="margin:0">${dd('fgC',[['','All components'],...C],FGA.c,"FGA.c=v;FGA.s='';FGA.t='';route()")}${dd('fgSb',[['','All subjects'],...sb2.map(x=>[x,x])],FGA.s||'',"FGA.s=v;FGA.t='';route()")}${dd('fgTp',[['','All topics'],...tb2.map(x=>[x,x])],FGA.t||'',"FGA.t=v;route()")}<input id="fgq" placeholder="Search figures…" value="${E(FGA.q)}" oninput="FGA.q=this.value;route();const i=$('#fgq');i.focus();i.setSelectionRange(99,99)"></div></div>
+<p class="mu sm" style="margin:0 0 12px">A figure is a named situation, diagram or data set. Make it once, attach it to as many questions and cards as you like, and it shows right inside each question or card, like an attached image. Open a component, subject and topic to see its figures.</p>
+${body||empty(all.length?'No figures match this filter.':'No figures yet. Add one with ＋ New figure.')}`}
 function fgDel(id){const f=(D.FG||[]).find(x=>x.id==id);if(!f)return;showConfirm('Delete figure','Delete “'+f.name+'”? It is removed from every question and card it was attached to.',async()=>{const r=await sb.from('figures').delete().eq('id',id);if(r.error){toast(r.error.message);return false}
 D.FG=D.FG.filter(x=>x.id!=id);D.FL=D.FL.filter(l=>l.figure_id!=id);fgIndex();if(f.ip.length)rmStore('flashcard-images',f.ip);toast('Figure deleted');route()})}
 const FGL=(k,x)=>x?(D.FL||[]).filter(l=>l.figure_id==x.id&&l.kind==k).map(l=>String(l.item_id)):[];
@@ -4274,8 +4292,8 @@ const gone=old?old.ip.filter(p=>!paths.includes(p)):[];if(gone.length)rmStore('f
 catch(e){if(fresh.length)rmStore('flashcard-images',fresh);toast(e.message||String(e));return false}}
 /* ---- admin: attach figures from a question / card editor, or to a whole selection ---- */
 function fgPickHtml(kind,id,c,s,t){if(!FGOK)return'';if(!(D.FG||[]).length)return '<p class="mu sm">No figures yet. Create them under Admin → Figures, then tick them here.</p>';const cur=new Set((id?(FGX[kind+':'+id]||[]):[]).map(String)),
-L=[...D.FG].sort((a,b)=>((b.c==c)-(a.c==c))||((b.s==s&&!!b.s)-(a.s==s&&!!a.s))||a.name.localeCompare(b.name));
-return `<div class="field"><label>Figures (shown right inside the ${kind=='q'?'question':'card'}, like an attached image)</label><div class="fgpk" id="fgPick">${L.map(f=>`<label class="msi"><input type="checkbox" class="fgck" value="${f.id}" ${cur.has(String(f.id))?'checked':''}><span>${E(f.name)}<small class="mu"> · ${E([f.c,f.s,f.t].filter(Boolean).join(' › ')||'any')}</small></span></label>`).join('')}</div></div>`}
+fit=f=>(!f.c||f.c==c)&&(!f.s||f.s==s)&&(!f.t||f.t==t),L=[...D.FG].sort((a,b)=>((b.c==c)-(a.c==c))||((b.s==s&&!!b.s)-(a.s==s&&!!a.s))||a.name.localeCompare(b.name)),hid=L.filter(f=>!fit(f)&&!cur.has(String(f.id))).length;
+return `<div class="field"><label>Figures (shown right inside the ${kind=='q'?'question':'card'}, like an attached image)</label><div class="fgpk" id="fgPick">${L.map(f=>`<label class="msi${fit(f)||cur.has(String(f.id))?'':' fgx'}"><input type="checkbox" class="fgck" value="${f.id}" ${cur.has(String(f.id))?'checked':''}><span>${E(f.name)}<small class="mu"> · ${E([f.c,f.s,f.t].filter(Boolean).join(' › ')||'any')}</small></span></label>`).join('')||''}</div>${hid?`<a class="lk sm" onclick="const p=document.getElementById('fgPick');p.classList.toggle('all');this.textContent=p.classList.contains('all')?'Show only matching figures':'Show all ${hid} other figures'">Show all ${hid} other figure${hid==1?'':'s'}</a>`:''}${L.length&&hid==L.length?'<p class="mu sm" style="margin:4px 0 0">No figure is set for this component, subject and topic yet.</p>':''}</div>`}
 const fgPickGet=()=>[...document.querySelectorAll('#fgPick .fgck:checked')].map(x=>x.value);
 async function fgSetFor(kind,itemId,ids){itemId=String(itemId);const cur=new Set((D.FL||[]).filter(l=>l.kind==kind&&String(l.item_id)==itemId).map(l=>l.figure_id)),want=new Set(ids),add=ids.filter(i=>!cur.has(i)),del=[...cur].filter(i=>!want.has(i));
 for(const f of del){const r=await sb.from('figure_links').delete().eq('figure_id',f).eq('kind',kind).eq('item_id',itemId);if(r.error)throw r.error}
