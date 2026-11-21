@@ -1072,6 +1072,13 @@ body.hm #srRoot{display:none!important}
 .fgG>summary b{flex:1}.fgG.l1>summary{font-size:1.02rem}
 .fgGb{padding:2px 12px 12px}.fgG.l2,.fgG.l3{background:var(--bg2);margin:8px 0 0}
 .fgpk:not(.all) .msi.fgx{display:none}
+
+.fgl{display:flex;flex-direction:column;gap:8px}
+.fgrow{display:flex;align-items:center;gap:12px;padding:8px 12px;border:1px solid var(--bd);border-radius:var(--r);background:var(--card)}
+.fgrow .fgthumb{height:48px;width:64px;flex:none;border-radius:8px;font-size:.6rem;padding:2px}
+.fgrow .fgm2{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.fgrow .fgm2 b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fgrow .row{margin:0;flex:none}
+@media(max-width:600px){.fgrow{flex-wrap:wrap}.fgrow .fgm2{flex:1 1 calc(100% - 80px)}.fgrow .row{width:100%}}
 </style>
 </head>
 <body class="hm">
@@ -4241,16 +4248,19 @@ async function fgThumbs(){for(const el of [...document.querySelectorAll('.fgthum
 const fgUse=(f,k)=>(D.FL||[]).filter(l=>l.figure_id==f.id&&l.kind==k).length;
 /* library: figures are grouped Component > Subject > Topic and stay collapsed until opened (or until you narrow them down) */
 const fgCardHtml=f=>`<div class="card stack"><div class="fgthumb" data-fg="${f.id}">${f.ip.length?'':E((f.body||'No content').slice(0,90))}</div><b>${E(f.name)}</b><div class="fgtags">${[f.c,f.s,f.t].filter(Boolean).map(t=>`<span class="tag">${E(t)}</span>`).join('')}</div><span class="mu sm">${fgUse(f,'q')} question${fgUse(f,'q')==1?'':'s'} · ${fgUse(f,'c')} card${fgUse(f,'c')==1?'':'s'}</span><div class="row" style="margin:0"><button class="btn" onclick="fgEdit('${f.id}')">Edit</button><button class="btn" onclick="fgDel('${f.id}')">Delete</button></div></div>`;
+const fgRowHtml=f=>`<div class="fgrow"><div class="fgthumb" data-fg="${f.id}">${f.ip.length?'':E((f.body||'').slice(0,24))}</div><div class="fgm2"><b>${E(f.name)}</b><span class="mu sm">${fgUse(f,'q')} question${fgUse(f,'q')==1?'':'s'} · ${fgUse(f,'c')} card${fgUse(f,'c')==1?'':'s'}${f.ip.length?' · '+f.ip.length+' image'+(f.ip.length==1?'':'s'):''}</span></div><div class="row"><button class="btn" onclick="fgEdit('${f.id}')">Edit</button><button class="btn" onclick="fgDel('${f.id}')">Delete</button></div></div>`;
+function fgView(v){FGA.v=v;try{localStorage.setItem('fgv',v)}catch(e){}route()}
 function fgTog(el,k){(FGA.o=FGA.o||{})[decodeURIComponent(k)]=el.open;if(el.open)fgThumbs()}
 function fgAdmin(){if(!FGOK)return `<div class="card stack"><h3>Figures need a one-time setup</h3><p class="mu">Run <b>figures.sql</b> in the Supabase SQL editor, then refresh this page.</p></div>`;
+let fv=FGA.v;if(!fv){try{fv=localStorage.getItem('fgv')}catch(e){}fv=fv=='list'?'list':'grid'}
 const all=D.FG||[],q=(FGA.q||'').toLowerCase(),sb2=[...new Set(all.filter(f=>!FGA.c||f.c==FGA.c).map(f=>f.s).filter(Boolean))].sort(cmp),tb2=[...new Set(all.filter(f=>(!FGA.c||f.c==FGA.c)&&(!FGA.s||f.s==FGA.s)).map(f=>f.t).filter(Boolean))].sort(cmp);
 const l=all.filter(f=>(!FGA.c||f.c==FGA.c)&&(!FGA.s||f.s==FGA.s)&&(!FGA.t||f.t==FGA.t)&&(!q||(f.name+' '+f.s+' '+f.t+' '+f.body).toLowerCase().includes(q))),narrowed=!!(FGA.c||FGA.s||FGA.t||q);
 const tree={};l.forEach(f=>{const c=f.c||'No component',sj=f.s||'No subject',t=f.t||'No topic';(((tree[c]=tree[c]||{})[sj]=tree[c][sj]||{})[t]=tree[c][sj][t]||[]).push(f)});
 const cnt=o=>Array.isArray(o)?o.length:Object.values(o).reduce((a,x)=>a+cnt(x),0),isOpen=k=>FGA.o&&FGA.o[k]!==undefined?FGA.o[k]:narrowed,
 det=(k,label,n,inner,lv)=>`<details class="fgG l${lv}" ${isOpen(k)?'open':''} ontoggle="fgTog(this,'${encodeURIComponent(k).replace(/'/g,'%27')}')"><summary><b>${E(label)}</b><span class="mu sm">${n} figure${n==1?'':'s'}</span></summary><div class="fgGb">${inner}</div></details>`,
 ci=c=>C.indexOf(c)<0?99:C.indexOf(c);
-const body=Object.keys(tree).sort((a,b)=>ci(a)-ci(b)||cmp(a,b)).map(c=>det(c,c,cnt(tree[c]),Object.keys(tree[c]).sort(cmp).map(sj=>det(c+'|'+sj,sj,cnt(tree[c][sj]),Object.keys(tree[c][sj]).sort(cmp).map(t=>det(c+'|'+sj+'|'+t,t,tree[c][sj][t].length,`<div class="g">${tree[c][sj][t].map(fgCardHtml).join('')}</div>`,3)).join(''),2)).join(''),1)).join('');
-return `<div class="row" style="margin:0 0 12px;justify-content:space-between"><button class="btn p" onclick="fgEdit()">＋ New figure</button><div class="row" style="margin:0">${dd('fgC',[['','All components'],...C],FGA.c,"FGA.c=v;FGA.s='';FGA.t='';route()")}${dd('fgSb',[['','All subjects'],...sb2.map(x=>[x,x])],FGA.s||'',"FGA.s=v;FGA.t='';route()")}${dd('fgTp',[['','All topics'],...tb2.map(x=>[x,x])],FGA.t||'',"FGA.t=v;route()")}<input id="fgq" placeholder="Search figures…" value="${E(FGA.q)}" oninput="FGA.q=this.value;route();const i=$('#fgq');i.focus();i.setSelectionRange(99,99)"></div></div>
+const body=Object.keys(tree).sort((a,b)=>ci(a)-ci(b)||cmp(a,b)).map(c=>det(c,c,cnt(tree[c]),Object.keys(tree[c]).sort(cmp).map(sj=>det(c+'|'+sj,sj,cnt(tree[c][sj]),Object.keys(tree[c][sj]).sort(cmp).map(t=>det(c+'|'+sj+'|'+t,t,tree[c][sj][t].length,(fv=='list'?`<div class="fgl">${tree[c][sj][t].map(fgRowHtml).join('')}</div>`:`<div class="g">${tree[c][sj][t].map(fgCardHtml).join('')}</div>`),3)).join(''),2)).join(''),1)).join('');
+return `<div class="row" style="margin:0 0 12px;justify-content:space-between"><button class="btn p" onclick="fgEdit()">＋ New figure</button><div class="row" style="margin:0"><div class="seg"><button class="${fv=='grid'?'on':''}" onclick="fgView('grid')">Grid</button><button class="${fv=='list'?'on':''}" onclick="fgView('list')">List</button></div>${dd('fgC',[['','All components'],...C],FGA.c,"FGA.c=v;FGA.s='';FGA.t='';route()")}${dd('fgSb',[['','All subjects'],...sb2.map(x=>[x,x])],FGA.s||'',"FGA.s=v;FGA.t='';route()")}${dd('fgTp',[['','All topics'],...tb2.map(x=>[x,x])],FGA.t||'',"FGA.t=v;route()")}<input id="fgq" placeholder="Search figures…" value="${E(FGA.q)}" oninput="FGA.q=this.value;route();const i=$('#fgq');i.focus();i.setSelectionRange(99,99)"></div></div>
 <p class="mu sm" style="margin:0 0 12px">A figure is a named situation, diagram or data set. Make it once, attach it to as many questions and cards as you like, and it shows right inside each question or card, like an attached image. Open a component, subject and topic to see its figures.</p>
 ${body||empty(all.length?'No figures match this filter.':'No figures yet. Add one with ＋ New figure.')}`}
 function fgDel(id){const f=(D.FG||[]).find(x=>x.id==id);if(!f)return;showConfirm('Delete figure','Delete “'+f.name+'”? It is removed from every question and card it was attached to.',async()=>{const r=await sb.from('figures').delete().eq('id',id);if(r.error){toast(r.error.message);return false}
