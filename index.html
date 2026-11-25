@@ -1079,9 +1079,47 @@ body.hm #srRoot{display:none!important}
 .fgrow .fgm2{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.fgrow .fgm2 b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .fgrow .row{margin:0;flex:none}
 @media(max-width:600px){.fgrow{flex-wrap:wrap}.fgrow .fgm2{flex:1 1 calc(100% - 80px)}.fgrow .row{width:100%}}
+/* ===== LOADING SPLASH: "F /" (pure CSS, same font as the header; the F is white, the / uses the site accent) ===== */
+html.sp-on,html.sp-on body{overflow:hidden}
+#sp{--sp-a:#5EEAD4;--sp-ag:rgba(94,234,212,.4);--sp-1:#14595c;--sp-2:#072a2c;position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(120% 90% at 50% 38%,var(--sp-1) 0%,var(--sp-2) 72%);color:#fff;font:700 16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;opacity:1;transition:opacity .35s ease}
+html[data-theme="dark"] #sp{--sp-1:#400f6e;--sp-2:#1a002e}
+#sp.out{opacity:0;visibility:hidden;pointer-events:none;transition:opacity .35s ease,visibility 0s .35s}
+#sp .sp-glow{position:absolute;width:min(78vw,560px);aspect-ratio:1;border-radius:50%;background:radial-gradient(closest-side,var(--sp-ag),transparent);animation:spGlow 2.4s ease-in-out infinite}
+#sp .sp-st{position:relative;display:flex;flex-direction:column;align-items:center}
+#sp .sp-mk{display:flex;align-items:center;gap:.16em;font-size:clamp(100px,30vw,176px);line-height:1;letter-spacing:-.02em;user-select:none}
+#sp .sp-f{display:inline-block;transform-origin:50% 92%;color:#fff;background:linear-gradient(105deg,#fff 0 40%,#c8fff6 50%,#fff 60% 100%) 130% 0/260% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 8px 20px rgba(0,0,0,.35));animation:spF 2.4s cubic-bezier(.3,1.5,.5,1) infinite,spSh 2.4s ease-in-out infinite;will-change:transform,opacity}
+#sp .sp-sl{position:relative;display:inline-block;transform-origin:30% 92%;animation:spS 2.4s cubic-bezier(.2,1.2,.4,1) infinite;will-change:transform,opacity,filter}
+#sp .sp-sl i{display:inline-block;font-style:normal;color:var(--sp-a);-webkit-text-stroke:.03em var(--sp-a);text-shadow:0 0 12px var(--sp-a),0 0 36px var(--sp-ag);animation:spGl 1.2s ease-in-out infinite alternate}
+#sp .sp-r{position:absolute;left:50%;top:52%;width:190px;height:190px;margin:-95px 0 0 -95px;border:2px solid var(--sp-a);border-radius:50%;opacity:0;animation:spR 2.4s ease-out infinite}
+#sp .sp-r.b{border-color:#fff;border-width:1px;animation-delay:.1s}
+#sp .sp-k{position:absolute;left:50%;top:52%;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;background:var(--sp-a);opacity:0;transform:rotate(var(--a)) translateX(2px);animation:spK 2.4s ease-out infinite}
+#sp .sp-k:nth-of-type(even){background:#fff;width:6px;height:6px;margin:-3px 0 0 -3px}
+#sp .sp-bar{width:min(150px,40vw);height:3px;margin-top:30px;border-radius:99px;background:rgba(255,255,255,.14);overflow:hidden}
+#sp .sp-bar i{display:block;width:42%;height:100%;border-radius:99px;background:linear-gradient(90deg,transparent,var(--sp-a),#fff,var(--sp-a),transparent);animation:spB 1.2s ease-in-out infinite}
+#sp .sp-msg{margin-top:16px;max-width:82vw;min-height:1.4em;text-align:center;font-size:.85rem;font-weight:500;opacity:0;transition:opacity .4s}
+#sp .sp-msg.on{opacity:.85}
+#sp .sp-msg button{margin-left:8px;border:1px solid var(--sp-a);background:transparent;color:#fff;border-radius:99px;padding:3px 12px;font:inherit;cursor:pointer}
+@keyframes spF{0%{transform:translateY(-72px) scale(1.04,1.32);opacity:0}9%{opacity:1}12%{transform:translateY(0) scale(1.16,.78)}18%{transform:translateY(-9px) scale(.96,1.07)}23%{transform:translateY(0) scale(1)}31%{transform:scale(1)}33%{transform:scale(1.09) rotate(-2.5deg)}41%{transform:scale(1) rotate(0)}90%{transform:scale(1);opacity:1}100%{transform:translateY(12px) scale(.95);opacity:0}}
+@keyframes spSh{0%,38%{background-position:130% 0}72%,100%{background-position:-30% 0}}
+@keyframes spS{0%,20%{transform:translate(78px,-78px) scale(1.55) rotate(12deg);opacity:0;filter:blur(8px) brightness(2.4)}30%{transform:translate(0,0) scale(1) rotate(0);opacity:1;filter:blur(0) brightness(2.4)}40%{filter:blur(0) brightness(1)}52%{transform:rotate(-6deg)}68%{transform:rotate(6deg)}82%{transform:rotate(-2deg)}91%{opacity:1;transform:rotate(0);filter:blur(0)}100%{transform:translate(-22px,22px) scale(.88);opacity:0;filter:blur(5px)}}
+@keyframes spGl{from{text-shadow:0 0 8px var(--sp-a),0 0 24px var(--sp-ag)}to{text-shadow:0 0 16px var(--sp-a),0 0 48px var(--sp-a)}}
+@keyframes spGlow{0%,100%{transform:scale(.88);opacity:.65}50%{transform:scale(1.08);opacity:1}}
+@keyframes spR{0%,29%{opacity:0;transform:scale(.08)}31%{opacity:.95}56%,100%{opacity:0;transform:scale(1)}}
+@keyframes spK{0%,29%{opacity:0;transform:rotate(var(--a)) translateX(2px) scale(1)}31%{opacity:1}50%,100%{opacity:0;transform:rotate(var(--a)) translateX(var(--d)) scale(.15)}}
+@keyframes spB{0%{transform:translateX(-110%)}100%{transform:translateX(260%)}}
+@media (prefers-reduced-motion:reduce){#sp .sp-f,#sp .sp-sl{animation:none;opacity:1;transform:none;filter:none}#sp .sp-f{background-position:50% 0}#sp .sp-r,#sp .sp-k{display:none}#sp .sp-glow{animation-duration:4.8s}#sp .sp-bar i{animation-duration:2.4s}}
 </style>
 </head>
 <body class="hm">
+<div id="sp" role="status" aria-live="polite" aria-label="Loading"><div class="sp-glow"></div><div class="sp-st"><div class="sp-mk" aria-hidden="true"><span class="sp-f">F</span><span class="sp-sl"><i>/</i><b class="sp-r"></b><b class="sp-r b"></b><b class="sp-k" style="--a:0deg;--d:84px"></b><b class="sp-k" style="--a:36deg;--d:64px"></b><b class="sp-k" style="--a:72deg;--d:90px"></b><b class="sp-k" style="--a:108deg;--d:67px"></b><b class="sp-k" style="--a:144deg;--d:87px"></b><b class="sp-k" style="--a:180deg;--d:70px"></b><b class="sp-k" style="--a:216deg;--d:93px"></b><b class="sp-k" style="--a:252deg;--d:64px"></b><b class="sp-k" style="--a:288deg;--d:84px"></b><b class="sp-k" style="--a:324deg;--d:72px"></b></span></div><div class="sp-bar"><i></i></div><div class="sp-msg" id="spMsg"></div></div></div>
+<noscript><style>#sp{display:none}html.sp-on,html.sp-on body{overflow:auto}</style></noscript>
+<script>/* loading splash: SPL.show() / SPL.hide(). It stays at least ~0.8s so the animation is seen, fades out, and offers a Reload button if loading takes too long */
+(function(){var el=document.getElementById('sp'),t0=Date.now(),on=1,tm=0,fs=0,MIN=800;document.documentElement.classList.add('sp-on');
+function msg(t){var m=document.getElementById('spMsg');if(!m)return;if(t){m.innerHTML=t;m.className='sp-msg on'}else{m.innerHTML='';m.className='sp-msg'}}
+function arm(){clearTimeout(fs);fs=setTimeout(function(){msg('Taking longer than usual. Check your connection. <button onclick="location.reload()">Reload</button>')},window.__spFail||12000)}
+function show(){if(!el)return;clearTimeout(tm);if(!on){on=1;t0=Date.now();msg('');el.style.display='';void el.offsetWidth;el.classList.remove('out');document.documentElement.classList.add('sp-on');arm()}}
+function hide(){if(!el||!on)return;clearTimeout(tm);tm=setTimeout(function(){on=0;clearTimeout(fs);msg('');el.classList.add('out');document.documentElement.classList.remove('sp-on');setTimeout(function(){if(!on)el.style.display='none'},420)},Math.max(0,MIN-(Date.now()-t0)))}
+window.SPL={show:show,hide:hide};arm()})();</script>
 <header><div class="w hi"><button class="btn" id="bg" onclick="dr(1)" aria-label="Menu">☰</button><a class="brand" onclick="go(ME ? 'dash' : 'home')">Found <i>/</i> CE Review Archive</a><button class="btn thm" id="thm" onclick="toggleTheme()" aria-label="Toggle dark mode" title="Dark mode"></button><div id="tb"></div></div></header>
 <div id="ov" onclick="dr(0)"></div><aside id="dr"></aside><div id="stRail"><div id="stRailIn"></div><div id="ntDock"><div id="ntZone"><span>Drop here to pin your notes</span></div></div><div id="fvDock"><div id="fvList"></div><div id="fvZone"><span>Drop here to pin this file</span></div></div></div>
 <main id="app"></main>
@@ -4333,6 +4371,7 @@ openMdl({title:'Figure for '+ids.length+' '+(kind=='q'?'question(s)':'card(s)'),
 onOk:async()=>{const fid=v('fgBA');if(!fid){toast('Choose a figure');return false}const add=v('fgBM')=='add',sel={q:new Set(FGL('q',{id:fid})),c:new Set(FGL('c',{id:fid}))};ids.forEach(i=>add?sel[kind].add(i):sel[kind].delete(i));
 try{await fgSync(fid,sel);toast('Figure '+(add?'attached to ':'removed from ')+ids.length+' item(s)');route()}catch(e){toast(e.message||String(e));return false}}})}
 route=(f=>function(){f();fgFollow();fgThumbs();fgHydrate()})(route);
+route=(f=>function(){f();if(window.SPL){QL?SPL.hide():SPL.show()}})(route);
 
 </script>
 </body>
