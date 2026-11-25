@@ -2392,7 +2392,7 @@ tzn=()=>{try{return new Intl.DateTimeFormat('en',{timeZone:TZ,timeZoneName:'long
 tzs=()=>{try{return new Intl.DateTimeFormat('en',{timeZone:TZ,timeZoneName:'short'}).formatToParts(Date.now()).find(x=>x.type=='timeZoneName').value}catch(e){return TZ}},
 phF=(o,ms)=>new Intl.DateTimeFormat('en-PH',Object.assign({timeZone:TZ},o)).format(ms),
 tm=ms=>phF({hour:'numeric',minute:'2-digit'},ms).toUpperCase(),tms=ms=>phF({hour:'numeric',minute:'2-digit',second:'2-digit'},ms).toUpperCase(),
-phDay=(ms=Date.now())=>new Intl.DateTimeFormat('en-CA',{timeZone:TZ}).format(ms),
+phDay=(ms=Date.now())=>new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Manila'}).format(ms),
 tmd=ms=>tm(ms)+(phDay(ms)!=phDay()?' (tomorrow)':''),
 hms=s=>{s=Math.max(0,s);return String(Math.floor(s/3600)).padStart(2,'0')+':'+String(Math.floor(s/60)%60).padStart(2,'0')+':'+String(s%60).padStart(2,'0')},
 dur=s=>{const m=Math.round(s/60);return m<60?m+' min':Math.floor(m/60)+' h'+(m%60?' '+m%60+' min':'')},
@@ -2400,22 +2400,36 @@ fm=n=>{const w=Math.floor(n);return n%1?(w||'')+'½':''+n},
 FULL=[120,180,240,300,360,420,480],MINI=[30,45,60,75,90],gl=m=>m<60?m+' min':Math.floor(m/60)+' hr'+(m%60?' '+m%60+' min':'');
 let stPh='';
 /* cross-device sync through the study_state table (run study_state.sql once). Newest copy wins; other devices pick it up within seconds. */
-let STOK=false,STT=null,STP=0;
-function stPush(){if(!STOK||!ME)return;clearTimeout(STT);const uid=ME.id;STT=setTimeout(()=>{if(!ME||ME.id!=uid)return;
-sb.from('study_state').upsert({user_id:uid,data:stLoad(),updated_at:new Date().toISOString()}).then(r=>r.error&&console.warn('Lock In sync:',r.error.message))},500)}
-/* first sync of a device that never synced before: keep both devices' history */
-function stMerge(rm,lc){const m=Object.assign({},rm),seen=new Set((rm.h||[]).map(x=>x.start));m.h=(rm.h||[]).concat((lc.h||[]).filter(x=>!seen.has(x.start))).sort((a,b)=>b.start-a.start).slice(0,30);
-m.dc=Object.assign({},lc.dc||{});Object.keys(rm.dc||{}).forEach(k=>{m.dc[k]=Math.max(m.dc[k]||0,rm.dc[k])});
-if((lc.last||'')>(rm.last||'')||((lc.last||'')==(rm.last||'')&&(lc.streak||0)>(rm.streak||0))){m.streak=lc.streak;m.last=lc.last}
-if(!m.a&&lc.a)m.a=lc.a;return m}
+let STOK=false,STDEAD=false,STT=null,STP=0,STX=0;
+const stMissing=e=>/42P01|PGRST205|does not exist|Could not find the table/i.test(((e&&e.code)||'')+' '+((e&&e.message)||'')),
+stCanon=o=>{const c=Object.assign({},o);delete c.ts;return JSON.stringify(c,(k,v)=>v&&typeof v=='object'&&!Array.isArray(v)?Object.keys(v).sort().reduce((r,x)=>(r[x]=v[x],r),{}):v)},
+stNorm=o=>Object.assign({goal:0,gk:'full',pm:'full',a:null,h:[],streak:0,last:'',dc:{},rd:[],ra:[],rv:{m:'',u:0}},o||{});
+/* Two devices never overwrite each other: everything that happened on either one is kept.
+   history = union, day credits = highest per day, streak = the copy that studied most recently, a session finished elsewhere ends here too. */
+function stMerge(rm,lc){rm=stNorm(rm);lc=stNorm(lc);const rmNew=(rm.ts||0)>(lc.ts||0)||((rm.ts||0)==(lc.ts||0)&&stCanon(rm)>stCanon(lc)),m=Object.assign({},rmNew?lc:rm,rmNew?rm:lc);
+const seen=new Map(),rank=x=>x.res=='done'?3:x.res=='early'||x.res=='stopped'?2:1;[...(rm.h||[]),...(lc.h||[])].forEach(x=>{const o=seen.get(x.start);if(!o||rank(x)>rank(o))seen.set(x.start,x)});
+m.h=[...seen.values()].sort((x,y)=>y.start-x.start).slice(0,30);
+m.dc={};[rm.dc,lc.dc].forEach(d=>Object.keys(d||{}).forEach(k=>{m.dc[k]=Math.max(m.dc[k]||0,d[k])}));
+const ra=rm.rv||{m:'',u:0},rb=lc.rv||{m:'',u:0};m.rv=ra.m>rb.m?ra:rb.m>ra.m?rb:{m:ra.m,u:Math.max(ra.u||0,rb.u||0)};
+const pa=(rm.last||'')>(lc.last||'')||((rm.last||'')==(lc.last||'')&&((rm.streak||0)>(lc.streak||0)||((rm.streak||0)==(lc.streak||0)&&stCanon(rm)>=stCanon(lc))));m.streak=(pa?rm:lc).streak||0;m.last=(pa?rm:lc).last||'';
+m.ra=[...new Set([...(rm.ra||[]),...(lc.ra||[])])].slice(-30);
+const gone=new Set(m.h.map(x=>x.start).concat(m.ra));let act=null;[rm.a,lc.a].forEach(x=>{if(!x||gone.has(x.start))return;if(!act)act=x;else{const la=(act.log||[]).length,lx=(x.log||[]).length;if(lx>la||(lx==la&&(x.start>act.start||(x.start==act.start&&stCanon(x)>stCanon(act)))))act=x}});m.a=act;
+m.ts=Math.max(rm.ts||0,lc.ts||0);return m}
+function stPush(){if(STDEAD||!ME)return;clearTimeout(STT);const uid=ME.id;STT=setTimeout(async()=>{if(!ME||ME.id!=uid)return;try{
+const rr=await sb.from('study_state').select('data').eq('user_id',uid).maybeSingle();if(rr.error&&stMissing(rr.error)){STDEAD=true;return}
+let n=stLoad();if(!rr.error&&rr.data&&rr.data.data){const mg=stMerge(rr.data.data,n);if(stCanon(mg)!=stCanon(n)){n=mg;try{localStorage.setItem('st_'+uid,JSON.stringify(n))}catch(e){}setTimeout(stAfterPull,0)}}
+const r=await sb.from('study_state').upsert({user_id:uid,data:n,updated_at:new Date().toISOString()});if(r.error)console.warn('Lock In sync:',r.error.message)}catch(e){console.warn(e)}},500)}
 async function stPull(){if(!ME||STP)return false;STP=1;try{const r=await sb.from('study_state').select('data').eq('user_id',ME.id).maybeSingle();
-if(r.error){STOK=false;console.warn('Lock In sync is off (run study_state.sql):',r.error.message);return false}
+if(r.error){if(stMissing(r.error)){STOK=false;STDEAD=true;console.warn('Lock In sync is off (run study_state.sql):',r.error.message)}else console.warn('Lock In sync will retry:',r.error.message);return false}
 STOK=true;const rm=r.data&&r.data.data,lc=stLoad(),k='st_'+ME.id,has=lc.h.length||lc.streak||lc.a||lc.goal;
-if(rm&&(rm.ts||0)>(lc.ts||0)){let n=rm;if(!lc.ts&&has)n=stMerge(rm,lc);n.ts=Math.max(rm.ts||0,Date.now()*(n===rm?0:1));try{localStorage.setItem(k,JSON.stringify(n))}catch(e){}if(n!==rm)stPush();return true}
-if((!rm&&has)||(rm&&(lc.ts||0)>(rm.ts||0))){if(!lc.ts)lc.ts=Date.now();try{localStorage.setItem(k,JSON.stringify(lc))}catch(e){}stPush()}
-return false}catch(e){console.warn(e);return false}finally{STP=0}}
+if(!rm){if(has){if(!lc.ts)lc.ts=Date.now();try{localStorage.setItem(k,JSON.stringify(lc))}catch(e){}stPush()}return false}
+const n=stMerge(rm,lc),chL=stCanon(n)!=stCanon(lc),chR=stCanon(n)!=stCanon(stNorm(rm));
+if(chL){try{localStorage.setItem(k,JSON.stringify(n))}catch(e){}}if(chR)stPush();return chL}catch(e){console.warn(e);return false}finally{STP=0}}
 function stAfterPull(){stRender();const n=(location.hash.slice(2)||'home').split('/')[0];if(n=='dash'&&!MD)route()}
-const stSyncNow=()=>{if(ME&&STOK&&!document.hidden)stPull().then(c=>c&&stAfterPull())};
+/* before a session is written off as "not clocked out", check what the other devices already saved */
+async function stExpireSafe(start){if(STX)return;STX=1;try{if(!STDEAD){for(let i=0;i<20&&STP;i++)await new Promise(r=>setTimeout(r,150));const c=await stPull();if(c)stAfterPull()}
+const s=stLoad(),a=s.a;if(a&&a.start==start&&stEl(a)-a.g>=(a.x?36000:stW(a)))stExpire(s)}catch(e){console.warn(e)}finally{STX=0}}
+const stSyncNow=()=>{if(ME&&!STDEAD&&!document.hidden)stPull().then(c=>c&&stAfterPull())};
 setInterval(stSyncNow,8000);addEventListener('focus',stSyncNow);document.addEventListener('visibilitychange',stSyncNow);
 const stLoad=()=>{let s={};try{s=JSON.parse(localStorage.getItem('st_'+ME.id)||'{}')}catch(e){}
 s=Object.assign({goal:0,gk:'',pm:'full',a:null,h:[],streak:0,last:'',dc:{},rv:{m:'',u:0}},s);
@@ -2518,13 +2532,13 @@ function stRvMini(){const m=+v('stRvM')||30;closeMdl();stAsk('revive',m)}
 function stRevSimple(){const s=stLoad(),d=stDer(s);if(d.miss<1||d.br||d.rv<1||s.a)return;const m=d.t.slice(0,7);if(s.rv.m!=m)s.rv={m,u:0};s.rv.u++;s.last=phDay(Date.now()-864e5);stSave(s);stRender();toast('Streak revived! Study today to keep it going')}
 function stStop(){showConfirm('Stop this study session?','It is saved in your history as "Stopped" and earns no streak credit.',()=>{const s=stLoad();if(!s.a)return;stClose(s,'stopped',stEl(s.a));stSave(s);stRender();toast('Session stopped')})}
 function stReset(){const s=stLoad();if(!s.a){s.goal=0;stSave(s);stRender();return}
-showConfirm('Reset the timer?','Your running session is deleted (not saved in history) and the timer setting is cleared.',()=>{const s=stLoad();s.a=null;s.goal=0;stSave(s);stRender();toast('Timer reset')})}
+showConfirm('Reset the timer?','Your running session is deleted (not saved in history) and the timer setting is cleared.',()=>{const s=stLoad();if(s.a)s.ra=(s.ra||[]).concat(s.a.start).slice(-30);s.a=null;s.goal=0;stSave(s);stRender();toast('Timer reset')})}
 function stExpire(s){stClose(s,'expired',stEl(s.a));stSave(s);stRender();toast('Study was not clocked out in time, so it did not count.')}
 function stAlert(w){if($('#stAl'))return;const d=document.createElement('div');d.id='stAl';d.innerHTML=`<div class="stAlc"><div class="stBell">${ico('bell')}</div><h2 class="lt">Time's up!</h2><p>Your study timer has run out. Tap <b>End study</b> to clock out so this session counts.</p><p class="mu sm">Time left to clock out: <b data-st="grace" style="color:#FF6A00;font-size:1.4rem">${mmss(w)}</b></p><button class="btn p" onclick="this.closest('#stAl').remove()">Close</button></div>`;document.body.appendChild(d)}
 function stNoPause(sec){if($('#stNp'))return;const d=document.createElement('div');d.id='stNp';d.innerHTML=`<div class="stAlc"><div class="stBell">${ico('ban')}</div><h2 class="lt">No more pauses</h2><p>You've used up all your pause time for this session.</p><p class="mu sm">Total pause time consumed: <b style="color:#FF6A00;font-size:1.4rem">${dur(sec)}</b></p><p class="lt" style="font-size:1.25rem;color:#FF6A00;margin-top:14px">Time to lock in!</p><button class="btn p" onclick="this.closest('#stNp').remove()">Lock in</button></div>`;document.body.appendChild(d)}
 function stTick(){if(!ME)return;{const gp=stGrLast,gt=stGreet();if(gt!==gp){const g=document.getElementById('stGr');if(g)g.innerHTML=gt}}const s=stLoad(),a=s.a,n=Date.now(),T=(k,x)=>document.querySelectorAll('[data-st="'+k+'"]').forEach(e=>e.textContent=x);
 T('clock',tms(n));T('date',phF({weekday:'long',month:'long',day:'numeric'},n));
-if(a){if(a.pa){const lim=stPl(a)*1000,used=a.pt+(n-a.pa);if(used>=lim){const rt=a.pa+(lim-a.pt);a.log.push({t:'resume',ts:rt,m:Math.round((rt-a.pa)/60000)});a.pt=lim;a.pa=0;stSave(s);stRender();stNoPause(lim/1000)}}const e=stEl(a,n),w=a.x?36000:stW(a);if(e-a.g>=w)return stExpire(s);if(e>=a.g&&!a.al){a.al=1;stSave(s);if(a.x)toast('2-hour minimum reached. End now, or keep going for bonus.');else stAlert(w-(e-a.g))}if(a.x)T('xb',fm(.5*Math.floor(Math.max(0,e-a.g)/3600)));T('pl',mmss(stPlLeft(a)));T('rem',hms(a.g-e));T('grace',mmss(Math.max(0,w-Math.max(0,e-a.g))));T('exp',stExp(s))}else{T('exp',s.goal?stExp(s):'--');const x=$('#stAl');if(x)x.remove();const y=$('#stNp');if(y)y.remove()}
+if(a){if(a.pa){const lim=stPl(a)*1000,used=a.pt+(n-a.pa);if(used>=lim){const rt=a.pa+(lim-a.pt);a.log.push({t:'resume',ts:rt,m:Math.round((rt-a.pa)/60000)});a.pt=lim;a.pa=0;stSave(s);stRender();stNoPause(lim/1000)}}const e=stEl(a,n),w=a.x?36000:stW(a);if(e-a.g>=w)return stExpireSafe(a.start);if(e>=a.g&&!a.al){a.al=1;stSave(s);if(a.x)toast('2-hour minimum reached. End now, or keep going for bonus.');else stAlert(w-(e-a.g))}if(a.x)T('xb',fm(.5*Math.floor(Math.max(0,e-a.g)/3600)));T('pl',mmss(stPlLeft(a)));T('rem',hms(a.g-e));T('grace',mmss(Math.max(0,w-Math.max(0,e-a.g))));T('exp',stExp(s))}else{T('exp',s.goal?stExp(s):'--');const x=$('#stAl');if(x)x.remove();const y=$('#stNp');if(y)y.remove()}
 if(stPhase(s)!=stPh)stRender()}
 setInterval(stTick,1000);document.addEventListener('visibilitychange',stTick);
 
